@@ -42,7 +42,7 @@ app.use("/wishlist",wishlistRouter)
 
 
 //Start server and connect to DB
-const db = require("./services/dbSetup.js")
+const db = require("./services/dbSetupService.js")
 const PORT = process.env.PORT||8080
 const start = async () => {
     try{

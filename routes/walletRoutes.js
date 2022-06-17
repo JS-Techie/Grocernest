@@ -1,12 +1,12 @@
 const express = require("express")
 const router = express.Router();
 
-import authenticate from "../middleware/authentication.js";
+// import authenticate from "../middleware/authentication.js";
 
-import{
+const{
     getAllTransactionsOfUser,
     getBalanceOfUser
-} from "../controllers/walletController.js"
+} =require( "../controllers/walletController.js")
 
 //Authenticated routes - User cannot view anything about wallet without having logged in
 

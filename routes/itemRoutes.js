@@ -1,13 +1,13 @@
 const express = require("express")
 const router = express.Router();
 
-import authenticate from "../middleware/authentication";
+// import authenticate from "../middleware/authentication";
 
-import{
+const{
     getItemsInCategory,
     getItemsInSubcategory,
     getItemsBySearchTerm
-} from "../controllers/itemController";
+} = require( "../controllers/itemController");
 
 
 router.route("/catgeory/:categoryId").get(getItemsInCategory)
