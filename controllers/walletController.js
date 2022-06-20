@@ -1,3 +1,5 @@
+const { sequelize, Sequelize } = require("../services/dbSetupService");
+
 
 const getAllTransactionsOfUser = async (req,res,next) => {
 

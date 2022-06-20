@@ -1,3 +1,5 @@
+const { sequelize, Sequelize } = require("../services/dbSetupService");
+
 const saveCart = async (req,res,next) => {
 
 }

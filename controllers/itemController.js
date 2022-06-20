@@ -1,3 +1,5 @@
+const { sequelize, Sequelize } = require("../services/dbSetupService");
+
 const getItemsInCategory = async(req,res,next) => {
 
 }
