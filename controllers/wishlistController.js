@@ -1,4 +1,6 @@
 
+const { sequelize, Sequelize } = require("../services/dbSetupService");
+
 const createWishlist = async (req,res,next) => {
 
 }

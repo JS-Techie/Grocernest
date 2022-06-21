@@ -107,7 +107,8 @@ module.exports = sequelize => {
       unique: false,
       type: "BTREE",
       fields: ["category_id"]
-    }]
+    }],
+    timestamps : false,
   };
   const TLkpSubCategoryModel = sequelize.define("t_lkp_sub_category_model", attributes, options);
   return TLkpSubCategoryModel;

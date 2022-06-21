@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dev" : "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon server.js"
   },
@@ -13,6 +14,7 @@
   "dependencies": {
     "aws-sdk": "^2.1155.0",
     "axios": "^0.27.2",
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
@@ -23,6 +25,7 @@
     "mysql2": "^2.3.3",
     "nodemailer": "^6.7.5",
     "nodemon": "^2.0.16",
+    "otp-generator": "^4.0.0",
     "sequelize": "^6.20.1",
     "sequelize-automate": "^1.2.2",
     "xss-clean": "^0.1.1"
