@@ -76,6 +76,8 @@ db.WalletTransactionModel = require("./t_wallet_transaction")(db.sequelize, Sequ
 
 db.WalletModel = require("./t_wallet")(db.sequelize, Sequelize);
 
+db.WishlistModel = require("./t_lkp_wishlist")(db.sequelize,Sequelize);
+
 
 
 // Relations between tables

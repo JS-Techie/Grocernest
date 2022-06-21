@@ -179,8 +179,7 @@ module.exports = sequelize => {
   const options = {
     tableName: "t_item",
     comment: "",
-    indexes: [],
-    timestamps : false,
+    indexes: []
   };
   const TItemModel = sequelize.define("t_item_model", attributes, options);
   return TItemModel;

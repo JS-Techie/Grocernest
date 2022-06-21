@@ -89,8 +89,7 @@ module.exports = sequelize => {
   const options = {
     tableName: "t_lkp_category",
     comment: "",
-    indexes: [],
-    timestamps : false,
+    indexes: []
   };
   const TLkpCategoryModel = sequelize.define("t_lkp_category_model", attributes, options);
   return TLkpCategoryModel;
