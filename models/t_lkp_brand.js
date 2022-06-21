@@ -80,7 +80,8 @@ module.exports = sequelize => {
   const options = {
     tableName: "t_lkp_brand",
     comment: "",
-    indexes: []
+    indexes: [],
+    timestamps : false,
   };
   const TLkpBrandModel = sequelize.define("t_lkp_brand_model", attributes, options);
   return TLkpBrandModel;
