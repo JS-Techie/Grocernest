@@ -27,3 +27,5 @@ CREATE TABLE `t_wallet_transaction` (
   KEY `t_wallet_transaction_fk` (`wallet_id`),
   CONSTRAINT `t_wallet_transaction_fk` FOREIGN KEY (`wallet_id`) REFERENCES `t_wallet` (`wallet_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
