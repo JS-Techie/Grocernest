@@ -4,6 +4,7 @@ const {
 
 module.exports = sequelize => {
   const attributes = {
+<<<<<<< Updated upstream
     cust_no: {
       type: DataTypes.STRING(20),
       allowNull: false,
@@ -21,6 +22,25 @@ module.exports = sequelize => {
       autoIncrement: true,
       comment: null,
       field: "wishlist_id"
+=======
+    wishlist_id: {
+      type: DataTypes.BIGINT,
+      allowNull: false,
+      defaultValue: null,
+      primaryKey: true,
+      autoIncrement: false,
+      comment: null,
+      field: "wishlist_id"
+    },
+    cust_no: {
+      type: DataTypes.STRING(20),
+      allowNull: false,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "cust_no"
+>>>>>>> Stashed changes
     },
     wishlist_name: {
       type: DataTypes.STRING(100),
@@ -51,8 +71,13 @@ module.exports = sequelize => {
     },
     created_at: {
       type: DataTypes.DATE,
+<<<<<<< Updated upstream
       allowNull: true,
       defaultValue: null,
+=======
+      allowNull: false,
+      defaultValue: sequelize.fn('current_timestamp'),
+>>>>>>> Stashed changes
       primaryKey: false,
       autoIncrement: false,
       comment: null,

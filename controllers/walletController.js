@@ -10,58 +10,18 @@ const getAllTransactionsOfUser = async (req, res, next) => {
     let customer_no = req.query.cust_no;
     console.log("==>> Get all the transactions of", customer_no);
 
-
     Wallet.findAll({
         include: [{
-            model: WalletTransaction, attributes: ['wallet_id'],
-            where: {
-                cust_no: customer_no,
-
-            }
-        }]
+            model: WalletTransaction,
+        }],
+        where: {
+            cust_no: customer_no,
+        }
     }).then((res1) => {
         res.send(res1);
-    }).catch((eee) => {
-        console.log("error is=========>>>>>>", eee);
+    }).catch((err) => {
+        console.log("error is=========>>>>>>", err);
     })
-
-
-
-
-
-
-    // Wallet.findAll({
-    //     attributes: ['wallet_id'],
-    //     where: { cust_no: customer_no }
-    // }).then((dbRes) => {
-
-    //     WalletTransaction.findAll({
-    //         where: {
-    //             wallet_id: dbRes[0].wallet_id
-    //         }
-    //     }).then((dbRes) => {
-    //         // console.log(dbRes);
-    //         res.send({
-    //             success: true,
-    //             data: dbRes,
-    //             message: ""
-    //         })
-    //     }).catch((error) => {
-    //         console.log(error);
-    //         res.send({
-    //             success: false,
-    //             data: "",
-    //             message: ""
-    //         })
-    //     })
-    // }).catch((error) => {
-    //     console.log(error);
-    //     res.send({
-    //         success: false,
-    //         data: "",
-    //         message: ""
-    //     })
-    // })
 }
 
 // Get Wallet Balance of a customer

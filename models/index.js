@@ -82,11 +82,7 @@ db.WishlistModel = require("./t_lkp_wishlist")(db.sequelize,Sequelize);
 
 // Relations between tables
 
-db.WalletModel.hasMany(db.WalletTransactionModel);      //one to many mapping
-db.WalletTransactionModel.belongsTo(db.WalletModel, {
-    foreignKey: "wallet_id",
-    as: "t_wallet_transaction_fk",
-});
+db.WalletModel.hasMany(db.WalletTransactionModel, { foreignKey: "wallet_id" });      //one to many mapping
 
 
 
