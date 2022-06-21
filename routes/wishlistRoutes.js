@@ -1,6 +1,8 @@
 const express = require("express")
 const router = express.Router();
 
+const authenticate = require("../middleware/authentication")
+
 const {
     createWishlist,
     addItemToWishlist,
@@ -8,13 +10,11 @@ const {
     deleteWishlist
 } =require ("../controllers/wishlistController")
 
-// import authenticate from "../middleware/authentication.js";
 
-//Authenticated routes, user cannot wishlist without logging in
 
-router.route("/create").post(createWishlist)
-router.route("/add/:wishlistId/item/:itemId").post(addItemToWishlist)
-router.route("/view/:wishlistId").get(getWishlist)
-router.route("/delete").delete(deleteWishlist)
+router.route("/create").post(authenticate,createWishlist)
+router.route("/add/:wishlistId/item/:itemId").post(authenticate,addItemToWishlist)
+router.route("/view/:wishlistId").get(authenticate,getWishlist)
+router.route("/delete").delete(authenticate,deleteWishlist)
 
 module.exports = router;
