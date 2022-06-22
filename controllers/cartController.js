@@ -99,8 +99,41 @@ const removeItemFromCart = async (req, res, next) => {
   }
 };
 
+
+const getCart = async (req,res,next) => {
+  //Get currentUser from JWT
+  //const currentUser = req.cust_no
+
+  //Find the cart associated with this customer id
+
+  try{
+    const cartForUser = await Cart.findAll({
+      where : {
+        //cust_no : currentUser
+      }
+    })
+
+    return res.status(200).send({
+      success : true,
+      data : cartForUser,
+      message : "Cart successfully fetched for user"
+    })
+
+
+  }catch(error){
+    return res.status(400).send({
+      success : false,
+      data : error,
+      message : "Error while fetching cart"
+    })
+  }
+
+  
+}
+
 module.exports = {
   saveCart,
   addItemToCart,
   removeItemFromCart,
+  getCart
 };

@@ -101,6 +101,9 @@ db.WishlistModel.hasMany(db.WishlistItemsModel , {foreignKey : "wishlist_id"});
 //One order has many order items
 db.OrderModel.hasMany(db.OrderItemsModel,{foreignKey : "order_id"})
 
+//One category has many subcategories
+db.LkpCategoryModel.hasMany(db.LkpSubCategoryModel, {foreignKey : "id"})
+
 
 
 module.exports = db;
