@@ -4,32 +4,32 @@ const {
 
 module.exports = sequelize => {
   const attributes = {
-    wallet_id: {
+    wishlist_id: {
+      type: DataTypes.STRING(255),
+      allowNull: false,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "wishlist_id"
+    },
+    item_id: {
       type: DataTypes.BIGINT,
       allowNull: false,
       defaultValue: null,
       primaryKey: true,
       autoIncrement: false,
       comment: null,
-      field: "wallet_id"
+      field: "item_id"
     },
-    cust_no: {
-      type: DataTypes.STRING(20),
+    quantity: {
+      type: DataTypes.BIGINT,
       allowNull: false,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "cust_no"
-    },
-    balance: {
-      type: DataTypes.DECIMAL,
-      allowNull: false,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "balance"
+      field: "quantity"
     },
     created_by: {
       type: DataTypes.BIGINT,
@@ -51,7 +51,7 @@ module.exports = sequelize => {
     },
     created_at: {
       type: DataTypes.DATE,
-      allowNull: false,
+      allowNull: true,
       defaultValue: sequelize.fn('current_timestamp'),
       primaryKey: false,
       autoIncrement: false,
@@ -69,10 +69,10 @@ module.exports = sequelize => {
     }
   };
   const options = {
-    tableName: "t_wallet",
+    tableName: "t_wishlist_items",
     comment: "",
     indexes: []
   };
-  const TWalletModel = sequelize.define("t_wallet_model", attributes, options);
-  return TWalletModel;
+  const TWishlistItemsModel = sequelize.define("t_wishlist_items_model", attributes, options);
+  return TWishlistItemsModel;
 };

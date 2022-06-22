@@ -76,15 +76,30 @@ db.WalletTransactionModel = require("./t_wallet_transaction")(db.sequelize, Sequ
 
 db.WalletModel = require("./t_wallet")(db.sequelize, Sequelize);
 
+db.WishlistModel = require("./t_lkp_wishlist")(db.sequelize,Sequelize);
+
+db.WishlistItemsModel = require("./t_wishlist_items")(db.sequelize, Sequelize);
+
+db.OrderModel = require("./t_lkp_order")(db.sequelize, Sequelize);
+
+db.OrderItemsModel = require("./t_order_items")(db.sequelize, Sequelize);
+
+db.CartModel = require("./t_cart")(db.sequelize,Sequelize);
+
+db.ProfileModel = require("./t_profile")(db.sequelize, Sequelize);
+
 
 
 // Relations between tables
 
-db.WalletModel.hasMany(db.WalletTransactionModel);      //one to many mapping
-db.WalletTransactionModel.belongsTo(db.WalletModel, {
-    foreignKey: "wallet_id",
-    as: "t_wallet_transaction_fk",
-});
+db.WalletModel.hasMany(db.WalletTransactionModel , {foreignKey : "wallet_id"});      //one to many mapping
+
+
+//One wishlist has many wishlist items
+db.WishlistModel.hasMany(db.WishlistItemsModel , {foreignKey : "wishlist_id"});
+
+//One order has many order items
+db.OrderModel.hasMany(db.OrderItemsModel,{foreignKey : "order_id"})
 
 
 
