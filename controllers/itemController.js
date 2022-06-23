@@ -13,6 +13,14 @@ const getItemsInCategory = async (req, res, next) => {
     const itemsInACategory = await Item.findAll({
       where: { category_id: category },
     });
+
+    if(itemsInACategory.length === 0){
+      return res.status(404).send({
+        success : false,
+        data : null,
+        message : "Could not find items in requested category"
+      })
+    }
     //Return all those items
     return res.status(200).send({
       success: true,
@@ -23,7 +31,7 @@ const getItemsInCategory = async (req, res, next) => {
     return res.status(400).send({
       success: false,
       data: error,
-      message: "Could not find items in the requested category",
+      message: "Error occured while fetching items belonging to requested category",
     });
   }
 };
@@ -43,6 +51,15 @@ const getItemsInSubcategory = async (req, res, next) => {
       },
     });
 
+    
+    if(ItemsInASubcategory.length === 0){
+      return res.status(404).send({
+        success : false,
+        data : null,
+        message : "Could not find items in requested sub-category"
+      })
+    }
+
     return res.status(200).send({
       success: true,
       data: ItemsInASubcategory,
@@ -52,7 +69,7 @@ const getItemsInSubcategory = async (req, res, next) => {
     return res.status(400).send({
       success: false,
       data: error,
-      message: "Could not find requested items in sub category",
+      message: "Error occurred while fetching requested items in sub category",
     });
   }
 };
@@ -63,6 +80,7 @@ const getItemsBySearchTerm = async (req, res, next) => {
 
   try {
     const itemFound = await Item.findAll({ where: { name: searchTerm } });
+ 
     const categoryFound = await Category.findAll({
       where: { group_name: searchTerm },
     });
@@ -74,12 +92,12 @@ const getItemsBySearchTerm = async (req, res, next) => {
     });
 
     if (
-      itemFound.length == 0 &&
-      categoryFound.length == 0 &&
-      subcategoryFound.length == 0 &&
-      brandFound.length == 0
+      itemFound.length === 0 &&
+      !categoryFound.length === 0 &&
+      !subcategoryFound.length === 0  &&
+      !brandFound.length === 0
     ) {
-      return res.status(400).send({
+      return res.status(404).send({
         success: false,
         data: null,
         message: "Nothing matches the search term",

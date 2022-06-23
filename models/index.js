@@ -8,8 +8,6 @@ db.CustNoteModel = require("./t_cust_note")(db.sequelize, Sequelize);
 
 db.CustomerModel = require("./t_customer")(db.sequelize, Sequelize);
 
-db.CustomerModel = require("./t_customer")(db.sequelize, Sequelize);
-
 db.GrnDetailsModel = require("./t_grn_details")(db.sequelize, Sequelize);
 
 db.GrnModel = require("./t_grn")(db.sequelize, Sequelize);
@@ -102,7 +100,9 @@ db.WishlistModel.hasMany(db.WishlistItemsModel , {foreignKey : "wishlist_id"});
 db.OrderModel.hasMany(db.OrderItemsModel,{foreignKey : "order_id"})
 
 //One category has many subcategories
-db.LkpCategoryModel.hasMany(db.LkpSubCategoryModel, {foreignKey : "id"})
+db.LkpCategoryModel.hasMany(db.LkpSubCategoryModel, {foreignKey : "category_id"})
+// db.LkpSubCategoryModel.belongsTo(db.LkpCategoryModel);
+
 
 
 

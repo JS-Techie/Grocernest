@@ -32,7 +32,7 @@ const getProfile = async (req, res, next) => {
     //Find what s3 has
 
     //const key = `${currentUser}_profile_image`
-    //put key into params for getFromS3()
+    //put key into params for getFromS3() method
 
     const responseFromS3 = await getFromS3();
 

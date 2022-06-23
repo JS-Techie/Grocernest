@@ -30,7 +30,7 @@ const addItemToCart = async (req, res, next) => {
       },
     });
 
-    if (itemAlreadyExists.length === 0) {
+    if (!itemAlreadyExists) {
       try {
         const newItem = await Cart.create({
           //cust_id : currentUser,
@@ -79,7 +79,7 @@ const removeItemFromCart = async (req, res, next) => {
       },
     });
 
-    if (itemExists.length === 0) {
+    if (!itemExists) {
       return res.status(404).send({
         success: false,
         data: null,

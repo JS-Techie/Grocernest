@@ -25,7 +25,7 @@ const createWishlist = async (req, res, next) => {
       return res.status(400).send({
         success: false,
         data: existingWishlist,
-        message: "Wishlist already exists",
+        message: "Wishlist already exists, please name your wishlist differently",
       });
     }
 
@@ -82,7 +82,7 @@ const addItemToWishlist = async (req, res, next) => {
 
     //////// NEEDS TESTING //////////
 
-    if (itemAlreadyInWishlist.length !== 0) {
+    if (itemAlreadyInWishlist) {
       const res = WishlistItems.update(
         {
           quantity: itemAlreadyInWishlist[0].dataValues.quantity + 1,

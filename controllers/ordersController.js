@@ -5,7 +5,6 @@ const OrderItems = db.OrderItemsModel;
 
 const getAllOrders = async (req, res, next) => {
   //Get currentUser from req.cust_no
-
   //const currentUser = req.cust_no
 
   //Get all order ids for that customer number
