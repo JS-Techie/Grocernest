@@ -4,14 +4,14 @@ const {
 
 module.exports = sequelize => {
   const attributes = {
-    wishlist_id: {
-      type: DataTypes.BIGINT,
+    address_id: {
+      type: DataTypes.STRING(255),
       allowNull: false,
       defaultValue: null,
       primaryKey: true,
       autoIncrement: false,
       comment: null,
-      field: "wishlist_id"
+      field: "address_id"
     },
     cust_no: {
       type: DataTypes.STRING(20),
@@ -22,14 +22,23 @@ module.exports = sequelize => {
       comment: null,
       field: "cust_no"
     },
-    wishlist_name: {
-      type: DataTypes.STRING(100),
+    address_title: {
+      type: DataTypes.STRING(255),
       allowNull: false,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "wishlist_name"
+      field: "address_title"
+    },
+    address_desc: {
+      type: DataTypes.STRING(255),
+      allowNull: false,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "address_desc"
     },
     created_by: {
       type: DataTypes.BIGINT,
@@ -69,10 +78,10 @@ module.exports = sequelize => {
     }
   };
   const options = {
-    tableName: "t_lkp_wishlist",
+    tableName: "t_address",
     comment: "",
     indexes: []
   };
-  const TLkpWishlistModel = sequelize.define("t_lkp_wishlist_model", attributes, options);
-  return TLkpWishlistModel;
+  const TAddressModel = sequelize.define("t_address_model", attributes, options);
+  return TAddressModel;
 };

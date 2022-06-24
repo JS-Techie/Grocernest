@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev" : "nodemon server.js",
+    "dev": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon server.js"
   },
@@ -28,6 +28,8 @@
     "otp-generator": "^4.0.0",
     "sequelize": "^6.20.1",
     "sequelize-automate": "^1.2.2",
+    "uniqid": "^5.4.0",
+    "uniqueid": "^1.0.0",
     "xss-clean": "^0.1.1"
   }
 }

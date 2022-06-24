@@ -1,7 +1,6 @@
 const { sequelize, Sequelize } = require("sequelize");
 const db = require("../services/dbSetupService");
 
-
 db.BatchModel = require("./t_batch")(db.sequelize, Sequelize);
 
 db.CustNoteModel = require("./t_cust_note")(db.sequelize, Sequelize);
@@ -76,15 +75,17 @@ db.WalletTransactionModel = require("./t_wallet_transaction")(db.sequelize, Sequ
 
 db.WalletModel = require("./t_wallet")(db.sequelize, Sequelize);
 
-db.WishlistModel = require("./t_lkp_wishlist")(db.sequelize,Sequelize);
+db.WishlistModel = require("./t_lkp_wishlist")(db.sequelize, Sequelize);
 
+db.AddressModel = require("./t_address")(db.sequelize, Sequelize)
 
 
 // Relations between tables
 
 db.WalletModel.hasMany(db.WalletTransactionModel, { foreignKey: "wallet_id" });      //one to many mapping
 
-
+// Address table
+db.CustomerModel.hasMany(db.AddressModel, { foreignKey: "cust_no" });
 
 module.exports = db;
 
