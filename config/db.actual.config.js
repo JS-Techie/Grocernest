@@ -3,7 +3,7 @@ module.exports = {
     HOST: "152.67.1.126",
     USER: "ecomm",
     PASSWORD: "ecomm@123",
-    DB: "grocernest",
+    DB: "ecomm",
 
     dialect: "mariadb",
     pool: {
