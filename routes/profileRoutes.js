@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const authenticate = require("../middleware/authentication")
+// const authenticate = require("../middleware/authentication")
 
 const {
     getProfile,
@@ -9,9 +9,11 @@ const {
     editProfile
 } = require("../controllers/profileController")
 
-router.route('/view').get(authenticate,getProfile)
-router.route('/upload').post(authenticate,uploadProfile)
-router.route('/edit').post(authenticate,editProfile) //Should be put request instead of post
+//Add auth middleware to every controller
+
+router.route('/view').get(getProfile)
+router.route('/upload').post(uploadProfile)
+router.route('/edit').post(editProfile) //Should be put request instead of post
 
 
 module.exports = router;

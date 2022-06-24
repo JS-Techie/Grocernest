@@ -5,33 +5,49 @@ const {
 module.exports = sequelize => {
   const attributes = {
     cust_no: {
-      type: DataTypes.STRING(20),
-      allowNull: false,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "cust_no"
-    },
-    wishlist_id: {
-
-      type: DataTypes.STRING(255),
+      type: DataTypes.BIGINT,
       allowNull: false,
       defaultValue: null,
       primaryKey: true,
       autoIncrement: false,
-
       comment: null,
-      field: "wishlist_id"
+      field: "cust_no"
     },
-    wishlist_name: {
+    cust_name: {
       type: DataTypes.STRING(100),
       allowNull: false,
+      defaultValue: "User",
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "cust_name"
+    },
+    cust_picture: {
+      type: DataTypes.STRING(1000),
+      allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "wishlist_name"
+      field: "cust_picture"
+    },
+    created_at: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      defaultValue: sequelize.fn('current_timestamp'),
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "created_at"
+    },
+    updated_at: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "updated_at"
     },
     created_by: {
       type: DataTypes.BIGINT,
@@ -50,33 +66,13 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "updated_by"
-    },
-    created_at: {
-      type: DataTypes.DATE,
-      allowNull: true,
-
-      defaultValue: sequelize.fn('current_timestamp'),
-
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "created_at"
-    },
-    updated_at: {
-      type: DataTypes.DATE,
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "updated_at"
     }
   };
   const options = {
-    tableName: "t_lkp_wishlist",
+    tableName: "t_profile",
     comment: "",
     indexes: []
   };
-  const TLkpWishlistModel = sequelize.define("t_lkp_wishlist_model", attributes, options);
-  return TLkpWishlistModel;
+  const TProfileModel = sequelize.define("t_profile_model", attributes, options);
+  return TProfileModel;
 };

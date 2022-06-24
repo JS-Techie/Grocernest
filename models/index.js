@@ -8,8 +8,6 @@ db.CustNoteModel = require("./t_cust_note")(db.sequelize, Sequelize);
 
 db.CustomerModel = require("./t_customer")(db.sequelize, Sequelize);
 
-db.CustomerModel = require("./t_customer")(db.sequelize, Sequelize);
-
 db.GrnDetailsModel = require("./t_grn_details")(db.sequelize, Sequelize);
 
 db.GrnModel = require("./t_grn")(db.sequelize, Sequelize);
@@ -79,10 +77,43 @@ db.WalletModel = require("./t_wallet")(db.sequelize, Sequelize);
 db.WishlistModel = require("./t_lkp_wishlist")(db.sequelize,Sequelize);
 
 
+db.WishlistItemsModel = require("./t_wishlist_items")(db.sequelize, Sequelize);
+
+db.OrderModel = require("./t_lkp_order")(db.sequelize, Sequelize);
+
+db.OrderItemsModel = require("./t_order_items")(db.sequelize, Sequelize);
+
+db.CartModel = require("./t_cart")(db.sequelize,Sequelize);
+
+db.ProfileModel = require("./t_profile")(db.sequelize, Sequelize);
+
+
 
 // Relations between tables
 
+db.WalletModel.hasMany(db.WalletTransactionModel , {foreignKey : "wallet_id"});      //one to many mapping
+
+
+//One wishlist has many wishlist items
+db.WishlistModel.hasMany(db.WishlistItemsModel , {foreignKey : "wishlist_id"});
+
+//One order has many order items
+db.OrderModel.hasMany(db.OrderItemsModel,{foreignKey : "order_id"})
+
+//One category has many subcategories
+db.LkpCategoryModel.hasMany(db.LkpSubCategoryModel, {foreignKey : "category_id"})
+
+//One category has many items
+db.LkpCategoryModel.hasMany(db.ItemModel, {foreignKey : "category_id"})
+
+//One subcategory has many items
+db.LkpSubCategoryModel.hasMany(db.ItemModel, {foreignKey : "sub_category_id"})
+
+//One brand has many items
+db.LkpBrandModel.hasMany(db.ItemModel, {foreignKey : "brand_id"})
+
 db.WalletModel.hasMany(db.WalletTransactionModel, { foreignKey: "wallet_id" });      //one to many mapping
+
 
 
 

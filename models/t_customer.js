@@ -96,7 +96,7 @@ module.exports = sequelize => {
     },
     created_at: {
       type: DataTypes.DATE,
-      allowNull: false,
+      allowNull: true,
       defaultValue: sequelize.fn('current_timestamp'),
       primaryKey: false,
       autoIncrement: false,

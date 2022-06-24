@@ -1,5 +1,5 @@
 const getAllAddresses = async (req,res,next) => {
-
+    
 }
 const createAddress = async (req,res,next) => {
     
