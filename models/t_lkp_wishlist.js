@@ -14,11 +14,13 @@ module.exports = sequelize => {
       field: "cust_no"
     },
     wishlist_id: {
+
       type: DataTypes.STRING(255),
       allowNull: false,
       defaultValue: null,
       primaryKey: true,
       autoIncrement: false,
+
       comment: null,
       field: "wishlist_id"
     },
@@ -52,7 +54,9 @@ module.exports = sequelize => {
     created_at: {
       type: DataTypes.DATE,
       allowNull: true,
+
       defaultValue: sequelize.fn('current_timestamp'),
+
       primaryKey: false,
       autoIncrement: false,
       comment: null,

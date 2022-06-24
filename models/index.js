@@ -76,6 +76,7 @@ db.WalletModel = require("./t_wallet")(db.sequelize, Sequelize);
 
 db.WishlistModel = require("./t_lkp_wishlist")(db.sequelize,Sequelize);
 
+
 db.WishlistItemsModel = require("./t_wishlist_items")(db.sequelize, Sequelize);
 
 db.OrderModel = require("./t_lkp_order")(db.sequelize, Sequelize);
@@ -110,6 +111,9 @@ db.LkpSubCategoryModel.hasMany(db.ItemModel, {foreignKey : "sub_category_id"})
 
 //One brand has many items
 db.LkpBrandModel.hasMany(db.ItemModel, {foreignKey : "brand_id"})
+
+db.WalletModel.hasMany(db.WalletTransactionModel, { foreignKey: "wallet_id" });      //one to many mapping
+
 
 
 
