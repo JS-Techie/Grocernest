@@ -101,8 +101,15 @@ db.OrderModel.hasMany(db.OrderItemsModel,{foreignKey : "order_id"})
 
 //One category has many subcategories
 db.LkpCategoryModel.hasMany(db.LkpSubCategoryModel, {foreignKey : "category_id"})
-// db.LkpSubCategoryModel.belongsTo(db.LkpCategoryModel);
 
+//One category has many items
+db.LkpCategoryModel.hasMany(db.ItemModel, {foreignKey : "category_id"})
+
+//One subcategory has many items
+db.LkpSubCategoryModel.hasMany(db.ItemModel, {foreignKey : "sub_category_id"})
+
+//One brand has many items
+db.LkpBrandModel.hasMany(db.ItemModel, {foreignKey : "brand_id"})
 
 
 

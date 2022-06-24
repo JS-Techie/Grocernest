@@ -2,10 +2,11 @@ const db = require("../models");
 
 const Category = db.LkpCategoryModel;
 const Subcategory = db.LkpSubCategoryModel;
-const Item = db.ItemModel;
+// const Item = db.ItemModel;
 
 const getAllCategories = async (req, res, next) => {
-  //Fetch all categories
+  
+  //Fetch all categories and subcategories within them
   try {
     const categories = await Category.findAll({
       include: [
@@ -22,7 +23,6 @@ const getAllCategories = async (req, res, next) => {
             subName: currentSubcategory.sub_cat_name,
             id: currentSubcategory.id,
             image: currentSubcategory.image,
-            // categoryToWhichSubcategoryBelongs : currentCategory.id
           };
         }
       );
@@ -46,7 +46,7 @@ const getAllCategories = async (req, res, next) => {
   } catch (error) {
     return res.status(400).send({
       success: false,
-      data: error,
+      data: error.message,
       message: "Error occured while fetching categories",
     });
   }
@@ -98,7 +98,7 @@ const getAllSubcategoriesInCategory = async (req, res, next) => {
   } catch (error) {
     return res.status(400).send({
       success: false,
-      data: error,
+      data: error.message,
       message: "Error occurred while fetching subcategories",
     });
   }

@@ -4,6 +4,14 @@ const Item = db.ItemModel;
 const Category = db.LkpCategoryModel;
 const Subcategory = db.LkpSubCategoryModel;
 const Brand = db.LkpBrandModel;
+const Batch = db.BatchModel;
+const Color = db.LkpColorModel;
+
+const{
+  responseFormat,
+  findNameAndQuantity
+} = require("../services/itemsResponse");
+
 
 const getItemsInCategory = async (req, res, next) => {
   //Get category id from the request
@@ -14,24 +22,54 @@ const getItemsInCategory = async (req, res, next) => {
       where: { category_id: category },
     });
 
-    if(itemsInACategory.length === 0){
+    if (itemsInACategory.length === 0) {
       return res.status(404).send({
-        success : false,
-        data : null,
-        message : "Could not find items in requested category"
-      })
+        success: false,
+        data: null,
+        message: "Could not find items in requested category",
+      });
     }
-    //Return all those items
+
+    const itemPromises = itemsInACategory.map(async (currentItem) => {
+      const color = await Color.findOne({
+        where: { id: currentItem.color_id },
+      });
+
+      const batch = await Batch.findOne({
+        where: { item_id: currentItem.id },
+      });
+
+      const nameAndQuantity = await findNameAndQuantity(currentItem);
+      const itemName = nameAndQuantity[0];
+      const quantity = nameAndQuantity[1];
+
+      const response = await responseFormat(
+        "TBD",
+        itemName,
+        quantity,
+        batch,
+        currentItem.image,
+        "TBD",
+        color,
+        currentItem.description
+      );
+
+      return response;
+    });
+
+    const responseArray = await Promise.all(itemPromises);
+
     return res.status(200).send({
       success: true,
-      data: itemsInACategory,
+      data: responseArray,
       message: "Found the items belonging to requested category",
     });
   } catch (error) {
     return res.status(400).send({
       success: false,
-      data: error,
-      message: "Error occured while fetching items belonging to requested category",
+      data: error.message,
+      message:
+        "Error occured while fetching items belonging to requested category",
     });
   }
 };
@@ -51,24 +89,52 @@ const getItemsInSubcategory = async (req, res, next) => {
       },
     });
 
-    
-    if(ItemsInASubcategory.length === 0){
+    if (ItemsInASubcategory.length === 0) {
       return res.status(404).send({
-        success : false,
-        data : null,
-        message : "Could not find items in requested sub-category"
-      })
+        success: false,
+        data: null,
+        message: "Could not find items in requested sub-category",
+      });
     }
+
+    const itemPromises = ItemsInASubcategory.map(async (currentItem) => {
+      const color = await Color.findOne({
+        where: { id: currentItem.color_id },
+      });
+
+      const batch = await Batch.findOne({
+        where: { item_id: currentItem.id },
+      });
+
+      const nameAndQuantity = await findNameAndQuantity(currentItem);
+      const itemName = nameAndQuantity[0];
+      const quantity = nameAndQuantity[1];
+
+      const response = await responseFormat(
+        "TBD",
+        itemName,
+        quantity,
+        batch,
+        currentItem.image,
+        "TBD",
+        color,
+        currentItem.description
+      );
+
+      return response;
+    });
+
+    const responseArray = await Promise.all(itemPromises);
 
     return res.status(200).send({
       success: true,
-      data: ItemsInASubcategory,
+      data: responseArray,
       message: "Found requested items in subcategory",
     });
   } catch (error) {
     return res.status(400).send({
       success: false,
-      data: error,
+      data: error.message,
       message: "Error occurred while fetching requested items in sub category",
     });
   }
@@ -79,23 +145,25 @@ const getItemsBySearchTerm = async (req, res, next) => {
   const searchTerm = req.params.searchTerm;
 
   try {
-    const itemFound = await Item.findAll({ where: { name: searchTerm } });
- 
-    const categoryFound = await Category.findAll({
+    const categories = await Category.findAll({
       where: { group_name: searchTerm },
+      include: Item,
     });
-    const subcategoryFound = await Subcategory.findAll({
+    const subcategories = await Subcategory.findAll({
       where: { sub_cat_name: searchTerm },
+      include: Item,
     });
-    const brandFound = await Brand.findAll({
+    const brands = await Brand.findAll({
       where: { brand_name: searchTerm },
+      include: Item,
     });
+    const items = await Item.findAll({ where: { name: searchTerm } });
 
     if (
-      itemFound.length === 0 &&
-      !categoryFound.length === 0 &&
-      !subcategoryFound.length === 0  &&
-      !brandFound.length === 0
+      items.length === 0 &&
+      categories.length === 0 &&
+      subcategories.length === 0 &&
+      brands.length === 0
     ) {
       return res.status(404).send({
         success: false,
@@ -104,20 +172,115 @@ const getItemsBySearchTerm = async (req, res, next) => {
       });
     }
 
+    let categoryResponseArray;
+    //let subcategoryResponseArray;
+    let brandResponseArray;
+    let itemResponseArray;
+
+    if (categories.length !== 0) {
+      const categoryPromises = categories[0].t_item_models.map(
+        async (currentItem) => {
+          const color = await Color.findOne({
+            where: { id: currentItem.color_id },
+          });
+
+          const batch = await Batch.findOne({
+            where: { item_id: currentItem.id },
+          });
+
+          const nameAndQuantity = await findNameAndQuantity(currentItem);
+          const itemName = nameAndQuantity[0];
+          const quantity = nameAndQuantity[1];
+          const response = await responseFormat(
+            "TBD",
+            itemName,
+            quantity,
+            batch,
+            currentItem.image,
+            "TBD",
+            color,
+            currentItem.description
+          );
+          return response;
+        }
+      );
+
+      categoryResponseArray = await Promise.all(categoryPromises);
+    }
+
+    if (brands.length !== 0) {
+      const brandPromises = brands[0].t_item_models.map(async (currentItem) => {
+        const color = await Color.findOne({
+          where: { id: currentItem.color_id },
+        });
+
+        const batch = await Batch.findOne({
+          where: { item_id: currentItem.id },
+        });
+
+        const nameAndQuantity = await findNameAndQuantity(currentItem);
+        const itemName = nameAndQuantity[0];
+        const quantity = nameAndQuantity[1];
+        const response = await responseFormat(
+          "TBD",
+          itemName,
+          quantity,
+          batch,
+          currentItem.image,
+          "TBD",
+          color,
+          currentItem.description
+        );
+        return response;
+      });
+
+      brandResponseArray = await Promise.all(brandPromises);
+    }
+
+    if (items.length !== 0) {
+      const brandPromises = items.map(async (currentItem) => {
+        const color = await Color.findOne({
+          where: { id: currentItem.color_id },
+        });
+
+        const batch = await Batch.findOne({
+          where: { item_id: currentItem.id },
+        });
+
+        const nameAndQuantity = await findNameAndQuantity(currentItem);
+        const itemName = nameAndQuantity[0];
+        const quantity = nameAndQuantity[1];
+        const response = await responseFormat(
+          "TBD",
+          itemName,
+          quantity,
+          batch,
+          currentItem.image,
+          "TBD",
+          color,
+          currentItem.description
+        );
+        return response;
+      });
+
+      itemResponseArray = await Promise.all(brandPromises);
+    }
+
     return res.status(200).send({
       success: true,
-      data: {
-        brand: brandFound,
-        item: itemFound,
-        category: categoryFound,
-        subcategory: subcategoryFound,
-      },
+      data: itemResponseArray
+        ? itemResponseArray
+        : categoryResponseArray
+        ? categoryResponseArray
+        : brandResponseArray
+        ? brandResponseArray
+        : null,
       message: "Found item/brand/subcategory/category matching search term",
     });
   } catch (error) {
     return res.status(400).send({
       success: false,
-      data: error,
+      data: error.message,
       message: "Error occured while fetching",
     });
   }
