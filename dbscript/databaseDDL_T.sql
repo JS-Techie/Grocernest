@@ -29,7 +29,6 @@ CREATE TABLE `t_wallet_transaction` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
-
 -- grocernest.t_address definition
 
 CREATE TABLE `t_address` (

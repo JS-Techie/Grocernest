@@ -1,7 +1,11 @@
 const express = require("express");
 const router = express.Router();
 
-const authenticate = require("../middleware/authentication")
+
+
+// const authenticate = require("../middleware/authentication")
+
+
 
 const{
     getAllOrders,
@@ -12,11 +16,13 @@ const{
 } = require("../controllers/ordersController")
 
 
-router.route('/all').get(authenticate,getAllOrders)
-router.route('/:orderId').get(authenticate,getOrderByOrderId)
-router.route('/cancel').post(authenticate,cancelOrder)
-router.route('/return').post(authenticate,returnOrder)
-router.route('/:orderId/tracking').get(authenticate,trackOrder)
+//Add authenticate middleware to all controllers
+
+router.route('/all').get(getAllOrders)
+router.route('/:orderId').get(getOrderByOrderId)
+router.route('/cancel').post(cancelOrder)
+router.route('/return').post(returnOrder)
+router.route('/:orderId/tracking').get(trackOrder)
 
 
 

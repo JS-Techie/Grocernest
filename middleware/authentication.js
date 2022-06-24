@@ -12,8 +12,10 @@ const authenticate = async (req, res, next) => {
   try {
     //Verify the token
     // req.payload = jwt.verify(token, "process.env.JWT_SECRET")
+    //req.cust_no = req.payload.cust_no
     // bypass as for now
     //If authenticated, call associated controller from the route
+    //
     next()
 
   } catch (error) {

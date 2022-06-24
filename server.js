@@ -54,7 +54,7 @@ const db = require("./services/dbSetupService.js");
 const PORT = process.env.PORT || 8080;
 const start = async () => {
   try {
-    await db.sequelize.sync();
+   
     console.log(`Database connected`);
     app.listen(PORT, () => {
       console.log(`Server started on port ${PORT}`);

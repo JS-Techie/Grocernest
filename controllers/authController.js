@@ -1,21 +1,91 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
-const { sequelize, Sequelize } = require("../services/dbSetupService");
-const { sendOTPToPhoneNumber } = require("../services/otpService");
-const { default: axios } = require("axios");
+const db = require("../models")
 
-const Customer = require("../models/t_customer")(sequelize, Sequelize);
+const Customer = db.CustomerModel;
 
 //Password field will be added to the t_customer table
 
-const registerUser = async (req, res, next) => {
+const login = async (req, res, next) => {
+
+  //Get currentUser from JWT
+  //const currentUser = req.cust_no
+
+  //Get the user details from the form
+
+  const { phoneNumber, password } = req.body;
+
+  try {
+    //Check if customer exists
+    const currentCustomer = await Customer.findOne({
+      where: { contact_no: phoneNumber },
+    });
+    //If customer doesnt exist, break login flow and ask to register
+    if (!currentCustomer) {
+      return res.status(404).json({
+        success: false,
+        data: null,
+        message: "User does not exist, please register",
+      });
+    }
+    //If current customer exists, check password against contact number entered
+    //If passwords dont match, send error to write correct password
+    if (!bcrypt.compareSync(password, currentCustomer.password)) {
+      return res.status(401).json({
+        success: false,
+        data: null,
+        message: "Please enter correct password for phone number entered",
+      });
+    }
+
+    //Get customer details from currentCustomer
+    const { cust_no, cust_name, contact_no } = currentCustomer;
+
+    //If passwords match, user can be logged in, so we generate token
+
+    const token = jwt.sign(
+      {
+        contact_no,
+        cust_name,
+        cust_no,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "2h", //Subject to change
+      }
+    );
+
+    console.log(token);
+
+    //Send response with the token in the data field
+    return res.status(200).json({
+      success: true,
+      data: {
+        token : token,
+        user : currentCustomer,
+      },
+      message: "Successful Login",
+    });
+
+    //After successful login, frontend will redirect to some page
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      data: error,
+      message: "Could not login user, something went wrong",
+    });
+  }
+};
+
+
+const register = async (req, res, next) => {
   try {
     //Get the user details from the form
-    const { first_name, last_name, phone_number, email, password } = req.body;
+    const { firstName, lastName, phoneNumber, email, password } = req.body;
 
     //Check if all required input is recieved
-    if (!phone_number || !password || !first_name || !last_name) {
+    if (!phoneNumber || !password || !firstName || !lastName) {
       return res.status(400).json({
         success: false,
         data: null,
@@ -25,7 +95,7 @@ const registerUser = async (req, res, next) => {
 
     //Check if user already exists
     const existingCustomer = await Customer.findAll({
-      where: { contact_no: phone_number },
+      where: { contact_no: phoneNumber },
     });
 
     //If user already exists, ask them to login
@@ -81,70 +151,6 @@ const registerUser = async (req, res, next) => {
   }
 };
 
-const loginUser = async (req, res, next) => {
-  //Get the user details from the form
-  const { phone_number, password } = req.body;
-
-  try {
-    //Check if customer exists
-    const currentCustomer = await Customer.findAll({
-      where: { contact_no: phone_number },
-    });
-    //If customer doesnt exist, break login flow and ask to register
-    if (!currentCustomer) {
-      return res.status(404).json({
-        success: false,
-        data: null,
-        message: "User does not exist, please register",
-      });
-    }
-    //If passwords dont match, send error to write correct password
-    if (!bcrypt.compareSync(password, currentCustomer.password)) {
-      return res.status(401).json({
-        success: false,
-        data: null,
-        message: "Please enter correct password for phone number entered",
-      });
-    }
-
-    //Get customer details from current
-    const { cust_no, cust_name, contact_no } = currentCustomer;
-
-    //If passwords match, user can be logged in, so we generate token
-
-    const token = jwt.sign(
-      {
-        contact_no,
-        cust_name,
-        cust_no,
-      },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "2h", //Subject to change
-      }
-    );
-
-    console.log(token);
-
-    //Send response with the token in the data field
-    return res.status(200).json({
-      success: true,
-      data: {
-        token,
-        currentCustomer,
-      },
-      message: "Successful Login",
-    });
-
-    //Redirect to home page after successful login
-  } catch (error) {
-    return res.status(400).json({
-      success: false,
-      data: error,
-      message: "Could not login user, something went wrong",
-    });
-  }
-};
 
 const verifyOTP = async (req, res, next) => {
   //Get the user entered otp
@@ -162,10 +168,16 @@ const forgotPassword = async (req, res, next) => {
 
 const resendToken = async (req, res, next) => {};
 
+const verifyToken = async (req,res,next) => {};
+
+const changePassword = async (req,res,next) => {};
+
 module.exports = {
-  loginUser,
-  registerUser,
+  login,
+  register,
   verifyOTP,
   forgotPassword,
   resendToken,
+  verifyToken,
+  changePassword
 };

@@ -6,7 +6,6 @@ const Customer = db.CustomerModel;
 
 
 
-
 const getAllAddresses = async (req, res, next) => {
 
     let customer_no = req.query.cust_no;
