@@ -1,8 +1,8 @@
 
 module.exports = {
-    HOST: "129.154.239.226",
-    USER: "grocernest",
-    PASSWORD: "Grocernest2022#",
+    HOST: "152.67.1.126",
+    USER: "ecomm",
+    PASSWORD: "ecomm@123",
     DB: "grocernest",
 
     dialect: "mariadb",
