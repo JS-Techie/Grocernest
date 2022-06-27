@@ -316,7 +316,12 @@ const changePassword = async (req, res, next) => {
   }
 };
 
-const resendToken = async (req, res, next) => {};
+const resendToken = async (req, res, next) => {
+
+  
+
+
+};
 
 const getOTP = async (req, res, next) => {
   //For testing purposes
