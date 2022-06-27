@@ -356,8 +356,6 @@ const changePassword = async (req, res, next) => {
   }
 };
 
-const resendToken = async (req, res, next) => {};
-
 const getOTP = async (req, res, next) => {
   //For testing purposes
   const CacheDetails = await Cache.findAll();
@@ -381,11 +379,9 @@ const getOTP = async (req, res, next) => {
   });
 };
 
-const getToken = async (req, res, next) => {
 
+const resendToken = async (req, res, next) => {};
 
-  
-};
 
 module.exports = {
   login,
@@ -396,5 +392,4 @@ module.exports = {
   verifyToken,
   changePassword,
   getOTP,
-  getToken,
 };
