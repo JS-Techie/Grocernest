@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon server.js"
+    "start": "node ./swagger.js && nodemon server.js",
+    "swagger": "node ./swagger.js"
   },
   "keywords": [],
   "author": "",
@@ -28,6 +29,9 @@
     "otp-generator": "^4.0.0",
     "sequelize": "^6.20.1",
     "sequelize-automate": "^1.2.2",
+    "swagger-autogen": "^2.21.4",
+    "swagger-jsdoc": "^6.2.1",
+    "swagger-ui-express": "^4.4.0",
     "uniqid": "^5.4.0",
     "uniqueid": "^1.0.0",
     "uuid": "^8.3.2",

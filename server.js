@@ -1,9 +1,14 @@
 require("dotenv").config();
 require("express-async-errors");
 
+// Swagger UI Setup
+const swaggerUI = require('swagger-ui-express');
+const endPoint = require('./swagger/swagger-output.json');
+
 //Express Setup
 const express = require("express");
 const app = express();
+
 
 //Middleware
 //We will later put the URL of frontend in the CORS config object so only frontend can call the API
@@ -19,8 +24,11 @@ app.get("/", (req, res, next) => {
   res.send("Grocernest API");
 });
 
-//routers
 
+// Swagger route
+app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(endPoint));
+
+//routers
 const authRouter = require("./routes/authRoutes");
 const listRouter = require("./routes/listRoutes");
 const cartRouter = require("./routes/cartRoutes");
@@ -35,6 +43,10 @@ const referralRouter = require("./routes/referralRoutes")
 const giftRouter = require("./routes/giftRoutes")
 
 //routes
+app.get('/responses', (req, res) => {
+  res.send(endPoint);
+});
+
 
 app.use(authRouter);
 app.use(listRouter);
@@ -43,18 +55,17 @@ app.use("/items", itemRouter);
 app.use("/wallet", walletRouter);
 app.use("/wishlist", wishlistRouter);
 app.use("/address", addressRouter);
-app.use("/profile",profileRouter);
-app.use("/orders",orderRouter);
+app.use("/profile", profileRouter);
+app.use("/orders", orderRouter);
 app.use("/coupons", couponRouter);
-app.use("/referral/view",referralRouter);
-app.use("/gift",giftRouter);
+app.use("/referral/view", referralRouter);
+app.use("/gift", giftRouter);
 
 //Start server and connect to DB
 const db = require("./services/dbSetupService.js");
 const PORT = process.env.PORT || 8080;
 const start = async () => {
   try {
-   
     console.log(`Database connected`);
     app.listen(PORT, () => {
       console.log(`Server started on port ${PORT}`);
