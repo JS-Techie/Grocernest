@@ -20,6 +20,7 @@ module.exports = sequelize => {
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
+    },
 
     wishlist_id: {
       type: DataTypes.STRING(255),
