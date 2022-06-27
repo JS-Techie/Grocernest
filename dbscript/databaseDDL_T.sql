@@ -29,11 +29,16 @@ CREATE TABLE `t_wallet_transaction` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
+-- grocernest.t_address definition
 
-
-
-
-
-
-
-
+CREATE TABLE `t_address` (
+  `address_id` varchar(255) NOT NULL,
+  `cust_no` varchar(20) NOT NULL,
+  `address_title` varchar(255) NOT NULL,
+  `address_desc` varchar(255) NOT NULL,
+  `created_by` bigint(20) NOT NULL,
+  `updated_by` bigint(20) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`address_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
