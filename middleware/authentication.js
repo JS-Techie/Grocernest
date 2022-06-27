@@ -11,8 +11,8 @@ const authenticate = async (req, res, next) => {
   const token = authHeader.split(' ')[1]
   try {
     //Verify the token
-    // req.payload = jwt.verify(token, "process.env.JWT_SECRET")
-    //req.cust_no = req.payload.cust_no
+    // req.user = jwt.verify(token, "process.env.JWT_SECRET")
+    //req.cust_no = req.user.cust_no
     // bypass as for now
     //If authenticated, call associated controller from the route
     //

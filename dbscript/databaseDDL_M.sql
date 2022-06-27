@@ -49,3 +49,15 @@ CREATE TABLE `t_order_items` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`item_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- ecomm.t_cache definition
+
+CREATE TABLE `t_cache` (
+  `user_details` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`user_details`)),
+  `generated_otp` varchar(100) NOT NULL,
+  `created_by` bigint(20) NOT NULL,
+  `updated_by` bigint(20) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`generated_otp`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

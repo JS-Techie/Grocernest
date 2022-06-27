@@ -1,19 +1,18 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
-const db = require("../models")
+const db = require("../models");
+
+const { generateOTP, sendOTPToPhoneNumber } = require("../services/otpService");
 
 const Customer = db.CustomerModel;
 
-//Password field will be added to the t_customer table
+//We should be using a cache to store both of these as global variables can lead to massive memory leaks.
+let newUser;
+let serverGeneratedOTP;
 
 const login = async (req, res, next) => {
-
-  //Get currentUser from JWT
-  //const currentUser = req.cust_no
-
   //Get the user details from the form
-
   const { phoneNumber, password } = req.body;
 
   try {
@@ -21,9 +20,11 @@ const login = async (req, res, next) => {
     const currentCustomer = await Customer.findOne({
       where: { contact_no: phoneNumber },
     });
+
+    console.log(currentCustomer);
     //If customer doesnt exist, break login flow and ask to register
     if (!currentCustomer) {
-      return res.status(404).json({
+      return res.status(404).send({
         success: false,
         data: null,
         message: "User does not exist, please register",
@@ -32,7 +33,7 @@ const login = async (req, res, next) => {
     //If current customer exists, check password against contact number entered
     //If passwords dont match, send error to write correct password
     if (!bcrypt.compareSync(password, currentCustomer.password)) {
-      return res.status(401).json({
+      return res.status(401).send({
         success: false,
         data: null,
         message: "Please enter correct password for phone number entered",
@@ -52,32 +53,31 @@ const login = async (req, res, next) => {
       },
       process.env.JWT_SECRET,
       {
-        expiresIn: "2h", //Subject to change
+        expiresIn: "24h", //Subject to change
       }
     );
 
     console.log(token);
 
     //Send response with the token in the data field
-    return res.status(200).json({
+    return res.status(200).send({
       success: true,
       data: {
-        token : token,
-        user : currentCustomer,
+        token: token,
+        currentUser: currentCustomer,
       },
       message: "Successful Login",
     });
 
     //After successful login, frontend will redirect to some page
   } catch (error) {
-    return res.status(400).json({
+    return res.status(400).send({
       success: false,
-      data: error,
-      message: "Could not login user, something went wrong",
+      data: error.message,
+      message: "Could not login user, check data field for error message",
     });
   }
 };
-
 
 const register = async (req, res, next) => {
   try {
@@ -86,7 +86,7 @@ const register = async (req, res, next) => {
 
     //Check if all required input is recieved
     if (!phoneNumber || !password || !firstName || !lastName) {
-      return res.status(400).json({
+      return res.status(400).send({
         success: false,
         data: null,
         message: "All input is required",
@@ -94,7 +94,7 @@ const register = async (req, res, next) => {
     }
 
     //Check if user already exists
-    const existingCustomer = await Customer.findAll({
+    const existingCustomer = await Customer.findOne({
       where: { contact_no: phoneNumber },
     });
 
@@ -107,9 +107,6 @@ const register = async (req, res, next) => {
       });
     }
 
-    //If user does not exist, we will verify the phone number
-    //verification of OTP will go here
-
     //Hash Password
     const encryptedPassword = bcrypt.hashSync(
       password,
@@ -117,27 +114,28 @@ const register = async (req, res, next) => {
     );
 
     //Create new Customer
-    const newCustomer = {
-      cust_name: first_name + " " + last_name,
-      email: email ? email.toLowerCase() : null,
-      contact_no: phone_number,
-      password: encryptedPassword,
-    };
 
     try {
-      //Add new customer to database
-      const result = await Customer.create(newCustomer);
-      console.log(result);
-      res.status(201).json({
+      newUser = await Customer.create({
+        cust_name: firstName + " " + lastName,
+        email: email ? email.toLowerCase() : null,
+        contact_no: phoneNumber,
+        password: encryptedPassword,
+      });
+
+      serverGeneratedOTP = generateOTP();
+      // sendOTPToPhoneNumber(serverGeneratedOTP);
+
+      return res.status(200).send({
         success: true,
-        data: newCustomer,
-        message: "Successfully added new customer to database",
+        data: {newUser,serverGeneratedOTP},
+        message: "Created new user and sent OTP to user entered phone number",
       });
     } catch (error) {
-      return res.status(500).json({
+      return res.status(401).send({
         success: false,
-        data: error,
-        message: "Error while adding new customer to database",
+        data: error.message,
+        message: "Could not create new user and send OTP",
       });
     }
 
@@ -151,26 +149,70 @@ const register = async (req, res, next) => {
   }
 };
 
-
 const verifyOTP = async (req, res, next) => {
   //Get the user entered otp
-  const enteredOtp = req.body.otp;
+  const userEnteredOTP = req.body.otp;
 
   //Compare the entered otp and the generated otp
+  if (userEnteredOTP !== parseInt(serverGeneratedOTP)) {
+
+    //reset the OTP
+    serverGeneratedOTP = null
+
+    return res.status(401).send({
+      success: false,
+      data: null,
+      message: "OTP entered was incorrect, please enter correct OTP",
+    });
+  }
+
+  //If the otp entered by the user is the same as the server generated OTP
+  //We save the new user to the database and set the newUser and the serverGeneratedOTP to be null again
+  try {
   
+    const response = await newUser.save();
+    
+  //Reset the new user and the otp
+    newUser = null
+    serverGeneratedOTP = null
+
+    return res.status(201).send({
+      success: true,
+      data: response,
+      message: "New user successfully added to the database",
+
+    });
+  } catch (error) {
+    
+  //Reset the new user and the otp
+    newUser = null
+    serverGeneratedOTP = null
+
+    return res.status(401).send({
+      success: false,
+      data: error.message,
+      message:
+        "Could not add the new user to the database, please check data field for more details",
+    });
+  }
+
+
+
 };
 const forgotPassword = async (req, res, next) => {
-  //Ask to enter number and send OTP to that number
-  //Once done, can send a response back to frontend, when the frontend recieves that response, can redirect user to change password page
 
- 
+  //Get Phone number of user
+
+  const {phoneNumber} = req.body
+
+  //Check if the phone number exists
 };
 
 const resendToken = async (req, res, next) => {};
 
-const verifyToken = async (req,res,next) => {};
+const verifyToken = async (req, res, next) => {};
 
-const changePassword = async (req,res,next) => {};
+const changePassword = async (req, res, next) => {};
 
 module.exports = {
   login,
@@ -179,5 +221,5 @@ module.exports = {
   forgotPassword,
   resendToken,
   verifyToken,
-  changePassword
+  changePassword,
 };

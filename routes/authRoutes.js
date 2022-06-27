@@ -13,13 +13,17 @@ const{
     resendToken
 } = require("../controllers/authController")
 
-router.route("/login").post(login);
 router.route("/register").post(register);
 router.route("/verify").post(verifyOTP);
-router.route("/resendToken").post(resendToken)
-router.route("/verifyToken").post(verifyToken)
+router.route("/login").post(login);
 router.route("/forgotPassword").post(forgotPassword)
+router.route("/verifyToken").post(verifyToken)
 router.route("/changePassword").post(changePassword)
+
+router.route("/resendToken").post(resendToken)
+
+
+
 
 
 module.exports = router;
