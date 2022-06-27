@@ -29,7 +29,10 @@
     "otp-generator": "^4.0.0",
     "sequelize": "^6.20.1",
     "sequelize-automate": "^1.2.2",
+<<<<<<< Updated upstream
     "swagger-autogen": "^2.21.4",
+=======
+>>>>>>> Stashed changes
     "swagger-jsdoc": "^6.2.1",
     "swagger-ui-express": "^4.4.0",
     "uniqid": "^5.4.0",
