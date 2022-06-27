@@ -6,10 +6,7 @@ const db = require("../models");
 const { generateOTP, sendOTPToPhoneNumber } = require("../services/otpService");
 
 const Customer = db.CustomerModel;
-
-//We should be using a cache to store both of these as global variables can lead to massive memory leaks.
-let newUser;
-let serverGeneratedOTP;
+const Cache = db.CacheModel;
 
 const login = async (req, res, next) => {
   //Get the user details from the form
@@ -82,22 +79,20 @@ const login = async (req, res, next) => {
 const register = async (req, res, next) => {
   try {
     //Get the user details from the form
-    const { firstName, lastName, phoneNumber, email, password } = req.body;
-
+    const { firstName, lastName, phoneNumber, email, password, captchaToken } =
+      req.body;
     //Check if all required input is recieved
-    if (!phoneNumber || !password || !firstName || !lastName) {
+    if (!phoneNumber || !password || !firstName || !lastName || !captchaToken) {
       return res.status(400).send({
         success: false,
         data: null,
         message: "All input is required",
       });
     }
-
     //Check if user already exists
     const existingCustomer = await Customer.findOne({
       where: { contact_no: phoneNumber },
     });
-
     //If user already exists, ask them to login
     if (existingCustomer) {
       return res.status(409).json({
@@ -106,31 +101,41 @@ const register = async (req, res, next) => {
         message: "User already exists, please login!",
       });
     }
-
     //Hash Password
     const encryptedPassword = bcrypt.hashSync(
       password,
       process.env.PASSWORD_SECRET
     );
-
     //Create new Customer
-
     try {
-      newUser = await Customer.create({
+      const newUser = await Customer.build({
         cust_name: firstName + " " + lastName,
         email: email ? email.toLowerCase() : null,
         contact_no: phoneNumber,
         password: encryptedPassword,
       });
-
       serverGeneratedOTP = generateOTP();
       // sendOTPToPhoneNumber(serverGeneratedOTP);
-
-      return res.status(200).send({
-        success: true,
-        data: {newUser,serverGeneratedOTP},
-        message: "Created new user and sent OTP to user entered phone number",
-      });
+      try {
+        const response = await Cache.create({
+          user_details: newUser,
+          generated_otp: serverGeneratedOTP,
+          created_by: 6,
+        });
+        return res.status(200).send({
+          success: true,
+          data: response,
+          message:
+            "User created and OTP successfully sent, find the OTP from getOTP route",
+        });
+      } catch (error) {
+        return res.status(400).send({
+          success: false,
+          data: error.message,
+          message:
+            "Could not store the user and OTP in cache, check data field for more details",
+        });
+      }
     } catch (error) {
       return res.status(401).send({
         success: false,
@@ -138,7 +143,6 @@ const register = async (req, res, next) => {
         message: "Could not create new user and send OTP",
       });
     }
-
     //Catch other errors and throw them
   } catch (error) {
     return res.status(400).json({
@@ -154,65 +158,188 @@ const verifyOTP = async (req, res, next) => {
   const userEnteredOTP = req.body.otp;
 
   //Compare the entered otp and the generated otp
-  if (userEnteredOTP !== parseInt(serverGeneratedOTP)) {
 
-    //reset the OTP
-    serverGeneratedOTP = null
-
-    return res.status(401).send({
-      success: false,
-      data: null,
-      message: "OTP entered was incorrect, please enter correct OTP",
-    });
-  }
-
-  //If the otp entered by the user is the same as the server generated OTP
-  //We save the new user to the database and set the newUser and the serverGeneratedOTP to be null again
   try {
-  
-    const response = await newUser.save();
-    
-  //Reset the new user and the otp
-    newUser = null
-    serverGeneratedOTP = null
+    const CacheDetails = await Cache.findAll();
 
-    return res.status(201).send({
+    const newUser = await CacheDetails[0].user_details;
+    const sentOTP = await CacheDetails[0].generated_otp;
+
+    if (sentOTP !== userEnteredOTP) {
+      return res.status(400).send({
+        success: false,
+        data: null,
+        message: "Incorrect OTP entered, please enter correct OTP",
+      });
+    }
+
+    const response = await Customer.create({
+      newUser,
+    });
+
+    const deletedField = await Cache.destroy({
+      where: { generated_otp: userEnteredOTP },
+    });
+
+    return res.status(200).send({
       success: true,
-      data: response,
-      message: "New user successfully added to the database",
-
+      data: {
+        created: response,
+        deletedFromCache: deletedField,
+      },
+      message: "User successfully validated and registered",
     });
   } catch (error) {
-    
-  //Reset the new user and the otp
-    newUser = null
-    serverGeneratedOTP = null
-
-    return res.status(401).send({
+    return res.status(400).send({
       success: false,
       data: error.message,
       message:
-        "Could not add the new user to the database, please check data field for more details",
+        "Something went wrong while validating OTP, please check data field for more details",
     });
   }
-
-
-
 };
+
 const forgotPassword = async (req, res, next) => {
-
   //Get Phone number of user
+  const { phoneNumber } = req.body;
 
-  const {phoneNumber} = req.body
+  try {
+    //Check if the phone number exists
+    const phoneNumberExists = await Customer.findOne({
+      where: { contact_no: phoneNumber },
+    });
 
-  //Check if the phone number exists
+    if (!phoneNumberExists) {
+      return res.status(404).send({
+        sucess: false,
+        data: null,
+        message: "The phone number is not registered, please register",
+      });
+    }
+
+    //sendOTP to phone number
+    const serverGeneratedOTP = generateOTP();
+    //sendOTPToPhoneNumber(serverGeneratedOTP)
+    const response = await Cache.create({
+      user_details: Customer,
+      generated_otp: serverGeneratedOTP,
+      created_by: 6,
+    });
+
+    return res.status(200).send({
+      success: true,
+      data: response,
+      message:
+        "OTP successfully sent, validation required, get the otp from the /getOTPFP route",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message:
+        "Error occured while sending OTP or getting phone number, check data field for more details",
+    });
+  }
+};
+
+const verifyToken = async (req, res, next) => {
+  //get the user entered OTP
+  const { userEnteredOTP } = req.body;
+
+  try {
+    const CacheDetails = await Cache.findAll();
+    const serverGeneratedOTP = await CacheDetails[0].generated_otp;
+
+    if (serverGeneratedOTP !== userEnteredOTP) {
+      return res.status(400).send({
+        success: false,
+        data: null,
+        message: "OTP entered is incorrect, please enter correct OTP",
+      });
+    }
+
+    return res.status(200).send({
+      success: true,
+      data: CacheDetails[0].user_details,
+      message:
+        "OTP successfully validated, user can proceed to change password, from the data field, please get the cust_no and pass it in the request body",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message:
+        "Something went wrong while validating OTP, check data field for more details",
+    });
+  }
+};
+
+const changePassword = async (req, res, next) => {
+  //Get the customer number from the body
+  const { customerNumber, newPassword } = req.body;
+
+  try {
+    const currentUser = await Customer.findOne({
+      where: { cust_no: customerNumber },
+    });
+
+    if (!currentUser) {
+      return res.status(404).send({
+        success: false,
+        data: null,
+        message: "User for whom password has to be changed not found",
+      });
+    }
+
+    const encryptedPassword = bcrypt.hashSync(
+      newPassword,
+      process.env.PASSWORD_SECRET
+    );
+
+    const updatedUser = await Customer.update({
+      password: encryptedPassword,
+      where: { cust_no: customerNumber },
+    });
+
+    return res.status(200).send({
+      success: true,
+      data: updatedUser,
+      message: "Password successfully changed, user can now proceed to login",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message:
+        "Something went wrong while changing password, please check data field for more details",
+    });
+  }
 };
 
 const resendToken = async (req, res, next) => {};
 
-const verifyToken = async (req, res, next) => {};
+const getOTP = async (req, res, next) => {
+  //For testing purposes
+  const CacheDetails = await Cache.findAll();
 
-const changePassword = async (req, res, next) => {};
+  if (CacheDetails.length !== 0) {
+    return res.status(200).send({
+      success: true,
+      data: {
+        user: await CacheDetails[0].user_details,
+        otp: await CacheDetails[0].generated_otp,
+      },
+      message:
+        "OTP generated and user created, waiting to store new user in DB",
+    });
+  }
+
+  return res.status(400).send({
+    success: false,
+    data: null,
+    message: "OTP not generated and sent",
+  });
+};
 
 module.exports = {
   login,
@@ -222,4 +349,5 @@ module.exports = {
   resendToken,
   verifyToken,
   changePassword,
+  getOTP,
 };

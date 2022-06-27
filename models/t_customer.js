@@ -124,6 +124,15 @@ module.exports = sequelize => {
         key: "id",
         model: "t_region_model"
       }
+    },
+    password: {
+      type: DataTypes.STRING(255),
+      allowNull: false,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "password"
     }
   };
   const options = {

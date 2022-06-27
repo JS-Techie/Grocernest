@@ -31,6 +31,7 @@ const getAllCategories = async (req, res, next) => {
 
       return {
         catName: currentCategory.group_name,
+        categoryId : currentCategory.id,
         img: currentCategory.image,
         subCategory: subcategoryResponseArray,
       };

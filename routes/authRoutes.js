@@ -1,4 +1,5 @@
-const express = require("express")
+const express = require("express");
+const { route } = require("express/lib/router");
 const router = express.Router();
 
 //const authenticate = require("../middleware/authentication") 
@@ -10,7 +11,8 @@ const{
     forgotPassword,
     changePassword,
     verifyToken,
-    resendToken
+    resendToken,
+    getOTP
 } = require("../controllers/authController")
 
 router.route("/register").post(register);
@@ -19,6 +21,7 @@ router.route("/login").post(login);
 router.route("/forgotPassword").post(forgotPassword)
 router.route("/verifyToken").post(verifyToken)
 router.route("/changePassword").post(changePassword)
+router.route("/getOTP").get(getOTP);
 
 router.route("/resendToken").post(resendToken)
 

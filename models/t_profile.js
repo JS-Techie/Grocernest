@@ -16,7 +16,7 @@ module.exports = sequelize => {
     cust_name: {
       type: DataTypes.STRING(100),
       allowNull: false,
-      defaultValue: "User",
+      defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,

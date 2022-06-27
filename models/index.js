@@ -87,6 +87,8 @@ db.CartModel = require("./t_cart")(db.sequelize,Sequelize);
 
 db.ProfileModel = require("./t_profile")(db.sequelize, Sequelize);
 
+db.CacheModel = require("./t_cache")(db.sequelize,Sequelize);
+
 
 
 // Relations between tables
