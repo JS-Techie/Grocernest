@@ -99,7 +99,7 @@ const register = async (req, res, next) => {
 
     //If user already exists, ask them to login
     if (existingCustomer) {
-      return res.status(409).json({
+      return res.status(409).send({
         success: false,
         data: existingCustomer,
         message: "User already exists, please login!",
@@ -122,8 +122,7 @@ const register = async (req, res, next) => {
         created_by: 13,
       };
 
-      console.log(newUser);
-      serverGeneratedOTP = generateOTP();
+      const serverGeneratedOTP = generateOTP();
       // sendOTPToPhoneNumber(serverGeneratedOTP);
 
       try {
@@ -159,7 +158,7 @@ const register = async (req, res, next) => {
     }
     //Catch other errors and throw them
   } catch (error) {
-    return res.status(400).json({
+    return res.status(400).send({
       success: false,
       data: error.message,
       message: "Could not register user",
@@ -187,7 +186,6 @@ const verifyOTP = async (req, res, next) => {
       });
     }
 
-    console.log("Before saving customer to DB");
     const response = await Customer.create({
       id: newUser.id,
       cust_no: newUser.cust_no,
@@ -195,7 +193,7 @@ const verifyOTP = async (req, res, next) => {
       cust_name: newUser.cust_name,
       email: newUser.email,
       contact_no: newUser.contact_no,
-      password: newUser.contact_no,
+      password: newUser.password,
       created_by: newUser.created_by,
     });
 
@@ -227,11 +225,13 @@ const forgotPassword = async (req, res, next) => {
 
   try {
     //Check if the phone number exists
-    const phoneNumberExists = await Customer.findOne({
+    const customerExists = await Customer.findOne({
       where: { contact_no: phoneNumber },
     });
 
-    if (!phoneNumberExists) {
+    console.log(customerExists)
+
+    if (!customerExists) {
       return res.status(404).send({
         sucess: false,
         data: null,
@@ -242,8 +242,9 @@ const forgotPassword = async (req, res, next) => {
     //sendOTP to phone number
     const serverGeneratedOTP = generateOTP();
     //sendOTPToPhoneNumber(serverGeneratedOTP)
+
     const response = await Cache.create({
-      user_details: Customer,
+      user_details: JSON.stringify(customerExists),
       generated_otp: serverGeneratedOTP,
       created_by: 6,
     });
@@ -252,7 +253,7 @@ const forgotPassword = async (req, res, next) => {
       success: true,
       data: response,
       message:
-        "OTP successfully sent, validation required, get the otp from the /getOTPFP route",
+        "OTP successfully sent, validation required, get the otp from the /getToken route route",
     });
   } catch (error) {
     return res.status(400).send({
@@ -282,9 +283,9 @@ const verifyToken = async (req, res, next) => {
 
     return res.status(200).send({
       success: true,
-      data: CacheDetails[0].user_details,
+      data: JSON.parse(CacheDetails[0].user_details),
       message:
-        "OTP successfully validated, user can proceed to change password, from the data field, please get the cust_no and pass it in the request body",
+        "OTP successfully validated, user can proceed to change password",
     });
   } catch (error) {
     return res.status(400).send({
@@ -298,7 +299,14 @@ const verifyToken = async (req, res, next) => {
 
 const changePassword = async (req, res, next) => {
   //Get the customer number from the body
-  const { customerNumber, newPassword } = req.body;
+  const { newPassword } = req.body;
+  const customer = await Cache.findAll();
+  const customerDetails  = JSON.parse(customer[0].user_details)
+  console.log(customerDetails);
+  const customerNumber = customerDetails.cust_no
+  console.log(customerNumber)
+
+  console.log(customerDetails.password + "<----- Old Password")
 
   try {
     const currentUser = await Customer.findOne({
@@ -313,19 +321,29 @@ const changePassword = async (req, res, next) => {
       });
     }
 
-    const encryptedPassword = bcrypt.hashSync(
-      newPassword,
-      process.env.PASSWORD_SECRET
-    );
+    const salt = bcrypt.genSaltSync(10);
+    const encryptedPassword = bcrypt.hashSync(newPassword, salt);
+
+    console.log(encryptedPassword + "<----- New Password")
 
     const updatedUser = await Customer.update({
-      password: encryptedPassword,
-      where: { cust_no: customerNumber },
-    });
+      password : encryptedPassword
+    },{
+      where : {
+        cust_no : customerNumber
+      }
+    })
+
+    const deletedField = await Cache.destroy({
+      where : {generated_otp : customer[0].generated_otp}
+    })
 
     return res.status(200).send({
       success: true,
-      data: updatedUser,
+      data:{
+        updatedUser,
+        deletedField
+      },
       message: "Password successfully changed, user can now proceed to login",
     });
   } catch (error) {
@@ -363,6 +381,12 @@ const getOTP = async (req, res, next) => {
   });
 };
 
+const getToken = async (req, res, next) => {
+
+
+  
+};
+
 module.exports = {
   login,
   register,
@@ -372,4 +396,5 @@ module.exports = {
   verifyToken,
   changePassword,
   getOTP,
+  getToken,
 };
