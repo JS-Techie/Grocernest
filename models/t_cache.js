@@ -5,7 +5,7 @@ const {
 module.exports = sequelize => {
   const attributes = {
     user_details: {
-      type: DataTypes.TEXT,
+      type: DataTypes.STRING(1000),
       allowNull: false,
       defaultValue: null,
       primaryKey: false,

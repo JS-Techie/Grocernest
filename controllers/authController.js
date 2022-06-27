@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const uniqid = require("uniqid");
 
 const db = require("../models");
 
@@ -79,20 +80,23 @@ const login = async (req, res, next) => {
 const register = async (req, res, next) => {
   try {
     //Get the user details from the form
-    const { firstName, lastName, phoneNumber, email, password, captchaToken } =
-      req.body;
+    const { firstName, lastName, phoneNumber, email, password } = req.body;
     //Check if all required input is recieved
-    if (!phoneNumber || !password || !firstName || !lastName || !captchaToken) {
+    if (!phoneNumber || !password || !firstName || !lastName) {
       return res.status(400).send({
         success: false,
         data: null,
         message: "All input is required",
       });
     }
+
+    console.log(firstName, lastName, password, email, phoneNumber);
+
     //Check if user already exists
     const existingCustomer = await Customer.findOne({
       where: { contact_no: phoneNumber },
     });
+
     //If user already exists, ask them to login
     if (existingCustomer) {
       return res.status(409).json({
@@ -101,30 +105,40 @@ const register = async (req, res, next) => {
         message: "User already exists, please login!",
       });
     }
+
+    let salt = bcrypt.genSaltSync(10);
     //Hash Password
-    const encryptedPassword = bcrypt.hashSync(
-      password,
-      process.env.PASSWORD_SECRET
-    );
+    let encryptedPassword = bcrypt.hashSync(password, salt);
     //Create new Customer
     try {
-      const newUser = await Customer.build({
+      const newUser = {
+        id: Math.floor(Math.random() * 10000 + 1),
+        cust_no: uniqid(),
+        active_ind: "Y",
         cust_name: firstName + " " + lastName,
         email: email ? email.toLowerCase() : null,
-        contact_no: phoneNumber,
+        contact_no: phoneNumber.toString(),
         password: encryptedPassword,
-      });
+        created_by: 13,
+      };
+
+      console.log(newUser);
       serverGeneratedOTP = generateOTP();
       // sendOTPToPhoneNumber(serverGeneratedOTP);
+
       try {
         const response = await Cache.create({
-          user_details: newUser,
+          user_details: JSON.stringify(newUser),
           generated_otp: serverGeneratedOTP,
-          created_by: 6,
+          created_by: 6, //hardcoded for now
         });
+
         return res.status(200).send({
           success: true,
-          data: response,
+          data: {
+            newUser,
+            response,
+          },
           message:
             "User created and OTP successfully sent, find the OTP from getOTP route",
         });
@@ -147,7 +161,7 @@ const register = async (req, res, next) => {
   } catch (error) {
     return res.status(400).json({
       success: false,
-      data: error,
+      data: error.message,
       message: "Could not register user",
     });
   }
@@ -162,7 +176,7 @@ const verifyOTP = async (req, res, next) => {
   try {
     const CacheDetails = await Cache.findAll();
 
-    const newUser = await CacheDetails[0].user_details;
+    const newUser = await JSON.parse(CacheDetails[0].user_details);
     const sentOTP = await CacheDetails[0].generated_otp;
 
     if (sentOTP !== userEnteredOTP) {
@@ -173,8 +187,16 @@ const verifyOTP = async (req, res, next) => {
       });
     }
 
+    console.log("Before saving customer to DB");
     const response = await Customer.create({
-      newUser,
+      id: newUser.id,
+      cust_no: newUser.cust_no,
+      active_ind: newUser.active_ind,
+      cust_name: newUser.cust_name,
+      email: newUser.email,
+      contact_no: newUser.contact_no,
+      password: newUser.contact_no,
+      created_by: newUser.created_by,
     });
 
     const deletedField = await Cache.destroy({
@@ -316,12 +338,7 @@ const changePassword = async (req, res, next) => {
   }
 };
 
-const resendToken = async (req, res, next) => {
-
-  
-
-
-};
+const resendToken = async (req, res, next) => {};
 
 const getOTP = async (req, res, next) => {
   //For testing purposes
@@ -331,7 +348,7 @@ const getOTP = async (req, res, next) => {
     return res.status(200).send({
       success: true,
       data: {
-        user: await CacheDetails[0].user_details,
+        // user: await JSON.parse(CacheDetails[0].user_details),
         otp: await CacheDetails[0].generated_otp,
       },
       message:
