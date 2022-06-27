@@ -1,4 +1,5 @@
 const responseFormat = async (
+  
     type,
     itemName,
     quantity,
@@ -9,6 +10,7 @@ const responseFormat = async (
     text
   ) => {
     return {
+      
       type: type,
       itemName: itemName
         ? itemName.includes("undefined")
