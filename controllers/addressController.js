@@ -19,10 +19,18 @@ const getAllAddresses = async (req, res, next) => {
                 cust_no: customer_no,
             }
         }],
-    }).then((res1) => {
-        res.send(res1);
-    }).catch((err) => {
-        console.log(err);
+    }).then((resData) => {
+        return res.status(200).send({
+            success: true,
+            data: resData,
+            message: "Found all addresses",
+        });
+    }).catch((error) => {
+        return res.status(400).send({
+            success: false,
+            data: error.message,
+            message: "Error occurred while fetching addresses",
+        });
     })
 }
 
@@ -34,7 +42,12 @@ const createAddress = async (req, res, next) => {
         cust_no: req.body.cust_no,
         address_id: uniqid(),
         address_title: req.body.address_title,
-        address_desc: req.body.address_desc,
+        address_line_1: req.body.address_line_1,
+        address_line_2: req.body.address_line_2,
+        state: req.body.state,
+        city: req.body.city,
+        PIN_code: req.body.PIN_code,
+        landmark: req.body.landmark,
         created_by: '2'
     }
 
@@ -49,9 +62,9 @@ const createAddress = async (req, res, next) => {
             message: "Successfully added new address to database",
         });
     } catch (error) {
-        return res.status(500).json({
+        return res.status(400).json({
             success: false,
-            data: error,
+            data: error.message,
             message: "Error while adding new address to database",
         });
     }
@@ -61,14 +74,24 @@ const updateAddress = async (req, res, next) => {
 
     let address_id = req.body.address_id;
     let address_title = req.body.address_title;
-    let address_desc = req.body.address_desc;
+    let address_line_1 = req.body.address_line_1;
+    let address_line_2 = req.body.address_line_2;
+    let state = req.body.state;
+    let city = req.body.city;
+    let PIN_code = req.body.PIN_code;
+    let landmark = req.body.landmark;
 
     console.log("Update Address");
 
     Address.update(
         {
             address_title: address_title,
-            address_desc: address_desc
+            address_line_1: address_line_1,
+            address_line_2: address_line_2,
+            state: state,
+            city: city,
+            PIN_code: PIN_code,
+            landmark: landmark
         },
         { where: { address_id: address_id } }
     )
@@ -81,9 +104,13 @@ const updateAddress = async (req, res, next) => {
                 message: "Successfully Updated address to database",
             });
         })
-        .catch((err) =>
-            console.log(err)
-        )
+        .catch((error) => {
+            return res.status(400).json({
+                success: false,
+                data: error.message,
+                message: "Error while updating address to database",
+            });
+        })
 }
 const deleteAddress = async (req, res, next) => {
 
@@ -98,8 +125,12 @@ const deleteAddress = async (req, res, next) => {
             success: true,
             message: "Address deleted successfully",
         });
-    }).catch((err) => {
-        console.log(error);
+    }).catch((error) => {
+        return res.status(400).json({
+            success: false,
+            data: error.message,
+            message: "Error while deleting address from database",
+        });
     })
 }
 

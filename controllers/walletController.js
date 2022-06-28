@@ -1,4 +1,3 @@
-const { sequelize, Sequelize } = require("../services/dbSetupService");
 const db = require('../models');
 
 const Wallet = db.WalletModel
@@ -17,10 +16,18 @@ const getAllTransactionsOfUser = async (req, res, next) => {
         where: {
             cust_no: customer_no,
         }
-    }).then((res1) => {
-        res.send(res1);
+    }).then((resData) => {
+        return res.status(201).json({
+            success: true,
+            data: resData,
+            message: "Successfully fetched Transaction Data",
+        });
     }).catch((err) => {
-        console.log("error is=========>>>>>>", err);
+        return res.status(400).json({
+            success: false,
+            data: error.message,
+            message: "Error while fetching transaction from database",
+        });
     })
 }
 
@@ -39,7 +46,11 @@ const getBalanceOfUser = async (req, res, next) => {
             message: ""
         })
     }).catch((error) => {
-        console.log(error);
+        return res.status(400).json({
+            success: false,
+            data: error.message,
+            message: "Error while fetching balance from database",
+        });
     })
 }
 
