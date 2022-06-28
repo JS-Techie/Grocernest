@@ -11,9 +11,10 @@ const authenticate = async (req, res, next) => {
   const token = authHeader.split(' ')[1]
   try {
     //Verify the token
-     req.user = jwt.verify(token, "process.env.JWT_SECRET")
-    req.cust_no = req.user.cust_no
-    next()
+     req.user = jwt.verify(token, process.env.JWT_SECRET)
+     console.log(req.user)
+     req.cust_no = req.user.cust_no
+     next();
 
   } catch (error) {
     throw new Error('Access token Invalid/Expired')

@@ -3,20 +3,52 @@ const uniqid = require("uniqid");
 
 const Wishlist = db.WishlistModel;
 const WishlistItems = db.WishlistItemsModel;
+const Customer = db.CustomerModel;
+
+const getAllWishlists = async (req, res, next) => {
+  //Get current user from JWT
+  const currentUser = req.cust_no;
+
+  try {
+    //get all wishlists for that customer
+    const wishlists = await Wishlist.findAll({
+      where: {
+        cust_no: currentUser,
+      },
+      include: WishlistItems,
+    });
+
+    return res.status(200).send({
+      success: true,
+      data: wishlists,
+      message: "Found wishlists",
+    });
+  } catch (error) {
+    return res.status(404).send({
+      success: false,
+      data: error.message,
+      message: "Could not find wishlists for requested user",
+    });
+  }
+};
 
 const createWishlist = async (req, res, next) => {
   //Get wishlist name
   const wishlistName = req.body.wishlistName;
 
   //Get currentUser from JWT
-  //const currentUser = req.cust_no
+  const currentUser = req.cust_no;
+
+  const currentCustomer = await Customer.findOne({
+    where: { cust_no: currentUser },
+  });
 
   try {
     //Find if wishlist with that same name already exists
     const existingWishlist = await Wishlist.findOne({
       where: {
         wishlist_name: wishlistName,
-        //cust_no : currentUser
+        cust_no: currentUser,
       },
     });
 
@@ -25,19 +57,20 @@ const createWishlist = async (req, res, next) => {
       return res.status(400).send({
         success: false,
         data: existingWishlist,
-        message: "Wishlist already exists, please name your wishlist differently",
+        message:
+          "Wishlist already exists, please name your wishlist differently",
       });
     }
 
     //If wishlist does not exist, make a new wishlist
     const newWishlist = {
-      cust_no: 3, //currentUser
+      cust_no: currentUser, //currentUser
       wishlist_id: uniqid(),
       wishlist_name: wishlistName,
       created_at: Date.now(),
       updated_at: Date.now(),
-      created_by: 3, //currentUser
-      updated_by: 3, //currentUser
+      created_by: 6, //currentUser
+      updated_by: 6, //currentUser
     };
 
     //Save wishlist to DB
@@ -132,7 +165,13 @@ const addItemToWishlist = async (req, res, next) => {
 
 const getWishlistById = async (req, res, next) => {
   //Get currentUser from JWT
-  //const currentUser = req.cust_no
+  const currentUser = req.cust_no;
+
+  const currentCustomer = await Customer.findOne({
+    where: { cust_no: currentUser },
+  });
+
+  console.log(currentCustomer);
 
   //fetch all the items in the wishlist
   try {
@@ -140,7 +179,7 @@ const getWishlistById = async (req, res, next) => {
       include: [{ model: WishlistItems }],
       where: {
         wishlist_id: req.params.wishlistId,
-        //cust_no : currentUser
+        cust_no: currentUser,
       },
     });
 
@@ -198,4 +237,5 @@ module.exports = {
   addItemToWishlist,
   getWishlistById,
   deleteWishlist,
+  getAllWishlists,
 };

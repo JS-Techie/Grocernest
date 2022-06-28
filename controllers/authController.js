@@ -379,7 +379,6 @@ const getOTP = async (req, res, next) => {
   });
 };
 
-
 const resendToken = async (req, res, next) => {};
 
 
