@@ -10,7 +10,7 @@ const {
 } = require("../controllers/walletController.js")
 
 
-const { getCustomerWalletDetails } = require("../controllers/AdminWalletController.js");
+const { getCustomerWalletDetails } = require("../controllers/adminWalletController.js");
 
 // Authenticated routes - User cannot view anything about wallet without having logged in
 
