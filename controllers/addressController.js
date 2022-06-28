@@ -8,17 +8,15 @@ const Customer = db.CustomerModel;
 
 const getAllAddresses = async (req, res, next) => {
 
-    let customer_no = req.query.cust_no;
+    // Get current user from JWT
+    let customer_no = req.cust_no;
     console.log("==>> Get all the Address of", customer_no);
 
     // Query
-    Customer.findAll({
-        include: [{
-            model: Address,
-            where: {
-                cust_no: customer_no,
-            }
-        }],
+    Address.findAll({
+        where: {
+            cust_no: customer_no,
+        }
     }).then((resData) => {
         return res.status(200).send({
             success: true,
@@ -35,11 +33,12 @@ const getAllAddresses = async (req, res, next) => {
 }
 
 const createAddress = async (req, res, next) => {
-    console.log("Add new address");
-    console.log(req.body);
+
+    // Get current user from JWT
+    let customer_no = req.cust_no;
 
     let new_address = {
-        cust_no: req.body.cust_no,
+        cust_no: customer_no,
         address_id: uniqid(),
         address_title: req.body.address_title,
         address_line_1: req.body.address_line_1,
@@ -82,6 +81,14 @@ const updateAddress = async (req, res, next) => {
     let landmark = req.body.landmark;
 
     console.log("Update Address");
+
+    if (!address_id || address_id == "") {
+        return res.status(404).json({
+            success: false,
+            data: "",
+            message: "Address id not found",
+        });
+    }
 
     Address.update(
         {

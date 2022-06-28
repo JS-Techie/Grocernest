@@ -4,10 +4,10 @@ const Wallet = db.WalletModel
 const WalletTransaction = db.WalletTransactionModel;
 
 // Find all the transactions of particular customer and send it
-const getAllTransactionsOfUser = async (req, res, next) => {
+const getAllTransactionsOfUser = (req, res, next) => {
 
-    let customer_no = req.query.cust_no;
-    console.log("==>> Get all the transactions of", customer_no);
+    // Get current user from JWT
+    const customer_no = req.cust_no;
 
     Wallet.findAll({
         include: [{
@@ -34,8 +34,8 @@ const getAllTransactionsOfUser = async (req, res, next) => {
 // Get Wallet Balance of a customer
 const getBalanceOfUser = async (req, res, next) => {
 
-    let customer_no = req.query.cust_no;
-    console.log("==>> Get Wallet balance of the user", customer_no);
+    // Get current user from JWT
+    const customer_no = req.cust_no;
 
     Wallet.findAll({
         where: { cust_no: customer_no }

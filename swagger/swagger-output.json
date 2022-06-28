@@ -414,11 +414,6 @@
             "name": "authorization",
             "in": "header",
             "type": "string"
-          },
-          {
-            "name": "cust_no",
-            "in": "query",
-            "type": "string"
           }
         ],
         "responses": {
@@ -438,11 +433,6 @@
           {
             "name": "authorization",
             "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "cust_no",
-            "in": "query",
             "type": "string"
           }
         ],
@@ -473,8 +463,8 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
+          "201": {
+            "description": "Created"
           },
           "400": {
             "description": "Bad Request"
