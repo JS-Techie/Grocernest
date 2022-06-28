@@ -51,7 +51,7 @@ const login = async (req, res, next) => {
       },
       process.env.JWT_SECRET,
       {
-        expiresIn: "24h", //Subject to change
+        expiresIn: "300d", //Subject to change
       }
     );
 
@@ -301,7 +301,7 @@ const changePassword = async (req, res, next) => {
   //Get the customer number from the body
   const { newPassword } = req.body;
   const customer = await Cache.findAll();
-  const customerDetails  = JSON.parse(customer[0].user_details)
+  const customerDetails = JSON.parse(customer[0].user_details)
   console.log(customerDetails);
   const customerNumber = customerDetails.cust_no
   console.log(customerNumber)
@@ -327,20 +327,20 @@ const changePassword = async (req, res, next) => {
     console.log(encryptedPassword + "<----- New Password")
 
     const updatedUser = await Customer.update({
-      password : encryptedPassword
-    },{
-      where : {
-        cust_no : customerNumber
+      password: encryptedPassword
+    }, {
+      where: {
+        cust_no: customerNumber
       }
     })
 
     const deletedField = await Cache.destroy({
-      where : {generated_otp : customer[0].generated_otp}
+      where: { generated_otp: customer[0].generated_otp }
     })
 
     return res.status(200).send({
       success: true,
-      data:{
+      data: {
         updatedUser,
         deletedField
       },
@@ -379,7 +379,7 @@ const getOTP = async (req, res, next) => {
   });
 };
 
-const resendToken = async (req, res, next) => {};
+const resendToken = async (req, res, next) => { };
 
 
 module.exports = {

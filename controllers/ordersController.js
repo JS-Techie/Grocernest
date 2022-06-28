@@ -2,26 +2,28 @@ const db = require("../models");
 
 const Order = db.OrderModel;
 const OrderItems = db.OrderItemsModel;
+const ItemTable = db.ItemModel
 
 const getAllOrders = async (req, res, next) => {
+
   //Get currentUser from req.payload.cust_no
-  //const currentUser = req.payload.cust_no
+  const currentUser = req.cust_no;
 
   //Get all order ids for that customer number
-
   try {
     const allOrders = await Order.findAll(
       {
-        include: [
-          {
-            model: OrderItems,
-            attributes: ["order_id"],
-          },
-        ],
+        include:
+        {
+          model: OrderItems,
+          include: {
+            model: ItemTable,
+          }
+        },
       },
       {
         where: {
-          //cust_no: currentUser,
+          cust_no: currentUser,
         },
       }
     );
@@ -47,10 +49,11 @@ const getAllOrders = async (req, res, next) => {
     });
   }
 };
+
 const getOrderByOrderId = async (req, res, next) => {
   //Get currentUser from req.cust_no
 
-  //const currentUser = req.cust_no
+  const currentUser = req.cust_no
 
   //Get order id from req.params
   const orderId = req.params.orderId;
@@ -62,13 +65,13 @@ const getOrderByOrderId = async (req, res, next) => {
         include: [
           {
             model: OrderItems,
-            attributes: ["order_id"],
+            // attributes: ["order_id"],
           },
         ],
       },
       {
         where: {
-          // cust_no : currentUser,
+          cust_no: currentUser,
           order_id: orderId,
         },
       }
@@ -82,9 +85,26 @@ const getOrderByOrderId = async (req, res, next) => {
       });
     }
 
+    // const promises = singleOrder.t_order_items_models.map(async (currentItem) => {
+
+    //   const item = await ItemModel.findOne({
+    //     where : {id : currentItem.id}
+    //   })
+
+    //   return({
+    //       itemName : item.name,
+    //       id : currentItem.id,
+    //       img : item.image
+    //   })
+    // })
+
+    // const itemResponse = await Promise.all(promises);
+
     return res.status(200).send({
       success: true,
-      data: singleOrder,
+      data: {
+        orderID: singleOrder.id,
+      },
       message: "Order successfully fetched for the user",
     });
   } catch (error) {

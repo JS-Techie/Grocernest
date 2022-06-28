@@ -18,7 +18,6 @@ router.route("/view/balance").get(authenticate, getBalanceOfUser);
 router.route("/view/transactions").get(authenticate, getAllTransactionsOfUser);
 
 // Admin routes
-
 // View the wallet history and current balance for a customer
 router.route("/customer/:custno").get(authenticate, getCustomerWalletDetails);
 
