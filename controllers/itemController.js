@@ -286,8 +286,13 @@ const getItemsBySearchTerm = async (req, res, next) => {
   }
 };
 
+const getItemById = async (req,res,next) => {
+
+}
+
 module.exports = {
   getItemsInCategory,
   getItemsInSubcategory,
   getItemsBySearchTerm,
+  getItemById,
 };

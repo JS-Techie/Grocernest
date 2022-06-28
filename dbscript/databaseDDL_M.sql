@@ -61,3 +61,16 @@ CREATE TABLE `t_cache` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`generated_otp`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+--adding available_for_ecomm field in item table
+
+ALTER TABLE ecomm.t_item ADD available_for_ecomm BOOL NULL;
+
+--adding available_for_ecomm field in category table
+
+ALTER TABLE ecomm.t_lkp_category ADD available_for_ecomm BOOL NULL;
+
+--adding available_for_ecomm field in sub category table
+
+ALTER TABLE ecomm.t_lkp_sub_category ADD available_for_ecomm BOOL NULL;
