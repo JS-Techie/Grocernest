@@ -16,4 +16,4 @@ router.route("/category/:categoryId/subcategory/:subcategoryId").get(getItemsInS
 router.route("/search/:searchTerm").get(getItemsBySearchTerm)
 router.route("/:itemId").get(getItemById)
 
-module.exports = router;
+module.exports = router;    
