@@ -12,13 +12,6 @@ const getAllOrders = async (req, res, next) => {
 
   //Get all order ids for that customer number
   try {
-
-    // `select t_lkp_order.order_id, t_lkp_order.created_at, t_lkp_order.status, t_item.id, t_item.name, t_order_items.quantity, t_item.image
-    // from ((t_lkp_order
-    // inner join t_order_items on t_order_items.order_id = t_lkp_order.order_id)
-    // inner join t_item on t_item.id = t_order_items.item_id)
-    // where t_lkp_order.cust_no = "${currentUser}"`
-
     const allOrders = await Order.findAll({
       where: { cust_no: currentUser }
     })
@@ -132,32 +125,29 @@ const getOrderByOrderId = async (req, res, next) => {
   }
 };
 const cancelOrder = async (req, res, next) => {
+
   //get currentUser from req.cust_no
-  //const currentUser = req.cust_no
+  const currentUser = req.cust_no
 
   //get orderId from req.body
-  const orderId = req.body.orderId;
+  const orderId = req.params.orderId;
+
+  console.log(orderId)
 
   try {
     //check if that orderId belongs to that customer
     const singleOrder = await Order.findOne(
       {
-        include: [
-          {
-            model: OrderItems,
-            attributes: ["order_id"],
-          },
-        ],
-      },
-      {
         where: {
-          //cust_no : currentUser,
+          cust_no: currentUser,
           order_id: orderId,
         },
       }
     );
 
-    if (singleOrder.length === 0) {
+    console.log(typeof singleOrder.status);
+
+    if (!singleOrder === 0) {
       return res.status(400).send({
         success: false,
         data: null,
@@ -165,18 +155,35 @@ const cancelOrder = async (req, res, next) => {
       });
     }
 
+    let include_array = ['Accepted', 'Shipped']
+    if (!include_array.includes(singleOrder.status)) {
+      return res.status(400).send({
+        success: false,
+        data: singleOrder,
+        message: "This order cannot be cancelled"
+      })
+    }
+
+    //if my string contains accepted or shipped we can cancel
+
+    const updatedOrderStatus = await singleOrder.update({
+      status: "Cancelled",
+      where: { order_id: singleOrder.order_id },
+
+    })
+
     //Update status of status to say cancelled if the status is accepted or shipped
     //cannot cancel for returned and delivered and already cancelled
 
     return res.status(200).send({
       success: true,
-      data: singleOrder,
+      data: updatedOrderStatus,
       message: "Requested order successfully cancelled for current user",
     });
   } catch (error) {
     return res.status(400).send({
       success: false,
-      data: error,
+      data: error.message,
       message: "Error occured while trying to fetch requested order for current user",
     });
   }
@@ -184,31 +191,23 @@ const cancelOrder = async (req, res, next) => {
 };
 const returnOrder = async (req, res, next) => {
   //get currentUser from req.cust_no
-  //const currentUser = req.cust_no
+  const currentUser = req.cust_no
 
   //get orderId from req.body
-  const orderId = req.body.orderId;
+  const orderId = req.params.orderId;
 
   try {
     //check if that orderId belongs to that customer
     const singleOrder = await Order.findOne(
       {
-        include: [
-          {
-            model: OrderItems,
-            attributes: ["order_id"],
-          },
-        ],
-      },
-      {
         where: {
-          //cust_no : currentUser,
+          cust_no: currentUser,
           order_id: orderId,
         },
       }
     );
 
-    if (singleOrder.length === 0) {
+    if (!singleOrder) {
       return res.status(400).send({
         success: false,
         data: null,
@@ -216,25 +215,39 @@ const returnOrder = async (req, res, next) => {
       });
     }
 
-    //Update status of status to say returned if the status is accepted or shipped or delivered
-    //cannot return for cancelled and already returned
+
+    let include_array = ['Accepted', 'Shipped', 'Delivered']
+    if (!include_array.includes(singleOrder.status)) {
+      return res.status(400).send({
+        success: false,
+        data: singleOrder,
+        message: "This order cannot be returned"
+      })
+    }
+
+    const updatedOrderStatus = await singleOrder.update({
+      status: "Returned",
+      where: { order_id: singleOrder.order_id },
+
+    })
+
 
     return res.status(200).send({
       success: true,
-      data: singleOrder,
+      data: updatedOrderStatus,
       message: "Requested order successfully Returned",
     });
   } catch (error) {
     return res.status(400).send({
       success: false,
-      data: error,
+      data: error.message,
       message: "Error occured while trying to fetch requested order for current user",
     });
   }
 };
 const trackOrder = async (req, res, next) => {
   //get currentUser from req.cust_no
-  //const currentUser = req.cust_no
+  const currentUser = req.cust_no
 
   //get orderId from req.params
   const orderId = req.params.orderId;
@@ -243,22 +256,14 @@ const trackOrder = async (req, res, next) => {
     //check if that orderId belongs to that customer
     const singleOrder = await Order.findOne(
       {
-        include: [
-          {
-            model: OrderItems,
-            attributes: ["order_id"],
-          },
-        ],
-      },
-      {
         where: {
-          //cust_no : currentUser,
+          cust_no: currentUser,
           order_id: orderId,
         },
       }
     );
 
-    if (singleOrder.length === 0) {
+    if (!singleOrder) {
       return res.status(404).send({
         success: false,
         data: null,
@@ -268,13 +273,13 @@ const trackOrder = async (req, res, next) => {
 
     return res.status(200).send({
       success: true,
-      data: singleOrder, //Send the status from here instead of the entire data
+      data: singleOrder.status, //Send the status from here instead of the entire data
       message: "Requested order successfully fetched",
     });
   } catch (error) {
     return res.status(400).send({
       success: false,
-      data: error,
+      data: error.message,
       message: "Error occured while fetching the requested order for the current user",
     });
   }

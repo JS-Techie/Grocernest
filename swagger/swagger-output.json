@@ -755,10 +755,16 @@
         }
       }
     },
-    "/orders/cancel": {
+    "/orders/cancel/{orderId}": {
       "post": {
         "description": "",
         "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
           {
             "name": "authorization",
             "in": "header",
@@ -787,10 +793,16 @@
         }
       }
     },
-    "/orders/return": {
+    "/orders/return/{orderId}": {
       "post": {
         "description": "",
         "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
           {
             "name": "authorization",
             "in": "header",
