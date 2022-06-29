@@ -18,9 +18,9 @@ const getItemsInCategory = async (req, res, next) => {
   const category = req.params.categoryId;
   try {
     //Search all items with that category id in items table
-    const itemsInACategory = await Item.findAll({
-      where: { category_id: category, available_for_ecomm: 1 },
-    });
+    // const itemsInACategory = await Item.findAll({
+    //   where: { category_id: category, available_for_ecomm: 1 },
+    // });
 
     if (itemsInACategory.length === 0) {
       return res.status(404).send({
@@ -30,49 +30,35 @@ const getItemsInCategory = async (req, res, next) => {
       });
     }
 
-    // const itemsInACategory =
-    //   await sequelize.query(`select t_item.id, t_item.name,t_item.brand_id,t_item.UOM ,t_item.category_id ,t_item.sub_category_id ,
-    // t_item.image ,t_item.description ,t_item.available_for_ecomm ,t_batch.batch_no ,
-    // t_batch.location_id ,t_batch.MRP ,t_batch.discount ,t_batch.cost_price ,t_batch.mfg_date ,t_batch.sale_price ,
-    // t_batch.created_at,t_lkp_color.color_name, t_lkp_brand.brand_name
-    // from ((((ecomm.t_item
-    //       inner join t_batch on t_batch.item_id = t_item.id )
-    //       inner join t_lkp_color on t_lkp_color.id = t_item.color_id)
-    //       inner join t_lkp_category on t_lkp_category.id = t_item.category_id)
-    //       inner join t_lkp_brand on t_lkp_brand.id = t_item.brand_id)
-    //        where t_lkp_category.id = ${category} and t_batch.location_id = 4;
-    // `);
+    const [itemsInACategory, metadata] =
+      await sequelize.query(`select t_item.id, t_item.name,t_item.brand_id,t_item.UOM ,t_item.category_id ,t_item.sub_category_id ,
+      t_item.image ,t_item.description ,t_item.available_for_ecomm ,t_batch.batch_no ,
+      t_batch.location_id ,t_batch.MRP ,t_batch.discount ,t_batch.cost_price ,t_batch.mfg_date ,t_batch.sale_price ,
+      t_batch.created_at,t_lkp_color.color_name, t_lkp_brand.brand_name
+      from (((((ecomm.t_item
+            inner join t_batch on t_batch.item_id = t_item.id )
+            inner join t_lkp_color on t_lkp_color.id = t_item.color_id)
+            inner join t_lkp_category on t_lkp_category.id = t_item.category_id)
+            inner join t_lkp_brand on t_lkp_brand.id = t_item.brand_id)
+            inner join t_inventory on t_inventory.item_id = t_item.id)
+             where t_lkp_category.id = ${category} and t_inventory.location_id = 4 and t_lkp_category.available_for_ecomm = 1 and t_item.available_for_ecomm = 1;
+    `);
 
-    const itemPromises = itemsInACategory.map(async (currentItem) => {
-      const color = await Color.findOne({
-        where: { id: currentItem.color_id },
-      });
-
-      const batch = await Batch.findOne({
-        where: { item_id: currentItem.id },
-      });
-
-      const brand = await Brand.findOne({
-        where: { id: currentItem.brand_id },
-      });
-
-      const response = await responseFormat(
-        currentItem.id,
-        currentItem.UOM,
-        "TBD",
-        currentItem.name,
-        batch,
-        currentItem.image,
-        "TBD",
-        color,
-        currentItem.description,
-        brand
-      );
-
-      return response;
+    const responseArray = itemsInACategory.map((current) => {
+      return {
+        itemName: current.name,
+        itemID: current.id,
+        UOM: current.UOM,
+        image: current.image,
+        description: current.description,
+        MRP: current.MRP,
+        discount: current.discount,
+        sale_price: current.sale_price,
+        mfg_date: current.mfg_date,
+        color: current.color_name,
+        brand: current.brand_name,
+      };
     });
-
-    const responseArray = await Promise.all(itemPromises);
 
     return res.status(200).send({
       success: true,
@@ -313,9 +299,17 @@ const getItemById = async (req, res, next) => {
   try {
     //Find all the details of the item pertaining to current item id
     const [itemResults, metadata] =
-      await sequelize.query(`select t_item.id, t_item.name,t_item.brand_id,t_item.category_id ,t_item.sub_category_id ,t_item.color_id ,t_item.image ,t_item.description ,t_item.available_for_ecomm ,t_batch.batch_no ,t_batch.location_id ,t_batch.MRP ,t_batch.discount ,t_batch.cost_price ,t_batch.mfg_date ,t_batch.sale_price ,t_batch.created_at ,t_inventory.quantity  from ((ecomm.t_item
-      inner join t_batch on t_batch.item_id = t_item.id )
-      inner join t_inventory on t_inventory.item_id = t_item.id) where t_item.id = ${currentItemId} AND t_inventory.location_id = 4 ORDER by t_batch.created_at`);
+      await sequelize.query(`select t_item.id, t_item.name,t_item.brand_id,t_item.UOM ,t_item.category_id, t_lkp_category.group_name,t_item.sub_category_id ,
+      t_item.image ,t_item.description ,t_item.available_for_ecomm ,t_batch.batch_no ,
+      t_batch.location_id ,t_batch.MRP ,t_batch.discount ,t_batch.cost_price ,t_batch.mfg_date ,t_batch.sale_price ,
+      t_batch.created_at,t_lkp_color.color_name, t_lkp_brand.brand_name
+      from (((((ecomm.t_item
+            inner join t_batch on t_batch.item_id = t_item.id )
+            inner join t_lkp_color on t_lkp_color.id = t_item.color_id)
+            inner join t_lkp_category on t_lkp_category.id = t_item.category_id)
+            inner join t_lkp_brand on t_lkp_brand.id = t_item.brand_id)
+            inner join t_inventory on t_inventory.item_id = t_item.id)
+             where t_item.id = ${currentItemId} and t_inventory.location_id = 4 and t_lkp_category.available_for_ecomm = 1 and t_item.available_for_ecomm = 1 order by t_batch.created_at;`);
 
     if (itemResults.length == 0) {
       return res.status(404).send({
@@ -327,48 +321,26 @@ const getItemById = async (req, res, next) => {
 
     const item = itemResults[0];
 
-    const color = await Color.findOne({
-      where: { id: item.color_id },
-    });
-
-    const category = await Category.findOne({
-      where: { id: item.category_id },
-    });
-
-    const subcategory = await Subcategory.findOne({
-      where: { id: item.sub_category_id },
-    });
-
-    const brand = await Brand.findOne({
-      where: { id: item.brand_id },
-    });
-
     let quantity = 0;
     itemResults.map((current) => {
       quantity += current.quantity;
     });
 
-    console.log(metadata);
-
     return res.status(200).send({
       success: true,
       data: {
-        itemId: item ? item.id : "Could not find item",
-        itemName: item ? item.name : "No name for item",
+        itemName: item.name,
+        itemID: item.id,
         quantity: quantity,
-        category: category
-          ? category.group_name
-          : "Could not find category name",
-        subcategory: subcategory
-          ? subcategory.sub_cat_name
-          : "Could not find subcategory for requested item",
-        color: color ? color.color_name : "Color not found",
-        brand: brand ? brand.brand_name : "Could not find brand name",
-        image: item ? item.image : "Could not find image",
-        description: item ? item.description : "Could not find description",
-        MRP: item ? item.MRP : "No MRP",
-        discount: item ? item.discount : "NO discount",
-        mfg: item ? item.mfg_date : "NO MFG date",
+        UOM: item.UOM,
+        image: item.image,
+        description: item.description,
+        MRP: item.MRP,
+        discount: item.discount,
+        sale_price: item.sale_price,
+        mfg_date: item.mfg_date,
+        color: item.color_name,
+        brand: item.brand_name,
       },
       message: "Details for requested item found",
     });

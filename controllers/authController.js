@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+
 const bcrypt = require("bcryptjs");
 const uniqid = require("uniqid");
 
@@ -49,7 +50,7 @@ const login = async (req, res, next) => {
         cust_name,
         cust_no,
       },
-      process.env.JWT_SECRET,
+      "hello hello hello",
       {
         expiresIn: "300d", //Subject to change
       }
