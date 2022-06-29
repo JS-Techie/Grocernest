@@ -13,13 +13,18 @@ const getAllCategories = async (req, res, next) => {
       include: [
         {
           model: Subcategory,
+          //where : {available_for_ecomm : 1},
         },
+        
       ],
     });
 
     const categoryPromises = categories.map(async (currentCategory) => {
       const subcategoryPromises = currentCategory.t_lkp_sub_category_models.map(
         (currentSubcategory) => {
+
+         
+
           return {
             subName: currentSubcategory.sub_cat_name,
             id: currentSubcategory.id,
