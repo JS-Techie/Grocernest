@@ -20,8 +20,8 @@ const {
 
 router.route('/all').get(authenticate, getAllOrders)
 router.route('/:orderId').get(authenticate, getOrderByOrderId)
-router.route('/cancel').post(authenticate, cancelOrder)
-router.route('/return').post(authenticate, returnOrder)
+router.route('/cancel/:orderId').post(authenticate, cancelOrder)
+router.route('/return/:orderId').post(authenticate, returnOrder)
 router.route('/:orderId/tracking').get(authenticate, trackOrder)
 
 module.exports = router;
