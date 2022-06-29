@@ -2,13 +2,14 @@ const db = require("../models");
 
 const Category = db.LkpCategoryModel;
 const Subcategory = db.LkpSubCategoryModel;
-// const Item = db.ItemModel;
+const Item = db.ItemModel;
 
 const getAllCategories = async (req, res, next) => {
   
   //Fetch all categories and subcategories within them
   try {
     const categories = await Category.findAll({
+      where : {available_for_ecomm : 1},
       include: [
         {
           model: Subcategory,

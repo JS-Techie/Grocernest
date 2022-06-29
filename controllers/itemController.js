@@ -19,7 +19,7 @@ const getItemsInCategory = async (req, res, next) => {
   try {
     //Search all items with that category id in items table
     const itemsInACategory = await Item.findAll({
-      where: { category_id: category },
+      where: { category_id: category, available_for_ecomm: 1 },
     });
 
     if (itemsInACategory.length === 0) {
@@ -29,6 +29,19 @@ const getItemsInCategory = async (req, res, next) => {
         message: "Could not find items in requested category",
       });
     }
+
+    // const itemsInACategory =
+    //   await sequelize.query(`select t_item.id, t_item.name,t_item.brand_id,t_item.UOM ,t_item.category_id ,t_item.sub_category_id ,
+    // t_item.image ,t_item.description ,t_item.available_for_ecomm ,t_batch.batch_no ,
+    // t_batch.location_id ,t_batch.MRP ,t_batch.discount ,t_batch.cost_price ,t_batch.mfg_date ,t_batch.sale_price ,
+    // t_batch.created_at,t_lkp_color.color_name, t_lkp_brand.brand_name
+    // from ((((ecomm.t_item
+    //       inner join t_batch on t_batch.item_id = t_item.id )
+    //       inner join t_lkp_color on t_lkp_color.id = t_item.color_id)
+    //       inner join t_lkp_category on t_lkp_category.id = t_item.category_id)
+    //       inner join t_lkp_brand on t_lkp_brand.id = t_item.brand_id)
+    //        where t_lkp_category.id = ${category} and t_batch.location_id = 4;
+    // `);
 
     const itemPromises = itemsInACategory.map(async (currentItem) => {
       const color = await Color.findOne({
@@ -40,8 +53,8 @@ const getItemsInCategory = async (req, res, next) => {
       });
 
       const brand = await Brand.findOne({
-        where : {id : currentItem.brand_id}
-      })
+        where: { id: currentItem.brand_id },
+      });
 
       const response = await responseFormat(
         currentItem.id,
@@ -88,6 +101,7 @@ const getItemsInSubcategory = async (req, res, next) => {
       where: {
         sub_category_id: subcategory,
         category_id: category,
+        //available_for_ecomm : 1
       },
     });
 
@@ -109,10 +123,10 @@ const getItemsInSubcategory = async (req, res, next) => {
       });
 
       const brand = await Brand.findOne({
-        where : {id : currentItem.brand_id}
-      })
+        where: { id: currentItem.brand_id },
+      });
 
-    
+      // const ItemsInASubcategory = await sequelize.query()
 
       const response = await responseFormat(
         currentItem.id,
@@ -301,7 +315,7 @@ const getItemById = async (req, res, next) => {
     const [itemResults, metadata] =
       await sequelize.query(`select t_item.id, t_item.name,t_item.brand_id,t_item.category_id ,t_item.sub_category_id ,t_item.color_id ,t_item.image ,t_item.description ,t_item.available_for_ecomm ,t_batch.batch_no ,t_batch.location_id ,t_batch.MRP ,t_batch.discount ,t_batch.cost_price ,t_batch.mfg_date ,t_batch.sale_price ,t_batch.created_at ,t_inventory.quantity  from ((ecomm.t_item
       inner join t_batch on t_batch.item_id = t_item.id )
-      inner join t_inventory on t_inventory.item_id = t_item.id) where t_item.id = ${currentItemId} AND t_batch.location_id = 4 ORDER by t_batch.created_at`);
+      inner join t_inventory on t_inventory.item_id = t_item.id) where t_item.id = ${currentItemId} AND t_inventory.location_id = 4 ORDER by t_batch.created_at`);
 
     if (itemResults.length == 0) {
       return res.status(404).send({
@@ -330,9 +344,11 @@ const getItemById = async (req, res, next) => {
     });
 
     let quantity = 0;
-    itemResults.map((current) => {  
-      quantity+= current.quantity;
+    itemResults.map((current) => {
+      quantity += current.quantity;
     });
+
+    console.log(metadata);
 
     return res.status(200).send({
       success: true,
@@ -340,18 +356,19 @@ const getItemById = async (req, res, next) => {
         itemId: item ? item.id : "Could not find item",
         itemName: item ? item.name : "No name for item",
         quantity: quantity,
-        category : category ? category.group_name : "Could not find category name",
-        subcategory : subcategory ? subcategory.sub_cat_name : "Could not find subcategory for requested item",
-        color : color.color_name,
-        brand : brand ? brand.brand_name : "Could not find brand name",
+        category: category
+          ? category.group_name
+          : "Could not find category name",
+        subcategory: subcategory
+          ? subcategory.sub_cat_name
+          : "Could not find subcategory for requested item",
+        color: color ? color.color_name : "Color not found",
+        brand: brand ? brand.brand_name : "Could not find brand name",
         image: item ? item.image : "Could not find image",
-        description: item
-          ? item.description
-          : "Could not find description",
+        description: item ? item.description : "Could not find description",
         MRP: item ? item.MRP : "No MRP",
         discount: item ? item.discount : "NO discount",
-        mfg: item? item.mfg_date : "NO MFG date",
-       
+        mfg: item ? item.mfg_date : "NO MFG date",
       },
       message: "Details for requested item found",
     });
