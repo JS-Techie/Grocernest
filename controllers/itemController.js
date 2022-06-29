@@ -22,14 +22,7 @@ const getItemsInCategory = async (req, res, next) => {
     //   where: { category_id: category, available_for_ecomm: 1 },
     // });
 
-    if (itemsInACategory.length === 0) {
-      return res.status(404).send({
-        success: false,
-        data: null,
-        message: "Could not find items in requested category",
-      });
-    }
-
+  
     const [itemsInACategory, metadata] =
       await sequelize.query(`select t_item.id, t_item.name,t_item.brand_id,t_item.UOM ,t_item.category_id ,t_item.sub_category_id ,
       t_item.image ,t_item.description ,t_item.available_for_ecomm ,t_batch.batch_no ,
@@ -44,7 +37,16 @@ const getItemsInCategory = async (req, res, next) => {
              where t_lkp_category.id = ${category} and t_inventory.location_id = 4 and t_lkp_category.available_for_ecomm = 1 and t_item.available_for_ecomm = 1;
     `);
 
-    const responseArray = itemsInACategory.map((current) => {
+    if (itemsInACategory.length === 0) {
+      return res.status(404).send({
+        success: false,
+        data: null,
+        message: "Could not find items in requested category",
+      });
+    }
+
+
+    const promises = await itemsInACategory.map(async (current) => {
       return {
         itemName: current.name,
         itemID: current.id,
@@ -59,6 +61,8 @@ const getItemsInCategory = async (req, res, next) => {
         brand: current.brand_name,
       };
     });
+
+    const responseArray = await Promise.all(promises)
 
     return res.status(200).send({
       success: true,
@@ -319,7 +323,7 @@ const getItemById = async (req, res, next) => {
       });
     }
 
-    const item = itemResults[0];
+    const item = await itemResults[0];
 
     let quantity = 0;
     itemResults.map((current) => {
