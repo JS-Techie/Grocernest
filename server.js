@@ -1,5 +1,4 @@
 require("dotenv").config();
-require("express-async-errors");
 
 // Swagger UI Setup
 const swaggerUI = require('swagger-ui-express');
