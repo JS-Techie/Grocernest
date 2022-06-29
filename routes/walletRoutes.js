@@ -1,8 +1,6 @@
-const express = require("express")
+const express = require("express");
 const router = express.Router();
 const authenticate = require("../middleware/authentication");
-
-// import authenticate from "../middleware/authentication.js";
 
 const {
     getAllTransactionsOfUser,
