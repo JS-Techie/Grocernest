@@ -37,7 +37,10 @@ const addItemToCart = async (req, res, next) => {
         });
         return res.status(200).send({
           success: true,
-          data: newItem,
+          data:{
+            itemID : newItem.item_id,
+            quantity : newItem.quantity,
+          },
           message: "Successfully added new item to cart",
         });
       } catch (error) {
