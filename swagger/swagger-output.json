@@ -293,18 +293,16 @@
         "responses": {}
       }
     },
+<<<<<<< HEAD
     "/cart/item/{itemId}/remove/{quantity}": {
+      "put": {
+=======
+    "/cart/item/{itemId}/subtract": {
       "put": {
         "description": "",
         "parameters": [
           {
             "name": "itemId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "quantity",
             "in": "path",
             "required": true,
             "type": "string"
@@ -316,11 +314,46 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "OK"
+          },
           "400": {
             "description": "Bad Request"
           },
           "404": {
             "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/cart/item/{itemId}/remove": {
+      "delete": {
+>>>>>>> 79499d23ab6f46a2caca1f4e4d45065be351d3ce
+        "description": "",
+        "parameters": [
+          {
+            "name": "itemId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
           }
         }
       }
