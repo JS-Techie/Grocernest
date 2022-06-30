@@ -13,7 +13,6 @@ const addItemToCart = async (req, res, next) => {
   //Get current user from JWT
   const currentUser = req.cust_no;
 
-
   //get item-id from params
   const itemId = req.params.itemId;
 
@@ -31,7 +30,7 @@ const addItemToCart = async (req, res, next) => {
     if (!itemAlreadyExists) {
       try {
         const newItem = await Cart.create({
-          cust_no : currentUser,
+          cust_no: currentUser,
           item_id: itemId,
           quantity: enteredQuantity,
           created_by: 1,
@@ -51,7 +50,7 @@ const addItemToCart = async (req, res, next) => {
     }
 
     //If the item already exists just increase the quantity
-    console.log(itemAlreadyExists.quantity)
+    console.log(itemAlreadyExists.quantity);
     try {
       const updatedItem = await Cart.update(
         { quantity: itemAlreadyExists.quantity + enteredQuantity },
