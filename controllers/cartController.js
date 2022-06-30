@@ -11,27 +11,30 @@ const saveCart = async (req, res, next) => {
 };
 const addItemToCart = async (req, res, next) => {
   //Get current user from JWT
-  //const currentUser = req.cust_no
+  const currentUser = req.cust_no;
+
 
   //get item-id from params
   const itemId = req.params.itemId;
 
   //get quantity from params
-  const quantity = req.params.quantity;
+  const enteredQuantity = parseInt(req.params.quantity);
 
   try {
     const itemAlreadyExists = await Cart.findOne({
       where: {
         item_id: itemId,
+        cust_no: currentUser,
       },
     });
 
     if (!itemAlreadyExists) {
       try {
         const newItem = await Cart.create({
-          //cust_id : currentUser,
+          cust_no : currentUser,
           item_id: itemId,
-          quantity: quantity,
+          quantity: enteredQuantity,
+          created_by: 1,
         });
         return res.status(200).send({
           success: true,
@@ -48,6 +51,25 @@ const addItemToCart = async (req, res, next) => {
     }
 
     //If the item already exists just increase the quantity
+    console.log(itemAlreadyExists.quantity)
+    try {
+      const updatedItem = await Cart.update(
+        { quantity: itemAlreadyExists.quantity + enteredQuantity },
+        { where: { item_id: itemId } }
+      );
+
+      return res.status(201).send({
+        success: true,
+        data: updatedItem,
+        message: "Updated quantity of item successfully",
+      });
+    } catch (error) {
+      return res.status(400).send({
+        success: false,
+        data: error.message,
+        message: "Could not update quantity of item in cart",
+      });
+    }
   } catch (error) {
     return res.status(400).send({
       success: false,
