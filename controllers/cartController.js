@@ -53,7 +53,7 @@ const addItemToCart = async (req, res, next) => {
     }
 
     //If the item already exists just increase the quantity
-    console.log(itemAlreadyExists.quantity);
+    // console.log(itemAlreadyExists.quantity);
     try {
       const updatedItem = await Cart.update(
         { quantity: itemAlreadyExists.quantity + enteredQuantity },
@@ -80,11 +80,12 @@ const addItemToCart = async (req, res, next) => {
     });
   }
 };
-const removeItemFromCart = async (req, res, next) => {
+
+
+
+const subtractItemFromCart = async (req, res, next) => {
   //Get current user from JWT
   const currentUser = req.cust_no
-
-  console.log("=================>")
 
   //Get item-id from params
   const itemId = req.params.itemId;
@@ -92,7 +93,7 @@ const removeItemFromCart = async (req, res, next) => {
   //Get quantity from params
   // const quantity = req.params.quantity;
 
-  console.log(currentUser, itemId);
+  // console.log(currentUser, itemId);
   try {
     //Find if the item exists in the cart
     const itemExists = await Cart.findOne({
@@ -111,7 +112,7 @@ const removeItemFromCart = async (req, res, next) => {
     }
     else {
       let itemQuantity = itemExists.dataValues.quantity;
-      console.log(itemQuantity);
+      // console.log(itemQuantity);
       if (itemQuantity == 1) {
         //if only one item exist, remove it from cart table
         Cart.destroy({
@@ -136,7 +137,7 @@ const removeItemFromCart = async (req, res, next) => {
       }
       else if (itemQuantity > 1) {
         //Subtract quantity in params from current quantity
-        console.log("subtracting qty");
+        // console.log("subtracting qty");
         Cart.update({ quantity: (itemQuantity - 1) },
           { where: { cust_no: currentUser, item_id: itemId }, }).then(() => {
             return res.status(200).send({
@@ -163,6 +164,44 @@ const removeItemFromCart = async (req, res, next) => {
     });
   }
 };
+
+const removeItemFromCart = async (req, res, next) => {
+  //Get current user from JWT
+  const currentUser = req.cust_no
+
+  //Get item-id from params
+  const itemId = req.params.itemId;
+
+  // console.log(currentUser, itemId);
+  Cart.destroy({
+    where: {
+      cust_no: currentUser,
+      item_id: itemId,
+    }
+  }).then((resData) => {
+    if (resData == 0) {
+      return res.status(400).json({
+        success: true,
+        data: "",
+        message: "No item found with this item id",
+      });
+    }
+    else {
+      return res.status(200).json({
+        success: true,
+        data: "",
+        message: "Item successfully deleted from cart.",
+      });
+    }
+  }).catch((error) => {
+    return res.status(400).json({
+      success: false,
+      data: error.message,
+      message: "Error while deleting item from database",
+    });
+  });
+}
+
 
 const getCart = async (req, res, next) => {
   //Get currentUser from JWT
@@ -222,6 +261,7 @@ const getCart = async (req, res, next) => {
 module.exports = {
   saveCart,
   addItemToCart,
+  subtractItemFromCart,
   removeItemFromCart,
   getCart,
 };
