@@ -121,6 +121,8 @@ db.WalletModel.hasMany(db.WalletTransactionModel, { foreignKey: "wallet_id" }); 
 // Address table
 db.CustomerModel.hasMany(db.AddressModel, { foreignKey: "cust_no" });
 
+db.CartModel.hasMany(db.ItemModel, {foreignKey : "id"})
+
 
 module.exports = db;
 

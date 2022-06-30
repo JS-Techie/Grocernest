@@ -1,6 +1,8 @@
 const db = require("../models");
 
 const Cart = db.CartModel;
+const Item = db.ItemModel;
+
 
 
 const saveCart = async (req, res, next) => {
@@ -102,20 +104,66 @@ const removeItemFromCart = async (req, res, next) => {
 
 const getCart = async (req,res,next) => {
   //Get currentUser from JWT
-  //const currentUser = req.cust_no
+  const currentUser = req.cust_no
+
+  console.log(currentUser)
 
   //Find the cart associated with this customer id
 
   try{
     const cartForUser = await Cart.findAll({
       where : {
-        //cust_no : currentUser
+        cust_no : currentUser
+      },
+      include : {
+        model : Item,
       }
     })
 
+    if(cartForUser.length === 0){
+      return res.status(404).send({
+        success : false,
+        data : null,
+        message : "There is no cart for current user"
+      })
+    }
+
+    // const promises = cartForUser.map(async(currentItem)=>{
+
+    //   const item = await Item.findOne({
+    //     where : {id:currentItem.item_id}
+    //   })
+
+    //   return({
+    //       itemID : currentItem.item_id,
+    //       quantity : currentItem.quantity,
+    //       itemName : item.name,
+    //       description : item.description,
+    //       image : item.image
+    //   })
+    // })
+
+    // const responseArray = await Promise.all(promises)
+
+
+    const promises = cartForUser.map(async(current)=>{
+      
+      const item = current.t_item_models[0];
+      
+      return({
+        itemID : current.item_id,
+        quantity : current.quantity,
+        itemName : item.name,
+        description : item.description,
+        image : item.image,
+      })
+    })
+
+    const responseArray = await Promise.all(promises)
+
     return res.status(200).send({
       success : true,
-      data : cartForUser,
+      data : responseArray,
       message : "Cart successfully fetched for user"
     })
 
@@ -123,8 +171,8 @@ const getCart = async (req,res,next) => {
   }catch(error){
     return res.status(400).send({
       success : false,
-      data : error,
-      message : "Error while fetching cart"
+      data : error.message,
+      message : "Error while fetching cart, check data field for more details"
     })
   }
 
