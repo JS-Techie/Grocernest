@@ -202,6 +202,30 @@ const removeItemFromCart = async (req, res, next) => {
   });
 }
 
+const getItemCount = async (req, res, next) => {
+  //Get currentUser from JWT
+  const currentUser = req.cust_no;
+
+  Cart.count({
+    where: {
+      cust_no: currentUser,
+    }
+  }).then((resData) => {
+    return res.status(200).json({
+      success: true,
+      data: {
+        "itemcount": resData
+      },
+      message: "Successfully fetched Item count",
+    });
+  }).catch((error) => {
+    return res.status(400).json({
+      success: false,
+      data: error.message,
+      message: "Error while counting item from Database",
+    });
+  });
+}
 
 const getCart = async (req, res, next) => {
   //Get currentUser from JWT
@@ -260,6 +284,7 @@ const getCart = async (req, res, next) => {
 
 module.exports = {
   saveCart,
+  getItemCount,
   addItemToCart,
   subtractItemFromCart,
   removeItemFromCart,
