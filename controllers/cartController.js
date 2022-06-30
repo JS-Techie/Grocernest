@@ -37,9 +37,9 @@ const addItemToCart = async (req, res, next) => {
         });
         return res.status(200).send({
           success: true,
-          data:{
-            itemID : newItem.item_id,
-            quantity : newItem.quantity,
+          data: {
+            itemID: newItem.item_id,
+            quantity: newItem.quantity,
           },
           message: "Successfully added new item to cart",
         });
@@ -82,19 +82,22 @@ const addItemToCart = async (req, res, next) => {
 };
 const removeItemFromCart = async (req, res, next) => {
   //Get current user from JWT
-  //const currentUser = req.cust_no
+  const currentUser = req.cust_no
+
+  console.log("=================>")
 
   //Get item-id from params
   const itemId = req.params.itemId;
 
   //Get quantity from params
-  const quantity = req.params.quantity;
+  // const quantity = req.params.quantity;
 
+  console.log(currentUser, itemId);
   try {
     //Find if the item exists in the cart
     const itemExists = await Cart.findOne({
       where: {
-        //cust_no = currentUser,
+        cust_no: currentUser,
         item_id: itemId,
       },
     });
@@ -106,9 +109,52 @@ const removeItemFromCart = async (req, res, next) => {
         message: "Requested item not found in cart",
       });
     }
+    else {
+      let itemQuantity = itemExists.dataValues.quantity;
+      console.log(itemQuantity);
+      if (itemQuantity == 1) {
+        //if only one item exist, remove it from cart table
+        Cart.destroy({
+          where: {
+            cust_no: currentUser,
+            item_id: itemId,
+            quantity: 1
+          }
+        }).then(() => {
+          return res.status(200).json({
+            success: true,
+            message: "Item successfully deleted from cart.",
+          });
+        }).catch((error) => {
+          return res.status(400).json({
+            success: false,
+            data: error.message,
+            message: "Error while deleting item from database",
+          });
+        })
 
-    //Subtract quantity in params from current quantity
-    //if difference <=0 remove it from cart table
+      }
+      else if (itemQuantity > 1) {
+        //Subtract quantity in params from current quantity
+        console.log("subtracting qty");
+        Cart.update({ quantity: (itemQuantity - 1) },
+          { where: { cust_no: currentUser, item_id: itemId }, }).then(() => {
+            return res.status(200).send({
+              success: true,
+              data: {
+                quantity: (itemQuantity - 1)
+              },
+              message: "Quantity Successfully Subtracted",
+            });
+          }).catch((error) => {
+            return res.status(400).json({
+              success: false,
+              data: error.message,
+              message: "Error while subtracting quantity from database",
+            });
+          })
+      }
+    }
   } catch (error) {
     return res.status(400).send({
       success: false,
