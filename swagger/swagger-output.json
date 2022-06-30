@@ -293,10 +293,6 @@
         "responses": {}
       }
     },
-<<<<<<< HEAD
-    "/cart/item/{itemId}/remove/{quantity}": {
-      "put": {
-=======
     "/cart/item/{itemId}/subtract": {
       "put": {
         "description": "",
@@ -328,7 +324,6 @@
     },
     "/cart/item/{itemId}/remove": {
       "delete": {
->>>>>>> 79499d23ab6f46a2caca1f4e4d45065be351d3ce
         "description": "",
         "parameters": [
           {
