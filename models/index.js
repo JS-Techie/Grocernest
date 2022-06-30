@@ -123,6 +123,9 @@ db.CustomerModel.hasMany(db.AddressModel, { foreignKey: "cust_no" });
 
 db.CartModel.hasMany(db.ItemModel, {foreignKey : "id"})
 
+//One item can belong to many batches
+db.ItemModel.hasMany(db.BatchModel, {foreignKey : "item_id"})
+
 
 module.exports = db;
 
