@@ -23,7 +23,7 @@ module.exports = sequelize => {
       field: "order_id"
     },
     status: {
-      type: DataTypes.ENUM('Accepted', 'Shipped', 'Delivered', 'Cancelled', 'Returned'),
+      type: DataTypes.ENUM('Placed', 'Accepted', 'Shipped', 'Delivered', 'Cancelled', 'Returned'),
       allowNull: false,
       defaultValue: null,
       primaryKey: false,

@@ -9,6 +9,7 @@ const saveCart = async (req, res, next) => {
   //const currentUser = req.cust_no
   //Already saving to DB in adding items and removing from DB based on certain conditions in remove route
 };
+
 const addItemToCart = async (req, res, next) => {
   //Get current user from JWT
   const currentUser = req.cust_no;
@@ -57,12 +58,13 @@ const addItemToCart = async (req, res, next) => {
     try {
       const updatedItem = await Cart.update(
         { quantity: itemAlreadyExists.quantity + enteredQuantity },
-        { where: { item_id: itemId } }
+        { where: { item_id: itemId, cust_no: currentUser } }
       );
 
+      console.log("updatedItem>", updatedItem);
       return res.status(201).send({
         success: true,
-        data: updatedItem,
+        data: { itemID: itemAlreadyExists.item_id, quantity: itemAlreadyExists.quantity + enteredQuantity },
         message: "Updated quantity of item successfully",
       });
     } catch (error) {
