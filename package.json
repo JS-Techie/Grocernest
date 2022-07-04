@@ -27,6 +27,7 @@
     "nodemailer": "^6.7.5",
     "nodemon": "^2.0.16",
     "otp-generator": "^4.0.0",
+    "random-avatar-generator": "^2.0.0",
     "sequelize": "^6.20.1",
     "sequelize-automate": "^1.2.2",
     "swagger-autogen": "^2.21.4",
