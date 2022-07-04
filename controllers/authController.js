@@ -231,6 +231,8 @@ const verifyOTP = async (req, res, next) => {
       contact_no: newUser.contact_no,
       password: newUser.password,
       created_by: newUser.created_by,
+      referral_code: newUser.referral_code,
+      referred_by: newUser.referred_by
     });
 
     const deletedField = await Cache.destroy({
