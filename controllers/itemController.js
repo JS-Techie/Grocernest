@@ -218,9 +218,10 @@ const getItemById = async (req, res, next) => {
       });
     }
     const item = await itemResults[0];
-    let quantity = 0;
+
+    let availableQuantity = 0;
     itemResults.map((current) => {
-      quantity += current.quantity;
+      availableQuantity += current.quantity;
     });
 
     return res.status(200).send({
@@ -228,7 +229,7 @@ const getItemById = async (req, res, next) => {
       data: {
         itemName: item.name,
         itemID: item.id,
-        quantity: quantity,
+        quantity: availableQuantity,
         UOM: item.UOM,
         categoryName: item.group_name,
         categoryID: item.category_id,

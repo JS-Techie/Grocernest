@@ -1,8 +1,10 @@
+
 const { sequelize } = require("../models");
 const db = require("../models");
 
 const Cart = db.CartModel;
 const Item = db.ItemModel;
+const Batch = db.BatchModel;
 
 const saveCart = async (req, res, next) => {
   //Get current user from JWT
@@ -59,9 +61,12 @@ const addItemToCart = async (req, res, next) => {
         { quantity: itemAlreadyExists.quantity + enteredQuantity },
         { where: { item_id: itemId, cust_no: currentUser } }
       );
- return res.status(201).send({
+      return res.status(201).send({
         success: true,
-        data: { itemID: itemAlreadyExists.item_id, quantity: itemAlreadyExists.quantity + enteredQuantity },
+        data: {
+          itemID: itemAlreadyExists.item_id,
+          quantity: itemAlreadyExists.quantity + enteredQuantity,
+        },
         message: "Updated quantity of item successfully",
       });
     } catch (error) {
@@ -80,11 +85,9 @@ const addItemToCart = async (req, res, next) => {
   }
 };
 
-
-
 const subtractItemFromCart = async (req, res, next) => {
   //Get current user from JWT
-  const currentUser = req.cust_no
+  const currentUser = req.cust_no;
 
   //Get item-id from params
   const itemId = req.params.itemId;
@@ -108,8 +111,7 @@ const subtractItemFromCart = async (req, res, next) => {
         data: null,
         message: "Requested item not found in cart",
       });
-    }
-    else {
+    } else {
       let itemQuantity = itemExists.dataValues.quantity;
       // console.log(itemQuantity);
       if (itemQuantity == 1) {
@@ -118,41 +120,45 @@ const subtractItemFromCart = async (req, res, next) => {
           where: {
             cust_no: currentUser,
             item_id: itemId,
-            quantity: 1
-          }
-        }).then(() => {
-          return res.status(200).json({
-            success: true,
-            message: "Item successfully deleted from cart.",
-          });
-        }).catch((error) => {
-          return res.status(400).json({
-            success: false,
-            data: error.message,
-            message: "Error while deleting item from database",
-          });
+            quantity: 1,
+          },
         })
-
-      }
-      else if (itemQuantity > 1) {
+          .then(() => {
+            return res.status(200).json({
+              success: true,
+              message: "Item successfully deleted from cart.",
+            });
+          })
+          .catch((error) => {
+            return res.status(400).json({
+              success: false,
+              data: error.message,
+              message: "Error while deleting item from database",
+            });
+          });
+      } else if (itemQuantity > 1) {
         //Subtract quantity in params from current quantity
         // console.log("subtracting qty");
-        Cart.update({ quantity: (itemQuantity - 1) },
-          { where: { cust_no: currentUser, item_id: itemId }, }).then(() => {
+        Cart.update(
+          { quantity: itemQuantity - 1 },
+          { where: { cust_no: currentUser, item_id: itemId } }
+        )
+          .then(() => {
             return res.status(200).send({
               success: true,
               data: {
-                quantity: (itemQuantity - 1)
+                quantity: itemQuantity - 1,
               },
               message: "Quantity Successfully Subtracted",
             });
-          }).catch((error) => {
+          })
+          .catch((error) => {
             return res.status(400).json({
               success: false,
               data: error.message,
               message: "Error while subtracting quantity from database",
             });
-          })
+          });
       }
     }
   } catch (error) {
@@ -166,7 +172,7 @@ const subtractItemFromCart = async (req, res, next) => {
 
 const removeItemFromCart = async (req, res, next) => {
   //Get current user from JWT
-  const currentUser = req.cust_no
+  const currentUser = req.cust_no;
 
   //Get item-id from params
   const itemId = req.params.itemId;
@@ -176,30 +182,31 @@ const removeItemFromCart = async (req, res, next) => {
     where: {
       cust_no: currentUser,
       item_id: itemId,
-    }
-  }).then((resData) => {
-    if (resData == 0) {
+    },
+  })
+    .then((resData) => {
+      if (resData == 0) {
+        return res.status(400).json({
+          success: true,
+          data: "",
+          message: "No item found with this item id",
+        });
+      } else {
+        return res.status(200).json({
+          success: true,
+          data: "",
+          message: "Item successfully deleted from cart.",
+        });
+      }
+    })
+    .catch((error) => {
       return res.status(400).json({
-        success: true,
-        data: "",
-        message: "No item found with this item id",
+        success: false,
+        data: error.message,
+        message: "Error while deleting item from database",
       });
-    }
-    else {
-      return res.status(200).json({
-        success: true,
-        data: "",
-        message: "Item successfully deleted from cart.",
-      });
-    }
-  }).catch((error) => {
-    return res.status(400).json({
-      success: false,
-      data: error.message,
-      message: "Error while deleting item from database",
     });
-  });
-}
+};
 
 const getItemCount = async (req, res, next) => {
   //Get currentUser from JWT
@@ -208,23 +215,25 @@ const getItemCount = async (req, res, next) => {
   Cart.count({
     where: {
       cust_no: currentUser,
-    }
-  }).then((resData) => {
-    return res.status(200).json({
-      success: true,
-      data: {
-        "itemcount": resData
-      },
-      message: "Successfully fetched Item count",
+    },
+  })
+    .then((resData) => {
+      return res.status(200).json({
+        success: true,
+        data: {
+          itemcount: resData,
+        },
+        message: "Successfully fetched Item count",
+      });
+    })
+    .catch((error) => {
+      return res.status(400).json({
+        success: false,
+        data: error.message,
+        message: "Error while counting item from Database",
+      });
     });
-  }).catch((error) => {
-    return res.status(400).json({
-      success: false,
-      data: error.message,
-      message: "Error while counting item from Database",
-    });
-  });
-}
+};
 
 const getCart = async (req, res, next) => {
   //Get currentUser from JWT
@@ -241,19 +250,31 @@ const getCart = async (req, res, next) => {
     inner join t_batch on t_batch.item_id = t_cart.item_id )
     inner join t_lkp_color on t_lkp_color.id = t_item.color_id )
     inner join t_lkp_brand on t_lkp_brand.id = t_item.brand_id )
-    where t_cart.cust_no = "${currentUser}"`);
+    where t_cart.cust_no = "${currentUser}" order by t_batch.created_at desc`);
 
     if (cartForUser.length === 0) {
       return res.status(404).send({
-        success: false,
-        data: null,
+        success: true,
+        data: [],
         message: "There is no cart for current user",
       });
     }
+
     const promises = cartForUser.map(async (current) => {
+
+      let availableQuantity = 0;
+      const batches = await Batch.findAll({
+        where : {item_id : current.item_id}
+      })
+
+      batches.map((currentBatch)=>{
+        availableQuantity+=currentBatch.quantity
+      })
+
       return {
         itemID: current.item_id,
         quantity: current.quantity,
+        availableQuantity,
         itemName: current.name,
         description: current.description,
         image: current.image,
@@ -265,7 +286,11 @@ const getCart = async (req, res, next) => {
       };
     });
 
-    const responseArray = await Promise.all(promises);
+    const resolved = await Promise.all(promises);
+    const responseArray = [
+      ...new Map(resolved.map((item) => [item["itemID"], item])).values(),
+    ];
+
 
     return res.status(200).send({
       success: true,
