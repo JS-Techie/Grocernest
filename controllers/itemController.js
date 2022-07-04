@@ -147,7 +147,7 @@ const getItemsBySearchTerm = async (req, res, next) => {
 
     if (results.length === 0) {
       return res.status(404).send({
-        success: true,
+        success: false,
         data: null,
         message: "No items found based on search term",
       });
