@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-
+const referralCodeGenerator = require('referral-code-generator')
 const bcrypt = require("bcryptjs");
 const uniqid = require("uniqid");
 
@@ -81,7 +81,8 @@ const login = async (req, res, next) => {
 const register = async (req, res, next) => {
   try {
     //Get the user details from the form
-    const { firstName, lastName, phoneNumber, email, password } = req.body;
+    const { firstName, lastName, phoneNumber, email, password, referral_code } = req.body;
+    let referrer_cust_id = "";
     //Check if all required input is recieved
     if (!phoneNumber || !password || !firstName || !lastName) {
       return res.status(400).send({
@@ -110,55 +111,89 @@ const register = async (req, res, next) => {
     let salt = bcrypt.genSaltSync(10);
     //Hash Password
     let encryptedPassword = bcrypt.hashSync(password, salt);
-    //Create new Customer
+
+    // check referel code valid or not
+
     try {
-      const newUser = {
-        id: Math.floor(Math.random() * 10000 + 1),
-        cust_no: uniqid(),
-        active_ind: "Y",
-        cust_name: firstName + " " + lastName,
-        email: email ? email.toLowerCase() : null,
-        contact_no: phoneNumber.toString(),
-        password: encryptedPassword,
-        created_by: 13,
-      };
+      if (referral_code != "") {
+        const referrer_customer = await Customer.findOne(
+          {
+            attributes: ["cust_no"],
+            where: { referral_code: referral_code },
+          });
 
-      const serverGeneratedOTP = generateOTP();
-      // sendOTPToPhoneNumber(serverGeneratedOTP);
+        if (!referrer_customer) {
+          return res.status(404).send({
+            success: false,
+            data: null,
+            message: "Referral code is not valid",
+          });
+        } else {
+          referrer_cust_id = referrer_customer.dataValues.cust_no
+        }
+      }
 
+
+      //Create new Customer
       try {
-        const response = await Cache.create({
-          user_details: JSON.stringify(newUser),
-          generated_otp: serverGeneratedOTP,
-          created_by: 6, //hardcoded for now
-        });
+        let ref_code = referralCodeGenerator.alpha('uppercase', 2) + "-" + referralCodeGenerator.alpha('uppercase', 1) + referralCodeGenerator.alphaNumeric('uppercase', 1, 4)
+        const newUser = {
+          id: Math.floor(Math.random() * 10000 + 1),
+          cust_no: uniqid(),
+          active_ind: "Y",
+          cust_name: firstName + " " + lastName,
+          email: email ? email.toLowerCase() : null,
+          contact_no: phoneNumber.toString(),
+          password: encryptedPassword,
+          created_by: 13,
+          referral_code: ref_code,
+          referred_by: referrer_cust_id
+        };
 
-        return res.status(200).send({
-          success: true,
-          data: {
-            newUser,
-            response,
-          },
-          message:
-            "User created and OTP successfully sent, find the OTP from getOTP route",
-        });
+        const serverGeneratedOTP = generateOTP();
+        // sendOTPToPhoneNumber(serverGeneratedOTP);
+
+        try {
+          const response = await Cache.create({
+            user_details: JSON.stringify(newUser),
+            generated_otp: serverGeneratedOTP,
+            created_by: 6, //hardcoded for now
+          });
+
+          return res.status(200).send({
+            success: true,
+            data: {
+              newUser,
+              response,
+            },
+            message:
+              "User created and OTP successfully sent, find the OTP from getOTP route",
+          });
+        } catch (error) {
+          return res.status(400).send({
+            success: false,
+            data: error.message,
+            message:
+              "Could not store the user and OTP in cache, check data field for more details",
+          });
+        }
       } catch (error) {
-        return res.status(400).send({
+        return res.status(401).send({
           success: false,
           data: error.message,
-          message:
-            "Could not store the user and OTP in cache, check data field for more details",
+          message: "Could not create new user and send OTP",
         });
       }
+      //Catch other errors and throw them
     } catch (error) {
-      return res.status(401).send({
+      return res.status(400).send({
         success: false,
         data: error.message,
-        message: "Could not create new user and send OTP",
+        message: "Could not register user",
       });
     }
-    //Catch other errors and throw them
-  } catch (error) {
+  }
+  catch (error) {
     return res.status(400).send({
       success: false,
       data: error.message,
@@ -378,7 +413,7 @@ const getOTP = async (req, res, next) => {
   });
 };
 
-const resendToken = async (req, res, next) => {};
+const resendToken = async (req, res, next) => { };
 
 module.exports = {
   login,
