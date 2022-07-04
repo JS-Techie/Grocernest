@@ -54,15 +54,12 @@ const addItemToCart = async (req, res, next) => {
     }
 
     //If the item already exists just increase the quantity
-    // console.log(itemAlreadyExists.quantity);
     try {
       const updatedItem = await Cart.update(
         { quantity: itemAlreadyExists.quantity + enteredQuantity },
         { where: { item_id: itemId, cust_no: currentUser } }
       );
-
-      console.log("updatedItem>", updatedItem);
-      return res.status(201).send({
+ return res.status(201).send({
         success: true,
         data: { itemID: itemAlreadyExists.item_id, quantity: itemAlreadyExists.quantity + enteredQuantity },
         message: "Updated quantity of item successfully",
