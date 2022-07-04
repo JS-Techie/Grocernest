@@ -49,3 +49,6 @@ CREATE TABLE `t_address` (
   PRIMARY KEY (`address_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+
+ALTER TABLE ecomm.t_customer ADD referral_code varchar(100) NULL;
+ALTER TABLE ecomm.t_customer ADD referred_by varchar(20) NULL;

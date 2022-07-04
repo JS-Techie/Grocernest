@@ -133,6 +133,24 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "password"
+    },
+    referral_code: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "referral_code"
+    },
+    referred_by: {
+      type: DataTypes.STRING(20),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "referred_by"
     }
   };
   const options = {
