@@ -55,6 +55,7 @@ const editProfile = async (req, res, next) => {
   const enteredFirstName = req.body.firstName;
   const enteredLastName = req.body.lastName;
 
+
   try {
     const currentUserProfile = await Customer.findOne({
       where: { cust_no: currentUser },

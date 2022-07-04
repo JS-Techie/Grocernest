@@ -36,6 +36,7 @@ const walletRouter = require("./routes/walletRoutes");
 const wishlistRouter = require("./routes/wishlistRoutes");
 const addressRouter = require("./routes/addressRoutes");
 const profileRouter = require("./routes/profileRoutes")
+const checkoutRouter = require("./routes/checkoutRoutes")
 const orderRouter = require("./routes/ordersRoutes")
 const couponRouter = require("./routes/couponsRoutes")
 const referralRouter = require("./routes/referralRoutes")
@@ -55,6 +56,7 @@ app.use("/wallet", walletRouter);
 app.use("/wishlist", wishlistRouter);
 app.use("/address", addressRouter);
 app.use("/profile", profileRouter);
+app.use("/checkout", checkoutRouter);
 app.use("/orders", orderRouter);
 app.use("/coupons", couponRouter);
 app.use("/referral/view", referralRouter);
