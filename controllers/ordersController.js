@@ -38,6 +38,7 @@ const getAllOrders = async (req, res, next) => {
 
       const orderItemsArray = await Promise.all(orderItemPromises)
 
+
       return ({
         orderID: currentOrder.order_id,
         Date: currentOrder.created_at,

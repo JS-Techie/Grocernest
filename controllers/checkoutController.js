@@ -15,12 +15,12 @@ const checkoutFromCart = async (req, res, next) => {
       where: { cust_no: currentUser },
     });
 
-    if(cartForUser.length === 0){
-        return res.status(404).send({
-            success : false,
-            data : [],
-            message : "The user does not have any items in his cart"
-        })
+    if (cartForUser.length === 0) {
+      return res.status(404).send({
+        success: false,
+        data: [],
+        message: "The user does not have any items in his cart",
+      });
     }
 
     const newOrder = await Order.create({
@@ -51,16 +51,16 @@ const checkoutFromCart = async (req, res, next) => {
     const orderItemsResolved = await Promise.all(orderItemsPromises);
 
     const deletedItemsFromCart = await Cart.destroy({
-        where : {cust_no : currentUser}
-    })
+      where: { cust_no: currentUser },
+    });
 
-    return res.status(200).send({
+    return res.status(201).send({
       success: true,
       data: {
         currentUser: currentUser,
         orderID: newOrder.order_id,
         orderItems: orderItemsResolved,
-        numberOfDeletedItemsFromCart : deletedItemsFromCart,
+        numberOfDeletedItemsFromCart: deletedItemsFromCart,
       },
       message: "Order placed successfully",
     });
@@ -126,23 +126,14 @@ const buyNow = async (req, res, next) => {
     return res.status(201).send({
       success: true,
       data: {
-        customerNumber: currentUser,
+        currentUser: currentUser,
         orderID: newOrder.order_id,
-        itemID: newOrderItem.item_id,
-        quantity: newOrderItem.quantity,
-        UOM: currentItem.UOM,
-        categoryName: currentItem.group_name,
-        categoryID: currentItem.category_id,
-        subcategoryName: currentItem.sub_cat_name,
-        subcategoryID: currentItem.sub_category_id,
-        image: currentItem.image,
-        description: currentItem.description,
-        MRP: currentItem.MRP,
-        discount: currentItem.discount,
-        sale_price: currentItem.sale_price,
-        mfg_date: currentItem.mfg_date,
-        color: currentItem.color_name,
-        brand: currentItem.brand_name,
+        orderStatus: newOrder.status,
+        orderItems: {
+          itemID: newOrderItem.item_id,
+          quantity: newOrderItem.quantity,
+        },
+        numberOfDeletedItemsFromCart: deletedItemsFromCart,
       },
       message: "Order created successfully",
     });
