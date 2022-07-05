@@ -57,6 +57,9 @@
                 },
                 "password": {
                   "example": "any"
+                },
+                "referral_code": {
+                  "example": "any"
                 }
               }
             }
@@ -71,6 +74,9 @@
           },
           "401": {
             "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
           },
           "409": {
             "description": "Conflict"
@@ -850,7 +856,7 @@
       }
     },
     "/checkout/cart": {
-      "get": {
+      "post": {
         "description": "",
         "parameters": [
           {
@@ -870,7 +876,7 @@
       }
     },
     "/checkout/item": {
-      "get": {
+      "post": {
         "description": "",
         "parameters": [
           {

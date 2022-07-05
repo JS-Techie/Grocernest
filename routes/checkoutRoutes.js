@@ -9,7 +9,7 @@ const{
 } = require("../controllers/checkoutController")
 
 
-router.route("/cart").get(authenticate, checkoutFromCart);
-router.route("/item").get(authenticate, buyNow);
+router.route("/cart").post(authenticate, checkoutFromCart);
+router.route("/item").post(authenticate, buyNow);
 
 module.exports = router;
