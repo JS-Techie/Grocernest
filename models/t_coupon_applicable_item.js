@@ -4,32 +4,41 @@ const {
 
 module.exports = sequelize => {
   const attributes = {
-    order_id: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "order_id"
-    },
-    item_id: {
+    coupon_id: {
       type: DataTypes.BIGINT,
       allowNull: false,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "item_id"
+      field: "coupon_id"
     },
-    quantity: {
+    applicable_category_id: {
       type: DataTypes.BIGINT,
-      allowNull: false,
+      allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "quantity"
+      field: "applicable_category_id"
+    },
+    applicable_subcategory_id: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "applicable_subcategory_id"
+    },
+    applicable_item_id: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "applicable_item_id"
     },
     created_by: {
       type: DataTypes.BIGINT,
@@ -51,7 +60,7 @@ module.exports = sequelize => {
     },
     created_at: {
       type: DataTypes.DATE,
-      allowNull: true,
+      allowNull: false,
       defaultValue: sequelize.fn('current_timestamp'),
       primaryKey: false,
       autoIncrement: false,
@@ -66,22 +75,13 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "updated_at"
-    },
-    id: {
-      type: DataTypes.BIGINT,
-      allowNull: false,
-      defaultValue: null,
-      primaryKey: true,
-      autoIncrement: true,
-      comment: null,
-      field: "id"
     }
   };
   const options = {
-    tableName: "t_order_items",
+    tableName: "t_coupon_applicable_item",
     comment: "",
     indexes: []
   };
-  const TOrderItemsModel = sequelize.define("t_order_items_model", attributes, options);
-  return TOrderItemsModel;
+  const TCouponApplicableItemModel = sequelize.define("t_coupon_applicable_item_model", attributes, options);
+  return TCouponApplicableItemModel;
 };
