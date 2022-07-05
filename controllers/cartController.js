@@ -1,4 +1,3 @@
-
 const { sequelize } = require("../models");
 const db = require("../models");
 
@@ -261,15 +260,14 @@ const getCart = async (req, res, next) => {
     }
 
     const promises = cartForUser.map(async (current) => {
-
       let availableQuantity = 0;
       const batches = await Batch.findAll({
-        where : {item_id : current.item_id}
-      })
+        where: { item_id: current.item_id },
+      });
 
-      batches.map((currentBatch)=>{
-        availableQuantity+=currentBatch.quantity
-      })
+      batches.map((currentBatch) => {
+        availableQuantity += currentBatch.quantity;
+      });
 
       return {
         itemID: current.item_id,
@@ -290,7 +288,6 @@ const getCart = async (req, res, next) => {
     const responseArray = [
       ...new Map(resolved.map((item) => [item["itemID"], item])).values(),
     ];
-
 
     return res.status(200).send({
       success: true,

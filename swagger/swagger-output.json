@@ -595,24 +595,9 @@
             "name": "authorization",
             "in": "header",
             "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "wishlistName": {
-                  "example": "any"
-                }
-              }
-            }
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          },
           "400": {
             "description": "Bad Request"
           },
@@ -645,41 +630,48 @@
         }
       }
     },
-    "/wishlist/add/{wishlistId}/item/{itemId}": {
+    "/wishlist/add/item/{itemId}": {
       "post": {
         "description": "",
         "parameters": [
-          {
-            "name": "wishlistId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
           {
             "name": "itemId",
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
+          "201": {
+            "description": "Created"
           },
           "400": {
             "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
           }
         }
       }
     },
-    "/wishlist/view/{wishlistId}": {
-      "get": {
+    "/wishlist/remove/item/{itemId}": {
+      "post": {
         "description": "",
         "parameters": [
           {
-            "name": "wishlistId",
+            "name": "itemId",
             "in": "path",
             "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
             "type": "string"
           }
         ],
@@ -689,18 +681,20 @@
           },
           "400": {
             "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
           }
         }
       }
     },
-    "/wishlist/delete/{wishlistId}": {
+    "/wishlist/delete": {
       "delete": {
         "description": "",
         "parameters": [
           {
-            "name": "wishlistId",
-            "in": "path",
-            "required": true,
+            "name": "authorization",
+            "in": "header",
             "type": "string"
           }
         ],
@@ -710,6 +704,9 @@
           },
           "400": {
             "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
           }
         }
       }

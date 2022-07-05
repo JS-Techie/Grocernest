@@ -158,7 +158,7 @@ module.exports = sequelize => {
       field: "updated_at"
     },
     image: {
-      type: DataTypes.STRING(100),
+      type: DataTypes.STRING(255),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
@@ -174,6 +174,15 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "description"
+    },
+    available_for_ecomm: {
+      type: DataTypes.INTEGER(1),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "available_for_ecomm"
     }
   };
   const options = {
