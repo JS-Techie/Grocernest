@@ -104,7 +104,7 @@ const getAllOrders = async (req, res, next) => {
   } catch (error) {
     return res.status(400).send({
       success: false,
-      data: error,
+      data: error.message,
       message: "Error while fetching orders for current user",
     });
   }
