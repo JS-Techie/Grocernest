@@ -17,7 +17,7 @@ module.exports = sequelize => {
       type: DataTypes.BIGINT,
       allowNull: false,
       defaultValue: null,
-      primaryKey: true,
+      primaryKey: false,
       autoIncrement: false,
       comment: null,
       field: "item_id"

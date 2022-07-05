@@ -1,6 +1,7 @@
 const { sequelize } = require("../models");
 const axios = require("axios");
 const db = require("../models");
+const { removeItemFromWishlist } = require("./wishlistController");
 
 const Order = db.OrderModel;
 const OrderItems = db.OrderItemsModel;
@@ -9,6 +10,14 @@ const Cart = db.CartModel;
 const checkoutFromCart = async (req, res, next) => {
   //Get current user from JWT
   const currentUser = req.cust_no;
+
+  if(!req.body.address_id){
+    return res.status(400).send({
+      success : false,
+      data : null,
+      message : "Please enter correct address"
+    })
+  }
 
   try {
     const cartForUser = await Cart.findAll({
@@ -83,6 +92,14 @@ const buyNow = async (req, res, next) => {
 
   //Get the quantity and item ID from request body
   const { itemID, quantity } = req.body;
+
+  if(!req.body.address_id){
+    return res.status(400).send({
+      success : false,
+      data : null,
+      message : "Please enter correct address"
+    })
+  }
 
   try {
     const [currentItemDetails, metadata] =

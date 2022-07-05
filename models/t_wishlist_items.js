@@ -4,32 +4,23 @@ const {
 
 module.exports = sequelize => {
   const attributes = {
-    wishlist_id: {
-      type: DataTypes.STRING(255),
+    cust_no: {
+      type: DataTypes.STRING(20),
       allowNull: false,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "wishlist_id"
+      field: "cust_no"
     },
     item_id: {
       type: DataTypes.BIGINT,
       allowNull: false,
       defaultValue: null,
-      primaryKey: true,
-      autoIncrement: false,
-      comment: null,
-      field: "item_id"
-    },
-    quantity: {
-      type: DataTypes.BIGINT,
-      allowNull: false,
-      defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "quantity"
+      field: "item_id"
     },
     created_by: {
       type: DataTypes.BIGINT,

@@ -1,241 +1,210 @@
+const { sequelize } = require("../models");
 const db = require("../models");
-const uniqid = require("uniqid");
 
-const Wishlist = db.WishlistModel;
-const WishlistItems = db.WishlistItemsModel;
-const Customer = db.CustomerModel;
-
-const getAllWishlists = async (req, res, next) => {
-  //Get current user from JWT
-  const currentUser = req.cust_no;
-
-  try {
-    //get all wishlists for that customer
-    const wishlists = await Wishlist.findAll({
-      where: {
-        cust_no: currentUser,
-      },
-      include: WishlistItems,
-    });
-
-    return res.status(200).send({
-      success: true,
-      data: wishlists,
-      message: "Found wishlists",
-    });
-  } catch (error) {
-    return res.status(404).send({
-      success: false,
-      data: error.message,
-      message: "Could not find wishlists for requested user",
-    });
-  }
-};
+const Wishlist = db.WishlistItemsModel;
+const Batch = db.BatchModel;
 
 const createWishlist = async (req, res, next) => {
-  //Get wishlist name
-  const wishlistName = req.body.wishlistName;
+  //get current user from jwt
+  // const currentUser = req.cust_no;
+};
 
-  //Get currentUser from JWT
+const getWishlist = async (req, res, next) => {
+  //get current user from jwt
   const currentUser = req.cust_no;
 
-  const currentCustomer = await Customer.findOne({
-    where: { cust_no: currentUser },
-  });
-
   try {
-    //Find if wishlist with that same name already exists
-    const existingWishlist = await Wishlist.findOne({
-      where: {
-        wishlist_name: wishlistName,
-        cust_no: currentUser,
-      },
-    });
+    const [wishlist, metadata] =
+      await sequelize.query(`select t_wishlist_items.item_id,t_item.name, t_item.image, t_item.description,
+      t_batch.MRP,t_batch.sale_price, t_batch.discount,t_lkp_color.color_name, t_lkp_brand.brand_name
+      from ((((t_wishlist_items
+      inner join t_item on t_item.id = t_wishlist_items.item_id)
+      inner join t_batch on t_batch.item_id = t_wishlist_items.item_id )
+      inner join t_lkp_color on t_lkp_color.id = t_item.color_id )
+      inner join t_lkp_brand on t_lkp_brand.id = t_item.brand_id )
+      where t_wishlist_items.cust_no = "${currentUser}" order by t_batch.created_at desc`);
 
-    //If there is an existing wishlist, ask user to make a wishlist with a different name
-    if (existingWishlist) {
-      return res.status(400).send({
+    if (wishlist.length === 0) {
+      return res.status(404).send({
         success: false,
-        data: existingWishlist,
-        message:
-          "Wishlist already exists, please name your wishlist differently",
+        data: null,
+        message: "No wishlist found for current user",
       });
     }
 
-    //If wishlist does not exist, make a new wishlist
-    const newWishlist = {
-      cust_no: currentUser, //currentUser
-      wishlist_id: uniqid(),
-      wishlist_name: wishlistName,
-      created_at: Date.now(),
-      updated_at: Date.now(),
-      created_by: 6, //currentUser
-      updated_by: 6, //currentUser
-    };
+    const promises = wishlist.map(async (current) => {
+      let availableQuantity = 0;
+      const batches = await Batch.findAll({
+        where: { item_id: current.item_id },
+      });
 
-    //Save wishlist to DB
-    const result = await Wishlist.create(newWishlist);
+      batches.map((currentBatch) => {
+        availableQuantity += currentBatch.quantity;
+      });
 
-    //Send success message
-    return res.status(200).send({
-      success: true,
-      data: result,
-      message: "New wishlist successfully created",
+      return {
+        itemID: current.item_id,
+        itemName: current.name,
+        UOM: current.UOM,
+        availableQuantity,
+        categoryName: current.group_name,
+        categoryID: current.category_id,
+        image: current.image,
+        description: current.description,
+        MRP: current.MRP,
+        discount: current.discount,
+        sale_price: current.sale_price,
+        mfg_date: current.mfg_date,
+        color: current.color_name,
+        brand: current.brand_name,
+      };
     });
 
-    //If there is any error, send error message
+    const resolved = await Promise.all(promises);
+    const responseArray = [
+      ...new Map(resolved.map((item) => [item["itemID"], item])).values(),
+    ];
+
+    return res.status(200).send({
+      success: true,
+      data: responseArray,
+      message: "Wishlist successfully found for user",
+    });
   } catch (error) {
-    res.status(400).send({
+    return res.status(400).send({
       success: false,
-      data: error,
-      message: "wishlist could not be created",
+      data: error.message,
+      message:
+        "Something went wrong while fetching wishlist for current user, please check data field for more details",
     });
   }
 };
 
 const addItemToWishlist = async (req, res, next) => {
-  //Get currentUser from JWT
-  //const currentUser = req.cust_no
+  //get current user from jwt
+  const currentUser = req.cust_no;
 
-  //Get wishlist id and item id from params
-  const wishlistToWhichItemIsToBeAdded = req.params.wishlistId;
-  const itemToBeAddedToSelectedWishlist = req.params.itemId;
+  const itemToBeAdded = req.params.itemId;
 
   try {
-    // check if item already is in wishlist
-    const itemAlreadyInWishlist = await WishlistItems.findAll({
-      where: {
-        item_id: itemToBeAddedToSelectedWishlist,
-        wishlist_id: wishlistToWhichItemIsToBeAdded,
-        //cust_no : currentUser
-      },
+    const wishlist = await WishlistItems.findOne({
+      where: { cust_no: currentUser, item_id: itemToBeAdded },
     });
 
-    //if item is already in wishlist, just increase the quantity
-
-    //////// NEEDS TESTING //////////
-
-    if (itemAlreadyInWishlist) {
-      const res = WishlistItems.update(
-        {
-          quantity: itemAlreadyInWishlist[0].dataValues.quantity + 1,
+    if (wishlist) {
+      return res.status(400).send({
+        success: false,
+        data: {
+          currentUser,
+          itemID: wishlist.item_id,
         },
-        {
-          where: {
-            item_id: itemToBeAddedToSelectedWishlist,
-            wishlist_id: wishlistToWhichItemIsToBeAdded,
-          },
-        }
-      );
-      console.log(res);
-      return res.status(200).send({
-        success: true,
-        data: res,
-        message: "Increased quantity of item in wishlist",
+        message:
+          "Item already in wishlist, please consider adding a different item",
       });
     }
 
-    //if item is not in wishlist, add it to wishlist
-    const result = await WishlistItems.create({
-      wishlist_id: wishlistToWhichItemIsToBeAdded,
-      item_id: itemToBeAddedToSelectedWishlist,
-      quantity: 1,
-      created_by: 3,
-      updated_by: 3,
-      created_at: Date.now(),
-      updated_at: Date.now(),
+    const newItem = await Wishlist.create({
+      cust_no: currentUser,
+      item_id: itemToBeAdded,
+      created_by: 2,
     });
 
-    console.log(result);
-
-    return res.status(200).send({
+    return res.status(201).send({
       success: true,
-      data: result,
-      message: "Item added successfully",
+      data: {
+        currentUser,
+        itemID: newItem.item_id,
+      },
+      message: "Successfully added item to wishlist",
     });
-    //Catch any errors
   } catch (error) {
     return res.status(400).send({
       success: false,
-      data: error,
-      message: "Could not add item to wishlist",
+      data: error.message,
+      message:
+        "Something went wrong while adding item to wishlist, please see error message for more details",
     });
   }
 };
 
-const getWishlistById = async (req, res, next) => {
-  //Get currentUser from JWT
+const removeItemFromWishlist = async (req, res, next) => {
+  //get current user from jwt
   const currentUser = req.cust_no;
 
-  const currentCustomer = await Customer.findOne({
-    where: { cust_no: currentUser },
-  });
+  const itemToBeRemoved = req.params.itemId;
 
-  console.log(currentCustomer);
-
-  //fetch all the items in the wishlist
   try {
-    const wishlist = await Wishlist.findAll({
-      include: [{ model: WishlistItems }],
-      where: {
-        wishlist_id: req.params.wishlistId,
-        cust_no: currentUser,
-      },
+    const wishlist = await Wishlist.findOne({
+      where: { cust_no: currentUser, item_id: itemToBeRemoved },
+    });
+
+    if (!wishlist) {
+      return res.status(404).send({
+        success: false,
+        data: null,
+        message: "Item not in wishlist, cannot be removed",
+      });
+    }
+
+    const numberOfRowsDeleted = await Wishlist.destroy({
+      where: { cust_no: currentUser, item_id: itemToBeRemoved },
     });
 
     return res.status(200).send({
       success: true,
-      data: wishlist,
-      message: "Found requested wishlist",
+      data: numberOfRowsDeleted,
+      message: "Item removed from wishlist successfully",
     });
-  } catch (err) {
+  } catch (error) {
     return res.status(400).send({
       success: false,
-      data: error,
-      message: "Could not fetch requested wishlist",
+      data: error.message,
+      message:
+        "Something went wrong while removing item, please check data field for more details",
     });
   }
 };
 
 const deleteWishlist = async (req, res, next) => {
-  //Get currentUser from JWT
-  //const currentUser = req.cust_no
-
-  //Get wishlist id from params
-  const wishlistId = req.params.wishlistId;
+  //get current user from jwt
+  const currentUser = req.cust_no;
 
   try {
-    const rowsDeletedFromWishlistTable = Wishlist.destroy({
-      where: {
-        wishlist_id: wishlistId,
-        //cust_no : currentUser
-      },
+    const wishlist = await Wishlist.findAll({
+      where: { cust_no: currentUser },
     });
-    const rowsDeletedFromWishlistItemsTable = WishlistItems.destroy({
-      where: { wishlist_id: wishlistId },
+
+    if (wishlist.length === 0) {
+      return res.status(404).send({
+        success: false,
+        data: null,
+        message: "No wishlist found for current user",
+      });
+    }
+
+    const deletedWishlist = await Wishlist.destroy({
+      where: { cust_no: currentUser },
     });
 
     return res.status(200).send({
       success: true,
-      data: {
-        rowsDeletedFromWishlistTable,
-        rowsDeletedFromWishlistItemsTable,
-      },
-      message: "Deleted requested wishlist",
+      data: deletedWishlist,
+      message: "Deleted wishlist for current user successfully",
     });
   } catch (error) {
     return res.status(400).send({
       success: false,
-      data: error,
-      message: "Could not find requested wishlist",
+      data: error.message,
+      message:
+        "Something went wrong while deleting wishlist, please check data field for more details",
     });
   }
 };
 
 module.exports = {
+  getWishlist,
   createWishlist,
   addItemToWishlist,
-  getWishlistById,
+  removeItemFromWishlist,
   deleteWishlist,
-  getAllWishlists,
 };

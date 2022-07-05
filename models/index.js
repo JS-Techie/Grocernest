@@ -96,8 +96,8 @@ db.CacheModel = require("./t_cache")(db.sequelize, Sequelize);
 db.WalletModel.hasMany(db.WalletTransactionModel, { foreignKey: "wallet_id" });      //one to many mapping
 
 
-//One wishlist has many wishlist items
-db.WishlistModel.hasMany(db.WishlistItemsModel, { foreignKey: "wishlist_id" });
+// //One wishlist has many wishlist items
+// db.WishlistModel.hasMany(db.WishlistItemsModel, { foreignKey: "wishlist_id" });
 
 //One order has many order items
 db.OrderModel.hasMany(db.OrderItemsModel, { foreignKey: "order_id" })
