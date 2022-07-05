@@ -252,7 +252,7 @@ const getCart = async (req, res, next) => {
     where t_cart.cust_no = "${currentUser}" order by t_batch.created_at desc`);
 
     if (cartForUser.length === 0) {
-      return res.status(404).send({
+      return res.status(200).send({
         success: true,
         data: [],
         message: "There is no cart for current user",
