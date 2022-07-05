@@ -16,7 +16,7 @@ const getAllOrders = async (req, res, next) => {
       where: { cust_no: currentUser },
     });
 
-    if(orders.length === 0){
+    if(allOrders.length === 0){
       return res.status(404).send({
         success : false,
         data : null,
