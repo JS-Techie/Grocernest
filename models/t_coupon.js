@@ -13,32 +13,77 @@ module.exports = sequelize => {
       comment: null,
       field: "id"
     },
-    sub_cat_cd: {
-      type: DataTypes.STRING(100),
+    coupon_code: {
+      type: DataTypes.STRING(30),
       allowNull: false,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "sub_cat_cd"
+      field: "coupon_code"
     },
-    sub_cat_name: {
-      type: DataTypes.STRING(500),
+    coupon_type: {
+      type: DataTypes.STRING(30),
       allowNull: false,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "sub_cat_name"
+      field: "coupon_type"
     },
-    active_ind: {
-      type: DataTypes.CHAR(1),
-      allowNull: false,
+    expiry: {
+      type: DataTypes.DATE,
+      allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "active_ind"
+      field: "expiry"
+    },
+    min_purchase: {
+      type: DataTypes.DECIMAL,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "min_purchase"
+    },
+    max_purchase: {
+      type: DataTypes.DECIMAL,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "max_purchase"
+    },
+    discount_amount: {
+      type: DataTypes.DECIMAL,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "discount_amount"
+    },
+    is_percentage: {
+      type: DataTypes.STRING(1),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "is_percentage"
+    },
+    max_discount_amount: {
+      type: DataTypes.DECIMAL,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "max_discount_amount"
     },
     created_by: {
       type: DataTypes.BIGINT,
@@ -75,49 +120,13 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "updated_at"
-    },
-    category_id: {
-      type: DataTypes.BIGINT,
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "category_id",
-      references: {
-        key: "id",
-        model: "t_lkp_category_model"
-      }
-    },
-    image: {
-      type: DataTypes.STRING(100),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "image"
-    },
-    available_for_ecomm: {
-      type: DataTypes.INTEGER(1),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "available_for_ecomm"
     }
   };
   const options = {
-    tableName: "t_lkp_sub_category",
+    tableName: "t_coupon",
     comment: "",
-    indexes: [{
-      name: "t_lkp_sub_category_FK",
-      unique: false,
-      type: "BTREE",
-      fields: ["category_id"]
-    }]
+    indexes: []
   };
-  const TLkpSubCategoryModel = sequelize.define("t_lkp_sub_category_model", attributes, options);
-  return TLkpSubCategoryModel;
+  const TCouponModel = sequelize.define("t_coupon_model", attributes, options);
+  return TCouponModel;
 };

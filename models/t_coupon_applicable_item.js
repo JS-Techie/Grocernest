@@ -4,23 +4,41 @@ const {
 
 module.exports = sequelize => {
   const attributes = {
-    cust_no: {
-      type: DataTypes.STRING(20),
-      allowNull: false,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "cust_no"
-    },
-    item_id: {
+    coupon_id: {
       type: DataTypes.BIGINT,
       allowNull: false,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "item_id"
+      field: "coupon_id"
+    },
+    applicable_category_id: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "applicable_category_id"
+    },
+    applicable_subcategory_id: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "applicable_subcategory_id"
+    },
+    applicable_item_id: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "applicable_item_id"
     },
     created_by: {
       type: DataTypes.BIGINT,
@@ -42,7 +60,7 @@ module.exports = sequelize => {
     },
     created_at: {
       type: DataTypes.DATE,
-      allowNull: true,
+      allowNull: false,
       defaultValue: sequelize.fn('current_timestamp'),
       primaryKey: false,
       autoIncrement: false,
@@ -60,10 +78,10 @@ module.exports = sequelize => {
     }
   };
   const options = {
-    tableName: "t_wishlist_items",
+    tableName: "t_coupon_applicable_item",
     comment: "",
     indexes: []
   };
-  const TWishlistItemsModel = sequelize.define("t_wishlist_items_model", attributes, options);
-  return TWishlistItemsModel;
+  const TCouponApplicableItemModel = sequelize.define("t_coupon_applicable_item_model", attributes, options);
+  return TCouponApplicableItemModel;
 };

@@ -1,8 +1,9 @@
-const getAllAvailableCoupons = async (req,res,next) => {
-    
+const getAllAvailableCoupons = async (req, res, next) => {
+
+
 }
 
-const validateCoupon = async (req,res,next) => {
+const validateCoupon = async (req, res, next) => {
 
 }
 

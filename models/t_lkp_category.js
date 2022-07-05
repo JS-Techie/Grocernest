@@ -84,6 +84,15 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "image"
+    },
+    available_for_ecomm: {
+      type: DataTypes.INTEGER(1),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "available_for_ecomm"
     }
   };
   const options = {
