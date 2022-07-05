@@ -16,54 +16,30 @@ const getAllOrders = async (req, res, next) => {
       where: { cust_no: currentUser },
     });
 
-    if(allOrders.length === 0){
+    console.log(allOrders);
+
+    if (allOrders.length === 0) {
       return res.status(404).send({
-        success : false,
-        data : null,
-        message : "No orders found for current user"
-      })
+        success: false,
+        data: null,
+        message: "No orders found for current user",
+      });
     }
 
     const orderPromises = allOrders.map(async (currentOrder) => {
-
       const orderItems = await OrderItems.findAll({
         where: { order_id: currentOrder.order_id },
       });
-
-
-      if(orderItems.length === 0){
-        return res.status(404).send({
-          success  : false,
-          data : null,
-          message : "No items found in current order"
-        })
-      }
 
       const orderItemPromises = orderItems.map(async (currentOrderItem) => {
         const currentItem = await Item.findOne({
           where: { id: currentOrderItem.item_id },
         });
 
-        if (!currentItem) {
-          return res.status(404).send({
-            success: false,
-            data: null,
-            message: "Item doesnt exist",
-          });
-        }
-
         const batches = await Batch.findAll({
           where: { item_id: currentItem.id },
-          order: ["created_at", "ASC"],
+          order: [["created_at", "ASC"]],
         });
-
-        if (batches.length === 0) {
-          return res.status(404).send({
-            success: false,
-            data: null,
-            message: "This item does not belong to any batch",
-          });
-        }
 
         const batch = batches[0];
 
@@ -121,15 +97,15 @@ const getOrderByOrderId = async (req, res, next) => {
   try {
     //Get that order according to its id
 
-    const [singleOrder, metadata] = await sequelize.query(`
-    
-    select t_lkp_order.order_id, t_lkp_order.created_at, t_lkp_order.status, t_item.id, t_item.name, t_order_items.quantity, t_item.image
+    const [singleOrder, metadata] =
+      await sequelize.query(`select t_lkp_order.order_id, t_lkp_order.created_at, t_lkp_order.status, t_item.id, t_item.name, t_order_items.quantity, t_item.image
     from ((t_lkp_order
     inner join t_order_items on t_order_items.order_id = t_lkp_order.order_id)
     inner join t_item on t_item.id = t_order_items.item_id)
     where t_lkp_order.cust_no = "${currentUser}"
     AND 
     t_lkp_order.order_id = ${orderId}`);
+
 
     if (singleOrder.length === 0) {
       return res.status(404).send({
@@ -139,38 +115,22 @@ const getOrderByOrderId = async (req, res, next) => {
       });
     }
 
+
     const promises = singleOrder.map(async (currentOrderItem) => {
-
       const currentItem = await Item.findOne({
-        where: { id: currentOrderItem.item_id },
+        where: { id: currentOrderItem.id },
       });
-
-      if (!currentItem) {
-        return res.status(404).send({
-          success: false,
-          data: null,
-          message: "Item doesnt exist",
-        });
-      }
 
       const batches = await Batch.findAll({
         where: { item_id: currentItem.id },
-        order: ["created_at", "ASC"],
+        order: [["created_at", "ASC"]],
       });
-
-      if (batches.length === 0) {
-        return res.status(404).send({
-          success: false,
-          data: null,
-          message: "This item does not belong to any batch",
-        });
-      }
 
       const batch = batches[0];
 
       return {
         itemName: currentItem.name,
-        id: currentItem.id,
+        id: currentItem.item_id,
         image: currentItem.image,
         quantity: currentOrderItem.quantity,
         MRP: batch.MRP,
@@ -183,7 +143,7 @@ const getOrderByOrderId = async (req, res, next) => {
 
     let orderTotal = 0;
     responseArray.map((current) => {
-      orderTotal += current.quantity * current.MRP;
+      orderTotal += (current.quantity * current.MRP);
     });
 
     return res.status(200).send({
@@ -200,7 +160,7 @@ const getOrderByOrderId = async (req, res, next) => {
   } catch (error) {
     return res.status(400).send({
       success: false,
-      data: error,
+      data: error.message,
       message: "Error while fetching orders for current user",
     });
   }
@@ -225,7 +185,7 @@ const cancelOrder = async (req, res, next) => {
 
     console.log(typeof singleOrder.status);
 
-    if (!singleOrder === 0) {
+    if (!singleOrder) {
       return res.status(400).send({
         success: false,
         data: null,
