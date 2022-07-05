@@ -3,6 +3,7 @@ const db = require("../models");
 
 const Wishlist = db.WishlistItemsModel;
 const Batch = db.BatchModel;
+const Item = db.ItemModel;
 
 const createWishlist = async (req, res, next) => {
   //get current user from jwt
@@ -87,7 +88,7 @@ const addItemToWishlist = async (req, res, next) => {
   const itemToBeAdded = req.params.itemId;
 
   try {
-    const wishlist = await WishlistItems.findOne({
+    const wishlist = await Wishlist.findOne({
       where: { cust_no: currentUser, item_id: itemToBeAdded },
     });
 
@@ -100,6 +101,18 @@ const addItemToWishlist = async (req, res, next) => {
         },
         message:
           "Item already in wishlist, please consider adding a different item",
+      });
+    }
+
+    const itemExists = await Item.findOne({
+      where: { id: itemToBeAdded },
+    });
+
+    if (!itemExists) {
+      return res.status(404).send({
+        success: false,
+        data: null,
+        message: "Item requested doesnt exist",
       });
     }
 
