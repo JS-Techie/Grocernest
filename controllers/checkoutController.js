@@ -150,7 +150,6 @@ const buyNow = async (req, res, next) => {
           itemID: newOrderItem.item_id,
           quantity: newOrderItem.quantity,
         },
-        numberOfDeletedItemsFromCart: deletedItemsFromCart,
       },
       message: "Order created successfully",
     });
