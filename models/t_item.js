@@ -183,6 +183,15 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "available_for_ecomm"
+    },
+    is_gift: {
+      type: DataTypes.INTEGER(1),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "is_gift"
     }
   };
   const options = {

@@ -74,3 +74,6 @@ ALTER TABLE ecomm.t_lkp_category ADD available_for_ecomm BOOL NULL;
 --adding available_for_ecomm field in sub category table
 
 ALTER TABLE ecomm.t_lkp_sub_category ADD available_for_ecomm BOOL NULL;
+
+--adding is_gift field in item table
+ALTER TABLE ecomm.t_item ADD is_gift BOOL NULL;

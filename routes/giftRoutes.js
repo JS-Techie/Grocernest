@@ -5,11 +5,12 @@ const authenticate = require("../middleware/authentication")
 
 const{
     getAllGifts,
-    applyGift
+    applyGifts
 }  = require("../controllers/giftController")
 
 router.route('/all').get(authenticate,getAllGifts)
-router.route('/apply').post(authenticate,applyGift)
+router.route('/apply').post(authenticate,applyGifts)
+
 
 
 module.exports = router;

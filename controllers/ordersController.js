@@ -106,7 +106,6 @@ const getOrderByOrderId = async (req, res, next) => {
     AND 
     t_lkp_order.order_id = ${orderId}`);
 
-
     if (singleOrder.length === 0) {
       return res.status(404).send({
         success: false,
@@ -114,7 +113,6 @@ const getOrderByOrderId = async (req, res, next) => {
         message: "Could not fetch requested order for the current user",
       });
     }
-
 
     const promises = singleOrder.map(async (currentOrderItem) => {
       const currentItem = await Item.findOne({
@@ -143,7 +141,7 @@ const getOrderByOrderId = async (req, res, next) => {
 
     let orderTotal = 0;
     responseArray.map((current) => {
-      orderTotal += (current.quantity * current.MRP);
+      orderTotal += current.quantity * current.MRP;
     });
 
     return res.status(200).send({
@@ -183,8 +181,6 @@ const cancelOrder = async (req, res, next) => {
       },
     });
 
-    console.log(typeof singleOrder.status);
-
     if (!singleOrder) {
       return res.status(400).send({
         success: false,
@@ -193,7 +189,8 @@ const cancelOrder = async (req, res, next) => {
       });
     }
 
-    let include_array = ["Accepted", "Shipped"];
+    let include_array = ["Placed", "Accepted", "Shipped"];
+
     if (!include_array.includes(singleOrder.status)) {
       return res.status(400).send({
         success: false,
@@ -250,7 +247,7 @@ const returnOrder = async (req, res, next) => {
       });
     }
 
-    let include_array = ["Accepted", "Shipped", "Delivered"];
+    let include_array = ["Placed", "Accepted", "Shipped", "Delivered"];
     if (!include_array.includes(singleOrder.status)) {
       return res.status(400).send({
         success: false,
