@@ -16,12 +16,12 @@ const getAllOrders = async (req, res, next) => {
       where: { cust_no: currentUser },
     });
 
-    console.log(allOrders);
+    // console.log(allOrders);
 
     if (allOrders.length === 0) {
-      return res.status(404).send({
+      return res.status(200).send({
         success: false,
-        data: null,
+        data: ["hehe"],
         message: "No orders found for current user",
       });
     }
