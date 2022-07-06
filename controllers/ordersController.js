@@ -21,7 +21,7 @@ const getAllOrders = async (req, res, next) => {
     if (allOrders.length === 0) {
       return res.status(200).send({
         success: false,
-        data: ["hehe"],
+        data: [],
         message: "No orders found for current user",
       });
     }
