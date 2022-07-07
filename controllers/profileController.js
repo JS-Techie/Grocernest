@@ -33,6 +33,7 @@ const getProfile = async (req, res, next) => {
         emailID: currentUserProfile.email,
         contactNumber: currentUserProfile.contact_no,
         profileImage: generator.generateRandomAvatar(),
+        referral_code: currentUserProfile.referral_code
       },
     });
   } catch (error) {
@@ -45,7 +46,7 @@ const getProfile = async (req, res, next) => {
   }
 };
 
-const uploadProfile = async (req, res, next) => {};
+const uploadProfile = async (req, res, next) => { };
 
 const editProfile = async (req, res, next) => {
   //Get current user from jwt
