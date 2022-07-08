@@ -35,15 +35,17 @@ const itemRouter = require("./routes/itemRoutes");
 const walletRouter = require("./routes/walletRoutes");
 const wishlistRouter = require("./routes/wishlistRoutes");
 const addressRouter = require("./routes/addressRoutes");
-const profileRouter = require("./routes/profileRoutes")
-const checkoutRouter = require("./routes/checkoutRoutes")
-const orderRouter = require("./routes/ordersRoutes")
-const couponRouter = require("./routes/couponsRoutes")
-const referralRouter = require("./routes/referralRoutes")
-const giftRouter = require("./routes/giftRoutes")
+const profileRouter = require("./routes/profileRoutes");
+const checkoutRouter = require("./routes/checkoutRoutes");
+const orderRouter = require("./routes/ordersRoutes");
+const couponRouter = require("./routes/couponsRoutes");
+const referralRouter = require("./routes/referralRoutes");
+const giftRouter = require("./routes/giftRoutes");
 
 // admin routers import
-const adminOrderRouter = require("./adminRoutes/orderRoutes")
+const adminOrderRouter = require("./adminRoutes/orderRoutes");
+const adminWalletRouter = require("./adminRoutes/walletRoutes");
+const adminCustomerRouter = require("./adminRoutes/customerRoutes");
 
 //routes
 app.get('/responses', (req, res) => {
@@ -68,6 +70,8 @@ app.use("/gift", giftRouter);
 
 // admin routes
 app.use("/admin/orders", adminOrderRouter);
+app.use("/admin/wallet", adminWalletRouter);
+app.use("/admin/customer", adminCustomerRouter);
 
 //Start server and connect to DB
 const db = require("./services/dbSetupService.js");
