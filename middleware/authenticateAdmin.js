@@ -16,12 +16,12 @@ const authenticateAdmin = async (req, res, next) => {
     //Get the token from the header
     const token = authHeader.split(' ')[1]
     try {
-        next();
+        // next();
         //Verify the token
-        // req.user = jwt.verify(token, "hello hello hello")
-        // console.log(req.user);
-        //  req.cust_no = req.user.cust_no
-        //  next();
+        req.user = jwt.verify(token, "cosmetixkey")
+        req.user_role = req.user.USERROLELIST[0].roleName;
+        console.log(req.user_role);
+        next();
 
     } catch (error) {
         return res.status(400).send({

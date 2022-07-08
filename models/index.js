@@ -103,6 +103,8 @@ db.WalletModel.hasMany(db.WalletTransactionModel, { foreignKey: "wallet_id" }); 
 db.OrderModel.hasMany(db.OrderItemsModel, { foreignKey: "order_id" })
 db.OrderItemsModel.hasMany(db.ItemModel, { foreignKey: "id" })
 
+// db.OrderModel.hasMany(db.CustomerModel, { foreignKey: "cust_no" })
+
 
 //One category has many subcategories
 db.LkpCategoryModel.hasMany(db.LkpSubCategoryModel, { foreignKey: "category_id" })
