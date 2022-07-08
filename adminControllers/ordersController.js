@@ -120,7 +120,25 @@ const getOrderDetails = async (req, res, next) => {
 }
 
 const changeOrderStatus = async (req, res, next) => {
-
+    // console.log("change order status");
+    Order.update(
+        { status: req.body.status },
+        { where: { order_id: req.body.orderId } }
+    )
+        .then((result) => {
+            return res.status(200).send({
+                success: true,
+                data: "",
+                message: "Successfully changed order status",
+            });
+        })
+        .catch((err) => {
+            return res.status(400).send({
+                success: false,
+                data: err.message,
+                message: "Error occurred while changing the order status",
+            });
+        })
 }
 
 const acceptedOrders = async (req, res, next) => {
