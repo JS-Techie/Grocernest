@@ -107,7 +107,7 @@ getOrderDetails = async (req, res, next) => {
         return res.status(200).send({
             success: true,
             data: {
-                "customer_details": cust_result,
+                "customer_details": cust_result[0],
                 "order_item_details": responseArray
             },
             message: "Successfully fetched all items of this order",
