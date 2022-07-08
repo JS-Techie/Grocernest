@@ -12,7 +12,7 @@ const getAllPendingOrders = async (req, res, next) => {
     try {
         const [results, metadata] =
             await sequelize.query(`
-            select tc.cust_name, tlo.cust_no ,tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total from t_lkp_order tlo inner join t_customer tc 
+            select tc.cust_name, tlo.cust_no , tc.contact_no, tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total from t_lkp_order tlo inner join t_customer tc 
             where tc.cust_no = tlo.cust_no 
             AND tlo.status="Placed"
           `);
@@ -54,6 +54,11 @@ const getAllPendingOrders = async (req, res, next) => {
         });
     }
 }
+
+getOrderDetails = async (req, res, next) => {
+
+}
+
 
 module.exports = {
     getAllPendingOrders
