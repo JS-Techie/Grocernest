@@ -1,7 +1,7 @@
 const { sequelize } = require("../models");
 const db = require("../models");
 const Order = db.OrderModel;
-const Customer = db.CustomerModel;
+// const Customer = db.CustomerModel;
 
 
 const getAllPendingOrders = async (req, res, next) => {
@@ -128,7 +128,7 @@ const changeOrderStatus = async (req, res, next) => {
         .then((result) => {
             return res.status(200).send({
                 success: true,
-                data: "",
+                data: { "status": req.body.status },
                 message: "Successfully changed order status",
             });
         })
