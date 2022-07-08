@@ -28,6 +28,7 @@ const getAllPendingOrders = async (req, res, next) => {
         const promises = results.map(async (current) => {
             return {
                 cust_name: current.cust_name,
+                contact_no: current.contact_no,
                 cust_no: current.cust_no,
                 order_id: current.order_id,
                 status: current.status,
