@@ -50,8 +50,8 @@ const getAllCoupons = async (req, res, next) => {
         itemName: item ? item.name : "",
         brandID: current.brand_id ? current.brand_id : "",
         brandName: brand ? brand.brand_name : "",
-        minPurchase: current.min_purchase ? current.min_purchase : "",
-        maxPurchase: current.max_purchase ? current.max_purchase : "",
+        minPurchase: current.min_purchase,
+        maxPurchase: current.max_purchase,
         description: current.description,
         assignedTo: current.assigned_user ? current.assigned_user : "",
         expiryDate: current.expiry_date ? current.expiry_date : "",
@@ -123,8 +123,8 @@ const getCouponById = async (req, res, next) => {
         itemName: item ? item.name : "",
         brandID: coupon.brand_id ? coupon.brand_id : "",
         brandName: brand ? brand.brand_name : "",
-        minPurchase: coupon.min_purchase ? coupon.min_purchase : "",
-        maxPurchase: coupon.max_purchase ? coupon.max_purchase : "",
+        minPurchase: coupon.min_purchase,
+        maxPurchase: coupon.max_purchase,
         description: coupon.description,
         assignedTo: coupon.assigned_user ? coupon.assigned_user : "",
         expiryDate: coupon.expiry_date ? coupon.expiry_date : "",
@@ -157,6 +157,15 @@ const createCoupon = async (req, res, next) => {
     expiry_date,
     assigned_user,
   } = req.body;
+
+
+  if(amount_of_discount === 0){
+    return res.status(400).send({
+      success : false,
+      data : [],
+      message : "Please enter an amount, it cannot be zero"
+    })
+  }
 
   try {
     const newCoupon = await Coupons.create({
