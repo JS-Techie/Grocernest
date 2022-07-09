@@ -3,6 +3,10 @@ const cc = require("coupon-code");
 const db = require("../models");
 
 const Coupons = db.CouponsModel;
+const Category = db.LkpCategoryModel;
+const Subcategory = db.LkpSubCategoryModel;
+const Item = db.ItemModel;
+const Brand = db.LkpBrandModel;
 
 const getAllCoupons = async (req, res, next) => {
   try {
@@ -17,15 +21,35 @@ const getAllCoupons = async (req, res, next) => {
     }
 
     const promises = coupons.map(async (current) => {
+      const item = await Item.findOne({
+        where: { id: current.item_id },
+      });
+
+      const category = await Category.findOne({
+        where: { id: current.cat_id },
+      });
+
+      const subcategory = await Subcategory.findOne({
+        where: { id: current.sub_cat_id },
+      });
+
+      const brand = await Brand.findOne({
+        where: { id: current.brand_id },
+      });
+
       return {
         couponID: current.id,
         couponCode: current.code,
         amount: current.amount_of_discount,
         isPercentage: current.is_percentage === 1 ? "Yes" : "No",
         categoryID: current.cat_id ? current.cat_id : "",
+        categoryName: category ? category.group_name : "",
         subcategoryID: current.sub_cat_id ? current.sub_cat_id : "",
+        subcategoryName: subcategory ? subcategory.sub_cat_name : "",
         itemID: current.item_id ? current.item_id : "",
+        itemName: item ? item.name : "",
         brandID: current.brand_id ? current.brand_id : "",
+        brandName: brand ? brand.brand_name : "",
         minPurchase: current.min_purchase ? current.min_purchase : "",
         maxPurchase: current.max_purchase ? current.max_purchase : "",
         description: current.description,
@@ -68,6 +92,22 @@ const getCouponById = async (req, res, next) => {
       });
     }
 
+    const item = await Item.findOne({
+      where: { id: coupon.item_id },
+    });
+
+    const category = await Category.findOne({
+      where: { id: coupon.cat_id },
+    });
+
+    const subcategory = await Subcategory.findOne({
+      where: { id: coupon.sub_cat_id },
+    });
+
+    const brand = await Brand.findOne({
+      where: { id: coupon.brand_id },
+    });
+
     return res.status(200).send({
       success: true,
       data: {
@@ -76,9 +116,13 @@ const getCouponById = async (req, res, next) => {
         amount: coupon.amount_of_discount,
         isPercentage: coupon.is_percentage === 1 ? "Yes" : "No",
         categoryID: coupon.cat_id ? coupon.cat_id : "",
+        categoryName: category ? category.group_name : "",
         subcategoryID: coupon.sub_cat_id ? coupon.sub_cat_id : "",
+        subcategoryName: subcategory ? subcategory.sub_cat_name : "",
         itemID: coupon.item_id ? coupon.item_id : "",
+        itemName: item ? item.name : "",
         brandID: coupon.brand_id ? coupon.brand_id : "",
+        brandName: brand ? brand.brand_name : "",
         minPurchase: coupon.min_purchase ? coupon.min_purchase : "",
         maxPurchase: coupon.max_purchase ? coupon.max_purchase : "",
         description: coupon.description,
@@ -100,6 +144,7 @@ const getCouponById = async (req, res, next) => {
 
 const createCoupon = async (req, res, next) => {
   const {
+    code,
     amount_of_discount,
     is_percentage,
     cat_id,
@@ -117,7 +162,7 @@ const createCoupon = async (req, res, next) => {
     const newCoupon = await Coupons.create({
       code: code ? code : cc.generate(),
       amount_of_discount,
-      is_percentage : is_percentage ? 1 : null,
+      is_percentage: is_percentage ? 1 : null,
       cat_id,
       sub_cat_id,
       item_id,
@@ -128,6 +173,7 @@ const createCoupon = async (req, res, next) => {
       expiry_date,
       assigned_user,
       created_by: 1,
+      usage : 0,
     });
 
     return res.status(201).send({
@@ -161,6 +207,7 @@ const updateCoupon = async (req, res, next) => {
     }
 
     const {
+      code,
       amount_of_discount,
       is_percentage,
       cat_id,
@@ -176,6 +223,7 @@ const updateCoupon = async (req, res, next) => {
 
     const updatedCoupon = await Coupons.update(
       {
+        code : code ? code : exists.code,
         amount_of_discount: amount_of_discount
           ? amount_of_discount
           : exists.amount_of_discount,
