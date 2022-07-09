@@ -187,9 +187,136 @@ const acceptedOrders = async (req, res, next) => {
         });
     }
 }
+
+const assignTransporter = async (req, res, next) => {
+    let orderId = req.body.orderId
+    let transporterName = req.body.transporterName
+
+    Order.update(
+        {
+            status: "Shipped",
+            transporter_name: transporterName
+        },
+        { where: { order_id: orderId } }
+    )
+        .then((result) => {
+            return res.status(200).send({
+                success: true,
+                data: { "status": "Shipped" },
+                message: "Order successfully shipped",
+            });
+        })
+        .catch((error) => {
+            return res.status(400).send({
+                success: false,
+                data: error.message,
+                message: "Error while assigning transporter name",
+            });
+        })
+
+}
+const getShippedOrders = async (req, res, next) => {
+    try {
+        const [results, metadata] =
+            await sequelize.query(`
+            select tlo.transporter_name, tc.cust_name, tlo.cust_no , tc.contact_no, tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total from t_lkp_order tlo inner join t_customer tc 
+            where tc.cust_no = tlo.cust_no 
+            AND tlo.status="Shipped"
+          `);
+
+        if (results.length === 0) {
+            return res.status(201).send({
+                success: true,
+                data: [],
+                message: "No orders found",
+            });
+        }
+
+        const promises = results.map(async (current) => {
+            return {
+                cust_name: current.cust_name,
+                contact_no: current.contact_no,
+                cust_no: current.cust_no,
+                order_id: current.order_id,
+                status: current.status,
+                created_at: current.created_at,
+                created_by: current.created_by,
+                total: current.total,
+                transporterName: current.transporter_name
+            };
+        });
+
+        const responseArray = await Promise.all(promises);
+
+        return res.status(200).send({
+            success: true,
+            data: responseArray,
+            message: "Successfully fetched all shipped orders",
+        });
+    } catch (error) {
+        return res.status(400).send({
+            success: false,
+            data: error.message,
+            message:
+                "Error occurred while fetching all shipped orders",
+        });
+    }
+}
+
+const getDeliveredOrders = async (req, res, next) => {
+    try {
+        const [results, metadata] =
+            await sequelize.query(`
+            select tc.cust_name, tlo.cust_no , tc.contact_no, tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total, tlo.transporter_name from t_lkp_order tlo inner join t_customer tc 
+            where tc.cust_no = tlo.cust_no 
+            AND tlo.status="Delivered"
+          `);
+
+        if (results.length === 0) {
+            return res.status(201).send({
+                success: true,
+                data: [],
+                message: "No orders found",
+            });
+        }
+
+        const promises = results.map(async (current) => {
+            return {
+                cust_name: current.cust_name,
+                contact_no: current.contact_no,
+                cust_no: current.cust_no,
+                order_id: current.order_id,
+                status: current.status,
+                created_at: current.created_at,
+                created_by: current.created_by,
+                total: current.total,
+                transporterName: current.transporter_name
+            };
+        });
+
+        const responseArray = await Promise.all(promises);
+
+        return res.status(200).send({
+            success: true,
+            data: responseArray,
+            message: "Successfully fetched all delivered orders",
+        });
+    } catch (error) {
+        return res.status(400).send({
+            success: false,
+            data: error.message,
+            message:
+                "Error occurred while fetching all delivered orders",
+        });
+    }
+}
+
 module.exports = {
     getAllPendingOrders,
     getOrderDetails,
     changeOrderStatus,
-    acceptedOrders
+    acceptedOrders,
+    assignTransporter,
+    getShippedOrders,
+    getDeliveredOrders
 }

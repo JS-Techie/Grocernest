@@ -4,50 +4,41 @@ const {
 
 module.exports = sequelize => {
   const attributes = {
-    cust_no: {
-      type: DataTypes.STRING(20),
-      allowNull: false,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "cust_no"
-    },
-    order_id: {
-      type: DataTypes.STRING(255),
+    id: {
+      type: DataTypes.BIGINT,
       allowNull: false,
       defaultValue: null,
       primaryKey: true,
-      autoIncrement: false,
+      autoIncrement: true,
       comment: null,
-      field: "order_id"
+      field: "id"
     },
-    status: {
-      type: DataTypes.ENUM('Placed', 'Accepted', 'Shipped', 'Delivered', 'Cancelled', 'Returned'),
-      allowNull: false,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "status"
-    },
-    created_at: {
-      type: DataTypes.DATE,
-      allowNull: true,
-      defaultValue: sequelize.fn('current_timestamp'),
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "created_at"
-    },
-    updated_at: {
-      type: DataTypes.DATE,
+    max_purchase: {
+      type: DataTypes.BIGINT,
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "updated_at"
+      field: "max_purchase"
+    },
+    min_purchase: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "min_purchase"
+    },
+    no_of_gifts: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "no_of_gifts"
     },
     created_by: {
       type: DataTypes.BIGINT,
@@ -67,39 +58,30 @@ module.exports = sequelize => {
       comment: null,
       field: "updated_by"
     },
-    total: {
-      type: DataTypes.BIGINT,
+    created_at: {
+      type: DataTypes.DATE,
       allowNull: true,
-      defaultValue: null,
+      defaultValue: sequelize.fn('current_timestamp'),
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "total"
+      field: "created_at"
     },
-    address: {
-      type: DataTypes.STRING(255),
+    updated_at: {
+      type: DataTypes.DATE,
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "address"
-    },
-    transporter_name: {
-      type: DataTypes.STRING(200),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "transporter_name"
+      field: "updated_at"
     }
   };
   const options = {
-    tableName: "t_lkp_order",
+    tableName: "t_gift_strategy",
     comment: "",
     indexes: []
   };
-  const TLkpOrderModel = sequelize.define("t_lkp_order_model", attributes, options);
-  return TLkpOrderModel;
+  const TGiftStrategyModel = sequelize.define("t_gift_strategy_model", attributes, options);
+  return TGiftStrategyModel;
 };
