@@ -27,7 +27,7 @@ app.get("/", (req, res, next) => {
 // Swagger route
 app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(endPoint));
 
-//routers
+// customer routers import
 const authRouter = require("./routes/authRoutes");
 const listRouter = require("./routes/listRoutes");
 const cartRouter = require("./routes/cartRoutes");
@@ -35,12 +35,17 @@ const itemRouter = require("./routes/itemRoutes");
 const walletRouter = require("./routes/walletRoutes");
 const wishlistRouter = require("./routes/wishlistRoutes");
 const addressRouter = require("./routes/addressRoutes");
-const profileRouter = require("./routes/profileRoutes")
-const checkoutRouter = require("./routes/checkoutRoutes")
-const orderRouter = require("./routes/ordersRoutes")
-const couponRouter = require("./routes/couponsRoutes")
-const referralRouter = require("./routes/referralRoutes")
-const giftRouter = require("./routes/giftRoutes")
+const profileRouter = require("./routes/profileRoutes");
+const checkoutRouter = require("./routes/checkoutRoutes");
+const orderRouter = require("./routes/ordersRoutes");
+const couponRouter = require("./routes/couponsRoutes");
+const referralRouter = require("./routes/referralRoutes");
+const giftRouter = require("./routes/giftRoutes");
+
+// admin routers import
+const adminOrderRouter = require("./adminRoutes/orderRoutes");
+const adminWalletRouter = require("./adminRoutes/walletRoutes");
+const adminCustomerRouter = require("./adminRoutes/customerRoutes");
 
 
 //routes
@@ -48,7 +53,7 @@ app.get('/responses', (req, res) => {
   res.send(endPoint);
 });
 
-
+// customer routes
 app.use(authRouter);
 app.use(listRouter);
 app.use("/cart", cartRouter);
@@ -63,6 +68,12 @@ app.use("/coupons", couponRouter);
 app.use("/referral/view", referralRouter);
 app.use("/gift", giftRouter);
 app.use("/coupons", couponRouter);
+
+
+// admin routes
+app.use("/admin/orders", adminOrderRouter);
+app.use("/admin/wallet", adminWalletRouter);
+app.use("/admin/customer", adminCustomerRouter);
 
 //Start server and connect to DB
 const db = require("./services/dbSetupService.js");
