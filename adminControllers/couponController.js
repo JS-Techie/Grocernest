@@ -115,9 +115,9 @@ const createCoupon = async (req, res, next) => {
 
   try {
     const newCoupon = await Coupons.create({
-      code: cc.generate(),
+      code: code ? code : cc.generate(),
       amount_of_discount,
-      is_percentage,
+      is_percentage : is_percentage ? 1 : null,
       cat_id,
       sub_cat_id,
       item_id,
