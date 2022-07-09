@@ -9,6 +9,7 @@ const { generateOTP, sendOTPToPhoneNumber } = require("../services/otpService");
 
 const Customer = db.CustomerModel;
 const Cache = db.CacheModel;
+const Coupon = db.CouponsModel;
 
 const login = async (req, res, next) => {
   //Get the user details from the form
@@ -112,7 +113,7 @@ const register = async (req, res, next) => {
     //Hash Password
     let encryptedPassword = bcrypt.hashSync(password, salt);
 
-    // check referel code valid or not
+    // check referral code valid or not
 
     try {
       if (referral_code != "") {
@@ -235,6 +236,15 @@ const verifyOTP = async (req, res, next) => {
       referred_by: newUser.referred_by
     });
 
+    const newCoupon = await Coupon.create({
+        code : "FIRSTBUY",
+        amount_of_discount : 10,
+        is_percentage : 1,
+        assigned_user : newUser.cust_no,
+        created_by : 1,
+        description : "Flat 10% off on your first purchase, use code FIRSTBUY"
+    })
+
     const deletedField = await Cache.destroy({
       where: { generated_otp: userEnteredOTP },
     });
@@ -243,6 +253,11 @@ const verifyOTP = async (req, res, next) => {
       success: true,
       data: {
         created: response,
+        coupon: {
+          code : newCoupon.code,
+          amount : newCoupon.is_percentage ? amount + "%" : amount,
+          description : newCoupon.description,
+        },
         deletedFromCache: deletedField,
       },
       message: "User successfully validated and registered",
