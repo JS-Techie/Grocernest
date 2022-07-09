@@ -89,6 +89,8 @@ db.ProfileModel = require("./t_profile")(db.sequelize, Sequelize);
 
 db.CacheModel = require("./t_cache")(db.sequelize, Sequelize);
 
+db.CouponsModel = require("./t_coupons")(db.sequelize, Sequelize);
+
 
 
 // Relations between tables

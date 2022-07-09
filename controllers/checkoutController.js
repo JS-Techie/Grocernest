@@ -1,22 +1,32 @@
 const { sequelize } = require("../models");
-const axios = require("axios");
 const db = require("../models");
-const { removeItemFromWishlist } = require("./wishlistController");
 
 const Order = db.OrderModel;
 const OrderItems = db.OrderItemsModel;
 const Cart = db.CartModel;
 
+const concatAddress = require("../utils/concatAddress");
+
 const checkoutFromCart = async (req, res, next) => {
   //Get current user from JWT
   const currentUser = req.cust_no;
 
-  if(!req.body.address_id){
+  const { total, address_id } = req.body;
+
+  if (!total) {
     return res.status(400).send({
-      success : false,
-      data : null,
-      message : "Please enter correct address"
-    })
+      success: false,
+      data: null,
+      message: "Please enter correct address",
+    });
+  }
+
+  if (!address_id) {
+    return res.status(400).send({
+      success: false,
+      data: null,
+      message: "Please enter correct address",
+    });
   }
 
   try {
@@ -25,10 +35,20 @@ const checkoutFromCart = async (req, res, next) => {
     });
 
     if (cartForUser.length === 0) {
-      return res.status(404).send({
-        success: false,
+      return res.status(200).send({
+        success: true,
         data: [],
         message: "The user does not have any items in his cart",
+      });
+    }
+
+    const address = concatAddress(address_id);
+
+    if (address == " ") {
+      return res.status(404).send({
+        success: false,
+        data: null,
+        message: "No address found for entered address id",
       });
     }
 
@@ -37,6 +57,8 @@ const checkoutFromCart = async (req, res, next) => {
       order_id: Math.floor(Math.random() * 10000000 + 1),
       status: "Placed",
       created_by: 2,
+      total,
+      address,
     });
 
     const promises = cartForUser.map(async (currentItem) => {
@@ -49,15 +71,28 @@ const checkoutFromCart = async (req, res, next) => {
     });
 
     const resolved = await Promise.all(promises);
-    const newOrderItems = await OrderItems.bulkCreate(resolved);
-    const orderItemsPromises = newOrderItems.map(async (currentItem) => {
+
+    try {
+      const newOrderItems = await OrderItems.bulkCreate(resolved);
+    } catch (error) {
+      await Order.destroy({
+        where: { order_id: newOrder.order_id },
+      });
+
+      return res.status(400).send({
+        success: false,
+        data: error.message,
+        message:
+          "Something went wrong while placing order, please check data field for more details",
+      });
+    }
+
+    const orderItems = resolved.map(async (currentItem) => {
       return {
         itemID: currentItem.item_id,
         quantity: currentItem.quantity,
       };
     });
-
-    const orderItemsResolved = await Promise.all(orderItemsPromises);
 
     const deletedItemsFromCart = await Cart.destroy({
       where: { cust_no: currentUser },
@@ -68,7 +103,8 @@ const checkoutFromCart = async (req, res, next) => {
       data: {
         currentUser: currentUser,
         orderID: newOrder.order_id,
-        orderItems: orderItemsResolved,
+        orderTotal: newOrder.total,
+        orderItems,
         numberOfDeletedItemsFromCart: deletedItemsFromCart,
       },
       message: "Order placed successfully",
@@ -91,14 +127,22 @@ const buyNow = async (req, res, next) => {
   const currentUser = req.cust_no;
 
   //Get the quantity and item ID from request body
-  const { itemID, quantity } = req.body;
+  const { itemID, quantity, total, address_id } = req.body;
 
-  if(!req.body.address_id){
+  if (!total) {
     return res.status(400).send({
-      success : false,
-      data : null,
-      message : "Please enter correct address"
-    })
+      success: false,
+      data: null,
+      message: "Please enter correct address",
+    });
+  }
+
+  if (!address_id) {
+    return res.status(400).send({
+      success: false,
+      data: null,
+      message: "Please enter correct address",
+    });
   }
 
   try {
@@ -124,20 +168,68 @@ const buyNow = async (req, res, next) => {
       });
     }
 
-    const currentItem = currentItemDetails[0];
+    const userGifts = await Cart.findAll({
+      where: { cust_no: currentUser },
+    });
+
+    const address = concatAddress(address_id);
+
+    if (address == " ") {
+      return res.status(404).send({
+        success: false,
+        data: null,
+        message: "No address found for entered address id",
+      });
+    }
 
     const newOrder = await Order.create({
       cust_no: currentUser,
       order_id: Math.floor(Math.random() * 10000000 + 1),
       status: "Placed",
       created_by: 2,
+      total,
+      address,
     });
 
-    const newOrderItem = await OrderItems.create({
+    let promises = [];
+    if (userHasGifts.length !== 0) {
+      promises = userGifts.map(async (current) => {
+        return {
+          order_id: newOrder.order_id,
+          item_id: current.item_id,
+          quantity: 1,
+          created_by: newOrder.created_by,
+        };
+      });
+    }
+
+    const orderItems = await Promise.all(promises);
+    orderItems.push({
       order_id: newOrder.order_id,
       item_id: currentItem.id,
-      quantity: quantity,
+      quantity,
       created_by: newOrder.created_by,
+    });
+
+    try {
+      await OrderItems.bulkCreate(orderItems);
+    } catch (error) {
+      const res = await Order.destroy({
+        where: { cust_no: currentUser, order_id: newOrder.order_id },
+      });
+
+      return res.status(400).send({
+        success: false,
+        data: error.message,
+        message:
+          "Could not add items to DB, please check data field for more details",
+      });
+    }
+    const response = orderItems.map((current) => {
+      return {
+        itemID: current.item_id,
+        quantity: current.quantity,
+      };
     });
 
     return res.status(201).send({
@@ -146,10 +238,8 @@ const buyNow = async (req, res, next) => {
         currentUser: currentUser,
         orderID: newOrder.order_id,
         orderStatus: newOrder.status,
-        orderItems: {
-          itemID: newOrderItem.item_id,
-          quantity: newOrderItem.quantity,
-        },
+        orderTotal: newOrder.total,
+        orderItems: response,
       },
       message: "Order created successfully",
     });

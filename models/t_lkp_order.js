@@ -66,6 +66,24 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "updated_by"
+    },
+    total: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "total"
+    },
+    address: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "address"
     }
   };
   const options = {

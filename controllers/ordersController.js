@@ -16,8 +16,6 @@ const getAllOrders = async (req, res, next) => {
       where: { cust_no: currentUser },
     });
 
-    // console.log(allOrders);
-
     if (allOrders.length === 0) {
       return res.status(200).send({
         success: false,
@@ -41,6 +39,7 @@ const getAllOrders = async (req, res, next) => {
           order: [["created_at", "ASC"]],
         });
 
+        
         const batch = batches[0];
 
         return {
@@ -56,16 +55,16 @@ const getAllOrders = async (req, res, next) => {
 
       const orderItemsArray = await Promise.all(orderItemPromises);
 
-      let orderTotal = 0;
-      orderItemsArray.map((current) => {
-        orderTotal += current.quantity * current.MRP;
-      });
+      // let orderTotal = 0;
+      // orderItemsArray.map((current) => {
+      //   orderTotal += current.quantity * current.MRP;
+      // });
 
       return {
         orderID: currentOrder.order_id,
         Date: currentOrder.created_at,
         status: currentOrder.status,
-        orderTotal,
+        orderTotal: currentOrder.total,
         itemDetails: orderItemsArray,
       };
     });

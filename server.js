@@ -47,6 +47,7 @@ const adminOrderRouter = require("./adminRoutes/orderRoutes");
 const adminWalletRouter = require("./adminRoutes/walletRoutes");
 const adminCustomerRouter = require("./adminRoutes/customerRoutes");
 
+
 //routes
 app.get('/responses', (req, res) => {
   res.send(endPoint);
@@ -66,6 +67,7 @@ app.use("/orders", orderRouter);
 app.use("/coupons", couponRouter);
 app.use("/referral/view", referralRouter);
 app.use("/gift", giftRouter);
+app.use("/coupons", couponRouter);
 
 
 // admin routes
