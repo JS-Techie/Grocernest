@@ -120,9 +120,16 @@ const getOrderDetails = async (req, res, next) => {
 }
 
 const changeOrderStatus = async (req, res, next) => {
-    // console.log("change order status");
+    console.log("change order status");
+
+    let cancellationReason = req.body.cancellationReason ? req.body.cancellationReason : ""
+    console.log("cancellationReason", cancellationReason);
     Order.update(
-        { status: req.body.status },
+        {
+            status: req.body.status,
+            cancellation_reason: cancellationReason,
+            updated_at: new Date()
+        },
         { where: { order_id: req.body.orderId } }
     )
         .then((result) => {
@@ -311,6 +318,56 @@ const getDeliveredOrders = async (req, res, next) => {
     }
 }
 
+const getCanceledorders = async (req, res, next) => {
+    try {
+        const [results, metadata] =
+            await sequelize.query(`
+            select tc.cust_name, tlo.cust_no , tc.contact_no, tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total, tlo.transporter_name,tlo.cancellation_reason from t_lkp_order tlo inner join t_customer tc 
+            where tc.cust_no = tlo.cust_no 
+            AND tlo.status="Cancelled"
+          `);
+
+        if (results.length === 0) {
+            return res.status(201).send({
+                success: true,
+                data: [],
+                message: "No orders found",
+            });
+        }
+
+        const promises = results.map(async (current) => {
+            return {
+                cust_name: current.cust_name,
+                contact_no: current.contact_no,
+                cust_no: current.cust_no,
+                order_id: current.order_id,
+                status: current.status,
+                created_at: current.created_at,
+                created_by: current.created_by,
+                total: current.total,
+                transporterName: current.transporter_name,
+                cancellation_reason: current.cancellation_reason
+            };
+        });
+
+        const responseArray = await Promise.all(promises);
+
+        return res.status(200).send({
+            success: true,
+            data: responseArray,
+            message: "Successfully fetched all canceled orders",
+        });
+    } catch (error) {
+        return res.status(400).send({
+            success: false,
+            data: error.message,
+            message:
+                "Error occurred while fetching all canceled orders",
+        });
+    }
+}
+
+
 module.exports = {
     getAllPendingOrders,
     getOrderDetails,
@@ -318,5 +375,6 @@ module.exports = {
     acceptedOrders,
     assignTransporter,
     getShippedOrders,
-    getDeliveredOrders
+    getDeliveredOrders,
+    getCanceledorders
 }

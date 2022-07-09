@@ -93,6 +93,15 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "transporter_name"
+    },
+    cancellation_reason: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "cancellation_reason"
     }
   };
   const options = {

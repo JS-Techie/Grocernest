@@ -1266,6 +1266,9 @@
             "schema": {
               "type": "object",
               "properties": {
+                "cancellationReason": {
+                  "example": "any"
+                },
                 "status": {
                   "example": "any"
                 },
@@ -1380,6 +1383,32 @@
       }
     },
     "/admin/orders/deliveredorders": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/admin/orders/getCanceledorders": {
       "get": {
         "description": "",
         "parameters": [

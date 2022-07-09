@@ -52,35 +52,3 @@ CREATE TABLE `t_address` (
 
 ALTER TABLE ecomm.t_customer ADD referral_code varchar(100) NULL;
 ALTER TABLE ecomm.t_customer ADD referred_by varchar(20) NULL;
-
-
--- coupon DDL  --
-
-CREATE TABLE `t_coupon` (
-  `id` bigint(20) NOT NULL,
-  `coupon_code` varchar(30) NOT NULL,
-  `coupon_type` varchar(30) NOT NULL,
-  `expiry` timestamp NULL DEFAULT NULL,
-  `min_purchase` decimal(10,2) NULL,
-  `max_purchase` decimal(10,2) NULL,
-  `discount_amount` decimal(10,2) NULL,
-  `is_percentage` varchar(1) NULL,
-  `max_discount_amount` decimal(10,2) NULL,
-  `created_by` bigint(20) NOT NULL,
-  `updated_by` bigint(20) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-
-CREATE TABLE `t_coupon_applicable_item` (
-  `coupon_id` bigint(30) NOT NULL, 
-  `applicable_category_id` bigint(20) NULL,
-  `applicable_subcategory_id` bigint(20) NULL,
-  `applicable_item_id` bigint(20) NULL,
-  `created_by` bigint(20) NOT NULL,
-  `updated_by` bigint(20) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `updated_at` timestamp NULL DEFAULT NULL
-)

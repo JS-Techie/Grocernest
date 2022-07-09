@@ -10,7 +10,8 @@ const {
     acceptedOrders,
     assignTransporter,
     getShippedOrders,
-    getDeliveredOrders
+    getDeliveredOrders,
+    getCanceledorders
 } = require("../adminControllers/ordersController.js");
 
 router.route('/pending').get(authenticateAdmin, getAllPendingOrders);
@@ -26,5 +27,7 @@ router.route('/assign/transporter').post(authenticateAdmin, assignTransporter);
 router.route('/shippedorders').get(authenticateAdmin, getShippedOrders);
 
 router.route('/deliveredorders').get(authenticateAdmin, getDeliveredOrders);
+
+router.route('/getCanceledorders').get(authenticateAdmin, getCanceledorders);
 
 module.exports = router;
