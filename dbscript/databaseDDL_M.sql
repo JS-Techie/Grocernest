@@ -77,3 +77,57 @@ ALTER TABLE ecomm.t_lkp_sub_category ADD available_for_ecomm BOOL NULL;
 
 --adding is_gift field in item table
 ALTER TABLE ecomm.t_item ADD is_gift BOOL NULL;
+
+
+--adding order_total field in t_lkp_order table
+ALTER TABLE ecomm.t_lkp_order ADD total BIGINT(40) NULL;
+
+
+--ecomm.t_coupons definition
+CREATE TABLE ecomm.t_coupons (
+	id BIGINT(20) auto_increment NOT NULL,
+	code varchar(100) NOT NULL,
+	amount_of_discount BIGINT(30) NULL,
+	is_percentage BOOL NULL,
+	cat_id BIGINT(20) NULL,
+	sub_cat_id BIGINT(20) NULL,
+	item_id BIGINT(20) NULL,
+	brand_id BIGINT(20) NULL,
+	description varchar(100) NULL,
+	min_purchase BIGINT(20) NULL,
+	max_purchase BIGINT(20) NULL,
+	 `created_by` bigint(20) NOT NULL,
+  `updated_by` bigint(20) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (id)
+)
+ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_general_ci;
+
+
+--ecomm.t_gift_strategy definition
+CREATE TABLE ecomm.t_gift_strategy (
+	id BIGINT(20) auto_increment NOT NULL,
+	max_purchase BIGINT(20) NULL,
+	min_purchase BIGINT(20) NULL,
+	no_of_gifts BIGINT(10) NULL,
+	`created_by` bigint(20) NOT NULL,
+  `updated_by` bigint(20) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT NULL,
+    PRIMARY KEY (id)
+)
+ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_general_ci;
+
+
+ALTER TABLE ecomm.t_coupons ADD expiry_date TIMESTAMP NULL;
+
+ALTER TABLE ecomm.t_coupons ADD assigned_user varchar(20) NULL;
+
+ALTER TABLE ecomm.t_coupons ADD `usage` BIGINT(20) NULL;
+
+
