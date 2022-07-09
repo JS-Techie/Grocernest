@@ -18,7 +18,7 @@ module.exports = sequelize => {
       }
     },
     transaction_id: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.STRING(50),
       allowNull: false,
       defaultValue: null,
       primaryKey: true,

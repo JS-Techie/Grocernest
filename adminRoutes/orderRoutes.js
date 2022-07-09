@@ -28,6 +28,6 @@ router.route('/shippedorders').get(authenticateAdmin, getShippedOrders);
 
 router.route('/deliveredorders').get(authenticateAdmin, getDeliveredOrders);
 
-router.route('/getCanceledorders').get(authenticateAdmin, getCanceledorders);
+router.route('/getcanceledorders').get(authenticateAdmin, getCanceledorders);
 
 module.exports = router;
