@@ -11,8 +11,8 @@ const {
     deleteCoupon
 } = require("../adminControllers/couponController")
 
-router.route("/all").get(admin,getAllCoupons);
-router.route("/:id").get(admin,getCouponById);
+router.route("/view/all").get(admin,getAllCoupons);
+router.route("/view/:id").get(admin,getCouponById);
 router.route("/create").post(admin,createCoupon);
 router.route("/update/:id").patch(admin,updateCoupon);
 router.route("/delete/:id").delete(admin,deleteCoupon);
