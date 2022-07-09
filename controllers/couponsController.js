@@ -40,7 +40,7 @@ const getAllAvailableCoupons = async (req, res, next) => {
       const [coupons, metadata] = await sequelize.query(
         `select t_coupons.code, t_coupons.amount_of_discount ,t_coupons.is_percentage ,t_coupons.description
         from ecomm.t_coupons where t_coupons.item_id = ${currentItem.id} OR t_coupons.cat_id = ${currentItem.category_id} OR t_coupons.sub_cat_id = ${currentItem.sub_category_id} or t_coupons.brand_id = ${currentItem.brand_id}
-       `
+       or t_coupons.assigned_user = ${currentUser}`
       );
 
       if (coupons.length === 0) {
@@ -78,7 +78,8 @@ const getAllAvailableCoupons = async (req, res, next) => {
       const [coupons, metadata] =
         await sequelize.query(`select t_coupons.code, t_coupons.amount_of_discount ,t_coupons.is_percentage ,t_coupons.description
         from ecomm.t_coupons
-        where t_coupons.item_id = ${currentItem.id} OR t_coupons.cat_id = ${currentItem.category_id} OR t_coupons.sub_cat_id = ${currentItem.sub_category_id} or t_coupons.brand_id = ${currentItem.brand_id} `);
+        where t_coupons.item_id = ${currentItem.id} OR t_coupons.cat_id = ${currentItem.category_id} OR t_coupons.sub_cat_id = ${currentItem.sub_category_id} or t_coupons.brand_id = ${currentItem.brand_id} \
+        or t_coupons.assigned_user = ${currentUser}`);
 
       const innerPromise = coupons.map((currentCoupon) => {
         return {
@@ -132,11 +133,17 @@ const validateCoupon = async (req, res, next) => {
       });
     }
 
+    const updateCoupon = await Coupons.update({
+       usage : couponExists.usage + 1,
+       where : {code : couponCode}
+    })
+
     if (couponExists.is_percentage === 1) {
       return res.status(200).send({
         success: true,
         data: {
           newTotal: total - (couponExists.amount_of_discount / 100) * total,
+          couponUpdated : updateCoupon === 1 ? "Yes" : "No",
         },
         message: "Coupon successfully applied",
       });
@@ -146,6 +153,7 @@ const validateCoupon = async (req, res, next) => {
       success: true,
       data: {
         newTotal: total - couponExists.amount_of_discount,
+        couponUpdated : updateCoupon === 1 ? "Yes" : "No",
       },
       message: "Coupon successfully applied",
     });
