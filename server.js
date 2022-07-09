@@ -42,6 +42,7 @@ const couponRouter = require("./routes/couponsRoutes")
 const referralRouter = require("./routes/referralRoutes")
 const giftRouter = require("./routes/giftRoutes")
 
+
 //routes
 app.get('/responses', (req, res) => {
   res.send(endPoint);
@@ -61,6 +62,7 @@ app.use("/orders", orderRouter);
 app.use("/coupons", couponRouter);
 app.use("/referral/view", referralRouter);
 app.use("/gift", giftRouter);
+app.use("/coupons", couponRouter);
 
 //Start server and connect to DB
 const db = require("./services/dbSetupService.js");

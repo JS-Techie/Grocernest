@@ -139,7 +139,7 @@ const getItemsBySearchTerm = async (req, res, next) => {
     from ((((((ecomm.t_item
           inner join t_batch on t_batch.item_id = t_item.id )
           inner join t_lkp_color on t_lkp_color.id = t_item.color_id)
-          inner join t_lkp_category on t_lkp_category.id = t_itegit m.category_id)
+          inner join t_lkp_category on t_lkp_category.id = t_item.category_id)
           inner join t_lkp_sub_category on t_lkp_sub_category.id = t_item.sub_category_id)
           inner join t_lkp_brand on t_lkp_brand.id = t_item.brand_id)
           inner join t_inventory on t_inventory.item_id = t_item.id)

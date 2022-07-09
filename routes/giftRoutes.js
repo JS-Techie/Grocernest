@@ -8,7 +8,7 @@ const{
     applyGifts
 }  = require("../controllers/giftController")
 
-router.route('/all').get(authenticate,getAllGifts)
+router.route('/all').get(authenticate, getAllGifts)
 router.route('/apply').post(authenticate,applyGifts)
 
 
