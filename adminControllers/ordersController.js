@@ -2,6 +2,7 @@ const { sequelize } = require("../models");
 const db = require("../models");
 const Order = db.OrderModel;
 // const Customer = db.CustomerModel;
+const Batch = db.BatchModel;
 
 
 const getAllPendingOrders = async (req, res, next) => {
@@ -98,6 +99,19 @@ const getOrderDetails = async (req, res, next) => {
                 message: "No items found based on search term",
             });
         }
+
+        // const promises = results.map(async(current)=>{
+
+        //     const batches = await Batch.findAll({
+        //         where : {item_id : current.item_id}
+        //     })
+
+        //     const oldestBatch = batches[0];
+
+        //     return({
+
+        //     })
+        // })
 
         const responseArray = await Promise.all(results);
 
