@@ -33,7 +33,7 @@ const getAllGifts = async (req, res, next) => {
 
     const [gifts, metadata] =
       await sequelize.query(`select t_item.id, t_item.name,t_item.brand_id,t_item.UOM ,t_item.category_id,t_item.sub_category_id
-      ,t_item.image ,t_item.description,t_lkp_color.color_name,t_batch.quantity, t_lkp_brand.brand_name
+      ,t_item.image ,t_item.description,t_lkp_color.color_name, t_lkp_brand.brand_name
       from ((ecomm.t_item
             inner join t_lkp_color on t_lkp_color.id = t_item.color_id)
             inner join t_lkp_brand on t_lkp_brand.id = t_item.brand_id)
