@@ -140,6 +140,14 @@ const getStrategyById = async (req, res, next) => {
 const createStrategy = async (req, res, next) => {
   const { min_purchase, max_purchase, no_of_gifts } = req.body;
 
+  if(!min_purchase || !max_purchase || !no_of_gifts){
+    return res.status(400).send({
+      success  : false,
+      data : [],
+      message : "Please enter all required fields"
+    })
+  }
+
   try {
     const newStrategy = await Strategy.create({
       min_purchase,
@@ -153,7 +161,7 @@ const createStrategy = async (req, res, next) => {
       data: {
         strategyID: newStrategy.id,
         minPurchase: newStrategy.min_purchase,
-        max_purchase: newStrategy.max_purchase,
+        maxPurchase: newStrategy.max_purchase,
         noOfGiftsApplicable: newStrategy.no_of_gifts,
       },
       message: "New strategy created successfully",
