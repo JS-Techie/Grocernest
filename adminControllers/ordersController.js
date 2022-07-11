@@ -100,20 +100,38 @@ const getOrderDetails = async (req, res, next) => {
             });
         }
 
-        // const promises = results.map(async(current)=>{
+        const promises = results.map(async(current)=>{
 
-        //     const batches = await Batch.findAll({
-        //         where : {item_id : current.item_id}
-        //     })
+            const batches = await Batch.findAll({
+                where : {item_id : current.item_id}
+            })
 
-        //     const oldestBatch = batches[0];
+            const oldestBatch = batches[0];
 
-        //     return({
+            return({
+                item_id : current.item_id,
+                name : current.name,
+                quantity : current.quantity,
+                item_cd : current.item_cd,
+                units : current.units,
+                UOM : current.UOM,
+                category : current.category,
+                subcategory : current.subcategory,
+                brand_id : current.brand_id,
+                div_id : current.div_id,
+                department_id : current.department_id,
+                size_id : current.size_id,
+                description : current.description,
+                cost_price : oldestBatch.cost_price,
+                sale_price : oldestBatch.sale_price,
+                MRP : oldestBatch.MRP,
+                discount : oldestBatch.discount,
+                is_free : sale_price === 0 ? true : false,
 
-        //     })
-        // })
+            })
+        })
 
-        const responseArray = await Promise.all(results);
+        const responseArray = await Promise.all(promises);
 
         return res.status(200).send({
             success: true,
