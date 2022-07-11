@@ -1811,6 +1811,9 @@
             "schema": {
               "type": "object",
               "properties": {
+                "code": {
+                  "example": "any"
+                },
                 "amount_of_discount": {
                   "example": "any"
                 },
