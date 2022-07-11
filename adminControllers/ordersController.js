@@ -53,6 +53,61 @@ const getAllPendingOrders = async (req, res, next) => {
     }
 }
 
+const getAllOrderByPhoneNumber = async (req, res, next) => {
+
+    const phno = req.body.phno;
+    const orderType = req.body.orderType;
+    // console.log(phno, orderType);
+
+    try {
+        const [results, metadata] =
+            await sequelize.query(`
+            select tc.cust_name, tlo.cust_no , tc.contact_no, tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total 
+            from t_lkp_order tlo inner join t_customer tc 
+            where tc.cust_no = tlo.cust_no 
+            AND tlo.status="${orderType}" AND
+            tc.contact_no LIKE '%${phno}%';
+
+          `);
+
+        if (results.length === 0) {
+            return res.status(201).send({
+                success: true,
+                data: [],
+                message: "No items found based on search term",
+            });
+        }
+
+        const promises = results.map(async (current) => {
+            return {
+                cust_name: current.cust_name,
+                contact_no: current.contact_no,
+                cust_no: current.cust_no,
+                order_id: current.order_id,
+                status: current.status,
+                created_at: current.created_at,
+                created_by: current.created_by,
+                total: current.total
+            };
+        });
+
+        const responseArray = await Promise.all(promises);
+
+        return res.status(200).send({
+            success: true,
+            data: responseArray,
+            message: "Successfully fetched all pending orders",
+        });
+    } catch (error) {
+        return res.status(400).send({
+            success: false,
+            data: error.message,
+            message:
+                "Error occurred while fetching all pending orders",
+        });
+    }
+
+}
 const getOrderDetails = async (req, res, next) => {
     const orderId = req.body.orderId;
     // console.log("get order details", orderId);
@@ -408,5 +463,6 @@ module.exports = {
     assignTransporter,
     getShippedOrders,
     getDeliveredOrders,
-    getCanceledorders
+    getCanceledorders,
+    getAllOrderByPhoneNumber
 }
