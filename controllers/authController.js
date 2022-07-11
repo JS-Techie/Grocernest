@@ -255,7 +255,7 @@ const verifyOTP = async (req, res, next) => {
         created: response,
         coupon: {
           code : newCoupon.code,
-          amount : newCoupon.is_percentage ? amount + "%" : amount,
+          amount : newCoupon.is_percentage ? newCoupon.amount_of_discount + "%" : newCoupon.amount_of_discount,
           description : newCoupon.description,
         },
         deletedFromCache: deletedField,
