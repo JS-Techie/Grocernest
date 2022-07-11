@@ -17,7 +17,7 @@ const checkoutFromCart = async (req, res, next) => {
     return res.status(400).send({
       success: false,
       data: null,
-      message: "Please enter correct address",
+      message: "Please enter the total amount",
     });
   }
 
@@ -133,7 +133,7 @@ const buyNow = async (req, res, next) => {
     return res.status(400).send({
       success: false,
       data: null,
-      message: "Please enter correct address",
+      message: "Please enter order total",
     });
   }
 
