@@ -74,7 +74,6 @@ const getAllAvailableCoupons = async (req, res, next) => {
         ...new Map(resolved.map((item) => [item["couponCode"], item])).values(),
       ];
 
-
       return res.status(200).send({
         success: true,
         data: response,
@@ -152,11 +151,10 @@ const validateCoupon = async (req, res, next) => {
       {
         usage: couponExists.usage + 1,
       },
-      { where: { code: couponCode, } }
+      { where: { code: couponCode } }
     );
 
-
-    console.log(updateCoupon)
+    console.log(updateCoupon);
 
     if (couponExists.is_percentage === 1) {
       return res.status(200).send({

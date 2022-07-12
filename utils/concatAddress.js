@@ -7,7 +7,7 @@ const concatAddress = async (addressID) => {
   });
 
   if(!addressResponse){
-    return (" ");
+    return false;
   }
 
   const address = 

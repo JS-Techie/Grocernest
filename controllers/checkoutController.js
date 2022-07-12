@@ -42,23 +42,17 @@ const checkoutFromCart = async (req, res, next) => {
       });
     }
 
-    let address
-    concatAddress(address_id).then((result)=>{
-      console.log(result)
-      address = result
-    }).catch((error)=>{
-      console.log(error);
-    });
+    const address = await Promise.resolve(concatAddress(address_id));
 
-    if (address == " ") {
+    if (address === false) {
       return res.status(404).send({
         success: false,
         data: null,
         message: "No address found for entered address id",
       });
     }
-    
-  const newOrder = await Order.create({
+
+    const newOrder = await Order.create({
       cust_no: currentUser,
       order_id: Math.floor(Math.random() * 10000000 + 1),
       status: "Placed",
@@ -78,8 +72,9 @@ const checkoutFromCart = async (req, res, next) => {
 
     const resolved = await Promise.all(promises);
 
+    let newOrderItems = [];
     try {
-      const newOrderItems = await OrderItems.bulkCreate(resolved);
+      newOrderItems = await Promise.resolve(OrderItems.bulkCreate(resolved));
     } catch (error) {
       await Order.destroy({
         where: { order_id: newOrder.order_id },
@@ -93,12 +88,14 @@ const checkoutFromCart = async (req, res, next) => {
       });
     }
 
-    const orderItems = resolved.map(async (currentItem) => {
+    const orderItemsPromises = newOrderItems.map(async (currentItem) => {
       return {
         itemID: currentItem.item_id,
         quantity: currentItem.quantity,
       };
     });
+
+    const orderItems = await Promise.all(orderItemsPromises);
 
     const deletedItemsFromCart = await Cart.destroy({
       where: { cust_no: currentUser },
@@ -110,6 +107,7 @@ const checkoutFromCart = async (req, res, next) => {
         currentUser: currentUser,
         orderID: newOrder.order_id,
         orderTotal: newOrder.total,
+        orderAddress: newOrder.address,
         orderItems,
         numberOfDeletedItemsFromCart: deletedItemsFromCart,
       },
