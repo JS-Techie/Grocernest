@@ -31,6 +31,8 @@ const getAllGifts = async (req, res, next) => {
     //get the latest order total to send gifts based on the rule engine
     const latestOrder = ordersForCurrentUser[0].total;
 
+    console.log(latestOrder)
+
     const [gifts, metadata] =
       await sequelize.query(`select t_item.id, t_item.name,t_item.brand_id,t_item.UOM ,t_item.category_id,t_item.sub_category_id
       ,t_item.image ,t_item.description,t_lkp_color.color_name, t_lkp_brand.brand_name
@@ -77,6 +79,8 @@ const getAllGifts = async (req, res, next) => {
       ...new Map(resolved.map((item) => [item["itemID"], item])).values(),
     ];
 
+    console.log(giftsArray)
+
     //response array based on rule engine
     // let response;
     // let noOfGiftsApplicable;
@@ -109,15 +113,17 @@ const getAllGifts = async (req, res, next) => {
       },
     });
 
+    console.log(strategy)
+
     if (!strategy) {
-      return res.status(404).send({
-        success: false,
+      return res.status(200).send({
+        success: true,
         data: [],
         message: "No gift strategies found",
       });
     }
 
-    response = giftsArray.slice(0, strategy.no_of_gifts);
+    response = giftsArray.slice(0, strategy.no_of_gifts + 4);
 
     return res.status(200).send({
       success: true,
