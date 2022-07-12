@@ -15,6 +15,14 @@ const getAllAvailableCoupons = async (req, res, next) => {
 
   //Need to add total
 
+  if(!total){
+    return res.status(400).send({
+      success : false,
+      data : [],
+      message : "Please enter total"
+    })
+  }
+
   let itemsInCart = [];
 
   if (!itemID) {
