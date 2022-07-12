@@ -145,7 +145,7 @@ const validateCoupon = async (req, res, next) => {
       {
         usage: couponExists.usage + 1,
       },
-      { where: { code: couponCode } }
+      { where: { code: couponCode, } }
     );
 
 

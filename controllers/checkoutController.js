@@ -52,6 +52,9 @@ const checkoutFromCart = async (req, res, next) => {
       });
     }
 
+
+    console.log(address)
+
     const newOrder = await Order.create({
       cust_no: currentUser,
       order_id: Math.floor(Math.random() * 10000000 + 1),
