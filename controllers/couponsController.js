@@ -148,12 +148,15 @@ const validateCoupon = async (req, res, next) => {
       { where: { code: couponCode } }
     );
 
+
+    console.log(updateCoupon)
+
     if (couponExists.is_percentage === 1) {
       return res.status(200).send({
         success: true,
         data: {
           newTotal: total - (couponExists.amount_of_discount / 100) * total,
-          couponUpdated: updateCoupon === 1 ? "Yes" : "No",
+          couponUpdated: updateCoupon ? "Yes" : "No",
         },
         message: "Coupon successfully applied",
       });
@@ -163,7 +166,7 @@ const validateCoupon = async (req, res, next) => {
       success: true,
       data: {
         newTotal: total - couponExists.amount_of_discount,
-        couponUpdated: updateCoupon === 1 ? "Yes" : "No",
+        couponUpdated: updateCoupon ? "Yes" : "No",
       },
       message: "Coupon successfully applied",
     });
