@@ -275,6 +275,7 @@ const updateCoupon = async (req, res, next) => {
     });
   }
 };
+
 const deleteCoupon = async (req, res, next) => {
   const couponID = req.params.id;
 

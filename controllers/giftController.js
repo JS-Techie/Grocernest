@@ -153,7 +153,7 @@ const applyGifts = async (req, res, next) => {
     const promises = gifts.map(async (current) => {
       return {
         cust_no: currentUser,
-        item_id: current.itemID,
+        item_id: current,
         quantity: 1,
         created_by: 1,
       };
