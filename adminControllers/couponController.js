@@ -232,13 +232,19 @@ const updateCoupon = async (req, res, next) => {
       assigned_user,
     } = req.body;
 
+      if(is_percentage !== null){
+        if(is_percentage === true){
+          is_percentage = 1;
+        }
+      }
+
     const updatedCoupon = await Coupons.update(
       {
         code : code ? code : exists.code,
         amount_of_discount: amount_of_discount
           ? amount_of_discount
           : exists.amount_of_discount,
-        is_percentage: is_percentage ? is_percentage : exists.is_percentage,
+        is_percentage: is_percentage!==null ? is_percentage : exists.is_percentage,
         cat_id: cat_id ? cat_id : exists.cat_id,
         sub_cat_id: sub_cat_id ? sub_cat_id : exists.sub_cat_id,
         item_id: item_id ? item_id : exists.item_id,
