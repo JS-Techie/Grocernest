@@ -57,6 +57,13 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
 
     const phno = req.body.phno;
     const orderType = req.body.orderType;
+    const startDate = req.body.startDate;
+    const endDate = req.body.endDate;
+
+    const phoneNoQuery = (phno == undefined || phno == "" ? "" : " AND tc.contact_no LIKE '%" + phno + "%'");
+    const dateQuery = (startDate == undefined || startDate == "" || endDate == undefined || endDate == "" ? "" : " AND tlo.created_at BETWEEN '" + startDate + "' AND '" + endDate + "'");
+
+
     // console.log(phno, orderType);
 
     try {
@@ -65,9 +72,9 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
             select tc.cust_name, tlo.cust_no , tc.contact_no, tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total 
             from t_lkp_order tlo inner join t_customer tc 
             where tc.cust_no = tlo.cust_no 
-            AND tlo.status="${orderType}" AND
-            tc.contact_no LIKE '%${phno}%';
-
+            AND tlo.status="${orderType}"
+            ${phoneNoQuery}
+            ${dateQuery}
           `);
 
         if (results.length === 0) {

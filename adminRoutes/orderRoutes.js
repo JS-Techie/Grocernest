@@ -31,7 +31,7 @@ router.route('/deliveredorders').get(authenticateAdmin, getDeliveredOrders);
 
 router.route('/getcanceledorders').get(authenticateAdmin, getCanceledorders);
 
-router.route('/getorders/phoneno').post(authenticateAdmin, getAllOrderByPhoneNumber);
+router.route('/getorders/filter').post(authenticateAdmin, getAllOrderByPhoneNumber);
 
 
 module.exports = router;
