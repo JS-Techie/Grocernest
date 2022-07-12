@@ -15,12 +15,12 @@ const getAllAvailableCoupons = async (req, res, next) => {
 
   //Need to add total
 
-  if(!total){
+  if (!total) {
     return res.status(400).send({
-      success : false,
-      data : [],
-      message : "Please enter total"
-    })
+      success: false,
+      data: [],
+      message: "Please enter total",
+    });
   }
 
   let itemsInCart = [];
@@ -141,17 +141,19 @@ const validateCoupon = async (req, res, next) => {
       });
     }
 
-    const updateCoupon = await Coupons.update({
-       usage : couponExists.usage + 1,
-       where : {code : couponCode}
-    })
+    const updateCoupon = await Coupons.update(
+      {
+        usage: couponExists.usage + 1,
+      },
+      { where: { code: couponCode } }
+    );
 
     if (couponExists.is_percentage === 1) {
       return res.status(200).send({
         success: true,
         data: {
           newTotal: total - (couponExists.amount_of_discount / 100) * total,
-          couponUpdated : updateCoupon === 1 ? "Yes" : "No",
+          couponUpdated: updateCoupon === 1 ? "Yes" : "No",
         },
         message: "Coupon successfully applied",
       });
@@ -161,7 +163,7 @@ const validateCoupon = async (req, res, next) => {
       success: true,
       data: {
         newTotal: total - couponExists.amount_of_discount,
-        couponUpdated : updateCoupon === 1 ? "Yes" : "No",
+        couponUpdated: updateCoupon === 1 ? "Yes" : "No",
       },
       message: "Coupon successfully applied",
     });
