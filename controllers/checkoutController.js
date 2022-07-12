@@ -42,7 +42,13 @@ const checkoutFromCart = async (req, res, next) => {
       });
     }
 
-    const address = concatAddress(address_id);
+    let address
+    concatAddress(address_id).then((result)=>{
+      console.log(result)
+      address = result
+    }).catch((error)=>{
+      console.log(error);
+    });
 
     if (address == " ") {
       return res.status(404).send({
@@ -51,11 +57,8 @@ const checkoutFromCart = async (req, res, next) => {
         message: "No address found for entered address id",
       });
     }
-
-
-    console.log(address)
-
-    const newOrder = await Order.create({
+    
+  const newOrder = await Order.create({
       cust_no: currentUser,
       order_id: Math.floor(Math.random() * 10000000 + 1),
       status: "Placed",

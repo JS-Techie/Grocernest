@@ -10,7 +10,7 @@ const concatAddress = async (addressID) => {
     return (" ");
   }
 
-  const address = new String(
+  const address = 
     addressResponse.address_title +
     " " +
     addressResponse.address_line_1 +
@@ -20,7 +20,6 @@ const concatAddress = async (addressID) => {
     addressResponse.city +
     " ," + 
     " " + addressResponse.state + " :" + " " + addressResponse.PIN_code
-  )
 
   return address;
 };
