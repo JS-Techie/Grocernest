@@ -70,10 +70,13 @@ const getAllAvailableCoupons = async (req, res, next) => {
       });
 
       const resolved = await Promise.all(promises);
+      const response = [
+        ...new Map(resolved.map((item) => [item["couponCode"], item])).values(),
+      ];
 
       return res.status(200).send({
         success: true,
-        data: resolved,
+        data: response,
         message: "Found all applicable coupons",
       });
     }
