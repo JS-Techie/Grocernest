@@ -26,7 +26,5 @@ router.route('/cancel/:orderId').post(authenticate, cancelOrder)
 router.route('/return/:orderId').post(authenticate, returnOrder)
 router.route('/:orderId/tracking').get(authenticate, trackOrder)
 
-// Admin routes
-router.route('/status/:orderId').get(authenticate, getOrderStatus)
 
 module.exports = router;
