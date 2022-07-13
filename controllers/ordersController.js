@@ -10,10 +10,12 @@ const getAllOrders = async (req, res, next) => {
   //Get currentUser from req.payload.cust_no
   const currentUser = req.cust_no;
 
+
   //Get all order ids for that customer number
   try {
     const allOrders = await Order.findAll({
       where: { cust_no: currentUser },
+      order: [["created_at", "DESC"]],
     });
 
     if (allOrders.length === 0) {
