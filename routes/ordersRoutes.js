@@ -11,7 +11,6 @@ const {
   trackOrder,
 } = require("../controllers/ordersController");
 
-const { getOrderStatus } = require("../controllers/adminOrdersController");
 
 //Add authenticate middleware to all controllers
 
