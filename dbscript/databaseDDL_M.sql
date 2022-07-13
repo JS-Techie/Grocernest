@@ -130,4 +130,6 @@ ALTER TABLE ecomm.t_coupons ADD assigned_user varchar(20) NULL;
 
 ALTER TABLE ecomm.t_coupons ADD `usage` BIGINT(20) NULL;
 
+ALTER TABLE ecomm.t_item ADD is_grocernest BOOL NULL;
+
 
