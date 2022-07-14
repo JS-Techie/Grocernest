@@ -237,6 +237,10 @@ const buyNow = async (req, res, next) => {
       };
     });
 
+    const deletedItemsFromCart = await Cart.destroy({
+      where: { cust_no: currentUser },
+    });
+
     return res.status(201).send({
       success: true,
       data: {
@@ -245,6 +249,7 @@ const buyNow = async (req, res, next) => {
         orderStatus: newOrder.status,
         orderTotal: newOrder.total,
         orderItems: response,
+        deletedItemsFromCart,
       },
       message: "Order created successfully",
     });
