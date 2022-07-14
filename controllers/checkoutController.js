@@ -59,7 +59,6 @@ const checkoutFromCart = async (req, res, next) => {
       created_by: 2,
       total,
       address,
-      wallet_balance_used,
     });
 
     const promises = cartForUser.map(async (currentItem) => {
@@ -194,7 +193,6 @@ const buyNow = async (req, res, next) => {
       created_by: 2,
       total,
       address,
-      wallet_balance_used
     });
 
     let promises = [];
