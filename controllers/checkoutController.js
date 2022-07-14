@@ -11,7 +11,7 @@ const checkoutFromCart = async (req, res, next) => {
   //Get current user from JWT
   const currentUser = req.cust_no;
 
-  const { total, address_id } = req.body;
+  const { total, address_id, wallet_balance_used } = req.body;
 
   if (!total) {
     return res.status(400).send({
@@ -59,6 +59,7 @@ const checkoutFromCart = async (req, res, next) => {
       created_by: 2,
       total,
       address,
+      wallet_balance_used,
     });
 
     const promises = cartForUser.map(async (currentItem) => {
@@ -131,7 +132,7 @@ const buyNow = async (req, res, next) => {
   const currentUser = req.cust_no;
 
   //Get the quantity and item ID from request body
-  const { itemID, quantity, total, address_id } = req.body;
+  const { itemID, quantity, total, address_id, wallet_balance_used } = req.body;
 
   if (!total) {
     return res.status(400).send({
@@ -193,6 +194,7 @@ const buyNow = async (req, res, next) => {
       created_by: 2,
       total,
       address,
+      wallet_balance_used
     });
 
     let promises = [];
