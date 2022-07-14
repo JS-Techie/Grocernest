@@ -10,7 +10,6 @@ const getAllOrders = async (req, res, next) => {
   //Get currentUser from req.payload.cust_no
   const currentUser = req.cust_no;
 
-
   //Get all order ids for that customer number
   try {
     const allOrders = await Order.findAll({
@@ -41,7 +40,6 @@ const getAllOrders = async (req, res, next) => {
           order: [["created_at", "ASC"]],
         });
 
-        
         const batch = batches[0];
 
         return {
@@ -52,6 +50,7 @@ const getAllOrders = async (req, res, next) => {
           MRP: batch.MRP,
           salePrice: batch.sale_price,
           discount: batch.discount,
+          isGift: currentItem.is_gift == 1 ? true : false,
         };
       });
 
@@ -131,6 +130,7 @@ const getOrderByOrderId = async (req, res, next) => {
         itemName: currentItem.name,
         id: currentItem.item_id,
         image: currentItem.image,
+        isGift: currentItem.is_gift == 1 ? true : false,
         quantity: currentOrderItem.quantity,
         MRP: batch.MRP,
         salePrice: batch.sale_price,

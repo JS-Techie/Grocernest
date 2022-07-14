@@ -217,7 +217,7 @@ const updateCoupon = async (req, res, next) => {
       });
     }
 
-    const {
+    let {
       code,
       amount_of_discount,
       is_percentage,
