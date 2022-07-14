@@ -232,7 +232,7 @@ const updateCoupon = async (req, res, next) => {
       assigned_user,
     } = req.body;
 
-      if(is_percentage !== null){
+      if(is_percentage){
         if(is_percentage === true){
           is_percentage = 1;
         }
@@ -243,16 +243,16 @@ const updateCoupon = async (req, res, next) => {
         code : code ? code : "",
         amount_of_discount: amount_of_discount
           ? amount_of_discount
-          : "",
-        is_percentage: is_percentage!==null ? is_percentage : "",
+          : null,
+        is_percentage: is_percentage!==null ? is_percentage : null,
         cat_id: cat_id ? cat_id : "",
-        sub_cat_id: sub_cat_id ? sub_cat_id : "",
-        item_id: item_id ? item_id : "",
-        brand_id: brand_id ? brand_id : "",
+        sub_cat_id: sub_cat_id ? sub_cat_id : null,
+        item_id: item_id ? item_id : null,
+        brand_id: brand_id ? brand_id : null,
         description: description ? description : "",
-        min_purchase: min_purchase ? min_purchase : "",
-        max_purchase: max_purchase ? max_purchase : "",
-        expiry_date: expiry_date ? expiry_date : "",
+        min_purchase: min_purchase ? min_purchase : null,
+        max_purchase: max_purchase ? max_purchase : null,
+        expiry_date: expiry_date ? expiry_date : null,
         assigned_user: assigned_user ? assigned_user : "",
       },
       {
