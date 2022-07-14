@@ -50,14 +50,14 @@ const getAllGifts = async (req, res, next) => {
       });
 
       let oldestBatch;
+      let availableQuantity = 0;
       if (batches.length !== 0) {
         oldestBatch = batches[0];
-
-        let availableQuantity = 0;
         batches.map((currentBatch) => {
           availableQuantity += currentBatch.quantity;
         });
       }
+
       return {
         itemID: current.id,
         itemName: current.name,
