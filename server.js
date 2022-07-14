@@ -41,6 +41,7 @@ const orderRouter = require("./routes/ordersRoutes");
 const couponRouter = require("./routes/couponsRoutes");
 const referralRouter = require("./routes/referralRoutes");
 const giftRouter = require("./routes/giftRoutes");
+const invoiceRouter = require("./routes/invoiceRoutes")
 
 // admin routers import
 const adminOrderRouter = require("./adminRoutes/orderRoutes");
@@ -58,6 +59,7 @@ app.get('/responses', (req, res) => {
 // customer routes
 app.use(authRouter);
 app.use(listRouter);
+app.use(invoiceRouter);
 app.use("/cart", cartRouter);
 app.use("/items", itemRouter);
 app.use("/wallet", walletRouter);
