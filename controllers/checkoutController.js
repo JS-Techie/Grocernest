@@ -196,7 +196,7 @@ const buyNow = async (req, res, next) => {
     });
 
     let promises = [];
-    if (userHasGifts.length !== 0) {
+    if (userGifts.length !== 0) {
       promises = userGifts.map(async (current) => {
         return {
           order_id: newOrder.order_id,
@@ -208,6 +208,7 @@ const buyNow = async (req, res, next) => {
     }
 
     const orderItems = await Promise.all(promises);
+    
     orderItems.push({
       order_id: newOrder.order_id,
       item_id: currentItem.id,
