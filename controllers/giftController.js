@@ -120,7 +120,10 @@ const getAllGifts = async (req, res, next) => {
     if (!strategy) {
       return res.status(200).send({
         success: true,
-        data: [],
+        data: {
+          gifts : [],
+          noOfGiftsApplicable : 0,
+        },
         message: "No gift strategies found",
       });
     }
