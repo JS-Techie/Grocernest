@@ -126,12 +126,13 @@ const getAllGifts = async (req, res, next) => {
     }
 
     response = giftsArray.slice(0, strategy.no_of_gifts + 4);
+  
 
     return res.status(200).send({
       success: true,
       data: {
         gifts: response,
-        noOfGiftsApplicable: strategy.no_of_gifts,
+        noOfGiftsApplicable: strategy.no_of_gifts ? strategy.no_of_gifts : 0,
       },
       message: "Found all gifts",
     });
