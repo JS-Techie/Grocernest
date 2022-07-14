@@ -176,7 +176,7 @@ const buyNow = async (req, res, next) => {
       where: { cust_no: currentUser },
     });
 
-    const address = concatAddress(address_id);
+    const address = await Promise.resolve(concatAddress(address_id));
 
     if (address == " ") {
       return res.status(404).send({
