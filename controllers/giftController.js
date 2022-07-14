@@ -31,7 +31,7 @@ const getAllGifts = async (req, res, next) => {
     //get the latest order total to send gifts based on the rule engine
     const latestOrder = ordersForCurrentUser[0].total;
 
-    console.log(latestOrder)
+    console.log(latestOrder);
 
     const [gifts, metadata] =
       await sequelize.query(`select t_item.id, t_item.name,t_item.brand_id,t_item.UOM ,t_item.category_id,t_item.sub_category_id
@@ -46,27 +46,29 @@ const getAllGifts = async (req, res, next) => {
     const promises = gifts.map(async (current) => {
       const batches = await Batch.findAll({
         where: { item_id: current.id },
-        order : [["created_at", "ASC"]]
+        order: [["created_at", "ASC"]],
       });
 
-      const oldestBatch = batches[0];
+      let oldestBatch;
+      if (batches.length !== 0) {
+        oldestBatch = batches[0];
 
-      let availableQuantity = 0;
-      batches.map((currentBatch) => {
-        availableQuantity += currentBatch.quantity;
-      });
-
+        let availableQuantity = 0;
+        batches.map((currentBatch) => {
+          availableQuantity += currentBatch.quantity;
+        });
+      }
       return {
         itemID: current.id,
         itemName: current.name,
         availableQuantity,
         categoryID: current.category_id,
         subcategoryID: current.sub_category_id,
-        MRP: oldestBatch.MRP,
-        discount: oldestBatch.discount,
-        costPrice: oldestBatch.cost_price,
-        mfgDate: oldestBatch.mfg_date,
-        salePrice : oldestBatch.sale_price,
+        MRP: oldestBatch ? oldestBatch.MRP : "",
+        discount: oldestBatch ? oldestBatch.discount : "",
+        costPrice: oldestBatch ? oldestBatch.cost_price : "",
+        mfgDate: oldestBatch ? oldestBatch.mfg_date : "",
+        salePrice: oldestBatch ? oldestBatch.sale_price : "",
         color: current.color_name,
         brand: current.brand_name,
       };
@@ -79,7 +81,7 @@ const getAllGifts = async (req, res, next) => {
       ...new Map(resolved.map((item) => [item["itemID"], item])).values(),
     ];
 
-    console.log(giftsArray)
+    console.log(giftsArray);
 
     //response array based on rule engine
     // let response;
@@ -113,7 +115,7 @@ const getAllGifts = async (req, res, next) => {
       },
     });
 
-    console.log(strategy)
+    console.log(strategy);
 
     if (!strategy) {
       return res.status(200).send({
