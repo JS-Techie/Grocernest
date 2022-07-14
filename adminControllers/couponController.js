@@ -240,20 +240,20 @@ const updateCoupon = async (req, res, next) => {
 
     const updatedCoupon = await Coupons.update(
       {
-        code : code ? code : exists.code,
+        code : code ? code : "",
         amount_of_discount: amount_of_discount
           ? amount_of_discount
-          : exists.amount_of_discount,
-        is_percentage: is_percentage!==null ? is_percentage : exists.is_percentage,
-        cat_id: cat_id ? cat_id : exists.cat_id,
-        sub_cat_id: sub_cat_id ? sub_cat_id : exists.sub_cat_id,
-        item_id: item_id ? item_id : exists.item_id,
-        brand_id: brand_id ? brand_id : exists.brand_id,
-        description: description ? description : exists.description,
-        min_purchase: min_purchase ? min_purchase : exists.min_purchase,
-        max_purchase: max_purchase ? max_purchase : exists.max_purchase,
-        expiry_date: expiry_date ? expiry_date : exists.expiry_date,
-        assigned_user: assigned_user ? assigned_user : exists.assigned_user,
+          : "",
+        is_percentage: is_percentage!==null ? is_percentage : "",
+        cat_id: cat_id ? cat_id : "",
+        sub_cat_id: sub_cat_id ? sub_cat_id : "",
+        item_id: item_id ? item_id : "",
+        brand_id: brand_id ? brand_id : "",
+        description: description ? description : "",
+        min_purchase: min_purchase ? min_purchase : "",
+        max_purchase: max_purchase ? max_purchase : "",
+        expiry_date: expiry_date ? expiry_date : "",
+        assigned_user: assigned_user ? assigned_user : "",
       },
       {
         where: { id: couponID },
