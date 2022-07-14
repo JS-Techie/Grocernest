@@ -208,10 +208,10 @@ const buyNow = async (req, res, next) => {
     }
 
     const orderItems = await Promise.all(promises);
-    
+
     orderItems.push({
       order_id: newOrder.order_id,
-      item_id: currentItem.id,
+      item_id: itemID,
       quantity,
       created_by: newOrder.created_by,
     });
