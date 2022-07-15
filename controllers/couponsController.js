@@ -13,8 +13,6 @@ const getAllAvailableCoupons = async (req, res, next) => {
 
   const { itemID, total } = req.body;
 
-  //Need to add total
-
   if (!total) {
     return res.status(400).send({
       success: false,
@@ -31,8 +29,10 @@ const getAllAvailableCoupons = async (req, res, next) => {
     });
   }
 
+  console.log(itemsInCart);
+
   try {
-    if (itemsInCart.length == 0) {
+    if (itemsInCart.length === 0) {
       const currentItem = await Item.findOne({
         where: { id: itemID },
       });
@@ -104,11 +104,14 @@ const getAllAvailableCoupons = async (req, res, next) => {
     });
 
     const resolved = await Promise.all(promiseArray);
-    const response = [
-      ...new Map(resolved.map((item) => [item["couponCode"], item])).values(),
-    ];
-    const responseArray = response.flat(1);
+    const response = resolved.filter((value, index, self) => {
+      return self.indexOf(value) === index;
+    });
 
+    const flattenedArray = response.flat(1);
+    const responseArray = [
+      ...new Map(flattenedArray.map((item) => [item["couponCode"], item])).values(),
+    ];
     return res.status(200).send({
       success: true,
       data: responseArray,
