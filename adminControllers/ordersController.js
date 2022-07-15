@@ -164,7 +164,7 @@ const getOrderDetails = async (req, res, next) => {
             tc.comments 
             from t_customer tc inner join t_lkp_order tlo 
             where
-            tc.id = tlo.cust_no and
+            tc.cust_no = tlo.cust_no and
             tlo.order_id = "${orderId}"
             `
         )
