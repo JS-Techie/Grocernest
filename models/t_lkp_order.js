@@ -102,6 +102,15 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "cancellation_reason"
+    },
+    wallet_balance_used: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "wallet_balance_used"
     }
   };
   const options = {

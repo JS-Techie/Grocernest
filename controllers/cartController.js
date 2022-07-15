@@ -281,6 +281,7 @@ const getCart = async (req, res, next) => {
         discount: current.discount,
         color: current.color_name,
         brand: current.brand_name,
+        isGift : current.is_gift === 1 ? true : false,
       };
     });
 

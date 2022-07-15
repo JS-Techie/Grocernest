@@ -162,6 +162,7 @@ const applyGifts = async (req, res, next) => {
         item_id: current,
         quantity: 1,
         created_by: 1,
+        is_gift : 1,
       };
     });
 
