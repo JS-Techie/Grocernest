@@ -68,7 +68,7 @@ module.exports = sequelize => {
       field: "updated_by"
     },
     total: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.FLOAT,
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
@@ -104,13 +104,31 @@ module.exports = sequelize => {
       field: "cancellation_reason"
     },
     wallet_balance_used: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.FLOAT,
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
       field: "wallet_balance_used"
+    },
+    applied_discount: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "applied_discount"
+    },
+    final_payable_amount: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "final_payable_amount"
     }
   };
   const options = {
