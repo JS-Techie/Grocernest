@@ -107,7 +107,9 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
                 created_by: current.created_by,
                 transporter_name: current.transporter_name,
                 cancellation_reason: current.cancellation_reason,
-                total: current.total
+                total: current.total,
+                applied_discount: current.applied_discount,
+                final_payable_amount: current.final_payable_amount
             };
         });
 
