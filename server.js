@@ -49,6 +49,7 @@ const adminWalletRouter = require("./adminRoutes/walletRoutes");
 const adminCustomerRouter = require("./adminRoutes/customerRoutes");
 const adminGiftRouter = require("./adminRoutes/giftRoutes");
 const adminCouponsRouter = require("./adminRoutes/couponRoutes");
+const adminOffersRouter = require("./adminRoutes/offerRoutes");
 
 
 //routes
@@ -80,6 +81,7 @@ app.use("/admin/wallet", adminWalletRouter);
 app.use("/admin/customer", adminCustomerRouter);
 app.use("/admin/gift" , adminGiftRouter);
 app.use("/admin/coupons", adminCouponsRouter);
+app.use("/admin/offers", adminOffersRouter);
 
 //Start server and connect to DB
 const db = require("./services/dbSetupService.js");
