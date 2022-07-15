@@ -132,4 +132,24 @@ ALTER TABLE ecomm.t_coupons ADD `usage` BIGINT(20) NULL;
 
 ALTER TABLE ecomm.t_item ADD is_grocernest BOOL NULL;
 
+-- ecomm.t_offers definition
+CREATE TABLE ecomm.t_offers (
+	id BIGINT(20) auto_increment NOT NULL,
+	`type` varchar(100) NULL,
+	item_id_1 BIGINT(20) NULL,
+	item_id_2 BIGINT(20) NULL,
+	item_id BIGINT(20) NULL,
+	amount_of_discount BIGINT(20) NULL,
+	is_percentage BOOL NULL,
+	 `created_by` bigint(20) NOT NULL,
+  `updated_by` bigint(20) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT NULL,
+  primary key (`id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_general_ci;
 
+ALTER TABLE ecomm.t_offers ADD item_1_quantity BIGINT(20) NULL;
+ALTER TABLE ecomm.t_offers ADD item_2_quantity BIGINT(20) NULL;

@@ -14,7 +14,7 @@ const{
 router.route("/view/all").get(admin, getAllOffers)
 router.route("/view/:id").get(admin, getOfferById)
 router.route("/create").post(admin, createOffer)
-router.route("/update/:id").put(admin, updateOffer)
+router.route("/update/:id").patch(admin, updateOffer)
 router.route("/delete/:id").delete(admin, deleteOffer)
 
 

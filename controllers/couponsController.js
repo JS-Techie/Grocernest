@@ -112,6 +112,7 @@ const getAllAvailableCoupons = async (req, res, next) => {
     const responseArray = [
       ...new Map(flattenedArray.map((item) => [item["couponCode"], item])).values(),
     ];
+    
     return res.status(200).send({
       success: true,
       data: responseArray,
