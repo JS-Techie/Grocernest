@@ -2051,9 +2051,7 @@
       }
     },
     "/admin/offers/update/{id}": {
-
       "patch": {
-
         "description": "",
         "parameters": [
           {
