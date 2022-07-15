@@ -66,6 +66,8 @@ const getAllOrders = async (req, res, next) => {
         Date: currentOrder.created_at,
         status: currentOrder.status,
         orderTotal: currentOrder.total,
+        applied_discount: currentOrder.applied_discount,
+        final_payable_amount: currentOrder.final_payable_amount,
         itemDetails: orderItemsArray,
       };
     });

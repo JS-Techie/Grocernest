@@ -69,9 +69,18 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
     try {
         const [results, metadata] =
             await sequelize.query(`
-            select tc.cust_name, tlo.cust_no , tc.contact_no, tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total,
+            select tc.cust_name, 
+            tlo.cust_no , 
+            tc.contact_no, 
+            tlo.order_id,
+            tlo.status,
+            tlo.created_at,
+            tlo.created_by,
+            tlo.total,
             tlo.transporter_name,
-            tlo.cancellation_reason
+            tlo.cancellation_reason,
+            tlo.applied_discount,
+            tlo.final_payable_amount
             from t_lkp_order tlo inner join t_customer tc 
             where tc.cust_no = tlo.cust_no 
             AND tlo.status="${orderType}"
@@ -98,7 +107,9 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
                 created_by: current.created_by,
                 transporter_name: current.transporter_name,
                 cancellation_reason: current.cancellation_reason,
-                total: current.total
+                total: current.total,
+                applied_discount: current.applied_discount,
+                final_payable_amount: current.final_payable_amount
             };
         });
 
@@ -153,7 +164,7 @@ const getOrderDetails = async (req, res, next) => {
             tc.comments 
             from t_customer tc inner join t_lkp_order tlo 
             where
-            tc.id = tlo.cust_no and
+            tc.cust_no = tlo.cust_no and
             tlo.order_id = "${orderId}"
             `
         )

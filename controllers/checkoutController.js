@@ -1,9 +1,12 @@
 const { sequelize } = require("../models");
 const db = require("../models");
+const uniqid = require('uniqid');
 
 const Order = db.OrderModel;
 const OrderItems = db.OrderItemsModel;
 const Cart = db.CartModel;
+const Wallet = db.Wallet;
+const Wallet_Transaction = db.Wallet_Transaction;
 
 const concatAddress = require("../utils/concatAddress");
 
@@ -11,7 +14,7 @@ const checkoutFromCart = async (req, res, next) => {
   //Get current user from JWT
   const currentUser = req.cust_no;
 
-  const { total, address_id, wallet_balance_used } = req.body;
+  const { total, address_id, applied_discount, final_payable_amount } = req.body;
 
   if (!total) {
     return res.status(400).send({
@@ -59,6 +62,8 @@ const checkoutFromCart = async (req, res, next) => {
       created_by: 2,
       total,
       address,
+      applied_discount: applied_discount,
+      final_payable_amount: final_payable_amount
     });
 
     const promises = cartForUser.map(async (currentItem) => {
@@ -131,7 +136,8 @@ const buyNow = async (req, res, next) => {
   const currentUser = req.cust_no;
 
   //Get the quantity and item ID from request body
-  const { itemID, quantity, total, address_id, wallet_balance_used } = req.body;
+  // wallet_balance_used, wallet_id
+  const { itemID, quantity, total, address_id, applied_discount, final_payable_amount } = req.body;
 
   if (!total) {
     return res.status(400).send({
@@ -193,7 +199,25 @@ const buyNow = async (req, res, next) => {
       created_by: 2,
       total,
       address,
+      applied_discount: applied_discount,
+      final_payable_amount: final_payable_amount
     });
+
+    // const wallet = await Wallet.update({
+    //   balance: -wallet_balance_used
+    // },
+    //   { where: { cust_no: currentUser } }
+    // )
+
+    // const wallet_transaction = await Wallet_Transaction.create({
+    //   wallet_id: wallet_id,
+    //   transaction_id: uniqid(),
+    //   transaction_type: 'D',
+    //   transaction_amount: wallet_balance_used,
+    //   transaction_details: newOrder.order_id,
+    //   created_by: 2
+    // })
+
 
     let promises = [];
     if (userGifts.length !== 0) {
