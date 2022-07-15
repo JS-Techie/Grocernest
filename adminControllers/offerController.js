@@ -80,11 +80,7 @@ const getOfferById = async (req, res, next) => {
         amountOfDiscount: current.amount_of_discount
           ? current.amount_of_discount
           : "",
-        isPercentage: current.is_percentage
-          ? current.is_percentage === 1
-            ? true
-            : false
-          : "",
+          isPercentage: current.is_percentage ? true : false,
       },
       message: "Requested offer found",
     });

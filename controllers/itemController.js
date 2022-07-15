@@ -1,7 +1,20 @@
+const jwt = require("jsonwebtoken");
+
 const { sequelize } = require("../models");
 const db = require("../models");
 
+const WishlistItems = db.WishlistItemsModel;
+
+const { findCustomerNumber } = require("../middleware/customerNumber");
+
 const getItemsInCategory = async (req, res, next) => {
+  //get current user if exists
+  let currentUser = null;
+
+  currentUser = await findCustomerNumber(req, res, next);
+
+  console.log(currentUser);
+
   //Get category id from the request
   const category = req.params.categoryId;
   try {
@@ -28,6 +41,13 @@ const getItemsInCategory = async (req, res, next) => {
     }
 
     const promises = await itemsInACategory.map(async (current) => {
+      let itemInWishlist;
+      if (currentUser) {
+        itemInWishlist = await WishlistItems.findOne({
+          where: { cust_no: currentUser, item_id: current.id },
+        });
+      }
+
       return {
         itemName: current.name,
         itemID: current.id,
@@ -42,6 +62,7 @@ const getItemsInCategory = async (req, res, next) => {
         mfg_date: current.mfg_date,
         color: current.color_name,
         brand: current.brand_name,
+        inWishlist: currentUser ? (itemInWishlist ? true : false) : "",
       };
     });
 
@@ -67,6 +88,13 @@ const getItemsInSubcategory = async (req, res, next) => {
   const category = req.params.categoryId;
   const subcategory = req.params.subcategoryId;
 
+  //Get current user if exists
+  let currentUser = null;
+
+  currentUser = await findCustomerNumber(req, res, next);
+
+  console.log(currentUser);
+
   try {
     const [ItemsInASubcategory, metadata] =
       await sequelize.query(`select distinct t_item.id, t_item.name,t_item.brand_id,t_item.UOM ,t_item.category_id ,t_item.sub_category_id ,
@@ -91,6 +119,12 @@ const getItemsInSubcategory = async (req, res, next) => {
     }
 
     const promises = ItemsInASubcategory.map(async (current) => {
+      let itemInWishlist;
+      if (currentUser) {
+        itemInWishlist = await WishlistItems.findOne({
+          where: { cust_no: currentUser, item_id: current.id },
+        });
+      }
       return {
         itemName: current.name,
         itemID: current.id,
@@ -107,6 +141,7 @@ const getItemsInSubcategory = async (req, res, next) => {
         mfg_date: current.mfg_date,
         color: current.color_name,
         brand: current.brand_name,
+        inWishlist: currentUser ? (itemInWishlist ? true : false) : "",
       };
     });
 
@@ -129,6 +164,13 @@ const getItemsInSubcategory = async (req, res, next) => {
 const getItemsBySearchTerm = async (req, res, next) => {
   //get the search term, find if anything from category or subcategory or item or brand name matches with the search term
   const searchTerm = req.params.searchTerm;
+
+  //Get current user if exists
+  let currentUser = null;
+
+  currentUser = await findCustomerNumber(req, res, next);
+
+  console.log(currentUser);
 
   try {
     const [results, metadata] =
@@ -154,6 +196,12 @@ const getItemsBySearchTerm = async (req, res, next) => {
     }
 
     const promises = results.map(async (current) => {
+      let itemInWishlist;
+      if (currentUser) {
+        itemInWishlist = await WishlistItems.findOne({
+          where: { cust_no: currentUser, item_id: current.id },
+        });
+      }
       return {
         itemName: current.name,
         itemID: current.id,
@@ -170,6 +218,7 @@ const getItemsBySearchTerm = async (req, res, next) => {
         mfg_date: current.mfg_date,
         color: current.color_name,
         brand: current.brand_name,
+        inWishlist: currentUser ? (itemInWishlist ? true : false) : "",
       };
     });
 
@@ -193,6 +242,13 @@ const getItemsBySearchTerm = async (req, res, next) => {
 const getItemById = async (req, res, next) => {
   //Get the itemId from the params
   const currentItemId = req.params.itemId;
+
+  //Get current user if exists
+  let currentUser = null;
+
+  currentUser = await findCustomerNumber(req, res, next);
+
+  console.log(currentUser);
 
   try {
     //Find all the details of the item pertaining to current item id
@@ -224,6 +280,13 @@ const getItemById = async (req, res, next) => {
       availableQuantity += current.quantity;
     });
 
+    let itemInWishlist;
+    if (currentUser) {
+      itemInWishlist = await WishlistItems.findOne({
+        where: { cust_no: currentUser, item_id: item.id },
+      });
+    }
+
     return res.status(200).send({
       success: true,
       data: {
@@ -243,6 +306,7 @@ const getItemById = async (req, res, next) => {
         mfg_date: item.mfg_date,
         color: item.color_name,
         brand: item.brand_name,
+        inWishlist: currentUser ? (itemInWishlist ? true : false) : "",
       },
       message: "Details for requested item found",
     });
@@ -258,7 +322,7 @@ const getItemById = async (req, res, next) => {
 
 module.exports = {
   getItemsInCategory,
-  getItemsInSubcategory,  
+  getItemsInSubcategory,
   getItemsBySearchTerm,
   getItemById,
 };
