@@ -63,6 +63,7 @@ const checkoutFromCart = async (req, res, next) => {
       total,
       address,
       applied_discount: applied_discount,
+      wallet_balance_used: wallet_balance_used,
       final_payable_amount: final_payable_amount
     });
 
@@ -221,6 +222,7 @@ const buyNow = async (req, res, next) => {
       total,
       address,
       applied_discount: applied_discount,
+      wallet_balance_used: wallet_balance_used,
       final_payable_amount: final_payable_amount
     });
 
