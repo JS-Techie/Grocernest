@@ -80,6 +80,7 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
             tlo.transporter_name,
             tlo.cancellation_reason,
             tlo.applied_discount,
+            tlo.wallet_balance_used,
             tlo.final_payable_amount
             from t_lkp_order tlo inner join t_customer tc 
             where tc.cust_no = tlo.cust_no 
@@ -109,6 +110,7 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
                 cancellation_reason: current.cancellation_reason,
                 total: current.total,
                 applied_discount: current.applied_discount,
+                wallet_balance_used: wallet_balance_used,
                 final_payable_amount: current.final_payable_amount
             };
         });
