@@ -18,24 +18,28 @@ const getAllOffers = async (req, res, next) => {
     }
 
     const promises = offers.map(async (current) => {
-
       const item1 = await Item.findOne({
-        where : {id : current.item_id_1}
-      })
+        where: { id: current.item_id_1 },
+      });
       const item2 = await Item.findOne({
-        where : {id : current.item_id_2}
-      })
+        where: { id: current.item_id_2 },
+      });
+
+      const item = await Item.findOne({
+        where: { id: current.item_id },
+      });
 
       return {
         offerID: current.id,
         offerType: current.type,
         itemX: current.item_id_1 ? current.item_id_1 : "",
-        firstItem : item1? item1.name : "",
+        firstItem: item1 ? item1.name : "",
         quantityOfItemX: current.item_1_quantity ? current.item_1_quantity : "",
         itemY: current.item_id_2 ? current.item_id_2 : "",
-        secondItem : item2? item2.name : "",
+        secondItem: item2 ? item2.name : "",
         quantityOfItemY: current.item_2_quantity ? current.item_2_quantity : "",
         itemID: current.item_id ? current.item_id : "",
+        itemName: item ? item.name : "",
         amountOfDiscount: current.amount_of_discount
           ? current.amount_of_discount
           : "",
@@ -78,11 +82,14 @@ const getOfferById = async (req, res, next) => {
     }
 
     const item1 = await Item.findOne({
-      where : {id : current.item_id_1}
-    })
+      where: { id: current.item_id_1 },
+    });
     const item2 = await Item.findOne({
-      where : {id : current.item_id_2}
-    })
+      where: { id: current.item_id_2 },
+    });
+    const item = await Item.findOne({
+      where: { id: current.item_id },
+    });
 
     return res.status(200).send({
       success: true,
@@ -90,16 +97,17 @@ const getOfferById = async (req, res, next) => {
         offerID: current.id,
         offerType: current.type,
         itemX: current.item_id_1 ? current.item_id_1 : "",
-        firstItem : item1? item1.name : "",
+        firstItem: item1 ? item1.name : "",
         quantityOfItemX: current.item_1_quantity ? current.item_1_quantity : "",
         itemY: current.item_id_2 ? current.item_id_2 : "",
-        secondItem : item2? item2.name : "",
+        secondItem: item2 ? item2.name : "",
         quantityOfItemY: current.item_2_quantity ? current.item_2_quantity : "",
         itemID: current.item_id ? current.item_id : "",
+        itemName: item ? item.name : "",
         amountOfDiscount: current.amount_of_discount
           ? current.amount_of_discount
           : "",
-          isPercentage: current.is_percentage ? true : false,
+        isPercentage: current.is_percentage ? true : false,
       },
       message: "Requested offer found",
     });
