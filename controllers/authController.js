@@ -241,8 +241,7 @@ const verifyOTP = async (req, res, next) => {
       wallet_id: uniqid(),
       cust_no: newUser.cust_no,
       balance: 0,
-      created_by: newUser.cust_no,
-      updated_by: newUser.cust_no
+      created_by: 2,
     })
 
     const newCoupon = await Coupon.create({
