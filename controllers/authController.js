@@ -10,6 +10,7 @@ const { generateOTP, sendOTPToPhoneNumber } = require("../services/otpService");
 const Customer = db.CustomerModel;
 const Cache = db.CacheModel;
 const Coupon = db.CouponsModel;
+const wallet = db.WalletModel;
 
 const login = async (req, res, next) => {
   //Get the user details from the form
@@ -236,13 +237,21 @@ const verifyOTP = async (req, res, next) => {
       referred_by: newUser.referred_by
     });
 
+    const new_wallet = await wallet.create({
+      wallet_id: uniqid(),
+      cust_no: newUser.cust_no,
+      balance: 0,
+      created_by: newUser.cust_no,
+      updated_by: newUser.cust_no
+    })
+
     const newCoupon = await Coupon.create({
-        code : "FIRSTBUY",
-        amount_of_discount : 10,
-        is_percentage : 1,
-        assigned_user : newUser.cust_no,
-        created_by : 1,
-        description : "Flat 10% off on your first purchase, use code FIRSTBUY"
+      code: "FIRSTBUY",
+      amount_of_discount: 10,
+      is_percentage: 1,
+      assigned_user: newUser.cust_no,
+      created_by: 1,
+      description: "Flat 10% off on your first purchase, use code FIRSTBUY"
     })
 
     const deletedField = await Cache.destroy({
@@ -254,9 +263,9 @@ const verifyOTP = async (req, res, next) => {
       data: {
         created: response,
         coupon: {
-          code : newCoupon.code,
-          amount : newCoupon.is_percentage ? newCoupon.amount_of_discount + "%" : newCoupon.amount_of_discount,
-          description : newCoupon.description,
+          code: newCoupon.code,
+          amount: newCoupon.is_percentage ? newCoupon.amount_of_discount + "%" : newCoupon.amount_of_discount,
+          description: newCoupon.description,
         },
         deletedFromCache: deletedField,
       },
