@@ -156,3 +156,6 @@ ALTER TABLE ecomm.t_offers ADD item_2_quantity BIGINT(20) NULL;
 
 
 ALTER TABLE ecomm.t_customer ADD new_phone_number varchar(20) NULL;
+
+ALTER TABLE ecomm.t_cart ADD is_offer BOOL NULL;
+ALTER TABLE ecomm.t_cart ADD offer_item_price DECIMAL(10,2) NULL;

@@ -243,7 +243,7 @@ const getCart = async (req, res, next) => {
   try {
     const [cartForUser, metadata] =
       await sequelize.query(`select t_cart.item_id, t_cart.quantity,t_item.name, t_item.image, t_item.description,
-    t_batch.MRP,t_batch.sale_price, t_batch.discount,t_lkp_color.color_name, t_lkp_brand.brand_name
+    t_batch.MRP,t_batch.sale_price, t_batch.discount,t_lkp_color.color_name, t_lkp_brand.brand_name, t_cart.is_offer,t_cart.is_gift,t_cart.offer_item_price
     from ((((t_cart
     inner join t_item on t_item.id = t_cart.item_id)
     inner join t_batch on t_batch.item_id = t_cart.item_id )
@@ -269,6 +269,7 @@ const getCart = async (req, res, next) => {
         availableQuantity += currentBatch.quantity;
       });
 
+
       return {
         itemID: current.item_id,
         quantity: current.quantity,
@@ -277,11 +278,12 @@ const getCart = async (req, res, next) => {
         description: current.description,
         image: current.image,
         MRP: current.MRP,
-        salePrice: current.sale_price,
+        salePrice: current.is_offer === 1 ? current.offer_item_price : current.sale_price,
         discount: current.discount,
         color: current.color_name,
         brand: current.brand_name,
         isGift : current.is_gift === 1 ? true : false,
+        isOffer : current.is_offer === 1 ? true : false,
       };
     });
 
