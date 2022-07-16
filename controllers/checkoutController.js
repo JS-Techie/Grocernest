@@ -137,7 +137,7 @@ const buyNow = async (req, res, next) => {
 
   //Get the quantity and item ID from request body
   // wallet_balance_used, wallet_id
-  const { itemID, quantity, total, address_id, applied_discount, final_payable_amount } = req.body;
+  const { itemID, quantity, total, address_id, applied_discount, final_payable_amount, wallet_balance_used, wallet_id } = req.body;
 
   if (!total) {
     return res.status(400).send({
@@ -203,20 +203,20 @@ const buyNow = async (req, res, next) => {
       final_payable_amount: final_payable_amount
     });
 
-    // const wallet = await Wallet.update({
-    //   balance: -wallet_balance_used
-    // },
-    //   { where: { cust_no: currentUser } }
-    // )
+    const wallet = await Wallet.update({
+      balance: -wallet_balance_used
+    },
+      { where: { cust_no: currentUser } }
+    )
 
-    // const wallet_transaction = await Wallet_Transaction.create({
-    //   wallet_id: wallet_id,
-    //   transaction_id: uniqid(),
-    //   transaction_type: 'D',
-    //   transaction_amount: wallet_balance_used,
-    //   transaction_details: newOrder.order_id,
-    //   created_by: 2
-    // })
+    const wallet_transaction = await Wallet_Transaction.create({
+      wallet_id: wallet_id,
+      transaction_id: uniqid(),
+      transaction_type: 'D',
+      transaction_amount: wallet_balance_used,
+      transaction_details: newOrder.order_id,
+      created_by: 2
+    })
 
 
     let promises = [];
