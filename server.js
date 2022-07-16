@@ -1,5 +1,5 @@
 require("dotenv").config();
-
+const refferal_job = require("./CRON_REF_1");
 // Swagger UI Setup
 const swaggerUI = require('swagger-ui-express');
 const endPoint = require('./swagger/swagger-output.json');
@@ -79,7 +79,7 @@ app.use("/coupons", couponRouter);
 app.use("/admin/orders", adminOrderRouter);
 app.use("/admin/wallet", adminWalletRouter);
 app.use("/admin/customer", adminCustomerRouter);
-app.use("/admin/gift" , adminGiftRouter);
+app.use("/admin/gift", adminGiftRouter);
 app.use("/admin/coupons", adminCouponsRouter);
 app.use("/admin/offers", adminOffersRouter);
 
@@ -98,3 +98,4 @@ const start = async () => {
 };
 
 start();
+refferal_job();
