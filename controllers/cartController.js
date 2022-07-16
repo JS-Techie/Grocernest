@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const { sequelize } = require("../models");
 const db = require("../models");
 
@@ -178,23 +179,18 @@ const removeItemFromCart = async (req, res, next) => {
   const itemId = req.params.itemId;
 
   //Find any offers with this item ID and remove that as well
-
-  try {
-    const offer = await Offers.findOne({
+  const offer = await Offers.findOne({
+    where: {
+      [Op.or]: [{ item_id_1: itemId }, { item_id: itemId }],
+    },
+  });
+  if (offer) {
+    await Cart.destroy({
       where: {
-        [Op.or]: [{ item_id_1: itemId }, { item_id: itemId }],
+        cust_no: currentUser,
+        item_id: offer.item_id_1 ? offer.item_id_1 : offer.item_id,
       },
     });
-    if (offer) {
-      await Cart.destroy({
-        where: {
-          cust_no: currentUser,
-          item_id: offer.item_id_1 ? offer.item_id_1 : offer.item_id,
-        },
-      });
-    }
-  } catch (error) {
-    res.send("Offers could not be removed because", error.message);
   }
 
   // console.log(currentUser, itemId);
