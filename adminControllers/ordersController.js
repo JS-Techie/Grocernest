@@ -110,7 +110,7 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
                 cancellation_reason: current.cancellation_reason,
                 total: current.total,
                 applied_discount: current.applied_discount,
-                wallet_balance_used: wallet_balance_used,
+                wallet_balance_used: current.wallet_balance_used,
                 final_payable_amount: current.final_payable_amount
             };
         });
