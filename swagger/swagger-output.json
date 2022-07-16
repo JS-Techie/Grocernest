@@ -817,7 +817,7 @@
         }
       }
     },
-    "/profile/edit": {
+    "/profile/edit/details": {
       "patch": {
         "description": "",
         "parameters": [
