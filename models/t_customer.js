@@ -160,6 +160,15 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "new_phone_number"
+    },
+    reward_recieved: {
+      type: DataTypes.STRING(20),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "reward_recieved"
     }
   };
   const options = {
