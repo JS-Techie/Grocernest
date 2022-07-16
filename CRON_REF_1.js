@@ -32,9 +32,7 @@ const job = async () => {
                     }
                 },
                 {
-                    reward_recieved: {
-                        [Op.not]: "Yes",
-                    }
+                    reward_recieved: null
                 }
                 ]
 
@@ -43,6 +41,8 @@ const job = async () => {
 
         let first_purchase_referred_user = [];
         const list_user = AllCustomers.map(async (currentUser) => {
+
+            // console.log("===============>", currentUser.cust_name);
 
             const No_of_Order = await Order.count({
                 where: {
