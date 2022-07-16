@@ -23,7 +23,7 @@ const getAllOffers = async (req, res, next) => {
         where : {id : current.item_id_1}
       })
       const item2 = await Item.findOne({
-        where : {id : item_id_2}
+        where : {id : current.item_id_2}
       })
 
       return {
@@ -81,7 +81,7 @@ const getOfferById = async (req, res, next) => {
       where : {id : current.item_id_1}
     })
     const item2 = await Item.findOne({
-      where : {id : item_id_2}
+      where : {id : current.item_id_2}
     })
 
     return res.status(200).send({
