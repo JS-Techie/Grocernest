@@ -61,6 +61,7 @@ const getWishlist = async (req, res, next) => {
         mfg_date: current.mfg_date,
         color: current.color_name,
         brand: current.brand_name,
+        inWishlist : true,
       };
     });
 
