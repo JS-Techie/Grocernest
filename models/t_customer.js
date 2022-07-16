@@ -151,6 +151,15 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "referred_by"
+    },
+    new_phone_number: {
+      type: DataTypes.STRING(20),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "new_phone_number"
     }
   };
   const options = {

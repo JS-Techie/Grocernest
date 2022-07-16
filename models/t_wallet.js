@@ -5,7 +5,7 @@ const {
 module.exports = sequelize => {
   const attributes = {
     wallet_id: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.STRING(20),
       allowNull: false,
       defaultValue: null,
       primaryKey: true,

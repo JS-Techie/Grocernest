@@ -5,17 +5,13 @@ const {
 module.exports = sequelize => {
   const attributes = {
     wallet_id: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.STRING(20),
       allowNull: false,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "wallet_id",
-      references: {
-        key: "wallet_id",
-        model: "t_wallet_model"
-      }
+      field: "wallet_id"
     },
     transaction_id: {
       type: DataTypes.STRING(50),

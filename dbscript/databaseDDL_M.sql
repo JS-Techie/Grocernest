@@ -153,3 +153,6 @@ COLLATE=utf8mb4_general_ci;
 
 ALTER TABLE ecomm.t_offers ADD item_1_quantity BIGINT(20) NULL;
 ALTER TABLE ecomm.t_offers ADD item_2_quantity BIGINT(20) NULL;
+
+
+ALTER TABLE ecomm.t_customer ADD new_phone_number varchar(20) NULL;
