@@ -4,6 +4,7 @@ const db = require("../models");
 const Cart = db.CartModel;
 const Item = db.ItemModel;
 const Batch = db.BatchModel;
+const Offers = db.OffersModel;
 
 const saveCart = async (req, res, next) => {
   //Get current user from JWT
@@ -176,6 +177,26 @@ const removeItemFromCart = async (req, res, next) => {
   //Get item-id from params
   const itemId = req.params.itemId;
 
+  //Find any offers with this item ID and remove that as well
+
+  try {
+    const offer = await Offers.findOne({
+      where: {
+        [Op.or]: [{ item_id_1: itemId }, { item_id: itemId }],
+      },
+    });
+    if (offer) {
+      await Cart.destroy({
+        where: {
+          cust_no: currentUser,
+          item_id: offer.item_id_1 ? offer.item_id_1 : offer.item_id,
+        },
+      });
+    }
+  } catch (error) {
+    res.send("Offers could not be removed because", error.message);
+  }
+
   // console.log(currentUser, itemId);
   Cart.destroy({
     where: {
@@ -269,7 +290,6 @@ const getCart = async (req, res, next) => {
         availableQuantity += currentBatch.quantity;
       });
 
-
       return {
         itemID: current.item_id,
         quantity: current.quantity,
@@ -278,12 +298,15 @@ const getCart = async (req, res, next) => {
         description: current.description,
         image: current.image,
         MRP: current.MRP,
-        salePrice: current.is_offer === 1 ? current.offer_item_price : current.sale_price,
+        salePrice:
+          current.is_offer === 1
+            ? current.offer_item_price
+            : current.sale_price,
         discount: current.discount,
         color: current.color_name,
         brand: current.brand_name,
-        isGift : current.is_gift === 1 ? true : false,
-        isOffer : current.is_offer === 1 ? true : false,
+        isGift: current.is_gift === 1 ? true : false,
+        isOffer: current.is_offer === 1 ? true : false,
       };
     });
 
