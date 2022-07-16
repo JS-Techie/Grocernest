@@ -1,9 +1,12 @@
 const jwt = require("jsonwebtoken");
+const { Op } = require("sequelize");
 
 const { sequelize } = require("../models");
 const db = require("../models");
 
 const WishlistItems = db.WishlistItemsModel;
+const Offers = db.OffersModel;
+const Item = db.ItemModel;
 
 const { findCustomerNumber } = require("../middleware/customerNumber");
 
@@ -48,6 +51,25 @@ const getItemsInCategory = async (req, res, next) => {
         });
       }
 
+      const offer = await Offers.findOne({
+        where: {
+          [Op.or]: [{ item_id_1: current.id }, { item_id: current.id }],
+        },
+      });
+
+      let itemIDOfOfferItem;
+      let offerItem;
+      if (offer) {
+        if (offer.item_id) {
+          itemIDOfOfferItem = offer.item_id;
+        } else {
+          itemIDOfOfferItem = offer.item_id_2;
+        }
+        offerItem = await Item.findOne({
+          where: { id: itemIDOfOfferItem },
+        });
+      }
+
       return {
         itemName: current.name,
         itemID: current.id,
@@ -63,6 +85,27 @@ const getItemsInCategory = async (req, res, next) => {
         color: current.color_name,
         brand: current.brand_name,
         inWishlist: currentUser ? (itemInWishlist ? true : false) : "",
+        isOffer: offer ? true : false,
+        offerType: offer ? offer.type : "",
+        itemIDOfOfferItem,
+        XQuantity: offer
+          ? offer.item_1_quantity
+            ? offer.item_1_quantity
+            : ""
+          : "",
+        YQuantity: offer
+          ? offer.item_2_quantity
+            ? offer.item_2_quantity
+            : ""
+          : "",
+        YItemName: offerItem ? offerItem.name : "",
+        amountOfDiscount: offer
+          ? offer.amount_of_discount
+            ? offer.amount_of_discount
+            : ""
+          : "",
+        isPercentage: offer ? (offer.is_percentage ? true : false) : "",
+        createdBy: offer ? (offer.created_by ? offer.created_by : "") : "",
       };
     });
 
@@ -125,6 +168,25 @@ const getItemsInSubcategory = async (req, res, next) => {
           where: { cust_no: currentUser, item_id: current.id },
         });
       }
+
+      const offer = await Offers.findOne({
+        where: {
+          [Op.or]: [{ item_id_1: current.id }, { item_id: current.id }],
+        },
+      });
+
+      let itemIDOfOfferItem;
+      let offerItem;
+      if (offer) {
+        if (offer.item_id) {
+          itemIDOfOfferItem = offer.item_id;
+        } else {
+          itemIDOfOfferItem = offer.item_id_2;
+        }
+        offerItem = await Item.findOne({
+          where: { id: itemIDOfOfferItem },
+        });
+      }
       return {
         itemName: current.name,
         itemID: current.id,
@@ -142,6 +204,27 @@ const getItemsInSubcategory = async (req, res, next) => {
         color: current.color_name,
         brand: current.brand_name,
         inWishlist: currentUser ? (itemInWishlist ? true : false) : "",
+        isOffer: offer ? true : false,
+        offerType: offer ? offer.type : "",
+        itemIDOfOfferItem,
+        XQuantity: offer
+          ? offer.item_1_quantity
+            ? offer.item_1_quantity
+            : ""
+          : "",
+        YQuantity: offer
+          ? offer.item_2_quantity
+            ? offer.item_2_quantity
+            : ""
+          : "",
+        YItemName: offerItem ? offerItem.name : "",
+        amountOfDiscount: offer
+          ? offer.amount_of_discount
+            ? offer.amount_of_discount
+            : ""
+          : "",
+        isPercentage: offer ? (offer.is_percentage ? true : false) : "",
+        createdBy: offer ? (offer.created_by ? offer.created_by : "") : "",
       };
     });
 
@@ -202,6 +285,25 @@ const getItemsBySearchTerm = async (req, res, next) => {
           where: { cust_no: currentUser, item_id: current.id },
         });
       }
+
+      const offer = await Offers.findOne({
+        where: {
+          [Op.or]: [{ item_id_1: current.id }, { item_id: current.id }],
+        },
+      });
+
+      let itemIDOfOfferItem;
+      let offerItem;
+      if (offer) {
+        if (offer.item_id) {
+          itemIDOfOfferItem = offer.item_id;
+        } else {
+          itemIDOfOfferItem = offer.item_id_2;
+        }
+        offerItem = await Item.findOne({
+          where: { id: itemIDOfOfferItem },
+        });
+      }
       return {
         itemName: current.name,
         itemID: current.id,
@@ -219,6 +321,27 @@ const getItemsBySearchTerm = async (req, res, next) => {
         color: current.color_name,
         brand: current.brand_name,
         inWishlist: currentUser ? (itemInWishlist ? true : false) : "",
+        isOffer: offer ? true : false,
+        offerType: offer ? offer.type : "",
+        itemIDOfOfferItem,
+        XQuantity: offer
+          ? offer.item_1_quantity
+            ? offer.item_1_quantity
+            : ""
+          : "",
+        YQuantity: offer
+          ? offer.item_2_quantity
+            ? offer.item_2_quantity
+            : ""
+          : "",
+        YItemName: offerItem ? offerItem.name : "",
+        amountOfDiscount: offer
+          ? offer.amount_of_discount
+            ? offer.amount_of_discount
+            : ""
+          : "",
+        isPercentage: offer ? (offer.is_percentage ? true : false) : "",
+        createdBy: offer ? (offer.created_by ? offer.created_by : "") : "",
       };
     });
 
@@ -287,6 +410,25 @@ const getItemById = async (req, res, next) => {
       });
     }
 
+    const offer = await Offers.findOne({
+      where: {
+        [Op.or]: [{ item_id_1: item.id }, { item_id: item.id }],
+      },
+    });
+
+    let itemIDOfOfferItem;
+    let offerItem;
+    if (offer) {
+      if (offer.item_id) {
+        itemIDOfOfferItem = offer.item_id;
+      } else {
+        itemIDOfOfferItem = offer.item_id_2;
+      }
+      offerItem = await Item.findOne({
+        where: { id: itemIDOfOfferItem },
+      });
+    }
+
     return res.status(200).send({
       success: true,
       data: {
@@ -307,6 +449,27 @@ const getItemById = async (req, res, next) => {
         color: item.color_name,
         brand: item.brand_name,
         inWishlist: currentUser ? (itemInWishlist ? true : false) : "",
+        isOffer: offer ? true : false,
+        offerType: offer ? offer.type : "",
+        itemIDOfOfferItem,
+        XQuantity: offer
+          ? offer.item_1_quantity
+            ? offer.item_1_quantity
+            : ""
+          : "",
+        YQuantity: offer
+          ? offer.item_2_quantity
+            ? offer.item_2_quantity
+            : ""
+          : "",
+        YItemName: offerItem ? offerItem.name : "",
+        amountOfDiscount: offer
+          ? offer.amount_of_discount
+            ? offer.amount_of_discount
+            : ""
+          : "",
+        isPercentage: offer ? (offer.is_percentage ? true : false) : "",
+        createdBy: offer ? (offer.created_by ? offer.created_by : "") : "",
       },
       message: "Details for requested item found",
     });
