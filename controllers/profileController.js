@@ -55,6 +55,7 @@ const editProfile = async (req, res, next) => {
   //for now, user can only change their name
   const enteredFirstName = req.body.firstName;
   const enteredLastName = req.body.lastName;
+ 
 
 
   try {
