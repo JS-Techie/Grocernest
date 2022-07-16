@@ -6,6 +6,7 @@ const db = require("../models");
 
 const WishlistItems = db.WishlistItemsModel;
 const Offers = db.OffersModel;
+const Item = db.ItemModel;
 
 const { findCustomerNumber } = require("../middleware/customerNumber");
 
@@ -57,12 +58,16 @@ const getItemsInCategory = async (req, res, next) => {
       });
 
       let itemIDOfOfferItem;
+      let offerItem;
       if (offer) {
         if (offer.item_id) {
           itemIDOfOfferItem = offer.item_id;
         } else {
           itemIDOfOfferItem = offer.item_id_2;
         }
+        offerItem = await Item.findOne({
+          where: { id: itemIDOfOfferItem },
+        });
       }
 
       return {
@@ -93,6 +98,7 @@ const getItemsInCategory = async (req, res, next) => {
             ? offer.item_2_quantity
             : ""
           : "",
+        YItemName: offerItem ? offerItem.name : "",
         amountOfDiscount: offer
           ? offer.amount_of_discount
             ? offer.amount_of_discount
@@ -170,12 +176,16 @@ const getItemsInSubcategory = async (req, res, next) => {
       });
 
       let itemIDOfOfferItem;
+      let offerItem;
       if (offer) {
         if (offer.item_id) {
           itemIDOfOfferItem = offer.item_id;
         } else {
           itemIDOfOfferItem = offer.item_id_2;
         }
+        offerItem = await Item.findOne({
+          where: { id: itemIDOfOfferItem },
+        });
       }
       return {
         itemName: current.name,
@@ -207,6 +217,7 @@ const getItemsInSubcategory = async (req, res, next) => {
             ? offer.item_2_quantity
             : ""
           : "",
+        YItemName: offerItem ? offerItem.name : "",
         amountOfDiscount: offer
           ? offer.amount_of_discount
             ? offer.amount_of_discount
@@ -282,12 +293,16 @@ const getItemsBySearchTerm = async (req, res, next) => {
       });
 
       let itemIDOfOfferItem;
+      let offerItem;
       if (offer) {
         if (offer.item_id) {
           itemIDOfOfferItem = offer.item_id;
         } else {
           itemIDOfOfferItem = offer.item_id_2;
         }
+        offerItem = await Item.findOne({
+          where: { id: itemIDOfOfferItem },
+        });
       }
       return {
         itemName: current.name,
@@ -319,6 +334,7 @@ const getItemsBySearchTerm = async (req, res, next) => {
             ? offer.item_2_quantity
             : ""
           : "",
+        YItemName: offerItem ? offerItem.name : "",
         amountOfDiscount: offer
           ? offer.amount_of_discount
             ? offer.amount_of_discount
@@ -401,12 +417,16 @@ const getItemById = async (req, res, next) => {
     });
 
     let itemIDOfOfferItem;
+    let offerItem;
     if (offer) {
       if (offer.item_id) {
         itemIDOfOfferItem = offer.item_id;
       } else {
         itemIDOfOfferItem = offer.item_id_2;
       }
+      offerItem = await Item.findOne({
+        where: { id: itemIDOfOfferItem },
+      });
     }
 
     return res.status(200).send({
@@ -442,6 +462,7 @@ const getItemById = async (req, res, next) => {
             ? offer.item_2_quantity
             : ""
           : "",
+        YItemName: offerItem ? offerItem.name : "",
         amountOfDiscount: offer
           ? offer.amount_of_discount
             ? offer.amount_of_discount
