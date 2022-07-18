@@ -339,7 +339,7 @@ const getItemCount = async (req, res, next) => {
       success: true,
       data: {
         //cartForUser,
-        itemCount: responseArray.length,
+        itemcount: responseArray.length,
       },
       message: "Successfully fetched cart count of the user",
     });
