@@ -256,6 +256,7 @@ const removeItemFromCart = async (req, res, next) => {
       },
     });
 
+
     let offerItemToBeRemoved = null;
     let offerItemDestroyed = null;
 

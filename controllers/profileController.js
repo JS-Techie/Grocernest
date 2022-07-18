@@ -32,6 +32,8 @@ const getProfile = async (req, res, next) => {
       data: {
         customerNumber: currentUserProfile.cust_no,
         customerName: currentUserProfile.cust_name,
+        firstName: currentUserProfile.cust_name.split(" ")[0],
+        lastName: currentUserProfile.cust_name.split(" ")[1],
         emailID: currentUserProfile.email,
         contactNumber: currentUserProfile.contact_no,
         profileImage: generator.generateRandomAvatar(),
