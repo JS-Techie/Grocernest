@@ -11,9 +11,19 @@ const offerForItem = async (req, res, next) => {
   //Get current user from jwt
   const currentUser = req.cust_no;
 
-  const { itemID, quantity } = req.body;
+  let { itemID, quantity } = req.body;
 
   try {
+
+    const cart = await Cart.findOne({
+      where : {cust_no : currentUser, item_id : itemID}
+    })
+
+    if(cart){
+      quantity = cart.quantity + quantity;
+    }
+
+
     const offer = await Offers.findOne({
       where: {
         [Op.or]: [{ item_id_1: itemID }, { item_id: itemID }],
@@ -39,9 +49,11 @@ const offerForItem = async (req, res, next) => {
 
       if (quantity >= offer.item_1_quantity) {
         if (quantity % offer.item_1_quantity !== 0) {
-          quantityToBeAdded = (quantity % offer.item_1_quantity) * offer.item_2_quantity ;
+          quantityToBeAdded =
+            (quantity % offer.item_1_quantity) * offer.item_2_quantity;
         } else if (quantity % offer.item_1_quantity === 0) {
-          quantityToBeAdded = (quantity / offer.item_1_quantity) * offer.item_2_quantity;
+          quantityToBeAdded =
+            (quantity / offer.item_1_quantity) * offer.item_2_quantity;
         }
       } else {
         return res.status(200).send({
@@ -83,7 +95,7 @@ const offerForItem = async (req, res, next) => {
     response = await Cart.create({
       cust_no: currentUser,
       item_id: itemID,
-      quantity: 1,
+      quantity,
       created_by: 1,
       is_offer: 1,
       offer_item_price: newSalePrice,
@@ -104,6 +116,8 @@ const offerForItem = async (req, res, next) => {
   }
 };
 
+const offerForItemBuyNow = async (req, res, next) => {};
 module.exports = {
   offerForItem,
+  offerForItemBuyNow,
 };

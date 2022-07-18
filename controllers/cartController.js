@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const { sequelize } = require("../models");
 const db = require("../models");
 
@@ -17,7 +18,7 @@ const addItemToCart = async (req, res, next) => {
   const currentUser = req.cust_no;
 
   //get item-id from params
-  const itemId = req.params.itemId;
+  const itemId = parseInt(req.params.itemId);
 
   //get quantity from params
   const enteredQuantity = parseInt(req.params.quantity);
@@ -90,82 +91,142 @@ const subtractItemFromCart = async (req, res, next) => {
   const currentUser = req.cust_no;
 
   //Get item-id from params
-  const itemId = req.params.itemId;
+  const itemID = req.params.itemId;
 
-  //Get quantity from params
-  // const quantity = req.params.quantity;
-
-  // console.log(currentUser, itemId);
   try {
-    //Find if the item exists in the cart
     const itemExists = await Cart.findOne({
-      where: {
-        cust_no: currentUser,
-        item_id: itemId,
-      },
+      where: { cust_no: currentUser, item_id: itemID },
     });
 
     if (!itemExists) {
       return res.status(404).send({
         success: false,
-        data: null,
-        message: "Requested item not found in cart",
+        data: [],
+        message: "Requested item does not exist in user's cart",
       });
-    } else {
-      let itemQuantity = itemExists.dataValues.quantity;
-      // console.log(itemQuantity);
-      if (itemQuantity == 1) {
-        //if only one item exist, remove it from cart table
-        Cart.destroy({
-          where: {
-            cust_no: currentUser,
-            item_id: itemId,
-            quantity: 1,
-          },
-        })
-          .then(() => {
-            return res.status(200).json({
-              success: true,
-              message: "Item successfully deleted from cart.",
-            });
-          })
-          .catch((error) => {
-            return res.status(400).json({
-              success: false,
-              data: error.message,
-              message: "Error while deleting item from database",
-            });
-          });
-      } else if (itemQuantity > 1) {
-        //Subtract quantity in params from current quantity
-        // console.log("subtracting qty");
-        Cart.update(
-          { quantity: itemQuantity - 1 },
-          { where: { cust_no: currentUser, item_id: itemId } }
-        )
-          .then(() => {
-            return res.status(200).send({
-              success: true,
-              data: {
-                quantity: itemQuantity - 1,
-              },
-              message: "Quantity Successfully Subtracted",
-            });
-          })
-          .catch((error) => {
-            return res.status(400).json({
-              success: false,
-              data: error.message,
-              message: "Error while subtracting quantity from database",
-            });
-          });
-      }
     }
+
+    const offerExists = await Offers.findOne({
+      where: {
+        [Op.or]: [{ item_id_1: itemID }],
+      },
+    });
+
+    let offerItemToBeRemoved = null;
+    let Xquantity = null;
+    let Yquantity = null;
+    if (offerExists) {
+      offerItemToBeRemoved = offerExists.item_id_2;
+      Xquantity = offerExists.item_1_quantity;
+      Yquantity = offerExists.item_2_quantity;
+    }
+
+    let removedItemFromCart = null;
+    let removedOfferItemFromCart = null;
+
+    if (itemExists.quantity === 1) {
+      removedItemFromCart = await Cart.destroy({
+        where: { cust_no: currentUser, item_id: itemID },
+      });
+
+      if (offerItemToBeRemoved) {
+        removedOfferItemFromCart = await Cart.destroy({
+          where: { cust_no: currentUser, item_id: offerItemToBeRemoved },
+        });
+      }
+
+      return res.status(200).send({
+        success: true,
+        data: {
+          removedItemFromCart,
+          offerItemRemoved: offerItemToBeRemoved,
+          removedOfferItemFromCart,
+        },
+        message: "Successfully removed item and its offer from cart",
+      });
+    }
+    let newQuantityOfNormalItem = itemExists.quantity - 1;
+
+    let itemQuantityUpdated = null;
+    let isBigger = false;
+
+    if (offerItemToBeRemoved) {
+      let newQuantityOfOfferItem = null;
+      if (newQuantityOfNormalItem < Xquantity) {
+        console.log("in if")
+        isBigger = true;
+      } else if (newQuantityOfNormalItem % offerExists.item_1_quantity === 0) {
+        console.log("in else if")
+        newQuantityOfOfferItem =
+          (newQuantityOfNormalItem / offerExists.item_1_quantity) *
+          offerExists.item_2_quantity;
+      } else {
+        console.log("in else")
+        newQuantityOfOfferItem =
+          Math.floor((newQuantityOfNormalItem / offerExists.item_1_quantity)) *
+          offerExists.item_2_quantity;
+      }
+
+      if (isBigger) {
+        offerItemQuantityUpdated = await Cart.destroy({
+          where: { cust_no: currentUser, item_id: offerItemToBeRemoved },
+        });
+      } else {
+        offerItemQuantityUpdated = await Cart.update(
+          {
+            quantity: newQuantityOfOfferItem,
+          },
+          {
+            where: { cust_no: currentUser, item_id: offerItemToBeRemoved },
+          }
+        );
+      }
+
+      itemQuantityUpdated = await Cart.update(
+        {
+          quantity: newQuantityOfNormalItem,
+        },
+        {
+          where: { cust_no: currentUser, item_id: itemID },
+        }
+      );
+
+      return res.status(200).send({
+        success: true,
+        data: {
+          newQuantityOfNormalItem,
+          itemQuantityUpdated,
+          newQuantityOfOfferItem,
+          offerItemToBeRemoved,
+          offerItemQuantityUpdated,
+        },
+        message: "Successfully updated quantity of item and its offer in cart",
+      });
+    }
+
+    itemQuantityUpdated = await Cart.update(
+      {
+        quantity: newQuantityOfNormalItem,
+      },
+      {
+        where: { cust_no: currentUser, item_id: itemID },
+      }
+    );
+
+    return res.status(200).send({
+      success: true,
+      data: {
+        newQuantityOfNormalItem,
+        itemQuantityUpdated,
+      },
+      message: "Successfully reduced quantity of item in cart",
+    });
   } catch (error) {
     return res.status(400).send({
       success: false,
-      data: error,
-      message: "Some error occured while removing the requested item from cart",
+      data: error.message,
+      message:
+        "Error occurred while subtracting items from cart, please check data field for more details",
     });
   }
 };
@@ -174,90 +235,128 @@ const removeItemFromCart = async (req, res, next) => {
   //Get current user from JWT
   const currentUser = req.cust_no;
 
-  //Get item-id from params
-  const itemId = req.params.itemId;
-
-  //Find any offers with this item ID and remove that as well
+  //get Item id from params
+  const itemID = req.params.itemId;
 
   try {
-    const offer = await Offers.findOne({
-      where: {
-        [Op.or]: [{ item_id_1: itemId }, { item_id: itemId }],
-      },
+    const itemExists = await Cart.findOne({
+      where: { cust_no: currentUser, item_id: itemID },
     });
-    if (offer) {
-      await Cart.destroy({
-        where: {
-          cust_no: currentUser,
-          item_id: offer.item_id_1 ? offer.item_id_1 : offer.item_id,
-        },
+
+    if (!itemExists) {
+      return res.status(404).send({
+        success: false,
+        data: [],
+        message: "Requested item does not exist in user's cart",
       });
     }
-  } catch (error) {
-    res.send("Offers could not be removed because", error.message);
-  }
-
-  // console.log(currentUser, itemId);
-  Cart.destroy({
-    where: {
-      cust_no: currentUser,
-      item_id: itemId,
-    },
-  })
-    .then((resData) => {
-      if (resData == 0) {
-        return res.status(400).json({
-          success: true,
-          data: "",
-          message: "No item found with this item id",
-        });
-      } else {
-        return res.status(200).json({
-          success: true,
-          data: "",
-          message: "Item successfully deleted from cart.",
-        });
-      }
-    })
-    .catch((error) => {
-      return res.status(400).json({
-        success: false,
-        data: error.message,
-        message: "Error while deleting item from database",
-      });
+    const offerExists = await Offers.findOne({
+      where: {
+        [Op.or]: [{ item_id_1: itemID }, { item_id: itemID }],
+      },
     });
+
+    let offerItemToBeRemoved = null;
+    let offerItemDestroyed = null;
+
+    if (offerExists) {
+      if (offerExists.item_id_1) {
+        offerItemToBeRemoved = offerExists.item_id_2;
+      }
+    }
+
+    const normalItemDestroyed = await Cart.destroy({
+      where: { cust_no: currentUser, item_id: itemID },
+    });
+
+    if (offerItemToBeRemoved) {
+      offerItemDestroyed = await Cart.destroy({
+        where: { cust_no: currentUser, item_id: offerItemToBeRemoved },
+      });
+    }
+
+    return res.status(200).send({
+      success: true,
+      data: {
+        offerExists: offerExists ? true : false,
+        normalItemDestroyed,
+        offerItemToBeRemoved,
+        offerItemDestroyed,
+      },
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message:
+        "Something went wrong while removing items from cart, check data field for more details",
+    });
+  }
 };
 
 const getItemCount = async (req, res, next) => {
   //Get currentUser from JWT
   const currentUser = req.cust_no;
 
-  Cart.count({
-    where: {
-      cust_no: currentUser,
-    },
-  })
-    .then((resData) => {
-      return res.status(200).json({
+  try {
+    const [cartForUser, metadata] =
+      await sequelize.query(`select t_cart.item_id, t_cart.quantity,t_item.name, t_item.image, t_item.description,
+    t_batch.MRP,t_batch.sale_price, t_batch.discount,t_lkp_color.color_name, t_lkp_brand.brand_name, t_cart.is_offer,t_cart.is_gift,t_cart.offer_item_price
+    from ((((t_cart
+    inner join t_item on t_item.id = t_cart.item_id)
+    inner join t_batch on t_batch.item_id = t_cart.item_id )
+    inner join t_lkp_color on t_lkp_color.id = t_item.color_id )
+    inner join t_lkp_brand on t_lkp_brand.id = t_item.brand_id )
+    where t_cart.cust_no = "${currentUser}"`);
+
+    // const cartForUser = await Cart.findAll({
+    //   where: { cust_no: currentUser },
+    // });
+
+    if (cartForUser.length === 0) {
+      return res.status(200).send({
         success: true,
-        data: {
-          itemcount: resData,
-        },
-        message: "Successfully fetched Item count",
+        data: [],
+        message: "There are no items in cart for current user",
       });
-    })
-    .catch((error) => {
-      return res.status(400).json({
-        success: false,
-        data: error.message,
-        message: "Error while counting item from Database",
-      });
+    }
+
+    const promises = cartForUser.map(async (current) => {
+      return {
+        itemID: current.item_id,
+      };
     });
+
+    const resolved = await Promise.all(promises);
+    const responseArray = [
+      ...new Map(resolved.map((item) => [item["itemID"], item])).values(),
+    ];
+
+    // console.log(cartForUser);
+    // console.log(cartForUser.length);
+    return res.status(200).send({
+      success: true,
+      data: {
+        //cartForUser,
+        itemCount: responseArray.length,
+      },
+      message: "Successfully fetched cart count of the user",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message:
+        "Something went wrong while fetching cart count, please check data field for more details",
+    });
+  }
 };
 
 const getCart = async (req, res, next) => {
   //Get currentUser from JWT
   const currentUser = req.cust_no;
+
+  console.log(currentUser);
 
   //Find the cart associated with this customer id
 
@@ -270,7 +369,7 @@ const getCart = async (req, res, next) => {
     inner join t_batch on t_batch.item_id = t_cart.item_id )
     inner join t_lkp_color on t_lkp_color.id = t_item.color_id )
     inner join t_lkp_brand on t_lkp_brand.id = t_item.brand_id )
-    where t_cart.cust_no = "${currentUser}" order by t_batch.created_at desc`);
+    where t_cart.cust_no = "${currentUser}"`);
 
     if (cartForUser.length === 0) {
       return res.status(200).send({
@@ -280,10 +379,32 @@ const getCart = async (req, res, next) => {
       });
     }
 
+    console.log(cartForUser);
+
     const promises = cartForUser.map(async (current) => {
+      let currentOffer = null;
+      if (current.is_offer === 1) {
+        currentOffer = await Offers.findOne({
+          where: {
+            [Op.or]: [
+              { item_id_1: current.item_id },
+              { item_id: current.item_id },
+            ],
+          },
+        });
+      }
+
+      let isEdit = null;
+      if (currentOffer) {
+        if (currentOffer.amount_of_discount) {
+          isEdit = true;
+        }
+      }
+
       let availableQuantity = 0;
       const batches = await Batch.findAll({
         where: { item_id: current.item_id },
+        order: [["created_by", "asc"]],
       });
 
       batches.map((currentBatch) => {
@@ -307,6 +428,7 @@ const getCart = async (req, res, next) => {
         brand: current.brand_name,
         isGift: current.is_gift === 1 ? true : false,
         isOffer: current.is_offer === 1 ? true : false,
+        canEdit: current.is_offer === 1 ? (isEdit ? true : false) : "",
       };
     });
 

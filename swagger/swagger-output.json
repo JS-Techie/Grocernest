@@ -1283,6 +1283,26 @@
         }
       }
     },
+    "/offers/item/buyNow": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
     "/admin/orders/pending": {
       "get": {
         "description": "",
