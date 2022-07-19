@@ -136,10 +136,26 @@ const offerForItemBuyNow = async (req, res, next) => {
       },
     });
 
+    const currentItem = await Item.findOne({
+      where: { id: itemID },
+    });
+
+    const batches = await Batch.findOne({
+      where: { item_id: itemID },
+      order: [["created_at", "asc"]],
+    });
+
+    const oldestBatch = batches[0];
+
     if (!offer) {
       return res.status(200).send({
         success: true,
-        data: [],
+        data: {
+          itemName: currentItem.name,
+          itemID,
+          quantity,
+          salePrice: oldestBatch.sale_price,
+        },
         message: "No offers exist for this item",
       });
     }
@@ -177,12 +193,13 @@ const offerForItemBuyNow = async (req, res, next) => {
             itemName: Xitem.name,
             quantity,
           },
-          offerItem: quantityOfOfferItem === null
-            ? "Not enough items to avail offer"
-            : {
-                itemName: Yitem.name,
-                quantity: Math.floor(quantityOfOfferItem),
-              },
+          offerItem:
+            quantityOfOfferItem === null
+              ? "Not enough items to avail offer"
+              : {
+                  itemName: Yitem.name,
+                  quantity: Math.floor(quantityOfOfferItem),
+                },
           salePrice: oldestBatch.sale_price * quantity,
         },
         message: "Offer successfully applied for current item",
