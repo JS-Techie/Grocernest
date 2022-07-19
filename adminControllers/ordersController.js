@@ -249,7 +249,13 @@ const getOrderDetails = async (req, res, next) => {
             })
         })
 
-        const responseArray = await Promise.all(promises);
+        const resolvedArray = await Promise.all(promises);
+
+        function onlyUnique(value, index, self) {
+            return self.indexOf(value) === index;
+        }
+
+        const responseArray = resolvedArray.filter(onlyUnique)
 
         return res.status(200).send({
             success: true,
