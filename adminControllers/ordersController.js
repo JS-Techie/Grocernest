@@ -59,10 +59,11 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
     const orderType = req.body.orderType;
     const startDate = req.body.startDate;
     const endDate = req.body.endDate;
+    const orderid = req.body.orderId;
 
     const phoneNoQuery = (phno == undefined || phno == "" ? "" : " AND tc.contact_no LIKE '%" + phno + "%'");
     const dateQuery = (startDate == undefined || startDate == "" || endDate == undefined || endDate == "" ? "" : " AND tlo.created_at BETWEEN '" + startDate + "' AND '" + endDate + "'");
-
+    const orderId = (orderid == undefined || orderid == "" ? "" : " AND tlo.order_id LIKE '%" + orderid + "%'");
 
     // console.log(phno, orderType);
 
@@ -87,6 +88,7 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
             AND tlo.status="${orderType}"
             ${phoneNoQuery}
             ${dateQuery}
+            ${orderId}
           `);
 
         if (results.length === 0) {
