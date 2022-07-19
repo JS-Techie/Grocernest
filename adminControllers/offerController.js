@@ -44,6 +44,7 @@ const getAllOffers = async (req, res, next) => {
           ? current.amount_of_discount
           : "",
         isPercentage: current.is_percentage ? true : false,
+        isActive: current.is_active ? true : false
       };
     });
 
@@ -108,6 +109,7 @@ const getOfferById = async (req, res, next) => {
           ? current.amount_of_discount
           : "",
         isPercentage: current.is_percentage ? true : false,
+        isActive: current.is_active ? true : false
       },
       message: "Requested offer found",
     });
@@ -152,6 +154,7 @@ const createOffer = async (req, res, next) => {
       amount_of_discount,
       is_percentage: is_percentage === true ? 1 : null,
       created_by: 1,
+      is_active: 1
     });
 
     return res.status(201).send({
@@ -182,6 +185,7 @@ const updateOffer = async (req, res, next) => {
     item_id,
     amount_of_discount,
     is_percentage,
+    is_active
   } = req.body;
 
   try {
@@ -207,6 +211,7 @@ const updateOffer = async (req, res, next) => {
         item_id,
         amount_of_discount,
         is_percentage: is_percentage === true ? 1 : null,
+        is_active: is_active === true ? 1 : null
       },
       {
         where: { id: offerID },
@@ -240,6 +245,7 @@ const updateOffer = async (req, res, next) => {
               ? true
               : false
             : "",
+          isActive: current.is_active ? true : false
         },
         newOffer: {
           offerID: updatedOffer.id,
@@ -261,6 +267,7 @@ const updateOffer = async (req, res, next) => {
               ? true
               : false
             : "",
+          isActive: current.is_active ? true : false
         },
         numberOfOffersUpdated: update,
       },
@@ -293,9 +300,11 @@ const deleteOffer = async (req, res, next) => {
       });
     }
 
-    const deletedOffer = await Offers.destroy({
-      where: { id: offerID },
-    });
+    const deletedOffer = await Offers.update({
+      is_active: null,
+
+    },
+      { where: { id: offerID } });
 
     return res.status(200).send({
       success: true,
@@ -320,6 +329,7 @@ const deleteOffer = async (req, res, next) => {
               ? true
               : false
             : "",
+          isActive: current.is_active ? true : false
         },
         numberOfOffersDeleted: deletedOffer,
       },

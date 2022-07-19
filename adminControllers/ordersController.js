@@ -147,7 +147,7 @@ const getOrderDetails = async (req, res, next) => {
             tlsc.sub_cat_name as subcategory,
             ti.brand_id ,ti.div_id, ti.department_id ,ti.size_id,ti.description,
             to2.type,to2.amount_of_discount, to2.is_percentage, 
-            to2.item_id, to2.item_id_1 ,to2.item_id_2 ,to2.item_1_quantity ,to2.item_2_quantity 
+            to2.item_id as offer_item_id, to2.item_id_1 ,to2.item_id_2 ,to2.item_1_quantity ,to2.item_2_quantity 
             from t_order_items toi
             inner join t_item ti 
             inner join t_lkp_category tlc 
@@ -167,7 +167,7 @@ const getOrderDetails = async (req, res, next) => {
             tlsc.sub_cat_name as subcategory,
             ti.brand_id ,ti.div_id, ti.department_id ,ti.size_id,ti.description,
             null as type, null as amount_of_discount, null as is_percentage, 
-            null as item_id, 
+            null as offer_item_id, 
             null as item_id_1,
             null as item_id_2,
             null as item_1_quantity,
@@ -236,6 +236,15 @@ const getOrderDetails = async (req, res, next) => {
                 MRP: oldestBatch.MRP,
                 discount: oldestBatch.discount,
                 is_free: oldestBatch.sale_price === 0 ? true : false,
+
+                type: current.type,
+                amount_of_discount: current.amount_of_discount,
+                is_percentage: current.is_percentage,
+                offer_item_id: current.offer_item_id,
+                item_id_1: current.item_id_1,
+                item_id_2: current.item_id_2,
+                item_1_quantity: current.item_1_quantity,
+                item_2_quantity: current.item_2_quantity
 
             })
         })
