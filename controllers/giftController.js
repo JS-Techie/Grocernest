@@ -22,7 +22,9 @@ const getAllGifts = async (req, res, next) => {
     if (ordersForCurrentUser.length === 0) {
       return res.status(200).send({
         success: true,
-        data: [],
+        data: {
+          noOfGiftsApplicable : 0,
+        },
         message:
           "This user has no previous orders, therefore gifts are not applicable",
       });
