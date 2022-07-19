@@ -142,18 +142,46 @@ const getOrderDetails = async (req, res, next) => {
         const [results, metadata] =
             await sequelize.query(`
             select 
-            toi.item_id,ti.name,toi.quantity,ti.item_cd,ti.units,ti.UOM,
+            toi.item_id,ti.name,toi.quantity,ti.item_cd,ti.units,ti.UOM,ti.is_gift,
             tlc.group_name as category,
             tlsc.sub_cat_name as subcategory,
-            ti.brand_id ,ti.div_id, ti.department_id ,ti.size_id,ti.description 
+            ti.brand_id ,ti.div_id, ti.department_id ,ti.size_id,ti.description,
+            to2.type,to2.amount_of_discount, to2.is_percentage, 
+            to2.item_id, to2.item_id_1 ,to2.item_id_2 ,to2.item_1_quantity ,to2.item_2_quantity 
             from t_order_items toi
             inner join t_item ti 
             inner join t_lkp_category tlc 
             inner join t_lkp_sub_category tlsc 
+            inner join t_offers to2 
             WHERE toi.order_id = "${orderId}" 
             AND ti.id = toi.item_id 
             and tlc.id = ti.category_id 
             and tlsc.id = ti.sub_category_id 
+            and (to2.item_id = toi.item_id
+            or to2.item_id_1  = toi.item_id
+            )
+            union
+            select 
+            toi.item_id,ti.name,toi.quantity,ti.item_cd,ti.units,ti.UOM,ti.is_gift,
+            tlc.group_name as category,
+            tlsc.sub_cat_name as subcategory,
+            ti.brand_id ,ti.div_id, ti.department_id ,ti.size_id,ti.description,
+            null as type, null as amount_of_discount, null as is_percentage, 
+            null as item_id, 
+            null as item_id_1,
+            null as item_id_2,
+            null as item_1_quantity,
+            null as item_2_quantity
+            from t_order_items toi
+            inner join t_item ti 
+            inner join t_lkp_category tlc 
+            inner join t_lkp_sub_category tlsc 
+            inner join t_offers to2 
+            WHERE toi.order_id = "${orderId}" 
+            AND ti.id = toi.item_id 
+            and tlc.id = ti.category_id 
+            and tlsc.id = ti.sub_category_id 
+             
           `);
 
         const [cust_result, metadata2] = await sequelize.query(
