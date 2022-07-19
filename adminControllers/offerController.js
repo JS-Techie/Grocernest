@@ -164,7 +164,7 @@ const createOffer = async (req, res, next) => {
       item_2_quantity,
       item_id,
       amount_of_discount,
-      is_percentage: is_percentage === true ? 1 : null,
+      is_percentage: is_percentage ? (is_percentage === true ? 1 : null) : null,
       created_by: 1,
       is_active: 1,
     });
