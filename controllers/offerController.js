@@ -154,7 +154,7 @@ const offerForItemBuyNow = async (req, res, next) => {
           itemName: currentItem.name,
           itemID,
           quantity,
-          salePrice: oldestBatch.sale_price,
+          total: oldestBatch.sale_price * quantity,
         },
         message: "No offers exist for this item",
       });
@@ -200,7 +200,7 @@ const offerForItemBuyNow = async (req, res, next) => {
                   itemName: Yitem.name,
                   quantity: Math.floor(quantityOfOfferItem),
                 },
-          salePrice: oldestBatch.sale_price * quantity,
+          total: oldestBatch.sale_price * quantity,
         },
         message: "Offer successfully applied for current item",
       });
@@ -233,7 +233,7 @@ const offerForItemBuyNow = async (req, res, next) => {
       success: true,
       data: {
         itemName: offerItemFromDB.name,
-        salePrice: newSalePrice,
+        total: newSalePrice,
         quantity,
         discountAmount: offer.amount_of_discount,
         isPercentage: offer.is_percentage === 1 ? true : false,
