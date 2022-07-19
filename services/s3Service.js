@@ -27,3 +27,4 @@ module.exports = {
   uploadToS3,
   getFromS3
 }
+

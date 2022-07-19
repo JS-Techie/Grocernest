@@ -14,15 +14,13 @@ const offerForItem = async (req, res, next) => {
   let { itemID, quantity } = req.body;
 
   try {
-
     const cart = await Cart.findOne({
-      where : {cust_no : currentUser, item_id : itemID}
-    })
+      where: { cust_no: currentUser, item_id: itemID },
+    });
 
-    if(cart){
+    if (cart) {
       quantity = cart.quantity + quantity;
     }
-
 
     const offer = await Offers.findOne({
       where: {
@@ -116,7 +114,124 @@ const offerForItem = async (req, res, next) => {
   }
 };
 
-const offerForItemBuyNow = async (req, res, next) => {};
+const offerForItemBuyNow = async (req, res, next) => {
+  //Get current user from JWT
+  const currentUser = req.cust_no;
+
+  //Get item id and quantity from request bidy
+  const { itemID, quantity } = req.body;
+
+  if (!itemID || !quantity) {
+    return res.status(400).send({
+      success: false,
+      data: [],
+      message: "Please enter all required details",
+    });
+  }
+
+  try {
+    const offer = await Offers.findOne({
+      where: {
+        [Op.or]: [{ item_id_1: itemID }, { item_id: itemID }],
+      },
+    });
+
+    if (!offer) {
+      return res.status(200).send({
+        success: true,
+        data: [],
+        message: "No offers exist for this item",
+      });
+    }
+    let newSalePrice = null;
+    let offerItemID = null;
+
+    if (offer.item_id_1) {
+      offerItemID = offer.item_id_2;
+
+      const batches = await Batch.findAll({
+        where: { item_id: itemID },
+        order: [["created_at", "asc"]],
+      });
+
+      const oldestBatch = batches[0];
+
+      const Xitem = await Item.findOne({
+        where: { id: offer.item_id_1 },
+      });
+
+      const Yitem = await Item.findOne({
+        where: { id: offerItemID },
+      });
+
+      let quantityOfOfferItem = null;
+      if (quantity >= offer.item_1_quantity) {
+        quantityOfOfferItem =
+          (quantity / offer.item_1_quantity) * offer.item_2_quantity;
+      }
+
+      return res.status(200).send({
+        success: true,
+        data: {
+          normalItem: {
+            itemName: Xitem.name,
+            quantity,
+          },
+          offerItem: quantityOfOfferItem === null
+            ? "Not enough items to avail offer"
+            : {
+                itemName: Yitem.name,
+                quantity: Math.floor(quantityOfOfferItem),
+              },
+          salePrice: oldestBatch.sale_price * quantity,
+        },
+        message: "Offer successfully applied for current item",
+      });
+    }
+
+    const offerItemFromDB = await Item.findOne({
+      where: { id: offer.item_id },
+    });
+
+    let batchesForOfferItem = await Batch.findAll({
+      where: { item_id: offer.item_id },
+      order: [["created_at", "asc"]],
+    });
+
+    const oldestBatchForOfferItem = batchesForOfferItem[0];
+
+    if (offer.is_percentage) {
+      newSalePrice =
+        oldestBatchForOfferItem.sale_price -
+        (offer.amount_of_discount / 100) * oldestBatchForOfferItem.sale_price;
+    } else {
+      newSalePrice =
+        oldestBatchForOfferItem.sale_price -
+        oldestBatchForOfferItem.amount_of_discount;
+    }
+
+    newSalePrice = newSalePrice * quantity;
+
+    return res.status(200).send({
+      success: true,
+      data: {
+        itemName: offerItemFromDB.name,
+        salePrice: newSalePrice,
+        quantity,
+        discountAmount: offer.amount_of_discount,
+        isPercentage: offer.is_percentage === 1 ? true : false,
+      },
+      message: "Successfully applied offer for current item",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message:
+        "Something went wrong while applying offer items, please check data field for more details",
+    });
+  }
+};
 module.exports = {
   offerForItem,
   offerForItemBuyNow,
