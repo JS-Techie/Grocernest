@@ -137,11 +137,13 @@ const createOffer = async (req, res, next) => {
     is_percentage,
   } = req.body;
 
-  const offerExists = await Offers.findOne({
-    where: { [Op.or]: [{ item_id_1: item_id_1 }, { item_id: item_id }] },
+  const offer = await Offers.findOne({
+    where: {
+      [Op.or]: [{ item_id_1: item_id_1 }, { item_id: item_id }],
+    },
   });
 
-  if (offerExists) {
+  if (offer) {
     return res.status(400).send({
       success: false,
       data: offerExists,
@@ -165,10 +167,12 @@ const createOffer = async (req, res, next) => {
       item_2_quantity,
       item_id,
       amount_of_discount,
-      is_percentage: is_percentage ? (is_percentage === true ? 1 : null) : null,
+      is_percentage: is_percentage !==null ? (is_percentage === true ? 1 : null) : null,
       created_by: 1,
       is_active: 1,
     });
+
+    
 
     return res.status(201).send({
       success: true,
