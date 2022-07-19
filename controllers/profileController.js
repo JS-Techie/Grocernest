@@ -77,7 +77,7 @@ const editProfile = async (req, res, next) => {
     const updatedProfile = await Customer.update(
       {
         cust_name: enteredFirstName + " " + enteredLastName,
-        email: email,
+        email: email ? "" : email,
       },
       { where: { cust_no: currentUser } }
     );
