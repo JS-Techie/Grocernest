@@ -13,33 +13,6 @@ module.exports = sequelize => {
       comment: null,
       field: "id"
     },
-    type: {
-      type: DataTypes.STRING(100),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "type"
-    },
-    item_id_1: {
-      type: DataTypes.BIGINT,
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "item_id_1"
-    },
-    item_id_2: {
-      type: DataTypes.BIGINT,
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "item_id_2"
-    },
     item_id: {
       type: DataTypes.BIGINT,
       allowNull: true,
@@ -49,23 +22,14 @@ module.exports = sequelize => {
       comment: null,
       field: "item_id"
     },
-    amount_of_discount: {
+    quantity: {
       type: DataTypes.BIGINT,
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "amount_of_discount"
-    },
-    is_percentage: {
-      type: DataTypes.INTEGER(1),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "is_percentage"
+      field: "quantity"
     },
     created_by: {
       type: DataTypes.BIGINT,
@@ -103,39 +67,21 @@ module.exports = sequelize => {
       comment: null,
       field: "updated_at"
     },
-    item_1_quantity: {
-      type: DataTypes.BIGINT,
+    cust_no: {
+      type: DataTypes.STRING(20),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "item_1_quantity"
-    },
-    item_2_quantity: {
-      type: DataTypes.BIGINT,
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "item_2_quantity"
-    },
-    is_active: {
-      type: DataTypes.INTEGER(1),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "is_active"
+      field: "cust_no"
     }
   };
   const options = {
-    tableName: "t_offers",
+    tableName: "t_offer_cache",
     comment: "",
     indexes: []
   };
-  const TOffersModel = sequelize.define("t_offers_model", attributes, options);
-  return TOffersModel;
+  const TOfferCacheModel = sequelize.define("t_offer_cache_model", attributes, options);
+  return TOfferCacheModel;
 };

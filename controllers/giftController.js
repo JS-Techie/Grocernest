@@ -31,6 +31,13 @@ const getAllGifts = async (req, res, next) => {
     }
 
     //get the latest order total to send gifts based on the rule engine
+    // if(latestOrder.status === "Cancelled"){
+    //   return res.status(200).send({
+    //     success : true,
+    //     data: [],
+    //     message : "No "
+    //   })
+    // }
     const latestOrder = ordersForCurrentUser[0].total;
 
     console.log(latestOrder);

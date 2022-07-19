@@ -6,6 +6,7 @@ const Offers = db.OffersModel;
 const Item = db.ItemModel;
 const Batch = db.BatchModel;
 const Cart = db.CartModel;
+const OffersCache = db.OffersCacheModel;
 
 const offerForItem = async (req, res, next) => {
   //Get current user from jwt
@@ -186,6 +187,12 @@ const offerForItemBuyNow = async (req, res, next) => {
           (quantity / offer.item_1_quantity) * offer.item_2_quantity;
       }
 
+      const saveOfferItemInCache = await OffersCache.create({
+        cust_no : currentUser,
+        item_id: offerItemID,
+        quantity: quantityOfOfferItem,
+        created_by: 1,
+      });
       return res.status(200).send({
         success: true,
         data: {
@@ -201,6 +208,7 @@ const offerForItemBuyNow = async (req, res, next) => {
                   quantity: Math.floor(quantityOfOfferItem),
                 },
           total: oldestBatch.sale_price * quantity,
+          DBresponse: saveOfferItemInCache,
         },
         message: "Offer successfully applied for current item",
       });

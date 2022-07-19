@@ -95,6 +95,8 @@ db.GiftStrategyModel = require("./t_gift_strategy")(db.sequelize, Sequelize);
 
 db.OffersModel = require("./t_offers")(db.sequelize, Sequelize);
 
+db.OffersCacheModel = require("./t_offer_cache")(db.sequelize, Sequelize);
+
 // Relations between tables
 
 db.WalletModel.hasMany(db.WalletTransactionModel, { foreignKey: "wallet_id" });      //one to many mapping

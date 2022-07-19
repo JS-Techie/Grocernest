@@ -134,6 +134,18 @@ const createOffer = async (req, res, next) => {
     is_percentage,
   } = req.body;
 
+  const offerExists = await Offers.findOne({
+    where: { [Op.or]: [{ item_id_1 }, { item_id }] },
+  });
+
+  if (offerExists) {
+    return res.status(400).send({
+      success: false,
+      data: offerExists,
+      message: "Offer already exists for this item",
+    });
+  }
+
   if (!type) {
     return res.status(400).send({
       success: false,
@@ -334,10 +346,54 @@ const deleteOffer = async (req, res, next) => {
   }
 };
 
+const activateOffer = async (req, res, next) => {
+  //Get current user from JWT
+
+  const offerID = req.params.id;
+
+  try {
+    const currentOffer = await Offers.findOne({
+      where: { id: offerID },
+    });
+
+    if (!currentOffer) {
+      return res.status(404).send({
+        success: false,
+        data: [],
+        message: "Requested offer does not exist",
+      });
+    }
+
+    const activatedOffer = await Offers.update(
+      {
+        is_active: 1,
+      },
+      {
+        where: { id: offerID },
+      }
+    );
+
+
+    return res.status(200).send({
+      success : true,
+      data : activatedOffer,
+      message : "Offer activated successfully"
+    })
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message:
+        "Something went wrong while activating offer, please check data field for more details",
+    });
+  }
+};
+
 module.exports = {
   getAllOffers,
   getOfferById,
   createOffer,
   updateOffer,
   deleteOffer,
+  activateOffer,
 };

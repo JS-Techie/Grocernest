@@ -41,14 +41,14 @@ const getAllCoupons = async (req, res, next) => {
         couponID: current.id,
         couponCode: current.code,
         amount: current.amount_of_discount,
-        isPercentage: current.is_percentage === 1 ? true : false, 
+        isPercentage: current.is_percentage === 1 ? true : false,
         categoryID: current.cat_id ? current.cat_id : "",
         categoryName: category ? category.group_name : "",
         subcategoryID: current.sub_cat_id ? current.sub_cat_id : "",
         subcategoryName: subcategory ? subcategory.sub_cat_name : "",
         itemID: current.item_id ? current.item_id : "",
         itemName: item ? item.name : "",
-        itemCode : item ? item.item_cd : "",
+        itemCode: item ? item.item_cd : "",
         brandID: current.brand_id ? current.brand_id : "",
         brandName: brand ? brand.brand_name : "",
         minPurchase: current.min_purchase,
@@ -122,7 +122,7 @@ const getCouponById = async (req, res, next) => {
         subcategoryName: subcategory ? subcategory.sub_cat_name : "",
         itemID: coupon.item_id ? coupon.item_id : "",
         itemName: item ? item.name : "",
-        itemCode : item ? item.item_cd : "",
+        itemCode: item ? item.item_cd : "",
         brandID: coupon.brand_id ? coupon.brand_id : "",
         brandName: brand ? brand.brand_name : "",
         minPurchase: coupon.min_purchase,
@@ -160,13 +160,20 @@ const createCoupon = async (req, res, next) => {
     assigned_user,
   } = req.body;
 
-
-  if(amount_of_discount === 0){
+  if (cat_id && sub_cat_id && item_id && brand_id && assigned_user) {
     return res.status(400).send({
-      success : false,
-      data : [],
-      message : "Please enter an amount, it cannot be zero"
-    })
+      success: false,
+      data: [],
+      message: "Please enter at least one field",
+    });
+  }
+
+  if (amount_of_discount === 0) {
+    return res.status(400).send({
+      success: false,
+      data: [],
+      message: "Please enter an amount, it cannot be zero",
+    });
   }
 
   try {
@@ -184,7 +191,7 @@ const createCoupon = async (req, res, next) => {
       expiry_date,
       assigned_user,
       created_by: 1,
-      usage : 0,
+      usage: 0,
     });
 
     return res.status(201).send({
@@ -232,20 +239,18 @@ const updateCoupon = async (req, res, next) => {
       assigned_user,
     } = req.body;
 
-      if(is_percentage){
-        if(is_percentage === true){
-          is_percentage = 1;
-        }
+    if (is_percentage) {
+      if (is_percentage === true) {
+        is_percentage = 1;
       }
+    }
 
     const updatedCoupon = await Coupons.update(
       {
-        code : code ? code : "",
-        amount_of_discount: amount_of_discount
-          ? amount_of_discount
-          : null,
-        is_percentage: is_percentage!==null ? is_percentage : null,
-        cat_id: cat_id ? cat_id : "",
+        code: code ? code : "",
+        amount_of_discount: amount_of_discount ? amount_of_discount : null,
+        is_percentage: is_percentage !== null ? is_percentage : null,
+        cat_id: cat_id ? cat_id : null,
         sub_cat_id: sub_cat_id ? sub_cat_id : null,
         item_id: item_id ? item_id : null,
         brand_id: brand_id ? brand_id : null,
