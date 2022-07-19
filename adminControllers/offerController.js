@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const db = require("../models");
 
 const Offers = db.OffersModel;
@@ -44,7 +45,7 @@ const getAllOffers = async (req, res, next) => {
           ? current.amount_of_discount
           : "",
         isPercentage: current.is_percentage ? true : false,
-        isActive: current.is_active ? true : false
+        isActive: current.is_active ? true : false,
       };
     });
 
@@ -109,7 +110,7 @@ const getOfferById = async (req, res, next) => {
           ? current.amount_of_discount
           : "",
         isPercentage: current.is_percentage ? true : false,
-        isActive: current.is_active ? true : false
+        isActive: current.is_active ? true : false,
       },
       message: "Requested offer found",
     });
@@ -136,11 +137,19 @@ const createOffer = async (req, res, next) => {
     is_percentage,
   } = req.body;
 
-  const offerExists = await Offers.findOne({
-    where: { [Op.or]: [{ item_id_1 }, { item_id }] },
-  });
+  let offer = null;
 
-  if (offerExists) {
+  if (item_id) {
+    offer = await Offers.findOne({
+      where: { item_id: item_id },
+    });
+  } else {
+    offer = await Offers.findOne({
+      where: { item_id_1: item_id_1 },
+    });
+  }
+
+  if (offer) {
     return res.status(400).send({
       success: false,
       data: offerExists,
@@ -156,6 +165,7 @@ const createOffer = async (req, res, next) => {
     });
   }
   try {
+    console.log("before offer query");
     const newOffer = await Offers.create({
       type,
       item_id_1,
@@ -164,10 +174,13 @@ const createOffer = async (req, res, next) => {
       item_2_quantity,
       item_id,
       amount_of_discount,
-      is_percentage: is_percentage === true ? 1 : null,
+      is_percentage:
+        is_percentage !== null ? (is_percentage === true ? 1 : null) : null,
       created_by: 1,
-      is_active: 1
+      is_active: 1,
     });
+
+    console.log("after offer query");
 
     return res.status(201).send({
       success: true,
@@ -197,7 +210,7 @@ const updateOffer = async (req, res, next) => {
     item_id,
     amount_of_discount,
     is_percentage,
-    is_active
+    is_active,
   } = req.body;
 
   try {
@@ -223,7 +236,7 @@ const updateOffer = async (req, res, next) => {
         item_id,
         amount_of_discount,
         is_percentage: is_percentage === true ? 1 : null,
-        is_active: is_active === true ? 1 : null
+        is_active: is_active === true ? 1 : null,
       },
       {
         where: { id: offerID },
@@ -257,7 +270,7 @@ const updateOffer = async (req, res, next) => {
               ? true
               : false
             : "",
-          isActive: current.is_active ? true : false
+          isActive: current.is_active ? true : false,
         },
         newOffer: {
           offerID: updatedOffer.id,
@@ -279,7 +292,7 @@ const updateOffer = async (req, res, next) => {
               ? true
               : false
             : "",
-          isActive: current.is_active ? true : false
+          isActive: current.is_active ? true : false,
         },
         numberOfOffersUpdated: update,
       },
@@ -312,11 +325,12 @@ const deleteOffer = async (req, res, next) => {
       });
     }
 
-    const deletedOffer = await Offers.update({
-      is_active: null,
-
-    },
-      { where: { id: offerID } });
+    const deletedOffer = await Offers.update(
+      {
+        is_active: null,
+      },
+      { where: { id: offerID } }
+    );
 
     return res.status(200).send({
       success: true,
@@ -341,7 +355,7 @@ const deleteOffer = async (req, res, next) => {
               ? true
               : false
             : "",
-          isActive: current.is_active ? true : false
+          isActive: current.is_active ? true : false,
         },
         numberOfOffersDeleted: deletedOffer,
       },
@@ -383,12 +397,11 @@ const activateOffer = async (req, res, next) => {
       }
     );
 
-
     return res.status(200).send({
-      success : true,
-      data : activatedOffer,
-      message : "Offer activated successfully"
-    })
+      success: true,
+      data: activatedOffer,
+      message: "Offer activated successfully",
+    });
   } catch (error) {
     return res.status(400).send({
       success: false,

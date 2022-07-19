@@ -17,7 +17,7 @@ router.route("/view/:id").get(admin, getOfferById)
 router.route("/create").post(admin, createOffer)
 router.route("/update/:id").patch(admin, updateOffer)
 router.route("/delete/:id").delete(admin, deleteOffer)
-router.route("activate/:id").patch(admin, activateOffer)
+router.route("/activate/:id").patch(admin, activateOffer)
 
 
 module.exports = router;
