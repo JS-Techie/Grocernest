@@ -140,7 +140,7 @@ const offerForItemBuyNow = async (req, res, next) => {
       where: { id: itemID },
     });
 
-    const batches = await Batch.findOne({
+    const batches = await Batch.findAll({
       where: { item_id: itemID },
       order: [["created_at", "asc"]],
     });
