@@ -60,13 +60,15 @@ const getAllAvailableCoupons = async (req, res, next) => {
       }
 
       const promises = await coupons.map(async (current) => {
-        return {
-          couponCode: current.code,
-          amount: current.is_percentage
-            ? current.amount_of_discount + " %"
-            : current.amount_of_discount,
-          description: current.description,
-        };
+        if (new Date(current.expiry_date) >= Date.now()) {
+          return {
+            couponCode: current.code,
+            amount: current.is_percentage
+              ? current.amount_of_discount + " %"
+              : current.amount_of_discount,
+            description: current.description,
+          };
+        }
       });
 
       const resolved = await Promise.all(promises);
@@ -110,9 +112,11 @@ const getAllAvailableCoupons = async (req, res, next) => {
 
     const flattenedArray = response.flat(1);
     const responseArray = [
-      ...new Map(flattenedArray.map((item) => [item["couponCode"], item])).values(),
+      ...new Map(
+        flattenedArray.map((item) => [item["couponCode"], item])
+      ).values(),
     ];
-    
+
     return res.status(200).send({
       success: true,
       data: responseArray,

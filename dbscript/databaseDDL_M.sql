@@ -159,3 +159,19 @@ ALTER TABLE ecomm.t_customer ADD new_phone_number varchar(20) NULL;
 
 ALTER TABLE ecomm.t_cart ADD is_offer BOOL NULL;
 ALTER TABLE ecomm.t_cart ADD offer_item_price DECIMAL(10,2) NULL;
+
+CREATE TABLE ecomm.t_offer_cache (
+	id BIGINT(20) auto_increment NOT NULL,
+	item_id BIGINT(20) NULL,
+	quantity BIGINT(20) NULL,
+	`created_by` bigint(20) NOT NULL,
+ 	 `updated_by` bigint(20) DEFAULT NULL,
+  	`created_at` timestamp NULL DEFAULT current_timestamp(),
+  	`updated_at` timestamp NULL DEFAULT NULL,
+  	primary key (`id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_general_ci;
+
+ALTER TABLE ecomm.t_offer_cache ADD cust_no varchar(20) NULL;

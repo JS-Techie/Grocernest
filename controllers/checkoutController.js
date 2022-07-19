@@ -1,12 +1,13 @@
 const { sequelize } = require("../models");
 const db = require("../models");
-const uniqid = require('uniqid');
+const uniqid = require("uniqid");
 
 const Order = db.OrderModel;
 const OrderItems = db.OrderItemsModel;
 const Cart = db.CartModel;
 const Wallet = db.WalletModel;
 const Wallet_Transaction = db.WalletTransactionModel;
+const OffersCache = db.OffersCacheModel;
 
 const concatAddress = require("../utils/concatAddress");
 
@@ -14,7 +15,14 @@ const checkoutFromCart = async (req, res, next) => {
   //Get current user from JWT
   const currentUser = req.cust_no;
 
-  const { total, address_id, applied_discount, final_payable_amount, wallet_balance_used, wallet_id } = req.body;
+  const {
+    total,
+    address_id,
+    applied_discount,
+    final_payable_amount,
+    wallet_balance_used,
+    wallet_id,
+  } = req.body;
 
   if (!total) {
     return res.status(400).send({
@@ -64,29 +72,30 @@ const checkoutFromCart = async (req, res, next) => {
       address,
       applied_discount: applied_discount,
       wallet_balance_used: wallet_balance_used,
-      final_payable_amount: final_payable_amount
+      final_payable_amount: final_payable_amount,
     });
 
     const user_wallet = await Wallet.findOne({
       where: {
-        cust_no: currentUser
-      }
-    })
+        cust_no: currentUser,
+      },
+    });
 
-    const wallet = await Wallet.update({
-      balance: user_wallet.balance - wallet_balance_used
-    },
+    const wallet = await Wallet.update(
+      {
+        balance: user_wallet.balance - wallet_balance_used,
+      },
       { where: { wallet_id: wallet_id } }
-    )
+    );
 
     const wallet_transaction = await Wallet_Transaction.create({
       wallet_id: wallet_id,
       transaction_id: uniqid(),
-      transaction_type: 'D',
+      transaction_type: "D",
       transaction_amount: wallet_balance_used,
       transaction_details: newOrder.order_id,
-      created_by: 2
-    })
+      created_by: 2,
+    });
 
     const promises = cartForUser.map(async (currentItem) => {
       return {
@@ -159,7 +168,16 @@ const buyNow = async (req, res, next) => {
 
   //Get the quantity and item ID from request body
   // wallet_balance_used, wallet_id
-  const { itemID, quantity, total, address_id, applied_discount, final_payable_amount, wallet_balance_used, wallet_id } = req.body;
+  const {
+    itemID,
+    quantity,
+    total,
+    address_id,
+    applied_discount,
+    final_payable_amount,
+    wallet_balance_used,
+    wallet_id,
+  } = req.body;
 
   if (!total) {
     return res.status(400).send({
@@ -223,30 +241,30 @@ const buyNow = async (req, res, next) => {
       address,
       applied_discount: applied_discount,
       wallet_balance_used: wallet_balance_used,
-      final_payable_amount: final_payable_amount
+      final_payable_amount: final_payable_amount,
     });
 
     const user_wallet = await Wallet.findOne({
       where: {
-        cust_no: currentUser
-      }
-    })
+        cust_no: currentUser,
+      },
+    });
 
-    const wallet = await Wallet.update({
-      balance: user_wallet.balance - wallet_balance_used
-    },
+    const wallet = await Wallet.update(
+      {
+        balance: user_wallet.balance - wallet_balance_used,
+      },
       { where: { wallet_id: wallet_id } }
-    )
+    );
 
     const wallet_transaction = await Wallet_Transaction.create({
       wallet_id: wallet_id,
       transaction_id: uniqid(),
-      transaction_type: 'D',
+      transaction_type: "D",
       transaction_amount: wallet_balance_used,
       transaction_details: newOrder.order_id,
-      created_by: 2
-    })
-
+      created_by: 2,
+    });
 
     let promises = [];
     if (userGifts.length !== 0) {
@@ -268,6 +286,24 @@ const buyNow = async (req, res, next) => {
       quantity,
       created_by: newOrder.created_by,
     });
+
+    const offerItem = await OffersCache.findOne({
+      where: { cust_no: currentUser },
+    });
+
+    let deletedFromCache;
+    if (offerItem) {
+      orderItems.push({
+        order_id: newOrder.order_id,
+        item_id: offerItem.item_id,
+        quantity: offerItem.quantity,
+        created_by: newOrder.created_by,
+      });
+
+      deletedFromCache = await offerItem.destroy({
+        where: { cust_no: currentUser },
+      });
+    }
 
     try {
       await OrderItems.bulkCreate(orderItems);
@@ -303,6 +339,7 @@ const buyNow = async (req, res, next) => {
         orderTotal: newOrder.total,
         orderItems: response,
         deletedItemsFromCart,
+        deletedFromCache,
       },
       message: "Order created successfully",
     });
