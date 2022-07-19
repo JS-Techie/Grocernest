@@ -1283,7 +1283,7 @@
         }
       }
     },
-    "/offers/item/buyNow": {
+    "/offers/item/buy": {
       "post": {
         "description": "",
         "parameters": [
