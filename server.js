@@ -103,4 +103,3 @@ const start = async () => {
 start();
 refferal_job();
 
-sendEmail("chandratanmoy5@gmail.com", "Welcome to Grocernest. You have registered successfully..!");
