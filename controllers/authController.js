@@ -246,9 +246,9 @@ const verifyOTP = async (req, res, next) => {
     })
 
     // send email if available
-    if (newUser.email !== null) {
-      sendEmail(newUser.email, "Welcome to Grocernest. You have registered successfully..!");
-    }
+    // if (newUser.email !== null) {
+    sendEmail(newUser.email, "Welcome to Grocernest. You have registered successfully..!");
+    // }
 
 
     // creating new coupon while successful reg.
