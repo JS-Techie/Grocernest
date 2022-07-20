@@ -165,6 +165,15 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "usage"
+    },
+    type: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "type"
     }
   };
   const options = {

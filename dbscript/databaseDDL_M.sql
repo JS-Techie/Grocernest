@@ -175,3 +175,6 @@ DEFAULT CHARSET=utf8mb4
 COLLATE=utf8mb4_general_ci;
 
 ALTER TABLE ecomm.t_offer_cache ADD cust_no varchar(20) NULL;
+
+ALTER TABLE ecomm.t_coupons ADD `type` varchar(100) NULL;
+
