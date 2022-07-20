@@ -140,20 +140,39 @@ const getStrategyById = async (req, res, next) => {
 const createStrategy = async (req, res, next) => {
   const { min_purchase, max_purchase, no_of_gifts } = req.body;
 
-  if(!min_purchase || !max_purchase || !no_of_gifts){
+  if (!min_purchase || !max_purchase || !no_of_gifts) {
     return res.status(400).send({
-      success  : false,
-      data : [],
-      message : "Please enter all required fields"
-    })
+      success: false,
+      data: [],
+      message: "Please enter all required fields",
+    });
   }
 
-  if(max_purchase <= min_purchase){
+  if (max_purchase <= min_purchase) {
     return res.status(400).send({
-      success : false,
-      data : [],
-      message : "Minimum Purchase cannot be more than Maximum purchase"
-    })
+      success: false,
+      data: [],
+      message: "Minimum Purchase cannot be more than Maximum purchase",
+    });
+  }
+
+  const strategies = await Strategy.findAll();
+  if (strategies.length > 0) {
+    strategies.map((current) => {
+      if (
+        min_purchase >= current.min_purchase ||
+        min_purchase <= current.max_purchase ||
+        max_purchase >= current.min_purchase ||
+        max_purchase <= current.max_purchase
+      ) {
+        return res.status(400).send({
+          success: false,
+          data: [],
+          message:
+            "Strategy already exists for this range, please try a new range",
+        });
+      }
+    });
   }
 
   try {
