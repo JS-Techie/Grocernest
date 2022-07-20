@@ -240,7 +240,7 @@ const getOrderDetails = async (req, res, next) => {
 
                 type: current.type,
                 amount_of_discount: current.amount_of_discount,
-                is_percentage: current.is_amount ? current.is_percentage === 1 ? true : false : null,
+                is_percentage: current.amount_of_discount ? current.is_percentage === 1 ? true : false : null,
                 offer_item_id: current.offer_item_id,
                 item_id_1: current.item_id_1,
                 item_id_2: current.item_id_2,
