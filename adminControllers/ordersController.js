@@ -1,8 +1,10 @@
 const { sequelize } = require("../models");
 const db = require("../models");
 const Order = db.OrderModel;
+const { sendEmail } = require('../services/mailService');
 // const Customer = db.CustomerModel;
 const Batch = db.BatchModel;
+const Customer = db.CustomerModel
 
 
 const getAllPendingOrders = async (req, res, next) => {
@@ -289,14 +291,31 @@ const changeOrderStatus = async (req, res, next) => {
             updated_at: new Date()
         },
         { where: { order_id: req.body.orderId } }
-    )
-        .then((result) => {
-            return res.status(200).send({
-                success: true,
-                data: { "status": req.body.status },
-                message: "Successfully changed order status",
-            });
+    ).then((result) => {
+        Order.findOne({
+            where: {
+                order_id: req.body.orderId
+            }
+        }).then((res) => {
+
+            let cust_no = res.dataValues.cust_no
+            Customer.findOne({
+                where: {
+                    cust_no: res.dataValues.cust_no
+                }
+            }).then((cust) => {
+                let email = cust.dataValues.email;
+                if (email !== null)
+                    sendEmail(email.toString(), "Your order status for order id-" + req.body.orderId + " has changed to " + req.body.status);
+            })
         })
+
+        return res.status(200).send({
+            success: true,
+            data: { "status": req.body.status },
+            message: "Successfully changed order status",
+        });
+    })
         .catch((err) => {
             return res.status(400).send({
                 success: false,
