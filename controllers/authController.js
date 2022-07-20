@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const referralCodeGenerator = require('referral-code-generator')
 const bcrypt = require("bcryptjs");
 const uniqid = require("uniqid");
-
+const { sendEmail } = require('../services/mailService');
 const db = require("../models");
 
 const { generateOTP, sendOTPToPhoneNumber } = require("../services/otpService");
@@ -237,6 +237,7 @@ const verifyOTP = async (req, res, next) => {
       referred_by: newUser.referred_by
     });
 
+    // creating blank wallet while successful reg.
     const new_wallet = await wallet.create({
       wallet_id: uniqid(),
       cust_no: newUser.cust_no,
@@ -244,6 +245,13 @@ const verifyOTP = async (req, res, next) => {
       created_by: 2,
     })
 
+    // send email if available
+    if (newUser.email) {
+      sendEmail(newUser.email, "Welcome to Grocernest. You have registered successfully..!");
+    }
+
+
+    // creating new coupon while successful reg.
     const newCoupon = await Coupon.create({
       code: "FIRSTBUY",
       amount_of_discount: 10,
