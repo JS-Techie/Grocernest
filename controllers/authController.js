@@ -246,7 +246,7 @@ const verifyOTP = async (req, res, next) => {
     })
 
     // send email if available
-    if (newUser.email) {
+    if (newUser.email !== null) {
       sendEmail(newUser.email, "Welcome to Grocernest. You have registered successfully..!");
     }
 

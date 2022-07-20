@@ -24,7 +24,7 @@ const sendEmail = (mailId, text) => {
     });
 }
 
-// sendEmail("chandratanmoy5@gmail.com", "abcd");
+// sendEmail("saonli.mondal@tuteck.com", "abcd");
 
 module.exports = {
     sendEmail
