@@ -157,22 +157,35 @@ const createStrategy = async (req, res, next) => {
   }
 
   const strategies = await Strategy.findAll();
+
+  console.log(strategies);
+  let isValid = true;
+
   if (strategies.length > 0) {
     strategies.map((current) => {
+      console.log(
+        current.min_purchase,
+        current.max_purchase,
+        current.no_of_gifts
+      );
       if (
-        min_purchase >= current.min_purchase ||
-        min_purchase <= current.max_purchase ||
-        max_purchase >= current.min_purchase ||
-        max_purchase <= current.max_purchase
+        (min_purchase >= current.min_purchase &&
+        min_purchase <= current.max_purchase) ||
+        (max_purchase >= current.min_purchase &&
+        max_purchase <= current.max_purchase)
       ) {
-        return res.status(400).send({
-          success: false,
-          data: [],
-          message:
-            "Strategy already exists for this range, please try a new range",
-        });
+        isValid = false;
       }
     });
+
+    if (!isValid) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message:
+          "Strategy already exists for this range, please try a new range",
+      });
+    }
   }
 
   try {
