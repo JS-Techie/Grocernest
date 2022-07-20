@@ -384,6 +384,26 @@ const assignTransporter = async (req, res, next) => {
         { where: { order_id: orderId } }
     )
         .then((result) => {
+
+            Order.findOne({
+                where: {
+                    order_id: req.body.orderId
+                }
+            }).then((res) => {
+
+                let cust_no = res.dataValues.cust_no
+                Customer.findOne({
+                    where: {
+                        cust_no: res.dataValues.cust_no
+                    }
+                }).then((cust) => {
+                    let email = cust.dataValues.email;
+                    if (email !== null)
+                        sendEmail(email.toString(), "Your order " + req.body.orderId + " is Shipped. Your order will be delivered by " + transporterName);
+                })
+            })
+
+
             return res.status(200).send({
                 success: true,
                 data: { "status": "Shipped" },
