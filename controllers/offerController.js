@@ -188,7 +188,7 @@ const offerForItemBuyNow = async (req, res, next) => {
       }
 
       const saveOfferItemInCache = await OffersCache.create({
-        cust_no : currentUser,
+        cust_no: currentUser,
         item_id: offerItemID,
         quantity: quantityOfOfferItem,
         created_by: 1,
@@ -231,11 +231,11 @@ const offerForItemBuyNow = async (req, res, next) => {
         (offer.amount_of_discount / 100) * oldestBatchForOfferItem.sale_price;
     } else {
       newSalePrice =
-        oldestBatchForOfferItem.sale_price -
-        oldestBatchForOfferItem.amount_of_discount;
+        oldestBatchForOfferItem.sale_price - offer.amount_of_discount;
     }
 
     newSalePrice = newSalePrice * quantity;
+    //console.log(newSalePrice, quantity, offer)
 
     return res.status(200).send({
       success: true,
