@@ -25,6 +25,7 @@ const offerForItem = async (req, res, next) => {
 
     const offer = await Offers.findOne({
       where: {
+        is_active: 1,
         [Op.or]: [{ item_id_1: itemID }, { item_id: itemID }],
       },
     });
@@ -61,14 +62,30 @@ const offerForItem = async (req, res, next) => {
           message: "More items need to be added to avail offer",
         });
       }
-      response = await Cart.create({
-        cust_no: currentUser,
-        item_id: itemToBeAdded,
-        quantity: quantityToBeAdded,
-        created_by: 1,
-        is_offer: 1,
-        offer_item_price: 0,
+
+      let offerItemInCart = await Cart.findOne({
+        where: { cust_no: currentUser, item_id: itemToBeAdded },
       });
+
+      if (offerItemInCart) {
+        response = await Cart.update(
+          {
+            quantity: quantityToBeAdded,
+          },
+          {
+            where: { cust_no: currentUser, item_id: itemToBeAdded },
+          }
+        );
+      } else {
+        response = await Cart.create({
+          cust_no: currentUser,
+          item_id: itemToBeAdded,
+          quantity: quantityToBeAdded,
+          created_by: 1,
+          is_offer: 1,
+          offer_item_price: 0,
+        });
+      }
 
       return res.status(201).send({
         success: true,
@@ -91,14 +108,29 @@ const offerForItem = async (req, res, next) => {
       newSalePrice = oldestBatch.sale_price - discount;
     }
 
-    response = await Cart.create({
-      cust_no: currentUser,
-      item_id: itemID,
-      quantity,
-      created_by: 1,
-      is_offer: 1,
-      offer_item_price: newSalePrice,
+    offerItemInCart = await Cart.findOne({
+      where: { cust_no: currentUser, item_id: itemID },
     });
+
+    if (offerItemInCart) {
+      response = await Cart.update(
+        {
+          quantity,
+        },
+        {
+          where: { cust_no: currentUser, item_id: itemID },
+        }
+      );
+    } else {
+      response = await Cart.create({
+        cust_no: currentUser,
+        item_id: itemID,
+        quantity,
+        created_by: 1,
+        is_offer: 1,
+        offer_item_price: newSalePrice,
+      });
+    }
 
     return res.status(201).send({
       success: true,
@@ -133,6 +165,7 @@ const offerForItemBuyNow = async (req, res, next) => {
   try {
     const offer = await Offers.findOne({
       where: {
+        is_active: 1,
         [Op.or]: [{ item_id_1: itemID }, { item_id: itemID }],
       },
     });

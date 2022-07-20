@@ -97,6 +97,8 @@ const checkoutFromCart = async (req, res, next) => {
       created_by: 2,
     });
 
+    console.log(cartForUser);
+
     const promises = cartForUser.map(async (currentItem) => {
       return {
         order_id: newOrder.order_id,
@@ -107,6 +109,8 @@ const checkoutFromCart = async (req, res, next) => {
     });
 
     const resolved = await Promise.all(promises);
+
+    console.log(resolved);
 
     let newOrderItems = [];
     try {
@@ -219,7 +223,7 @@ const buyNow = async (req, res, next) => {
     }
 
     const userGifts = await Cart.findAll({
-      where: { cust_no: currentUser },
+      where: { cust_no: currentUser, is_gift: 1 },
     });
 
     const address = await Promise.resolve(concatAddress(address_id));
@@ -308,7 +312,7 @@ const buyNow = async (req, res, next) => {
     try {
       await OrderItems.bulkCreate(orderItems);
     } catch (error) {
-      const res = await Order.destroy({
+      await Order.destroy({
         where: { cust_no: currentUser, order_id: newOrder.order_id },
       });
 
@@ -327,7 +331,7 @@ const buyNow = async (req, res, next) => {
     });
 
     const deletedItemsFromCart = await Cart.destroy({
-      where: { cust_no: currentUser },
+      where: { cust_no: currentUser, is_gift: 1 },
     });
 
     return res.status(201).send({

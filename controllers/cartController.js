@@ -107,9 +107,7 @@ const subtractItemFromCart = async (req, res, next) => {
     }
 
     const offerExists = await Offers.findOne({
-      where: {
-        [Op.or]: [{ item_id_1: itemID }],
-      },
+      where: { is_active: 1, [Op.or]: [{ item_id_1: itemID }] },
     });
 
     let offerItemToBeRemoved = null;
@@ -153,17 +151,17 @@ const subtractItemFromCart = async (req, res, next) => {
     if (offerItemToBeRemoved) {
       let newQuantityOfOfferItem = null;
       if (newQuantityOfNormalItem < Xquantity) {
-        console.log("in if")
+        console.log("in if");
         isBigger = true;
       } else if (newQuantityOfNormalItem % offerExists.item_1_quantity === 0) {
-        console.log("in else if")
+        console.log("in else if");
         newQuantityOfOfferItem =
           (newQuantityOfNormalItem / offerExists.item_1_quantity) *
           offerExists.item_2_quantity;
       } else {
-        console.log("in else")
+        console.log("in else");
         newQuantityOfOfferItem =
-          Math.floor((newQuantityOfNormalItem / offerExists.item_1_quantity)) *
+          Math.floor(newQuantityOfNormalItem / offerExists.item_1_quantity) *
           offerExists.item_2_quantity;
       }
 
@@ -255,7 +253,6 @@ const removeItemFromCart = async (req, res, next) => {
         [Op.or]: [{ item_id_1: itemID }, { item_id: itemID }],
       },
     });
-
 
     let offerItemToBeRemoved = null;
     let offerItemDestroyed = null;
@@ -387,6 +384,7 @@ const getCart = async (req, res, next) => {
       if (current.is_offer === 1) {
         currentOffer = await Offers.findOne({
           where: {
+            is_active: 1,
             [Op.or]: [
               { item_id_1: current.item_id },
               { item_id: current.item_id },
