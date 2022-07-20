@@ -58,6 +58,7 @@ const getAllCoupons = async (req, res, next) => {
         expiryDate: current.expiry_date ? current.expiry_date : "",
         numberOfTimesUsed: current.usage,
         createdBy: current.created_by,
+        couponType: current.type ? current.type : "",
       };
     });
 
@@ -132,6 +133,7 @@ const getCouponById = async (req, res, next) => {
         expiryDate: coupon.expiry_date ? coupon.expiry_date : "",
         numberOfTimesUsed: coupon.usage,
         createdBy: coupon.created_by,
+        couponType: coupon.type,
       },
       message: "Found requested coupon",
     });
@@ -146,6 +148,7 @@ const getCouponById = async (req, res, next) => {
 
 const createCoupon = async (req, res, next) => {
   const {
+    type,
     code,
     amount_of_discount,
     is_percentage,
@@ -192,6 +195,7 @@ const createCoupon = async (req, res, next) => {
       assigned_user,
       created_by: 1,
       usage: 0,
+      type,
     });
 
     return res.status(201).send({
