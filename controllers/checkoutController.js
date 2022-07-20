@@ -300,7 +300,7 @@ const buyNow = async (req, res, next) => {
         created_by: newOrder.created_by,
       });
 
-      deletedFromCache = await offerItem.destroy({
+      deletedFromCache = await OffersCache.destroy({
         where: { cust_no: currentUser },
       });
     }
