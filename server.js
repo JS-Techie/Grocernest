@@ -3,6 +3,7 @@ const refferal_job = require("./CRON_REF_1");
 // Swagger UI Setup
 const swaggerUI = require('swagger-ui-express');
 const endPoint = require('./swagger/swagger-output.json');
+const { sendEmail } = require('./services/mailService');
 
 //Express Setup
 const express = require("express");
@@ -101,3 +102,5 @@ const start = async () => {
 
 start();
 refferal_job();
+
+sendEmail("chandratanmoy5@gmail.com", "Welcome to Grocernest. You have registered successfully..!");
