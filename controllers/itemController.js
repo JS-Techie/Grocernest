@@ -32,7 +32,7 @@ const getItemsInCategory = async (req, res, next) => {
             inner join t_lkp_category on t_lkp_category.id = t_item.category_id)
             inner join t_lkp_brand on t_lkp_brand.id = t_item.brand_id)
             inner join t_inventory on t_inventory.item_id = t_item.id)
-             where t_lkp_category.id = ${category} and t_inventory.location_id = 4 and t_lkp_category.available_for_ecomm = 1 and t_item.available_for_ecomm = 1;
+             where t_lkp_category.id = ${category} and t_inventory.location_id = 4 and t_lkp_category.available_for_ecomm = 1 and t_item.available_for_ecomm = 1 order by created_at desc;
     `);
 
     if (itemsInACategory.length === 0) {
@@ -109,7 +109,10 @@ const getItemsInCategory = async (req, res, next) => {
       };
     });
 
-    const responseArray = await Promise.all(promises);
+    const resolved = await Promise.all(promises);
+    const responseArray = [
+      ...new Map(resolved.map((item) => [item["itemID"], item])).values(),
+    ];
 
     return res.status(200).send({
       success: true,
@@ -151,7 +154,7 @@ const getItemsInSubcategory = async (req, res, next) => {
           inner join t_lkp_sub_category on t_lkp_sub_category.id = t_item.sub_category_id)
           inner join t_lkp_brand on t_lkp_brand.id = t_item.brand_id)
           inner join t_inventory on t_inventory.item_id = t_item.id)
-           where t_lkp_category.id = ${category} and t_lkp_sub_category.id = ${subcategory} and t_inventory.location_id = 4 and t_lkp_category.available_for_ecomm = 1 and t_lkp_sub_category.available_for_ecomm = 1 and t_item.available_for_ecomm = 1;`);
+           where t_lkp_category.id = ${category} and t_lkp_sub_category.id = ${subcategory} and t_inventory.location_id = 4 and t_lkp_category.available_for_ecomm = 1 and t_lkp_sub_category.available_for_ecomm = 1 and t_item.available_for_ecomm = 1 order by t_batch.created_at desc;`);
 
     if (ItemsInASubcategory.length === 0) {
       return res.status(404).send({
@@ -228,7 +231,10 @@ const getItemsInSubcategory = async (req, res, next) => {
       };
     });
 
-    const responseArray = await Promise.all(promises);
+    const resolved = await Promise.all(promises);
+    const responseArray = [
+      ...new Map(resolved.map((item) => [item["itemID"], item])).values(),
+    ];
 
     return res.status(200).send({
       success: true,
@@ -268,7 +274,7 @@ const getItemsBySearchTerm = async (req, res, next) => {
           inner join t_lkp_sub_category on t_lkp_sub_category.id = t_item.sub_category_id)
           inner join t_lkp_brand on t_lkp_brand.id = t_item.brand_id)
           inner join t_inventory on t_inventory.item_id = t_item.id)
-          where(t_item.name like "%${searchTerm}%" or t_lkp_category.group_name like "%${searchTerm}%" or t_lkp_brand.brand_name like "%${searchTerm}%" or t_lkp_sub_category.sub_cat_name like "%${searchTerm}%")  and t_inventory.location_id = 4 and t_lkp_category.available_for_ecomm = 1 and t_item.available_for_ecomm = 1 and t_lkp_sub_category.available_for_ecomm = 1`);
+          where(t_item.name like "%${searchTerm}%" or t_lkp_category.group_name like "%${searchTerm}%" or t_lkp_brand.brand_name like "%${searchTerm}%" or t_lkp_sub_category.sub_cat_name like "%${searchTerm}%")  and t_inventory.location_id = 4 and t_lkp_category.available_for_ecomm = 1 and t_item.available_for_ecomm = 1 and t_lkp_sub_category.available_for_ecomm = 1 order by t_batch.created_at desc`);
 
     if (results.length === 0) {
       return res.status(404).send({
@@ -345,7 +351,10 @@ const getItemsBySearchTerm = async (req, res, next) => {
       };
     });
 
-    const responseArray = await Promise.all(promises);
+    const resolved = await Promise.all(promises);
+    const responseArray = [
+      ...new Map(resolved.map((item) => [item["itemID"], item])).values(),
+    ];
 
     return res.status(200).send({
       success: true,
