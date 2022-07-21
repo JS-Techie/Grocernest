@@ -286,7 +286,7 @@ const getOrderDetails = async (req, res, next) => {
 const changeOrderStatus = async (req, res, next) => {
     console.log("change order status");
 
-    let cancellationReason = req.body.cancellationReason ? req.body.cancellationReason : ""
+    let cancellationReason = req.body.cancellataionReason ? req.body.cancellataionReason : ""
     console.log("cancellationReason", cancellationReason);
     Order.update(
         {
