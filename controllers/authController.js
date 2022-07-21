@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const referralCodeGenerator = require('referral-code-generator')
 const bcrypt = require("bcryptjs");
 const uniqid = require("uniqid");
-const { sendEmail } = require('../services/mailService');
+const { sendRegistrationEmail } = require('../services/mail/mailService');
 const db = require("../models");
 
 const { generateOTP, sendOTPToPhoneNumber } = require("../services/otpService");
@@ -248,7 +248,7 @@ const verifyOTP = async (req, res, next) => {
     // send email if available
     if (newUser.email !== null) {
       // console.log(newUser.email);
-      sendEmail(newUser.email.toString(), "Welcome to Grocernest. You have registered successfully..!");
+      sendRegistrationEmail(newUser.email.toString());
     }
 
 

@@ -1,7 +1,7 @@
 const { sequelize } = require("../models");
 const db = require("../models");
 const Order = db.OrderModel;
-const { sendEmail } = require('../services/mailService');
+const { sendOrderStatusEmail, sendCancelledStatusEmail } = require("../services/mail/mailService");
 // const Customer = db.CustomerModel;
 const Batch = db.BatchModel;
 const Customer = db.CustomerModel
@@ -310,7 +310,12 @@ const changeOrderStatus = async (req, res, next) => {
             }).then((cust) => {
                 let email = cust.dataValues.email;
                 if (email !== null)
-                    sendEmail(email.toString(), "Your order status for order id-" + req.body.orderId + " has changed to " + req.body.status);
+                    if (req.body.status === "Cancelled") {
+                        sendCancelledStatusEmail(email.toString(), req.body.orderId, req.body.cancellationReason)
+                    }
+                    else {
+                        sendOrderStatusEmail(email.toString(), req.body.orderId, "Your order " + req.body.orderId + " has been " + req.body.status)
+                    }
             })
         })
 
@@ -403,7 +408,7 @@ const assignTransporter = async (req, res, next) => {
                 }).then((cust) => {
                     let email = cust.dataValues.email;
                     if (email !== null)
-                        sendEmail(email.toString(), "Your order " + req.body.orderId + " is Shipped. Your order will be delivered by " + transporterName);
+                        sendOrderStatusEmail(email.toString(), req.body.orderId, "Your order " + req.body.orderId + " has been Shipped. Your order will be delivered by " + transporterName);
                 })
             })
 
