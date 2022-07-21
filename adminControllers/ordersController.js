@@ -91,6 +91,7 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
             ${phoneNoQuery}
             ${dateQuery}
             ${orderId}
+             order by created_at DESC
           `);
 
         if (results.length === 0) {
