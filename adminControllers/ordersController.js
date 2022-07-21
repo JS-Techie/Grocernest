@@ -311,7 +311,7 @@ const changeOrderStatus = async (req, res, next) => {
                 let email = cust.dataValues.email;
                 if (email !== null)
                     if (req.body.status === "Cancelled") {
-                        sendCancelledStatusEmail(email.toString(), req.body.orderId, req.body.cancellationReason)
+                        sendCancelledStatusEmail(email.toString(), req.body.orderId, req.body.cancellataionReason)
                     }
                     else {
                         sendOrderStatusEmail(email.toString(), req.body.orderId, "Your order " + req.body.orderId + " has been " + req.body.status)
