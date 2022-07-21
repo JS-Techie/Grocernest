@@ -250,6 +250,7 @@ const removeItemFromCart = async (req, res, next) => {
     }
     const offerExists = await Offers.findOne({
       where: {
+        is_active: 1,
         [Op.or]: [{ item_id_1: itemID }, { item_id: itemID }],
       },
     });
