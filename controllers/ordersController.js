@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const { sequelize } = require("../models");
 const db = require("../models");
 
@@ -5,6 +6,7 @@ const Order = db.OrderModel;
 const OrderItems = db.OrderItemsModel;
 const Item = db.ItemModel;
 const Batch = db.BatchModel;
+const Offers = db.OffersModel;
 
 const getAllOrders = async (req, res, next) => {
   //Get currentUser from req.payload.cust_no
@@ -31,26 +33,73 @@ const getAllOrders = async (req, res, next) => {
       });
 
       const orderItemPromises = orderItems.map(async (currentOrderItem) => {
+        let currentOffer = null;
+        let isEdit = null;
+        if (currentOrderItem.is_offer === 1) {
+          currentOffer = await Offers.findOne({
+            where: {
+              is_active: 1,
+              [Op.or]: [
+                { item_id_1: currentOrderItem.item_id },
+                { item_id: currentOrderItem.item_id },
+              ],
+            },
+          });
+          if (currentOffer) {
+            if (currentOffer.amount_of_discount) {
+              isEdit = true;
+            }
+          }
+        }
+
         const currentItem = await Item.findOne({
           where: { id: currentOrderItem.item_id },
         });
 
         const batches = await Batch.findAll({
-          where: { item_id: currentItem.id },
+          where: { item_id: currentOrderItem.item_id },
           order: [["created_at", "ASC"]],
         });
-
-        const batch = batches[0];
+        let oldestBatch = null;
+        if (batches.length > 0) {
+          oldestBatch = batches[0];
+        }
 
         return {
           itemName: currentItem.name,
           id: currentItem.id,
           image: currentItem.image,
           quantity: currentOrderItem.quantity,
-          MRP: batch.MRP,
-          salePrice: batch.sale_price,
-          discount: batch.discount,
-          isGift: currentItem.is_gift == 1 ? true : false,
+          MRP: oldestBatch.MRP,
+          salePrice:
+            currentOrderItem.is_offer === 1
+              ? currentOrderItem.offer_price
+              : oldestBatch.sale_price,
+          discount: oldestBatch.discount,
+          isGift: currentItem.is_gift === 1 ? true : false,
+          isOffer: currentOrderItem.is_offer === 1 ? true : false,
+          canEdit:
+            currentOrderItem.is_offer === 1 ? (isEdit ? true : false) : "",
+          offerDetails: currentOffer
+            ? {
+                offerID: currentOffer.id,
+                offerType: currentOffer.type,
+                itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
+                quantityOfItemX: currentOffer.item_1_quantity
+                  ? currentOffer.item_1_quantity
+                  : "",
+                itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
+                quantityOfItemY: currentOffer.item_2_quantity
+                  ? currentOffer.item_2_quantity
+                  : "",
+                itemID: currentOffer.item_id ? currentOffer.item_id : "",
+                amountOfDiscount: currentOffer.amount_of_discount
+                  ? currentOffer.amount_of_discount
+                  : "",
+                isPercentage: currentOffer.is_percentage ? true : false,
+                isActive: currentOffer.is_active ? true : false,
+              }
+            : "",
         };
       });
 
@@ -100,7 +149,8 @@ const getOrderByOrderId = async (req, res, next) => {
     //Get that order according to its id
 
     const [singleOrder, metadata] =
-      await sequelize.query(`select t_lkp_order.order_id, t_lkp_order.created_at, t_lkp_order.status, t_item.id, t_item.name, t_order_items.quantity, t_item.image
+      await sequelize.query(`select t_lkp_order.order_id, t_lkp_order.created_at, t_lkp_order.status, t_item.id, t_item.name, t_order_items.quantity, t_item.image,
+      t_order_items.is_offer, t_order_items.is_gift, t_order_items.offer_price
     from ((t_lkp_order
     inner join t_order_items on t_order_items.order_id = t_lkp_order.order_id)
     inner join t_item on t_item.id = t_order_items.item_id)
@@ -116,27 +166,76 @@ const getOrderByOrderId = async (req, res, next) => {
       });
     }
 
+    console.log(singleOrder);
+
     const promises = singleOrder.map(async (currentOrderItem) => {
+      let currentOffer = null;
+      let isEdit = null;
+      if (currentOrderItem.is_offer === 1) {
+        currentOffer = await Offers.findOne({
+          where: {
+            is_active: 1,
+            [Op.or]: [
+              { item_id_1: currentOrderItem.id },
+              { item_id: currentOrderItem.id },
+            ],
+          },
+        });
+        if (currentOffer) {
+          if (currentOffer.amount_of_discount) {
+            isEdit = true;
+          }
+        }
+      }
+
       const currentItem = await Item.findOne({
         where: { id: currentOrderItem.id },
       });
 
+      let oldestBatch = null;
       const batches = await Batch.findAll({
-        where: { item_id: currentItem.id },
+        where: { item_id: currentOrderItem.id },
         order: [["created_at", "ASC"]],
       });
 
-      const batch = batches[0];
+      oldestBatch = batches[0];
 
       return {
         itemName: currentItem.name,
-        id: currentItem.item_id,
+        id: currentItem.id,
         image: currentItem.image,
         isGift: currentItem.is_gift == 1 ? true : false,
         quantity: currentOrderItem.quantity,
-        MRP: batch.MRP,
-        salePrice: batch.sale_price,
-        discount: batch.discount,
+        MRP: oldestBatch.MRP,
+        salePrice:
+          currentOrderItem.is_offer === 1
+            ? currentOffer.amount_of_discount
+              ? currentOrderItem.offer_price
+              : oldestBatch.sale_price
+            : oldestBatch.sale_price,
+        discount: oldestBatch.discount,
+        isOffer: currentOrderItem.is_offer === 1 ? true : false,
+        canEdit: currentOrderItem.is_offer === 1 ? (isEdit ? true : false) : "",
+        offerDetails: currentOffer
+          ? {
+              offerID: currentOffer.id,
+              offerType: currentOffer.type,
+              itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
+              quantityOfItemX: currentOffer.item_1_quantity
+                ? currentOffer.item_1_quantity
+                : "",
+              itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
+              quantityOfItemY: currentOffer.item_2_quantity
+                ? currentOffer.item_2_quantity
+                : "",
+              itemID: currentOffer.item_id ? currentOffer.item_id : "",
+              amountOfDiscount: currentOffer.amount_of_discount
+                ? currentOffer.amount_of_discount
+                : "",
+              isPercentage: currentOffer.is_percentage ? true : false,
+              isActive: currentOffer.is_active ? true : false,
+            }
+          : "",
       };
     });
 

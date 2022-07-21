@@ -7,6 +7,7 @@ const Category = db.LkpCategoryModel;
 const Subcategory = db.LkpSubCategoryModel;
 const Item = db.ItemModel;
 const Brand = db.LkpBrandModel;
+const Customer = db.CustomerModel;
 
 const getAllCoupons = async (req, res, next) => {
   try {
@@ -37,6 +38,10 @@ const getAllCoupons = async (req, res, next) => {
         where: { id: current.brand_id },
       });
 
+      const customer = await Customer.findOne({
+        where: { cust_no: current.assigned_user },
+      });
+
       return {
         couponID: current.id,
         couponCode: current.code,
@@ -54,6 +59,8 @@ const getAllCoupons = async (req, res, next) => {
         minPurchase: current.min_purchase,
         maxPurchase: current.max_purchase,
         description: current.description,
+        phoneNumber: customer ? customer.contact_no : "",
+        customerName: customer ? customer.cust_name : "",
         assignedTo: current.assigned_user ? current.assigned_user : "",
         expiryDate: current.expiry_date ? current.expiry_date : "",
         numberOfTimesUsed: current.usage,

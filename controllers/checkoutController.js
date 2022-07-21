@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const { sequelize } = require("../models");
 const db = require("../models");
 const uniqid = require("uniqid");
@@ -8,6 +9,8 @@ const Cart = db.CartModel;
 const Wallet = db.WalletModel;
 const Wallet_Transaction = db.WalletTransactionModel;
 const OffersCache = db.OffersCacheModel;
+const Offers = db.OffersModel;
+const Batch = db.BatchModel;
 
 const concatAddress = require("../utils/concatAddress");
 
@@ -100,11 +103,23 @@ const checkoutFromCart = async (req, res, next) => {
     console.log(cartForUser);
 
     const promises = cartForUser.map(async (currentItem) => {
+      const batches = await Batch.findAll({
+        where: { item_id: currentItem.item_id },
+        order: [["created_at", "asc"]],
+      });
+
+      const oldestBatch = batches[0];
+
       return {
         order_id: newOrder.order_id,
         item_id: currentItem.item_id,
         quantity: currentItem.quantity,
         created_by: newOrder.created_by,
+        is_offer: currentItem.is_offer === 1 ? 1 : null,
+        is_gift: currentItem.is_gift === 1 ? 1 : null,
+        offer_price: currentItem.offer_item_price
+          ? currentItem.offer_item_price
+          : oldestBatch.sale_price,
       };
     });
 
@@ -129,9 +144,28 @@ const checkoutFromCart = async (req, res, next) => {
     }
 
     const orderItemsPromises = newOrderItems.map(async (currentItem) => {
+      let oldestBatch = null;
+      const batches = await Batch.findAll({
+        where: { item_id: currentItem.item_id },
+        order: [["created_by", "asc"]],
+      });
+
+      if (batches.length > 0) {
+        oldestBatch = batches[0];
+        // batches.map((currentBatch) => {
+        //   availableQuantity += currentBatch.quantity;
+        // });
+      }
+
       return {
         itemID: currentItem.item_id,
         quantity: currentItem.quantity,
+        isOffer: currentItem.is_offer === 1 ? true : false,
+        isGift: currentItem.is_gift === 1 ? true : false,
+        salePrice:
+          currentItem.is_offer === 1
+            ? currentItem.offer_price
+            : oldestBatch.sale_price,
       };
     });
 
@@ -278,17 +312,44 @@ const buyNow = async (req, res, next) => {
           item_id: current.item_id,
           quantity: 1,
           created_by: newOrder.created_by,
+          is_gift: 1,
         };
       });
     }
 
     const orderItems = await Promise.all(promises);
 
+    const offer = await Offers.findOne({
+      where: { is_active: 1, item_id: itemID },
+    });
+
+    const batches = await Batch.findAll({
+      where: { item_id: itemID },
+    });
+    let oldestBatch = null;
+    if (batches.length > 0) {
+      oldestBatch = batches[0];
+    }
+
+    let newSalePrice = null;
+
+    if (offer) {
+      if (offer.is_percentage) {
+        newSalePrice =
+          oldestBatch.sale_price -
+          (amount_of_discount / 100) * oldestBatch.sale_price;
+      } else {
+        newSalePrice = oldestBatch.sale_price - offer.amount_of_discount;
+      }
+    }
+
     orderItems.push({
       order_id: newOrder.order_id,
       item_id: itemID,
       quantity,
       created_by: newOrder.created_by,
+      is_offer: offer ? 1 : null,
+      offer_price: offer ? newSalePrice : null,
     });
 
     const offerItem = await OffersCache.findOne({
@@ -302,6 +363,8 @@ const buyNow = async (req, res, next) => {
         item_id: offerItem.item_id,
         quantity: offerItem.quantity,
         created_by: newOrder.created_by,
+        is_offer: 1,
+        offer_price: 0,
       });
 
       deletedFromCache = await OffersCache.destroy({
@@ -327,6 +390,8 @@ const buyNow = async (req, res, next) => {
       return {
         itemID: current.item_id,
         quantity: current.quantity,
+        isGift: current.is_gift === 1 ? true : false,
+        isOffer: current.is_offer === 1 ? true : false,
       };
     });
 

@@ -1,4 +1,5 @@
 const { sequelize } = require("../models");
+const moment = require("moment");
 
 const db = require("../models");
 
@@ -29,9 +30,7 @@ const getAllAvailableCoupons = async (req, res, next) => {
     });
   }
 
-
-
-  console.log(itemsInCart);
+  console.log("Items in cart ====> ", itemsInCart);
 
   try {
     if (itemsInCart.length === 0) {
@@ -62,21 +61,39 @@ const getAllAvailableCoupons = async (req, res, next) => {
       }
 
       const promises = await coupons.map(async (current) => {
-        if (new Date(current.expiry_date) >= Date.now()) {
-          return {
-            couponCode: current.code,
-            amount: current.is_percentage
-              ? current.amount_of_discount + " %"
-              : current.amount_of_discount,
-            description: current.description,
-          };
-        }
+        // var t = current.expiry_date?.split(/[- :]/);
+        // var d = new Date(Date.UTC(t[0], t[1] - 1, t[2], t[3], t[4], t[5]));
+        // console.log(d);
+
+        // console.log(
+        //   "Expiry ====>",
+        //   moment(current.expiry_date).format("DD/MM/YYYY")
+        // );
+        // console.log(
+        //   "Current Date ====>",
+        //   moment(Date.now()).format("DD/MM/YYYY")
+        // );
+        // console.log(
+        //   moment(current.expiry_date).format("DD/MM/YYYY") >=
+        //     moment(Date.now()).format("DD/MM/YYYY")
+        // );
+        return {
+          couponCode: current.code,
+          amount: current.is_percentage
+            ? current.amount_of_discount + " %"
+            : current.amount_of_discount,
+          description: current.description,
+        };
       });
 
       const resolved = await Promise.all(promises);
+      // console.log("Resolved array =====>", resolved);
+
       const response = [
         ...new Map(resolved.map((item) => [item["couponCode"], item])).values(),
       ];
+
+      // console.log("Response array =====>", response);
 
       return res.status(200).send({
         success: true,
