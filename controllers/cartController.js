@@ -401,14 +401,18 @@ const getCart = async (req, res, next) => {
       }
 
       let availableQuantity = 0;
+      let oldestBatch = null;
       const batches = await Batch.findAll({
         where: { item_id: current.item_id },
         order: [["created_by", "asc"]],
       });
 
-      batches.map((currentBatch) => {
-        availableQuantity += currentBatch.quantity;
-      });
+      if (batches.length > 0) {
+        oldestBatch = batches[0];
+        batches.map((currentBatch) => {
+          availableQuantity += currentBatch.quantity;
+        });
+      }
 
       return {
         itemID: current.item_id,
@@ -417,11 +421,11 @@ const getCart = async (req, res, next) => {
         itemName: current.name,
         description: current.description,
         image: current.image,
-        MRP: current.MRP,
+        MRP: oldestBatch.MRP,
         salePrice:
           current.is_offer === 1
             ? current.offer_item_price
-            : current.sale_price,
+            : oldestBatch.sale_price,
         discount: current.discount,
         color: current.color_name,
         brand: current.brand_name,
