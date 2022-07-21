@@ -103,6 +103,14 @@ const checkoutFromCart = async (req, res, next) => {
     console.log(cartForUser);
 
     const promises = cartForUser.map(async (currentItem) => {
+
+      const batches = await Batch.findAll({
+        where : {item_id : currentItem.item_id},
+        order : [["created_at", "asc"]]
+      })
+
+      const oldestBatch = batches[0];
+
       return {
         order_id: newOrder.order_id,
         item_id: currentItem.item_id,
@@ -112,7 +120,7 @@ const checkoutFromCart = async (req, res, next) => {
         is_gift: currentItem.is_gift === 1 ? 1 : null,
         offer_price: currentItem.offer_item_price
           ? currentItem.offer_price
-          : null,
+          : oldestBatch.sale_price,
       };
     });
 
