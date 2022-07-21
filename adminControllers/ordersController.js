@@ -144,7 +144,7 @@ const getOrderDetails = async (req, res, next) => {
         const [results, metadata] =
             await sequelize.query(`
             select 
-            toi.item_id,ti.name,toi.quantity,ti.item_cd,ti.units,ti.UOM,ti.is_gift,
+            toi.item_id,ti.name,toi.quantity,ti.item_cd,ti.units,ti.UOM,
             tlc.group_name as category,
             tlsc.sub_cat_name as subcategory,
             toi.is_gift,
@@ -169,7 +169,7 @@ const getOrderDetails = async (req, res, next) => {
             union
             
             select 
-            toi.item_id,ti.name,toi.quantity,ti.item_cd,ti.units,ti.UOM,ti.is_gift,
+            toi.item_id,ti.name,toi.quantity,ti.item_cd,ti.units,ti.UOM,
             tlc.group_name as category,
             tlsc.sub_cat_name as subcategory,
             toi.is_gift,
