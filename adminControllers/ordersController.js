@@ -153,7 +153,8 @@ const getOrderDetails = async (req, res, next) => {
             null as item_id_1,
             null as item_id_2,
             null as item_1_quantity,
-            null as item_2_quantity
+            null as item_2_quantity,
+            'false' as is_offer
             from t_order_items toi
             inner join t_item ti 
             inner join t_lkp_category tlc 
@@ -172,7 +173,8 @@ const getOrderDetails = async (req, res, next) => {
             tlsc.sub_cat_name as subcategory,
             ti.brand_id ,ti.div_id, ti.department_id ,ti.size_id,ti.description,
             to2.type,to2.amount_of_discount, to2.is_percentage, 
-            to2.item_id as offer_item_id, to2.item_id_1 ,to2.item_id_2 ,to2.item_1_quantity ,to2.item_2_quantity 
+            to2.item_id as offer_item_id, to2.item_id_1 ,to2.item_id_2 ,to2.item_1_quantity ,to2.item_2_quantity,
+            'true' as is_offer 
             from t_order_items toi
             inner join t_item ti 
             inner join t_lkp_category tlc 
@@ -239,6 +241,8 @@ const getOrderDetails = async (req, res, next) => {
                 MRP: oldestBatch.MRP,
                 discount: oldestBatch.discount,
                 is_free: oldestBatch.sale_price === 0 ? true : false,
+                is_offer: current.is_offer === 'true' ? true : false,
+                can_edit: current.amount_of_discount ? true : false,
 
                 type: current.type,
                 amount_of_discount: current.amount_of_discount,
