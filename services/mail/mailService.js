@@ -60,33 +60,37 @@ const sendCancelledStatusEmail = async (mailid, orderId, cancellation_reason) =>
 }
 
 // order placed mail with invoice attached
-const sendOrderPlacedEmail = async (mailid, orderId) => {
-    var mailOptions = {
-        from: 'grocernest@gmail.com',
-        to: mailid,
-        subject: 'Grocernest Order Status',
-        html: await ejs.renderFile('./templates/orderstatus.ejs', {
-            text: msg,
-            orderId: orderId,
-            cancellation_reason: cancellation_reason
-        })
-    };
+// const sendOrderPlacedEmail = async (mailid, orderId) => {
+//     var mailOptions = {
+//         from: 'grocernest@gmail.com',
+//         to: mailid,
+//         subject: 'Grocernest Order Status',
+//         html: await ejs.renderFile('./templates/orderPlaced.ejs', {
+//             orderId: orderId,
+//         }),
+//         attachments: [{
+//             filename: 'invoice.pdf',
+//             path: './invoice.pdf',
+//             contentType: 'application/pdf'
+//         }],
+//     };
 
-    transporter.sendMail(mailOptions, function (error, info) {
-        if (error) {
-            console.log(error);
-        } else {
-            console.log('Email sent: ' + info.response);
-        }
-    });
-}
+//     transporter.sendMail(mailOptions, function (error, info) {
+//         if (error) {
+//             console.log(error);
+//         } else {
+//             console.log('Email sent: ' + info.response);
+//         }
+//     });
+// }
 
 
 module.exports = {
     sendRegistrationEmail,
     sendOrderStatusEmail,
     sendCancelledStatusEmail,
-    sendOrderPlacedEmail
+    // sendOrderPlacedEmail
 }
 // sendRegistrationEmail('chandratanmoy5@gmail.com');
 // sendOrderStatusEmail('chandratanmoy5@gmail.com', 'd154232g6532fgk5k', 'Your order is successfully placed');
+// sendOrderPlacedEmail('chandratanmoy5@gmail.com', '76846738')
