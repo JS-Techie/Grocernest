@@ -103,11 +103,10 @@ const checkoutFromCart = async (req, res, next) => {
     console.log(cartForUser);
 
     const promises = cartForUser.map(async (currentItem) => {
-
       const batches = await Batch.findAll({
-        where : {item_id : currentItem.item_id},
-        order : [["created_at", "asc"]]
-      })
+        where: { item_id: currentItem.item_id },
+        order: [["created_at", "asc"]],
+      });
 
       const oldestBatch = batches[0];
 
@@ -119,7 +118,7 @@ const checkoutFromCart = async (req, res, next) => {
         is_offer: currentItem.is_offer === 1 ? 1 : null,
         is_gift: currentItem.is_gift === 1 ? 1 : null,
         offer_price: currentItem.offer_item_price
-          ? currentItem.offer_price
+          ? currentItem.offer_item_price
           : oldestBatch.sale_price,
       };
     });
@@ -145,7 +144,6 @@ const checkoutFromCart = async (req, res, next) => {
     }
 
     const orderItemsPromises = newOrderItems.map(async (currentItem) => {
-
       let oldestBatch = null;
       const batches = await Batch.findAll({
         where: { item_id: currentItem.item_id },
@@ -325,12 +323,33 @@ const buyNow = async (req, res, next) => {
       where: { is_active: 1, item_id: itemID },
     });
 
+    const batches = await Batch.findAll({
+      where: { item_id: itemID },
+    });
+    let oldestBatch = null;
+    if (batches.length > 0) {
+      oldestBatch = batches[0];
+    }
+
+    let newSalePrice = null;
+
+    if (offer) {
+      if (offer.is_percentage) {
+        newSalePrice =
+          oldestBatch.sale_price -
+          (amount_of_discount / 100) * oldestBatch.sale_price;
+      } else {
+        newSalePrice = oldestBatch.sale_price - offer.amount_of_discount;
+      }
+    }
+
     orderItems.push({
       order_id: newOrder.order_id,
       item_id: itemID,
       quantity,
       created_by: newOrder.created_by,
       is_offer: offer ? 1 : null,
+      offer_price: offer ? newSalePrice : null,
     });
 
     const offerItem = await OffersCache.findOne({
@@ -345,6 +364,7 @@ const buyNow = async (req, res, next) => {
         quantity: offerItem.quantity,
         created_by: newOrder.created_by,
         is_offer: 1,
+        offer_price: 0,
       });
 
       deletedFromCache = await OffersCache.destroy({

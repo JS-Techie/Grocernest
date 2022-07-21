@@ -194,7 +194,7 @@ const getOrderByOrderId = async (req, res, next) => {
 
       let oldestBatch = null;
       const batches = await Batch.findAll({
-        where: { item_id: currentItem.id },
+        where: { item_id: currentOrderItem.id },
         order: [["created_at", "ASC"]],
       });
 
@@ -209,7 +209,9 @@ const getOrderByOrderId = async (req, res, next) => {
         MRP: oldestBatch.MRP,
         salePrice:
           currentOrderItem.is_offer === 1
-            ? currentOrderItem.offer_price
+            ? currentOffer.amount_of_discount
+              ? currentOrderItem.offer_price
+              : oldestBatch.sale_price
             : oldestBatch.sale_price,
         discount: oldestBatch.discount,
         isOffer: currentOrderItem.is_offer === 1 ? true : false,
