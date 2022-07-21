@@ -147,6 +147,7 @@ const getOrderDetails = async (req, res, next) => {
             toi.item_id,ti.name,toi.quantity,ti.item_cd,ti.units,ti.UOM,ti.is_gift,
             tlc.group_name as category,
             tlsc.sub_cat_name as subcategory,
+            toi.is_gift,
             ti.brand_id ,ti.div_id, ti.department_id ,ti.size_id,ti.description,
             null as type, null as amount_of_discount, null as is_percentage, 
             null as offer_item_id, 
@@ -171,6 +172,7 @@ const getOrderDetails = async (req, res, next) => {
             toi.item_id,ti.name,toi.quantity,ti.item_cd,ti.units,ti.UOM,ti.is_gift,
             tlc.group_name as category,
             tlsc.sub_cat_name as subcategory,
+            toi.is_gift,
             ti.brand_id ,ti.div_id, ti.department_id ,ti.size_id,ti.description,
             to2.type,to2.amount_of_discount, to2.is_percentage, 
             to2.item_id as offer_item_id, to2.item_id_1 ,to2.item_id_2 ,to2.item_1_quantity ,to2.item_2_quantity,
@@ -242,6 +244,7 @@ const getOrderDetails = async (req, res, next) => {
                 discount: oldestBatch.discount,
                 is_free: oldestBatch.sale_price === 0 ? true : false,
                 is_offer: current.is_offer === 'true' ? true : false,
+                is_gift: current.is_gift === 1 ? true : false,
                 can_edit: current.amount_of_discount ? true : false,
 
                 type: current.type,
