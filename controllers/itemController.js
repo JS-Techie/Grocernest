@@ -52,7 +52,7 @@ const getItemsInCategory = async (req, res, next) => {
       }
 
       const offer = await Offers.findOne({
-        where: {
+        where: { is_active : 1,
           [Op.or]: [{ item_id_1: current.id }, { item_id: current.id }],
         },
       });
@@ -173,7 +173,7 @@ const getItemsInSubcategory = async (req, res, next) => {
       }
 
       const offer = await Offers.findOne({
-        where: {
+        where: {is_active : 1,
           [Op.or]: [{ item_id_1: current.id }, { item_id: current.id }],
         },
       });
@@ -293,7 +293,7 @@ const getItemsBySearchTerm = async (req, res, next) => {
       }
 
       const offer = await Offers.findOne({
-        where: {
+        where: {is_active : 1,
           [Op.or]: [{ item_id_1: current.id }, { item_id: current.id }],
         },
       });
@@ -420,7 +420,7 @@ const getItemById = async (req, res, next) => {
     }
 
     const offer = await Offers.findOne({
-      where: {
+      where: {is_active : 1,
         [Op.or]: [{ item_id_1: item.id }, { item_id: item.id }],
       },
     });
