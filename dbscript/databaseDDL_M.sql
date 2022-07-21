@@ -178,3 +178,8 @@ ALTER TABLE ecomm.t_offer_cache ADD cust_no varchar(20) NULL;
 
 ALTER TABLE ecomm.t_coupons ADD `type` varchar(100) NULL;
 
+ALTER TABLE ecomm.t_order_items ADD is_gift BOOL NULL;
+ALTER TABLE ecomm.t_order_items ADD is_offer BOOL NULL;
+
+ALTER TABLE ecomm.t_order_items ADD offer_price DECIMAL(10,2) NULL;
+

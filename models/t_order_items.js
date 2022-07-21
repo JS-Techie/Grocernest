@@ -75,6 +75,33 @@ module.exports = sequelize => {
       autoIncrement: true,
       comment: null,
       field: "id"
+    },
+    is_gift: {
+      type: DataTypes.INTEGER(1),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "is_gift"
+    },
+    is_offer: {
+      type: DataTypes.INTEGER(1),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "is_offer"
+    },
+    offer_price: {
+      type: DataTypes.DECIMAL,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "offer_price"
     }
   };
   const options = {
