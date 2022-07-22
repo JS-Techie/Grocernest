@@ -1,18 +1,26 @@
 const fs = require("fs");
 const PDFDocument = require("pdfkit");
-const getStream = require("get-stream")
+const blobStream = require("blob-stream");
+const getStream = require("get-stream");
 const moment = require("moment");
 
-const generatePdf = (invoice, path, start) => {
+const{uploadToS3, getFromS3} = require("../services/s3Service")
+
+const generatePdf = async (invoice, path) => {
+  let isGenerated = false;
   let doc = new PDFDocument({ margin: 50 });
-  doc.on('data', start)
+  doc.pipe(fs.createWriteStream(path));
+  // doc.on("data", start);
   generateHeader(doc);
   generateCustomerInformation(doc, invoice);
   generateInvoiceTable(doc, invoice);
   generateFooter(invoice, doc);
   doc.end();
-  doc.pipe(fs.createWriteStream(path));
-  //   return await getStream.buffer(doc);
+  doc.on("end", () => {
+    console.log("Generated PDF and stored on local");
+  });
+  return await getStream.buffer(doc);
+  //return isGenerated;
 };
 
 const generateHeader = (doc) => {

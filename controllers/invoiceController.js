@@ -1,4 +1,7 @@
 const { generatePdf } = require("../utils/generatePdf");
+const fs = require("fs");
+const pdfParse = require("pdf-parse");
+// const stream = require("node:stream");
 const db = require("../models");
 const { uploadToS3, getFromS3 } = require("../services/s3Service");
 
@@ -69,33 +72,21 @@ const downloadInvoice = async (req, res, next) => {
       orderItems: resolved,
     };
 
-    const stream = res.writeHead(200, {
-      "Content-Type": "application/pdf",
-      "Content-Disposition": "attachment;filename=invoice.pdf",
+    await generatePdf(response, "invoice.pdf");
+
+    // let s3ResponseUpload;
+    // const data = fs.readFileSync("invoice.pdf");
+    // s3ResponseUpload = await uploadToS3(
+    //   data,
+    //   "pdfs/invoices/invoice-" + currentOrder.order_id + ".pdf"
+    // );
+    return res.status(200).send({
+      success: true,
+      data: [],
+      message: "Invoice generated successfully",
     });
-
-    generatePdf(response, "invoice.pdf", (chunk) => {
-      console.log(chunk);
-      stream.write(chunk, (err, data) => {
-        if (err) {
-          console.log(err);
-        }
-        // stream.end();
-      });
-      // stream.end();
-    });
-
-    stream.on("end", () => {
-
-      return res.status(200).send({
-        success: true,
-        data: "pdf_gen",
-        message: "Invoice generated successfully",
-      })
-    })
-    // let response_from_s3 = await uploadToS3(stream, "invoice-" + currentOrder.order_id + ".pdf");
-
   } catch (error) {
+    console.log(error);
     return res.status(400).send({
       success: false,
       data: error.message,
