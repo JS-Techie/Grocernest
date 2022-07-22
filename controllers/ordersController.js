@@ -7,6 +7,7 @@ const OrderItems = db.OrderItemsModel;
 const Item = db.ItemModel;
 const Batch = db.BatchModel;
 const Offers = db.OffersModel;
+const Inventory = db.InventoryModel;
 
 const getAllOrders = async (req, res, next) => {
   //Get currentUser from req.payload.cust_no
@@ -311,9 +312,48 @@ const cancelOrder = async (req, res, next) => {
     //Update status of status to say cancelled if the status is accepted or shipped
     //cannot cancel for returned and delivered and already cancelled
 
+    let updateInventory = null;
+    let updateBatch = null;
+
+    if (singleOrder.status !== "Placed") {
+      const itemsInOrder = await OrderItems.findAll({
+        where: { order_id: orderId },
+      });
+
+      if (itemsInOrder.length > 0) {
+        itemsInOrder.map(async (currentItem) => {
+          const batches = await Batch.findAll({
+            where: { item_id: currentItem.item_id },
+          });
+
+          const oldestBatch = batches[0];
+
+          updateInventory = await Inventory.update(
+            { balance_type: 1 },
+            {
+              where: { batch_id: oldestBatch.id, item_id: currentItem.id },
+            }
+          );
+
+          updateBatch = await Batch.update(
+            {
+              quantity: currentItem.quantity + oldestBatch.quantity,
+            },
+            {
+              where: { id: oldestBatch.id },
+            }
+          );
+        });
+      }
+    }
+
     return res.status(200).send({
       success: true,
-      data: updatedOrderStatus,
+      data: {
+        updatedOrderStatus,
+        updateInventory,
+        updateBatch,
+      },
       message: "Requested order successfully cancelled for current user",
     });
   } catch (error) {
