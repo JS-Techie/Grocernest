@@ -1,6 +1,6 @@
 const { generatePdf } = require("../utils/generatePdf");
 const db = require("../models");
-const StreamTransport = require("nodemailer/lib/stream-transport");
+const { uploadToS3, getFromS3 } = require("../services/s3Service");
 
 const Order = db.OrderModel;
 const OrderItems = db.OrderItemsModel;
@@ -76,8 +76,25 @@ const downloadInvoice = async (req, res, next) => {
 
     generatePdf(response, "invoice.pdf", (chunk) => {
       console.log(chunk);
-      stream.write(chunk);
+      stream.write(chunk, (err, data) => {
+        if (err) {
+          console.log(err);
+        }
+        // stream.end();
+      });
+      // stream.end();
     });
+
+    stream.on("end", () => {
+
+      return res.status(200).send({
+        success: true,
+        data: "pdf_gen",
+        message: "Invoice generated successfully",
+      })
+    })
+    // let response_from_s3 = await uploadToS3(stream, "invoice-" + currentOrder.order_id + ".pdf");
+
   } catch (error) {
     return res.status(400).send({
       success: false,

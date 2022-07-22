@@ -3,16 +3,16 @@ const PDFDocument = require("pdfkit");
 const getStream = require("get-stream")
 const moment = require("moment");
 
-const generatePdf =  (invoice, path, start) => {
+const generatePdf = (invoice, path, start) => {
   let doc = new PDFDocument({ margin: 50 });
   doc.on('data', start)
   generateHeader(doc);
   generateCustomerInformation(doc, invoice);
   generateInvoiceTable(doc, invoice);
-  generateFooter(invoice,doc);
+  generateFooter(invoice, doc);
   doc.end();
   doc.pipe(fs.createWriteStream(path));
-//   return await getStream.buffer(doc);
+  //   return await getStream.buffer(doc);
 };
 
 const generateHeader = (doc) => {
@@ -75,7 +75,7 @@ function generateInvoiceTable(doc, invoice) {
   }
 }
 
-function generateFooter(invoice,doc) {
+function generateFooter(invoice, doc) {
   doc
     .text(`Invoice Total: ${invoice.total}`, 50, 500)
     .text(`Payment Mode : Cash on Delivery`, 50, 520)
