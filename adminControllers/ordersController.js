@@ -4,7 +4,10 @@ const Order = db.OrderModel;
 const { sendOrderStatusEmail, sendCancelledStatusEmail } = require("../services/mail/mailService");
 // const Customer = db.CustomerModel;
 const Batch = db.BatchModel;
-const Customer = db.CustomerModel
+const Customer = db.CustomerModel;
+const OrderItem = db.OrderItemsModel;
+const Item = db.ItemModel;
+const Inventory = db.InventoryModel;
 
 
 const getAllPendingOrders = async (req, res, next) => {
@@ -291,7 +294,7 @@ const changeOrderStatus = async (req, res, next) => {
     console.log("change order status");
 
     let cancellationReason = req.body.cancellataionReason ? req.body.cancellataionReason : ""
-    console.log("cancellationReason", cancellationReason);
+    // console.log("cancellationReason", cancellationReason);
     Order.update(
         {
             status: req.body.status,
@@ -306,7 +309,68 @@ const changeOrderStatus = async (req, res, next) => {
             }
         }).then((res) => {
 
-            let cust_no = res.dataValues.cust_no
+            if (req.body.status === "Accepted" || req.body.status === "Delivered" || req.body.status === "Cancelled") {
+                OrderItem.findAll({
+                    where: {
+                        order_id: res.dataValues.order_id
+                    }
+                }).then((res2) => {
+                    // console.log(res2);
+                    res2.map((currentItem) => {
+                        console.log("Item id=>>", currentItem.item_id);
+                        Item.findOne({
+                            where: {
+                                id: currentItem.item_id
+                            }
+                        }).then((item) => {
+                            Batch.findAll({
+                                where: {
+                                    item_id: item.id
+                                }
+                            }).then((batches) => {
+                                console.log("oldest batch is", batches[0]);
+                                console.log("BATCH id=>>>", batches[0].id);
+                                if (req.body.status === "Accepted") {
+                                    Batch.update({
+                                        quantity: batches[0].quantity - currentItem.quantity,
+                                    },
+                                        {
+                                            where: {
+                                                id: batches[0].id
+                                            }
+                                        })
+                                }
+                                else if (req.body.status === "Cancelled") {
+                                    Batch.update({
+                                        quantity: batches[0].quantity + currentItem.quantity,
+                                    },
+                                        {
+                                            where: {
+                                                id: batches[0].id
+                                            }
+                                        })
+                                }
+                                Inventory.update({
+                                    balance_type: req.body.status !== "Cancelled" ? req.body.status === "Accepted" ? 2 : 7 : 1,
+                                },
+                                    {
+                                        where: {
+                                            item_id: batches[0].item_id,
+                                            batch_id: batches[0].id
+                                        }
+                                    }
+                                )
+                            })
+                        })
+
+                    })
+                })
+            }
+            else if (req.body.status === "Cancelled") {
+
+            }
+
+            // let cust_no = res.dataValues.cust_no
             Customer.findOne({
                 where: {
                     cust_no: res.dataValues.cust_no
