@@ -304,16 +304,13 @@ const cancelOrder = async (req, res, next) => {
 
     //if my string contains accepted or shipped we can cancel
 
-    const updatedOrderStatus = await singleOrder.update({
-      status: "Cancelled",
-      where: { order_id: singleOrder.order_id },
-    });
-
     //Update status of status to say cancelled if the status is accepted or shipped
     //cannot cancel for returned and delivered and already cancelled
 
     let updateInventory = null;
     let updateBatch = null;
+
+    console.log(singleOrder.status);
 
     if (singleOrder.status !== "Placed") {
       const itemsInOrder = await OrderItems.findAll({
@@ -346,6 +343,11 @@ const cancelOrder = async (req, res, next) => {
         });
       }
     }
+
+    const updatedOrderStatus = await singleOrder.update({
+      status: "Cancelled",
+      where: { order_id: singleOrder.order_id },
+    });
 
     return res.status(200).send({
       success: true,
