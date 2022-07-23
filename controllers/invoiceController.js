@@ -91,7 +91,8 @@ const downloadInvoice = async (req, res, next) => {
         "invoice.pdf",
         "pdfs/invoices/invoice-" + response.orderID + ".pdf"
       );
-
+        
+    sendOrderPlacedEmail(email, orderID);
       return res.status(200).send({
         success: true,
         data: {
@@ -101,12 +102,11 @@ const downloadInvoice = async (req, res, next) => {
       });
     });
 
-    sendOrderPlacedEmail(email, orderID);
-    return res.status(200).send({
-      success: true,
-      data: [],
-      message: "Invoice generated successfully and sent to registered email",
-    });
+    // return res.status(200).send({
+    //   success: true,
+    //   data: [],
+    //   message: "Invoice generated successfully and sent to registered email",
+    // });
   } catch (error) {
     console.log(error);
     return res.status(400).send({
