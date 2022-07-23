@@ -48,7 +48,7 @@ const offerForItem = async (req, res, next) => {
       itemToBeAdded = offer.item_id_2;
       if (quantity >= offer.item_1_quantity) {
         quantityToBeAdded =
-          Math.floor((quantity / offer.item_1_quantity)) * offer.item_2_quantity;
+          Math.floor(quantity / offer.item_1_quantity) * offer.item_2_quantity;
         console.log("New quantity of item in cart ====>", quantity);
         console.log(
           "New quantity of offer item in cart ====>",
@@ -166,6 +166,7 @@ const offerForItemBuyNow = async (req, res, next) => {
   try {
     const offer = await Offers.findOne({
       where: {
+        is_active: 1,
         [Op.or]: [{ item_id_1: itemID }, { item_id: itemID }],
       },
     });
@@ -217,7 +218,7 @@ const offerForItemBuyNow = async (req, res, next) => {
       let quantityOfOfferItem = null;
       if (quantity >= offer.item_1_quantity) {
         quantityOfOfferItem =
-          Math.floor((quantity / offer.item_1_quantity)) * offer.item_2_quantity;
+          Math.floor(quantity / offer.item_1_quantity) * offer.item_2_quantity;
       }
 
       const saveOfferItemInCache = await OffersCache.create({
