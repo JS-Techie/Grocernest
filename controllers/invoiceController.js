@@ -5,6 +5,7 @@ const pdfParse = require("pdf-parse");
 // const stream = require("node:stream");
 const db = require("../models");
 const { uploadToS3, getFromS3 } = require("../services/s3Service");
+const { sendOrderPlacedEmail } = require("../services/mail/mailService");
 
 const Order = db.OrderModel;
 const OrderItems = db.OrderItemsModel;
@@ -17,6 +18,15 @@ const downloadInvoice = async (req, res, next) => {
   const currentCustomer = req.cust_no;
 
   const { orderID } = req.body;
+
+  let email = "";
+  Customer.findOne({
+    where: {
+      cust_no: currentCustomer,
+    },
+  }).then((cust) => {
+    email = cust.dataValues.email;
+  });
 
   try {
     const currentOrder = await Order.findOne({
@@ -90,14 +100,7 @@ const downloadInvoice = async (req, res, next) => {
         message: "Invoice generated successfully",
       });
     });
-
-    writeStream.on("error", () => {
-      return res.status(400).send({
-        success: false,
-        data: "Error occurred while generating PDF",
-        message: "Invoice not generated successfully",
-      });
-    });
+    sendOrderPlacedEmail(email, orderID);
   } catch (error) {
     console.log(error);
     return res.status(400).send({
