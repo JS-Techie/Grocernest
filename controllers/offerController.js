@@ -46,15 +46,16 @@ const offerForItem = async (req, res, next) => {
 
     if (offer.item_id_1) {
       itemToBeAdded = offer.item_id_2;
-
       if (quantity >= offer.item_1_quantity) {
-        if (quantity % offer.item_1_quantity !== 0) {
-          quantityToBeAdded =
-            (quantity % offer.item_1_quantity) * offer.item_2_quantity;
-        } else if (quantity % offer.item_1_quantity === 0) {
-          quantityToBeAdded =
-            (quantity / offer.item_1_quantity) * offer.item_2_quantity;
-        }
+        quantityToBeAdded =
+          Math.floor((quantity / offer.item_1_quantity)) * offer.item_2_quantity;
+        console.log("New quantity of item in cart ====>", quantity);
+        console.log(
+          "New quantity of offer item in cart ====>",
+          quantityToBeAdded
+        );
+        console.log("Xquantity ===>", offer.item_1_quantity);
+        console.log("Yquantity====>", offer.item_2_quantity);
       } else {
         return res.status(200).send({
           success: true,
@@ -165,7 +166,6 @@ const offerForItemBuyNow = async (req, res, next) => {
   try {
     const offer = await Offers.findOne({
       where: {
-        is_active: 1,
         [Op.or]: [{ item_id_1: itemID }, { item_id: itemID }],
       },
     });
