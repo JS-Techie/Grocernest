@@ -1,5 +1,6 @@
 const S3 = require("aws-sdk/clients/s3");
 const s3Config = require("../config/s3Config");
+const fs = require("fs");
 
 const s3 = new S3(s3Config);
 
@@ -8,9 +9,7 @@ const uploadToS3 = async (file, key) => {
   const uploadParams = {
     Bucket: process.env.AWS_BUCKET_NAME,
     Key: key,
-    Body: file,
-    ContentType: "application/pdf",
-    ContentDisposition: "inline",
+    Body: fs.readFileSync(file),
   };
   console.log("uploaded to s3");
   return await s3.upload(uploadParams).promise();

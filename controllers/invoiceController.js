@@ -1,5 +1,6 @@
 const { generatePdf } = require("../utils/generatePdf");
 const fs = require("fs");
+const path = require("path");
 const pdfParse = require("pdf-parse");
 // const stream = require("node:stream");
 const db = require("../models");
@@ -72,18 +73,30 @@ const downloadInvoice = async (req, res, next) => {
       orderItems: resolved,
     };
 
-    await generatePdf(response, "invoice.pdf");
+    let writeStream = await generatePdf(response, "invoice.pdf");
 
-    // let s3ResponseUpload;
-    // const data = fs.readFileSync("invoice.pdf");
-    // s3ResponseUpload = await uploadToS3(
-    //   data,
-    //   "pdfs/invoices/invoice-" + currentOrder.order_id + ".pdf"
-    // );
-    return res.status(200).send({
-      success: true,
-      data: [],
-      message: "Invoice generated successfully",
+    writeStream.on("finish", async () => {
+      console.log("stored pdf on local");
+      let uploadResponse = await uploadToS3(
+        "invoice.pdf",
+        "pdfs/invoices/invoice-" + response.orderID + ".pdf"
+      );
+
+      return res.status(200).send({
+        success: true,
+        data: {
+          URL: uploadResponse.Location,
+        },
+        message: "Invoice generated successfully",
+      });
+    });
+
+    writeStream.on("error", () => {
+      return res.status(400).send({
+        success: false,
+        data: "Error occurred while generating PDF",
+        message: "Invoice not generated successfully",
+      });
     });
   } catch (error) {
     console.log(error);
