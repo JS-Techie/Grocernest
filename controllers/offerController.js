@@ -217,7 +217,7 @@ const offerForItemBuyNow = async (req, res, next) => {
       let quantityOfOfferItem = null;
       if (quantity >= offer.item_1_quantity) {
         quantityOfOfferItem =
-          (quantity / offer.item_1_quantity) * offer.item_2_quantity;
+          Math.floor((quantity / offer.item_1_quantity)) * offer.item_2_quantity;
       }
 
       const saveOfferItemInCache = await OffersCache.create({
