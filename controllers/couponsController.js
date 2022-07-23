@@ -87,13 +87,11 @@ const getAllAvailableCoupons = async (req, res, next) => {
       });
 
       const resolved = await Promise.all(promises);
-      // console.log("Resolved array =====>", resolved);
+     
 
       const response = [
         ...new Map(resolved.map((item) => [item["couponCode"], item])).values(),
       ];
-
-      // console.log("Response array =====>", response);
 
       return res.status(200).send({
         success: true,

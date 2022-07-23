@@ -85,22 +85,28 @@ const downloadInvoice = async (req, res, next) => {
 
     let writeStream = await generatePdf(response, "invoice.pdf");
 
-    // writeStream.on("finish", async () => {
-    //   console.log("stored pdf on local");
-    //   let uploadResponse = await uploadToS3(
-    //     "invoice.pdf",
-    //     "pdfs/invoices/invoice-" + response.orderID + ".pdf"
-    //   );
+    writeStream.on("finish", async () => {
+      console.log("stored pdf on local");
+      let uploadResponse = await uploadToS3(
+        "invoice.pdf",
+        "pdfs/invoices/invoice-" + response.orderID + ".pdf"
+      );
 
-    //   return res.status(200).send({
-    //     success: true,
-    //     data: {
-    //       URL: uploadResponse.Location,
-    //     },
-    //     message: "Invoice generated successfully",
-    //   });
-    // });
+      return res.status(200).send({
+        success: true,
+        data: {
+          URL: uploadResponse.Location,
+        },
+        message: "Invoice generated successfully",
+      });
+    });
+
     sendOrderPlacedEmail(email, orderID);
+    return res.status(200).send({
+      success: true,
+      data: [],
+      message: "Invoice generated successfully and sent to registered email",
+    });
   } catch (error) {
     console.log(error);
     return res.status(400).send({
