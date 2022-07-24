@@ -326,7 +326,10 @@ const cancelOrder = async (req, res, next) => {
           const oldestBatch = batches[0];
 
           updateInventory = await Inventory.update(
-            { balance_type: 1 },
+            {
+              balance_type: 1,
+              quantity: currentItem.quantity + oldestBatch.quantity,
+            },
             {
               where: { batch_id: oldestBatch.id, item_id: currentItem.id },
             }
