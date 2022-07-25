@@ -275,6 +275,9 @@ const getOrderDetails = async (req, res, next) => {
       };
     });
 
+
+    //Free item is item_id_2 in offers not is_free flag from batch
+    
     const resolvedArray = await Promise.all(promises);
 
     const responseArray = [
