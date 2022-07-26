@@ -17,16 +17,19 @@ const downloadInvoice = async (req, res, next) => {
   //Get current user from jwt
   const currentCustomer = req.cust_no;
 
+  // console.log("===>>", currentCustomer);
+  // const sendEmail = 
+
   const { orderID } = req.body;
 
-  let email = "";
-  Customer.findOne({
-    where: {
-      cust_no: currentCustomer,
-    },
-  }).then((cust) => {
-    email = cust.dataValues.email;
-  });
+  // let email = "";
+  // Customer.findOne({
+  //   where: {
+  //     cust_no: currentCustomer,
+  //   },
+  // }).then((cust) => {
+  //   email = cust.dataValues.email;
+  // });
 
   try {
     const currentOrder = await Order.findOne({
@@ -68,8 +71,8 @@ const downloadInvoice = async (req, res, next) => {
         image: item.image,
         description: item.description,
         isGift: item.is_gift == 1 ? true : false,
-        isOffer : item.is_offer == 1 ? true : false,
-        offerPrice : item.is_offer == 1 ? offer_price : "",
+        isOffer: item.is_offer == 1 ? true : false,
+        offerPrice: item.is_offer == 1 ? offer_price : "",
       };
     });
 
@@ -97,7 +100,10 @@ const downloadInvoice = async (req, res, next) => {
         "pdfs/invoices/invoice-" + response.orderID + ".pdf"
       );
 
-      sendOrderPlacedEmail(email, orderID);
+      // if (sendEmail == "true") {
+      //   sendOrderPlacedEmail(email, orderID);
+      // }
+
       return res.status(200).send({
         success: true,
         data: {

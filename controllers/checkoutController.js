@@ -11,6 +11,7 @@ const Wallet_Transaction = db.WalletTransactionModel;
 const OffersCache = db.OffersCacheModel;
 const Offers = db.OffersModel;
 const Batch = db.BatchModel;
+const { sendOrderPlacedEmail } = require("../services/mail/mailService");
 
 const concatAddress = require("../utils/concatAddress");
 
@@ -174,6 +175,17 @@ const checkoutFromCart = async (req, res, next) => {
     const deletedItemsFromCart = await Cart.destroy({
       where: { cust_no: currentUser },
     });
+
+    let email = "";
+    Customer.findOne({
+      where: {
+        cust_no: currentUser,
+      },
+    }).then((cust) => {
+      email = cust.dataValues.email;
+      sendOrderPlacedEmail(email, newOrder.order_id);
+    });
+
 
     return res.status(201).send({
       success: true,
