@@ -13,6 +13,7 @@ const OffersCache = db.OffersCacheModel;
 const Offers = db.OffersModel;
 const Batch = db.BatchModel;
 const Item = db.ItemModel;
+const Customer = db.CustomerModel;
 
 const { sendOrderPlacedEmail } = require("../services/mail/mailService");
 
@@ -175,9 +176,7 @@ const checkoutFromCart = async (req, res, next) => {
 
     const orderItems = await Promise.all(orderItemsPromises);
 
-    const deletedItemsFromCart = await Cart.destroy({
-      where: { cust_no: currentUser },
-    });
+
 
     await InvoiceGen(currentUser, newOrder.order_id);
     let email = "";
@@ -188,6 +187,10 @@ const checkoutFromCart = async (req, res, next) => {
     }).then((cust) => {
       email = cust.dataValues.email;
       sendOrderPlacedEmail(email, newOrder.order_id);
+    });
+
+    const deletedItemsFromCart = await Cart.destroy({
+      where: { cust_no: currentUser },
     });
 
 
