@@ -169,6 +169,15 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "reward_recieved"
+    },
+    image: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "image"
     }
   };
   const options = {

@@ -68,6 +68,8 @@ const downloadInvoice = async (req, res, next) => {
         image: item.image,
         description: item.description,
         isGift: item.is_gift == 1 ? true : false,
+        isOffer : item.is_offer == 1 ? true : false,
+        offerPrice : item.is_offer == 1 ? offer_price : "",
       };
     });
 
@@ -80,6 +82,9 @@ const downloadInvoice = async (req, res, next) => {
       address: currentOrder.address,
       total: currentOrder.total,
       date: currentOrder.created_at,
+      payableTotal: currentOrder.final_payable_amount,
+      walletBalanceUsed: currentOrder.wallet_balance_used,
+      appliedDiscount: currentOrder.applied_discount,
       orderItems: resolved,
     };
 
@@ -91,8 +96,8 @@ const downloadInvoice = async (req, res, next) => {
         "invoice.pdf",
         "pdfs/invoices/invoice-" + response.orderID + ".pdf"
       );
-        
-    sendOrderPlacedEmail(email, orderID);
+
+      sendOrderPlacedEmail(email, orderID);
       return res.status(200).send({
         success: true,
         data: {

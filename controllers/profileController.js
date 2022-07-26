@@ -1,8 +1,10 @@
 const { AvatarGenerator } = require("random-avatar-generator");
-
-const { uploadToS3, getFromS3 } = require("../services/s3Service");
 const { generateOTP, sendOTPToPhoneNumber } = require("../services/otpService");
 const db = require("../models");
+const S3 = require("aws-sdk/clients/s3");
+const s3Config = require("../config/s3Config");
+
+const s3 = new S3(s3Config);
 
 const Customer = db.CustomerModel;
 const Cache = db.CacheModel;
@@ -36,7 +38,9 @@ const getProfile = async (req, res, next) => {
         lastName: currentUserProfile.cust_name.split(" ")[1],
         emailID: currentUserProfile.email,
         contactNumber: currentUserProfile.contact_no,
-        profileImage: generator.generateRandomAvatar(),
+        profileImage: currentUserProfile.image
+          ? currentUserProfile.image
+          : generator.generateRandomAvatar(),
         referral_code: currentUserProfile.referral_code,
       },
     });
@@ -50,7 +54,53 @@ const getProfile = async (req, res, next) => {
   }
 };
 
-const uploadProfile = async (req, res, next) => {};
+const uploadProfile = async (req, res, next) => {
+  //get current user from jwt
+  const currentUser = req.cust_no;
+
+  const { base64 } = req.body;
+
+  try {
+    const base64Data = new Buffer.from(
+      base64.replace(/^data:image\/\w+;base64,/, ""),
+      "base64"
+    );
+    const type = base64.split(";")[0].split("/")[1];
+    const params = {
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Key: `profile/images/${currentUser}.${type}`,
+      Body: base64Data,
+      ACL: "public-read",
+      ContentEncoding: "base64",
+      ContentType: `image/${type}`,
+    };
+
+    const s3UploadResponse = await s3.upload(params).promise();
+    const url = s3UploadResponse.Location;
+
+    await Customer.update(
+      {
+        image: url,
+      },
+      {
+        where: { cust_no: currentUser },
+      }
+    );
+
+    return res.status(200).send({
+      success: false,
+      data: url,
+      message: "Uploaded image of user successfully",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message:
+        "Something went wrong while uploading image, please check data field for more details",
+    });
+  }
+};
 
 const editProfile = async (req, res, next) => {
   //Get current user from jwt

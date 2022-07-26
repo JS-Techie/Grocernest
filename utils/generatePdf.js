@@ -45,7 +45,9 @@ const generateCustomerInformation = (doc, invoice) => {
 
   doc
     .font("Helvetica-Bold")
-    .text(`Invoice total: ${invoice.total}`, 50, 95, { align: "center" });
+    .text(`Payable total: ${invoice.payableTotal}`, 50, 95, {
+      align: "center",
+    });
 };
 
 function generateTableRow(doc, y, c1, c4, c5) {
@@ -77,9 +79,13 @@ function generateInvoiceTable(doc, invoice) {
     generateTableRow(
       doc,
       position,
-      item.isGift === true ? `${item.itemName} (gift)` : item.itemName,
+      item.isGift === true
+        ? `${item.itemName} (gift)`
+        : item.isOffer === true
+        ? `${item.itemName} (offer)`
+        : item.itemName,
       item.quantity,
-      item.MRP
+      item.isGift === true ? 0 : item.MRP
     );
     generateHr(doc, position + 20);
   }
@@ -88,8 +94,10 @@ function generateInvoiceTable(doc, invoice) {
 function generateFooter(invoice, doc) {
   doc
     .text(`Invoice Total: ${invoice.total}`, 50, 500)
-    .text(`Payment Mode : Cash on Delivery`, 50, 520)
-    .text(`Paid by wallet : Yet to add`, 50, 540)
+    .text(`Paid by wallet : ${invoice.walletBalanceUsed}`, 50, 520)
+    .text(`Applied discount : ${invoice.appliedDiscount}`, 50, 540)
+    .text(`Payment Mode : Cash on Delivery`, 50, 560)
+
     .moveDown();
 }
 

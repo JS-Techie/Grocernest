@@ -182,4 +182,6 @@ ALTER TABLE ecomm.t_order_items ADD is_gift BOOL NULL;
 ALTER TABLE ecomm.t_order_items ADD is_offer BOOL NULL;
 
 ALTER TABLE ecomm.t_order_items ADD offer_price DECIMAL(10,2) NULL;
+ALTER TABLE ecomm.t_customer ADD image varchar(255) NULL;
+
 
