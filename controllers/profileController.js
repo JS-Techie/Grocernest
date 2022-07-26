@@ -65,14 +65,13 @@ const uploadProfile = async (req, res, next) => {
       base64.replace(/^data:image\/\w+;base64,/, ""),
       "base64"
     );
-    const type = base64.split(";")[0].split("/")[1];
+    //const type = base64.split(";")[0].split("/")[1];
     const params = {
       Bucket: process.env.AWS_BUCKET_NAME,
-      Key: `profile/images/${currentUser}.${type}`,
+      Key: `profile/images/${currentUser}.jpeg`,
       Body: base64Data,
-      ACL: "public-read",
       ContentEncoding: "base64",
-      ContentType: `image/${type}`,
+     ContentType: `image/jpeg`,
     };
 
     const s3UploadResponse = await s3.upload(params).promise();
