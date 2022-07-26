@@ -152,7 +152,7 @@ const createOffer = async (req, res, next) => {
   if (offer) {
     return res.status(400).send({
       success: false,
-      data: offerExists,
+      data: offer,
       message: "Offer already exists for this item",
     });
   }
