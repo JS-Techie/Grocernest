@@ -70,15 +70,15 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
       : " AND tc.contact_no LIKE '%" + phno + "%'";
   const dateQuery =
     startDate == undefined ||
-    startDate == "" ||
-    endDate == undefined ||
-    endDate == ""
+      startDate == "" ||
+      endDate == undefined ||
+      endDate == ""
       ? ""
       : " AND tlo.created_at BETWEEN '" +
-        startDate +
-        "' AND (SELECT DATE_ADD('" +
-        endDate +
-        "', INTERVAL 1 DAY))";
+      startDate +
+      "' AND (SELECT DATE_ADD('" +
+      endDate +
+      "', INTERVAL 1 DAY))";
   const orderId =
     orderid == undefined || orderid == ""
       ? ""
@@ -255,8 +255,8 @@ const getOrderDetails = async (req, res, next) => {
         sale_price: oldestBatch.sale_price,
         MRP: oldestBatch.MRP,
         discount: oldestBatch.discount,
-        is_free: oldestBatch.sale_price === 0 ? true : false,
-        is_offer: current.is_offer === "true" ? true : false,
+        // is_free: oldestBatch.sale_price === 0 ? true : false,
+        is_offer: current.is_offer === 1 ? true : false,
         is_gift: current.is_gift === 1 ? true : false,
         can_edit: current.amount_of_discount ? true : false,
 
@@ -266,7 +266,7 @@ const getOrderDetails = async (req, res, next) => {
           ? current.is_percentage === 1
             ? true
             : false
-          : null,
+          : "",
         offer_item_id: current.offer_item_id,
         item_id_1: current.item_id_1,
         item_id_2: current.item_id_2,
@@ -277,7 +277,8 @@ const getOrderDetails = async (req, res, next) => {
 
 
     //Free item is item_id_2 in offers not is_free flag from batch
-    
+
+
     const resolvedArray = await Promise.all(promises);
 
     const responseArray = [
@@ -420,9 +421,9 @@ const changeOrderStatus = async (req, res, next) => {
                 email.toString(),
                 req.body.orderId,
                 "Your order " +
-                  req.body.orderId +
-                  " has been " +
-                  req.body.status
+                req.body.orderId +
+                " has been " +
+                req.body.status
               );
             }
         });
@@ -517,9 +518,9 @@ const assignTransporter = async (req, res, next) => {
               email.toString(),
               req.body.orderId,
               "Your order " +
-                req.body.orderId +
-                " has been Shipped. Your order will be delivered by " +
-                transporterName
+              req.body.orderId +
+              " has been Shipped. Your order will be delivered by " +
+              transporterName
             );
         });
       });
