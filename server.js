@@ -1,29 +1,35 @@
 require("dotenv").config();
 const refferal_job = require("./CRON_REF_1");
 // Swagger UI Setup
-const swaggerUI = require('swagger-ui-express');
-const endPoint = require('./swagger/swagger-output.json');
+const swaggerUI = require("swagger-ui-express");
+const endPoint = require("./swagger/swagger-output.json");
 
 //Express Setup
+const bodyParser = require("body-parser");
 const express = require("express");
 const app = express();
 
-
 //Middleware
 //We will later put the URL of frontend in the CORS config object so only frontend can call the API
+app.use(bodyParser.json({ limit: "100mb" }));
+app.use(
+  bodyParser.urlencoded({
+    limit: "50mb",
+    extended: true,
+    parameterLimit: 50000,
+  })
+);
 const cors = require("cors");
 const fileUpload = require("express-fileupload");
 const xss = require("xss-clean");
 app.use(cors());
-app.use(express.json({limit : "100mb"}));
-//app.use(express.urlencoded({ limit: '50mb', extended: true, parameterLimit: 50000 }));
+
 app.use(fileUpload());
 app.use(xss());
 
 app.get("/", (req, res, next) => {
   res.send("Grocernest API");
 });
-
 
 // Swagger route
 app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(endPoint));
@@ -42,8 +48,8 @@ const orderRouter = require("./routes/ordersRoutes");
 const couponRouter = require("./routes/couponsRoutes");
 const referralRouter = require("./routes/referralRoutes");
 const giftRouter = require("./routes/giftRoutes");
-const invoiceRouter = require("./routes/invoiceRoutes")
-const offerRouter = require("./routes/offerRoutes")
+const invoiceRouter = require("./routes/invoiceRoutes");
+const offerRouter = require("./routes/offerRoutes");
 
 // admin routers import
 const adminOrderRouter = require("./adminRoutes/orderRoutes");
@@ -53,9 +59,8 @@ const adminGiftRouter = require("./adminRoutes/giftRoutes");
 const adminCouponsRouter = require("./adminRoutes/couponRoutes");
 const adminOffersRouter = require("./adminRoutes/offerRoutes");
 
-
 //routes
-app.get('/responses', (req, res) => {
+app.get("/responses", (req, res) => {
   res.send(endPoint);
 });
 
@@ -75,8 +80,7 @@ app.use("/coupons", couponRouter);
 app.use("/referral/view", referralRouter);
 app.use("/gift", giftRouter);
 app.use("/coupons", couponRouter);
-app.use("/offers", offerRouter)
-
+app.use("/offers", offerRouter);
 
 // admin routes
 app.use("/admin/orders", adminOrderRouter);
@@ -102,4 +106,3 @@ const start = async () => {
 
 start();
 refferal_job();
-
