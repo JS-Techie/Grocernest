@@ -2,10 +2,8 @@ const { generatePdf } = require("../utils/generatePdf");
 const fs = require("fs");
 const path = require("path");
 const pdfParse = require("pdf-parse");
-// const stream = require("node:stream");
 const db = require("../models");
 const { uploadToS3, getFromS3 } = require("../services/s3Service");
-const { sendOrderPlacedEmail } = require("../services/mail/mailService");
 
 const Order = db.OrderModel;
 const OrderItems = db.OrderItemsModel;
@@ -17,19 +15,9 @@ const downloadInvoice = async (req, res, next) => {
   //Get current user from jwt
   const currentCustomer = req.cust_no;
 
-  // console.log("===>>", currentCustomer);
-  // const sendEmail = 
 
   const { orderID } = req.body;
 
-  // let email = "";
-  // Customer.findOne({
-  //   where: {
-  //     cust_no: currentCustomer,
-  //   },
-  // }).then((cust) => {
-  //   email = cust.dataValues.email;
-  // });
 
   try {
     const currentOrder = await Order.findOne({
@@ -100,10 +88,6 @@ const downloadInvoice = async (req, res, next) => {
         "pdfs/invoices/invoice-" + response.orderID + ".pdf"
       );
 
-      // if (sendEmail == "true") {
-      //   sendOrderPlacedEmail(email, orderID);
-      // }
-
       return res.status(200).send({
         success: true,
         data: {
@@ -113,11 +97,6 @@ const downloadInvoice = async (req, res, next) => {
       });
     });
 
-    // return res.status(200).send({
-    //   success: true,
-    //   data: [],
-    //   message: "Invoice generated successfully and sent to registered email",
-    // });
   } catch (error) {
     console.log(error);
     return res.status(400).send({
