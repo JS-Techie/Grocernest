@@ -11,14 +11,16 @@ const app = express();
 
 //Middleware
 //We will later put the URL of frontend in the CORS config object so only frontend can call the API
-app.use(bodyParser.json({ limit: "100mb" }));
-app.use(
-  bodyParser.urlencoded({
-    limit: "50mb",
-    extended: true,
-    parameterLimit: 50000,
-  })
-);
+// app.use(bodyParser.json({ limit: "100mb" }));
+// app.use(
+//   bodyParser.urlencoded({
+//     limit: "50mb",
+//     extended: true,
+//     parameterLimit: 50000,
+//   })
+// );
+
+app.use(express.json({ limit: "50mb" }));
 const cors = require("cors");
 const fileUpload = require("express-fileupload");
 const xss = require("xss-clean");
