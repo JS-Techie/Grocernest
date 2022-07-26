@@ -156,6 +156,7 @@ const editProfile = async (req, res, next) => {
       success: true,
       data: {
         updatedProfile,
+        url,
       },
       message: "Details of user updated successfully",
     });
