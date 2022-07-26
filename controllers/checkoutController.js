@@ -2,6 +2,7 @@ const { Op } = require("sequelize");
 const { sequelize } = require("../models");
 const db = require("../models");
 const uniqid = require("uniqid");
+const { generatePdf } = require("../utils/generatePdf");
 
 const Order = db.OrderModel;
 const OrderItems = db.OrderItemsModel;
@@ -11,6 +12,9 @@ const Wallet_Transaction = db.WalletTransactionModel;
 const OffersCache = db.OffersCacheModel;
 const Offers = db.OffersModel;
 const Batch = db.BatchModel;
+const Item = db.ItemModel;
+const Customer = db.CustomerModel;
+
 const { sendOrderPlacedEmail } = require("../services/mail/mailService");
 
 const concatAddress = require("../utils/concatAddress");
@@ -172,10 +176,9 @@ const checkoutFromCart = async (req, res, next) => {
 
     const orderItems = await Promise.all(orderItemsPromises);
 
-    const deletedItemsFromCart = await Cart.destroy({
-      where: { cust_no: currentUser },
-    });
 
+
+    await InvoiceGen(currentUser, newOrder.order_id);
     let email = "";
     Customer.findOne({
       where: {
@@ -184,6 +187,10 @@ const checkoutFromCart = async (req, res, next) => {
     }).then((cust) => {
       email = cust.dataValues.email;
       sendOrderPlacedEmail(email, newOrder.order_id);
+    });
+
+    const deletedItemsFromCart = await Cart.destroy({
+      where: { cust_no: currentUser },
     });
 
 
@@ -434,6 +441,82 @@ const buyNow = async (req, res, next) => {
   }
 };
 
+
+const InvoiceGen = async (cust_no, order_id) => {
+  const currentCustomer = cust_no;
+  const orderID = order_id;
+  try {
+    const currentOrder = await Order.findOne({
+      include: { model: OrderItems },
+      where: { order_id: orderID, cust_no: currentCustomer },
+    });
+
+    if (!currentOrder) {
+      return res.status(404).send({
+        success: false,
+        data: [],
+        message: "No order found for current user and entered order ID",
+      });
+    }
+
+    const currentUser = await Customer.findOne({
+      where: { cust_no: currentCustomer },
+    });
+
+    const promises = currentOrder.t_order_items_models.map(async (current) => {
+      const item = await Item.findOne({
+        where: { id: current.item_id },
+      });
+
+      const batches = await Batch.findAll({
+        where: { item_id: current.item_id },
+        order: [["created_at", "ASC"]],
+      });
+
+      let oldestBatch;
+      if (batches.length !== 0) {
+        oldestBatch = batches[0];
+      }
+
+      return {
+        itemName: item.name,
+        quantity: current.quantity,
+        MRP: oldestBatch ? oldestBatch.MRP : "",
+        image: item.image,
+        description: item.description,
+        isGift: item.is_gift == 1 ? true : false,
+        isOffer: item.is_offer == 1 ? true : false,
+        offerPrice: item.is_offer == 1 ? offer_price : "",
+      };
+    });
+
+    const resolved = await Promise.all(promises);
+
+    const response = {
+      customerName: currentUser.cust_name,
+      orderID: currentOrder.order_id,
+      status: currentOrder.status,
+      address: currentOrder.address,
+      total: currentOrder.total,
+      date: currentOrder.created_at,
+      payableTotal: currentOrder.final_payable_amount,
+      walletBalanceUsed: currentOrder.wallet_balance_used,
+      appliedDiscount: currentOrder.applied_discount,
+      orderItems: resolved,
+    };
+
+    let writeStream = await generatePdf(response, "invoice.pdf");
+
+    writeStream.on("finish", async () => {
+      console.log("stored pdf on local");
+      return "done"
+    });
+
+  } catch (error) {
+    console.log(error);
+    return "error"
+  }
+};
 module.exports = {
   checkoutFromCart,
   buyNow,
