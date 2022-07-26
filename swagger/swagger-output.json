@@ -858,6 +858,9 @@
                 },
                 "email": {
                   "example": "any"
+                },
+                "base64": {
+                  "example": "any"
                 }
               }
             }
