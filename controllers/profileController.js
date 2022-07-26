@@ -71,7 +71,7 @@ const uploadProfile = async (req, res, next) => {
       Key: `profile/images/${currentUser}.jpeg`,
       Body: base64Data,
       ContentEncoding: "base64",
-     ContentType: `image/jpeg`,
+      ContentType: `image/jpeg`,
     };
 
     const s3UploadResponse = await s3.upload(params).promise();
@@ -87,7 +87,7 @@ const uploadProfile = async (req, res, next) => {
     );
 
     return res.status(200).send({
-      success: false,
+      success: true,
       data: url,
       message: "Uploaded image of user successfully",
     });
@@ -109,7 +109,27 @@ const editProfile = async (req, res, next) => {
   const enteredFirstName = req.body.firstName;
   const enteredLastName = req.body.lastName;
   const email = req.body.email;
+  const { base64 } = req.body;
 
+  let url = null;
+
+  if (base64) {
+    const base64Data = new Buffer.from(
+      base64.replace(/^data:image\/\w+;base64,/, ""),
+      "base64"
+    );
+    //const type = base64.split(";")[0].split("/")[1];
+    const params = {
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Key: `profile/images/${currentUser}.jpeg`,
+      Body: base64Data,
+      ContentEncoding: "base64",
+      ContentType: `image/jpeg`,
+    };
+
+    const s3UploadResponse = await s3.upload(params).promise();
+     url = s3UploadResponse.Location;
+  }
   try {
     const currentUserProfile = await Customer.findOne({
       where: { cust_no: currentUser },
@@ -127,11 +147,10 @@ const editProfile = async (req, res, next) => {
       {
         cust_name: enteredFirstName + " " + enteredLastName,
         email: email ? email : "",
+        image : base64 ? url : null
       },
       { where: { cust_no: currentUser } }
     );
-
-    const generator = new AvatarGenerator();
 
     return res.status(200).send({
       success: true,
