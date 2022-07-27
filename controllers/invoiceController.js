@@ -15,9 +15,7 @@ const downloadInvoice = async (req, res, next) => {
   //Get current user from jwt
   const currentCustomer = req.cust_no;
 
-
   const { orderID } = req.body;
-
 
   try {
     const currentOrder = await Order.findOne({
@@ -79,15 +77,19 @@ const downloadInvoice = async (req, res, next) => {
       orderItems: resolved,
     };
 
-    let writeStream = await generatePdf(response, "invoice.pdf");
+    let writeStream = await generatePdf(
+      response,
+      `invoice-${response.orderID}.pdf`
+    );
 
     writeStream.on("finish", async () => {
       console.log("stored pdf on local");
       let uploadResponse = await uploadToS3(
-        "invoice.pdf",
+        `invoice-${response.orderID}.pdf`,
         "pdfs/invoices/invoice-" + response.orderID + ".pdf"
       );
 
+      fs.unlinkSync(`invoice-${response.orderID}.pdf`);
       return res.status(200).send({
         success: true,
         data: {
@@ -96,7 +98,6 @@ const downloadInvoice = async (req, res, next) => {
         message: "Invoice generated successfully",
       });
     });
-
   } catch (error) {
     console.log(error);
     return res.status(400).send({
