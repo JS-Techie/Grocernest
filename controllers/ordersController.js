@@ -358,8 +358,6 @@ const cancelOrder = async (req, res, next) => {
       success: true,
       data: {
         updatedOrderStatus,
-        updateInventory,
-        updateBatch,
       },
       message: "Requested order successfully cancelled for current user",
     });

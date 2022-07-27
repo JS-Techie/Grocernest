@@ -220,8 +220,6 @@ const checkoutFromCart = async (req, res, next) => {
         orderAddress: newOrder.address,
         orderItems,
         numberOfDeletedItemsFromCart: deletedItemsFromCart,
-        updateInventory,
-        updateBatch,
       },
       message: "Order placed successfully",
     });
