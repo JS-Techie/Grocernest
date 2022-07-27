@@ -3,6 +3,7 @@ const { generateOTP, sendOTPToPhoneNumber } = require("../services/otpService");
 const db = require("../models");
 const S3 = require("aws-sdk/clients/s3");
 const s3Config = require("../config/s3Config");
+const uniqid = require("uniqid")
 
 const s3 = new S3(s3Config);
 
@@ -121,7 +122,7 @@ const editProfile = async (req, res, next) => {
     //const type = base64.split(";")[0].split("/")[1];
     const params = {
       Bucket: process.env.AWS_BUCKET_NAME,
-      Key: `profile/images/${currentUser}.jpeg`,
+      Key: `profile/images/${currentUser}-${uniqid()}.jpeg`,
       Body: base64Data,
       ContentEncoding: "base64",
       ContentType: `image/jpeg`,
