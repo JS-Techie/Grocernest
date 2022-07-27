@@ -307,49 +307,47 @@ const cancelOrder = async (req, res, next) => {
     //Update status of status to say cancelled if the status is accepted or shipped
     //cannot cancel for returned and delivered and already cancelled
 
-    let updateInventory = null;
-    let updateBatch = null;
+    // let updateInventory = null;
+    // let updateBatch = null;
 
     console.log(singleOrder.status);
 
-   
-      const itemsInOrder = await OrderItems.findAll({
-        where: { order_id: orderId },
-      });
+    // const itemsInOrder = await OrderItems.findAll({
+    //   where: { order_id: orderId },
+    // });
 
-      if (itemsInOrder.length > 0) {
-        itemsInOrder.map(async (currentItem) => {
-          const batches = await Batch.findAll({
-            where: { item_id: currentItem.item_id },
-          });
+    // if (itemsInOrder.length > 0) {
+    //   itemsInOrder.map(async (currentItem) => {
+    //     const batches = await Batch.findAll({
+    //       where: { item_id: currentItem.item_id },
+    //     });
 
-          const oldestBatch = batches[0];
+    //     const oldestBatch = batches[0];
 
-          const currentInventory = await Inventory.findOne({
-            where : {item_id : currentItem.item_id, batch_id : oldestBatch.id}
-          })
+    //     const currentInventory = await Inventory.findOne({
+    //       where : {item_id : currentItem.item_id, batch_id : oldestBatch.id}
+    //     })
 
-          updateInventory = await Inventory.update(
-            {
-              balance_type: 1,
-              quantity: currentItem.quantity + currentInventory.quantity,
-            },
-            {
-              where: { batch_id: oldestBatch.id, item_id: currentItem.item_id },
-            }
-          );
+    //     updateInventory = await Inventory.update(
+    //       {
+    //         balance_type: 1,
+    //         quantity: currentItem.quantity + currentInventory.quantity,
+    //       },
+    //       {
+    //         where: { batch_id: oldestBatch.id, item_id: currentItem.item_id },
+    //       }
+    //     );
 
-          updateBatch = await Batch.update(
-            {
-              quantity: currentItem.quantity + oldestBatch.quantity,
-            },
-            {
-              where: { id: oldestBatch.id },
-            }
-          );
-        });
-      }
-    
+    //     updateBatch = await Batch.update(
+    //       {
+    //         quantity: currentItem.quantity + oldestBatch.quantity,
+    //       },
+    //       {
+    //         where: { id: oldestBatch.id },
+    //       }
+    //     );
+    //   });
+    // }
 
     const updatedOrderStatus = await singleOrder.update({
       status: "Cancelled",

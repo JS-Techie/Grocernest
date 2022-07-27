@@ -174,27 +174,27 @@ const checkoutFromCart = async (req, res, next) => {
 
     const orderItems = await Promise.all(orderItemsPromises);
 
-    let updateInventory = null;
-    let updateBatch = null;
+    // let updateInventory = null;
+    // let updateBatch = null;
 
-    orderItems.map(async (current) => {
-      const currentInventory = await Inventory.findOne({
-        where: { batch_id: current.oldestBatch.id, item_id: current.itemID },
-      });
-      updateInventory = await Inventory.update(
-        {
-          quantity: currentInventory.quantity - current.quantity,
-          balance_type: 7,
-        },
-        {
-          where: { batch_id: current.oldestBatch.id, item_id: current.itemID },
-        }
-      );
-      updateBatch = await Batch.update(
-        { quantity: current.oldestBatch.quantity - current.quantity },
-        { where: { id: current.oldestBatch.id, item_id: current.itemID } }
-      );
-    });
+    // orderItems.map(async (current) => {
+    //   const currentInventory = await Inventory.findOne({
+    //     where: { batch_id: current.oldestBatch.id, item_id: current.itemID },
+    //   });
+    //   updateInventory = await Inventory.update(
+    //     {
+    //       quantity: currentInventory.quantity - current.quantity,
+    //       balance_type: 7,
+    //     },
+    //     {
+    //       where: { batch_id: current.oldestBatch.id, item_id: current.itemID },
+    //     }
+    //   );
+    //   updateBatch = await Batch.update(
+    //     { quantity: current.oldestBatch.quantity - current.quantity },
+    //     { where: { id: current.oldestBatch.id, item_id: current.itemID } }
+    //   );
+    // });
 
     await InvoiceGen(currentUser, newOrder.order_id);
     let email = "";
@@ -433,44 +433,43 @@ const buyNow = async (req, res, next) => {
       };
     });
 
-    let updateBatch;
-    let updateInventory;
+    // let updateBatch;
+    // let updateInventory;
 
-    orderItems.map(async (current) => {
-      let oldestBatch;
-      const batches = await Batch.findAll({
-        where: { item_id: current.item_id },
-      });
+    // orderItems.map(async (current) => {
+    //   let oldestBatch;
+    //   const batches = await Batch.findAll({
+    //     where: { item_id: current.item_id },
+    //   });
 
-      if (batches.length > 0) {
-        oldestBatch = batches[0];
-      }
+    //   if (batches.length > 0) {
+    //     oldestBatch = batches[0];
+    //   }
 
-      const currentInventory = await Inventory.findOne({
-        where: { batch_id: oldestBatch.id, item_id: current.item_id },
-      });
-      updateInventory = await Inventory.update(
-        {
-          balance_type: 7,
-          quantity: currentInventory.quantity - current.quantity,
-        },
-        {
-          where: {
-            batch_id: oldestBatch.id,
-            item_id: current.item_id,
-          },
-        }
-      );
-      updateBatch = await Batch.update(
-        { quantity: oldestBatch.quantity - current.quantity },
-        { where: { id: oldestBatch.id, item_id: current.item_id } }
-      );
-    });
+    //   const currentInventory = await Inventory.findOne({
+    //     where: { batch_id: oldestBatch.id, item_id: current.item_id },
+    //   });
+    //   updateInventory = await Inventory.update(
+    //     {
+    //       balance_type: 7,
+    //       quantity: currentInventory.quantity - current.quantity,
+    //     },
+    //     {
+    //       where: {
+    //         batch_id: oldestBatch.id,
+    //         item_id: current.item_id,
+    //       },
+    //     }
+    //   );
+    //   updateBatch = await Batch.update(
+    //     { quantity: oldestBatch.quantity - current.quantity },
+    //     { where: { id: oldestBatch.id, item_id: current.item_id } }
+    //   );
+    // });
 
     const deletedItemsFromCart = await Cart.destroy({
       where: { cust_no: currentUser, is_gift: 1 },
-    });
-
+  })
     return res.status(201).send({
       success: true,
       data: {
