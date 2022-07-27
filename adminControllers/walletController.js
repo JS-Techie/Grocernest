@@ -1,6 +1,7 @@
 const db = require('../models');
 const { sequelize } = require("../models");
 const uniqid = require('uniqid');
+const WalletService = require('./service/walletService');
 
 const Wallet = db.WalletModel
 const WalletTransaction = db.WalletTransactionModel;
@@ -33,44 +34,23 @@ const checkWalletDetails = async (req, res, next) => {
 const creditAmountToWallet = async (req, res, next) => {
     let amount = req.body.amount;
     let cust_no = req.body.cust_no;
+    let details = req.body.details;
 
-    let details = req.body.details
-    let transaction_id = uniqid();
-    try {
-        const [results, metadata] =
-            await sequelize.query(`
-            UPDATE t_wallet
-            SET balance = (select balance from t_wallet where cust_no="${cust_no}")+${amount}
-            WHERE cust_no = "${cust_no}"
-          `);
+    let walletService = new WalletService();
+    let result = await walletService.creditAmount(amount, cust_no, details);
 
-        const [results2, metadata2] =
-            await sequelize.query(`
-            INSERT INTO t_wallet_transaction
-            (wallet_id, transaction_id, transaction_type, transaction_amount, transaction_details, transaction_date_time, created_by, updated_by, created_at, updated_at)
-            VALUES((
-            select wallet_id from t_wallet where cust_no="${cust_no}"
-            ), "${transaction_id}", "C", ${amount}, "${details}", current_timestamp(), 2, NULL, current_timestamp(), current_timestamp()); 
-        `);
-
-        const [results3, metadata3] =
-            await sequelize.query(`
-            select balance from t_wallet where cust_no="${cust_no}"
-          `);
-
+    if (result.success == true) {
         return res.status(200).send({
             success: true,
-            data: results3[0],
-            message: "Amount successfully added to the wallet",
-        });
-    } catch (error) {
-        return res.status(400).send({
-            success: false,
-            data: error.message,
-            message:
-                "Error while adding amount to the wallet",
+            data: result.data,
+            message: result.message,
         });
     }
+    return res.status(400).send({
+        success: false,
+        data: result.data,
+        message: result.message,
+    });
 }
 
 const debitAmountFromWallet = async (req, res, next) => {

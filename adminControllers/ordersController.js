@@ -5,6 +5,7 @@ const {
   sendOrderStatusEmail,
   sendCancelledStatusEmail,
 } = require("../services/mail/mailService");
+const WalletService = require('./service/walletService');
 // const Customer = db.CustomerModel;
 const Batch = db.BatchModel;
 const Customer = db.CustomerModel;
@@ -151,6 +152,7 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
     });
   }
 };
+
 const getOrderDetails = async (req, res, next) => {
   const orderId = req.body.orderId;
   // console.log("get order details", orderId);
@@ -308,10 +310,12 @@ const getOrderDetails = async (req, res, next) => {
 const changeOrderStatus = async (req, res, next) => {
   console.log("change order status");
 
+  let wallet_balance_used = 0;
   let cancellationReason = req.body.cancellataionReason
     ? req.body.cancellataionReason
     : "";
   // console.log("cancellationReason", cancellationReason);
+
   Order.update(
     {
       status: req.body.status,
@@ -326,6 +330,7 @@ const changeOrderStatus = async (req, res, next) => {
           order_id: req.body.orderId,
         },
       }).then((res) => {
+        // wallet_balance_used = res.dataValues.wallet_balance_used;
         if (
           req.body.status === "Accepted" ||
           req.body.status === "Delivered" ||
@@ -335,7 +340,17 @@ const changeOrderStatus = async (req, res, next) => {
             where: {
               order_id: res.dataValues.order_id,
             },
-          }).then((res2) => {
+          }).then(async (res2) => {
+
+            if (req.body.status === "Cancelled") {
+              // if order cancelled give user the deducted wallet balance
+              if (res.dataValues.wallet_balance_used != 0) {
+                console.log("add the deducted balance to the user wallet");
+                let walletService = new WalletService();
+                let result = await walletService.creditAmount(res.dataValues.wallet_balance_used, res.dataValues.cust_no, "cancelled order ID-" + req.body.orderId + " wallet balance refunded.");
+              }
+            }
+
             // console.log(res2);
             res2.map((currentItem) => {
               console.log("Item id=>>", currentItem.item_id);

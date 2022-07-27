@@ -1,7 +1,7 @@
 const { Op } = require("sequelize");
 const { sequelize } = require("../models");
 const db = require("../models");
-
+const WalletService = require('../adminControllers/service/walletService');
 const Order = db.OrderModel;
 const OrderItems = db.OrderItemsModel;
 const Item = db.ItemModel;
@@ -83,23 +83,23 @@ const getAllOrders = async (req, res, next) => {
             currentOrderItem.is_offer === 1 ? (isEdit ? true : false) : "",
           offerDetails: currentOffer
             ? {
-                offerID: currentOffer.id,
-                offerType: currentOffer.type,
-                itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
-                quantityOfItemX: currentOffer.item_1_quantity
-                  ? currentOffer.item_1_quantity
-                  : "",
-                itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
-                quantityOfItemY: currentOffer.item_2_quantity
-                  ? currentOffer.item_2_quantity
-                  : "",
-                itemID: currentOffer.item_id ? currentOffer.item_id : "",
-                amountOfDiscount: currentOffer.amount_of_discount
-                  ? currentOffer.amount_of_discount
-                  : "",
-                isPercentage: currentOffer.is_percentage ? true : false,
-                isActive: currentOffer.is_active ? true : false,
-              }
+              offerID: currentOffer.id,
+              offerType: currentOffer.type,
+              itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
+              quantityOfItemX: currentOffer.item_1_quantity
+                ? currentOffer.item_1_quantity
+                : "",
+              itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
+              quantityOfItemY: currentOffer.item_2_quantity
+                ? currentOffer.item_2_quantity
+                : "",
+              itemID: currentOffer.item_id ? currentOffer.item_id : "",
+              amountOfDiscount: currentOffer.amount_of_discount
+                ? currentOffer.amount_of_discount
+                : "",
+              isPercentage: currentOffer.is_percentage ? true : false,
+              isActive: currentOffer.is_active ? true : false,
+            }
             : "",
         };
       });
@@ -219,23 +219,23 @@ const getOrderByOrderId = async (req, res, next) => {
         canEdit: currentOrderItem.is_offer === 1 ? (isEdit ? true : false) : "",
         offerDetails: currentOffer
           ? {
-              offerID: currentOffer.id,
-              offerType: currentOffer.type,
-              itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
-              quantityOfItemX: currentOffer.item_1_quantity
-                ? currentOffer.item_1_quantity
-                : "",
-              itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
-              quantityOfItemY: currentOffer.item_2_quantity
-                ? currentOffer.item_2_quantity
-                : "",
-              itemID: currentOffer.item_id ? currentOffer.item_id : "",
-              amountOfDiscount: currentOffer.amount_of_discount
-                ? currentOffer.amount_of_discount
-                : "",
-              isPercentage: currentOffer.is_percentage ? true : false,
-              isActive: currentOffer.is_active ? true : false,
-            }
+            offerID: currentOffer.id,
+            offerType: currentOffer.type,
+            itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
+            quantityOfItemX: currentOffer.item_1_quantity
+              ? currentOffer.item_1_quantity
+              : "",
+            itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
+            quantityOfItemY: currentOffer.item_2_quantity
+              ? currentOffer.item_2_quantity
+              : "",
+            itemID: currentOffer.item_id ? currentOffer.item_id : "",
+            amountOfDiscount: currentOffer.amount_of_discount
+              ? currentOffer.amount_of_discount
+              : "",
+            isPercentage: currentOffer.is_percentage ? true : false,
+            isActive: currentOffer.is_active ? true : false,
+          }
           : "",
       };
     });
@@ -354,6 +354,10 @@ const cancelOrder = async (req, res, next) => {
       where: { order_id: singleOrder.order_id },
     });
 
+    if (singleOrder.wallet_balance_used != 0) {
+      let walletService = new WalletService();
+      await walletService.creditAmount(singleOrder.wallet_balance_used, singleOrder.cust_no, "cancelled order ID-" + singleOrder.order_id + " wallet balance refunded.");
+    }
     return res.status(200).send({
       success: true,
       data: {
