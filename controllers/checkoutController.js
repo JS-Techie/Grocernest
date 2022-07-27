@@ -14,6 +14,7 @@ const Offers = db.OffersModel;
 const Batch = db.BatchModel;
 const Item = db.ItemModel;
 const Customer = db.CustomerModel;
+const Inventory = db.InventoryModel;
 
 const { sendOrderPlacedEmail } = require("../services/mail/mailService");
 
@@ -105,8 +106,6 @@ const checkoutFromCart = async (req, res, next) => {
       created_by: 2,
     });
 
-    console.log(cartForUser);
-
     const promises = cartForUser.map(async (currentItem) => {
       const batches = await Batch.findAll({
         where: { item_id: currentItem.item_id },
@@ -129,8 +128,6 @@ const checkoutFromCart = async (req, res, next) => {
     });
 
     const resolved = await Promise.all(promises);
-
-    console.log(resolved);
 
     let newOrderItems = [];
     try {
@@ -171,12 +168,33 @@ const checkoutFromCart = async (req, res, next) => {
           currentItem.is_offer === 1
             ? currentItem.offer_price
             : oldestBatch.sale_price,
+        oldestBatch,
       };
     });
 
     const orderItems = await Promise.all(orderItemsPromises);
 
+    let updateInventory = null;
+    let updateBatch = null;
 
+    orderItems.map(async (current) => {
+      const currentInventory = await Inventory.findOne({
+        where: { batch_id: current.oldestBatch.id, item_id: current.itemID },
+      });
+      updateInventory = await Inventory.update(
+        {
+          quantity: currentInventory.quantity - current.quantity,
+          balance_type: 7,
+        },
+        {
+          where: { batch_id: current.oldestBatch.id, item_id: current.itemID },
+        }
+      );
+      updateBatch = await Batch.update(
+        { quantity: current.oldestBatch.quantity - current.quantity },
+        { where: { id: current.oldestBatch.id, item_id: current.itemID } }
+      );
+    });
 
     await InvoiceGen(currentUser, newOrder.order_id);
     let email = "";
@@ -193,7 +211,6 @@ const checkoutFromCart = async (req, res, next) => {
       where: { cust_no: currentUser },
     });
 
-
     return res.status(201).send({
       success: true,
       data: {
@@ -203,6 +220,8 @@ const checkoutFromCart = async (req, res, next) => {
         orderAddress: newOrder.address,
         orderItems,
         numberOfDeletedItemsFromCart: deletedItemsFromCart,
+        updateInventory,
+        updateBatch,
       },
       message: "Order placed successfully",
     });
@@ -441,7 +460,6 @@ const buyNow = async (req, res, next) => {
   }
 };
 
-
 const InvoiceGen = async (cust_no, order_id) => {
   const currentCustomer = cust_no;
   const orderID = order_id;
@@ -509,12 +527,11 @@ const InvoiceGen = async (cust_no, order_id) => {
 
     writeStream.on("finish", async () => {
       console.log("stored pdf on local");
-      return "done"
+      return "done";
     });
-
   } catch (error) {
     console.log(error);
-    return "error"
+    return "error";
   }
 };
 module.exports = {

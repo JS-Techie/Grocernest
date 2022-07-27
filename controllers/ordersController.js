@@ -312,7 +312,7 @@ const cancelOrder = async (req, res, next) => {
 
     console.log(singleOrder.status);
 
-    if (singleOrder.status !== "Placed") {
+   
       const itemsInOrder = await OrderItems.findAll({
         where: { order_id: orderId },
       });
@@ -325,13 +325,17 @@ const cancelOrder = async (req, res, next) => {
 
           const oldestBatch = batches[0];
 
+          const currentInventory = await Inventory.findOne({
+            where : {item_id : currentItem.item_id, batch_id : oldestBatch.id}
+          })
+
           updateInventory = await Inventory.update(
             {
               balance_type: 1,
-              quantity: currentItem.quantity + oldestBatch.quantity,
+              quantity: currentItem.quantity + currentInventory.quantity,
             },
             {
-              where: { batch_id: oldestBatch.id, item_id: currentItem.id },
+              where: { batch_id: oldestBatch.id, item_id: currentItem.item_id },
             }
           );
 
@@ -345,7 +349,7 @@ const cancelOrder = async (req, res, next) => {
           );
         });
       }
-    }
+    
 
     const updatedOrderStatus = await singleOrder.update({
       status: "Cancelled",
