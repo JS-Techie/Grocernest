@@ -433,6 +433,40 @@ const buyNow = async (req, res, next) => {
       };
     });
 
+    let updateBatch;
+    let updateInventory;
+
+    orderItems.map(async (current) => {
+      let oldestBatch;
+      const batches = await Batch.findAll({
+        where: { item_id: current.item_id },
+      });
+
+      if (batches.length > 0) {
+        oldestBatch = batches[0];
+      }
+
+      const currentInventory = await Inventory.findOne({
+        where: { batch_id: oldestBatch.id, item_id: current.item_id },
+      });
+      updateInventory = await Inventory.update(
+        {
+          balance_type: 7,
+          quantity: currentInventory.quantity - current.quantity,
+        },
+        {
+          where: {
+            batch_id: oldestBatch.id,
+            item_id: current.item_id,
+          },
+        }
+      );
+      updateBatch = await Batch.update(
+        { quantity: oldestBatch.quantity - current.quantity },
+        { where: { id: oldestBatch.id, item_id: current.item_id } }
+      );
+    });
+
     const deletedItemsFromCart = await Cart.destroy({
       where: { cust_no: currentUser, is_gift: 1 },
     });
