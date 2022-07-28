@@ -465,9 +465,21 @@ const buyNow = async (req, res, next) => {
     //   );
     // });
 
+    await InvoiceGen(currentUser, newOrder.order_id);
+    let email = "";
+    Customer.findOne({
+      where: {
+        cust_no: currentUser,
+      },
+    }).then((cust) => {
+      email = cust.dataValues.email;
+      sendOrderPlacedEmail(email, newOrder.order_id);
+    });
+
+
     const deletedItemsFromCart = await Cart.destroy({
       where: { cust_no: currentUser, is_gift: 1 },
-  })
+    })
     return res.status(201).send({
       success: true,
       data: {
