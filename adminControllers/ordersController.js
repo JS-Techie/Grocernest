@@ -1,4 +1,5 @@
 const { sequelize } = require("../models");
+const { Op } = require("sequelize");
 const db = require("../models");
 const Order = db.OrderModel;
 const {
@@ -13,6 +14,7 @@ const OrderItem = db.OrderItemsModel;
 const Item = db.ItemModel;
 const Inventory = db.InventoryModel;
 const Category = db.LkpCategoryModel;
+const Offers = db.OffersModel;
 
 const getAllPendingOrders = async (req, res, next) => {
   try {
@@ -222,6 +224,7 @@ const getOrderDetails = async (req, res, next) => {
         }
       }
 
+      console.log("===============================", currentOffer);
       const currentItem = await Item.findOne({
         where: { id: currentOrderItem.id },
       });
@@ -248,7 +251,7 @@ const getOrderDetails = async (req, res, next) => {
         quantity: currentOrderItem.quantity,
         MRP: oldestBatch.MRP,
         salePrice:
-          currentOrderItem.is_offer === 1
+          currentOffer
             ? currentOffer.amount_of_discount
               ? currentOrderItem.offer_price
               : oldestBatch.sale_price
