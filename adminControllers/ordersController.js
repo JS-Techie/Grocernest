@@ -154,6 +154,134 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
 };
 
 const getOrderDetails = async (req, res, next) => {
+  //Get currentUser from req.cust_no
+
+
+  // const currentUser = req.cust_no;
+
+  //Get order id from req.params
+  const orderId = req.body.orderId;
+
+  try {
+    //Get that order according to its id
+
+    const [singleOrder, metadata] =
+      await sequelize.query(`select t_lkp_order.order_id, t_lkp_order.created_at, t_lkp_order.status, t_item.id, t_item.name, t_order_items.quantity, t_item.image,
+      t_order_items.is_offer, t_order_items.is_gift, t_order_items.offer_price
+    from ((t_lkp_order
+    inner join t_order_items on t_order_items.order_id = t_lkp_order.order_id)
+    inner join t_item on t_item.id = t_order_items.item_id)
+    where t_lkp_order.order_id = ${orderId}`);
+
+    if (singleOrder.length === 0) {
+      return res.status(404).send({
+        success: false,
+        data: null,
+        message: "Could not fetch requested order for the current user",
+      });
+    }
+
+    console.log(singleOrder);
+
+    const promises = singleOrder.map(async (currentOrderItem) => {
+      let currentOffer = null;
+      let isEdit = null;
+      if (currentOrderItem.is_offer === 1) {
+        currentOffer = await Offers.findOne({
+          where: {
+            is_active: 1,
+            [Op.or]: [
+              { item_id_1: currentOrderItem.id },
+              { item_id: currentOrderItem.id },
+            ],
+          },
+        });
+        if (currentOffer) {
+          if (currentOffer.amount_of_discount) {
+            isEdit = true;
+          }
+        }
+      }
+
+      const currentItem = await Item.findOne({
+        where: { id: currentOrderItem.id },
+      });
+
+      let oldestBatch = null;
+      const batches = await Batch.findAll({
+        where: { item_id: currentOrderItem.id },
+        order: [["created_at", "ASC"]],
+      });
+
+      oldestBatch = batches[0];
+
+      return {
+        itemName: currentItem.name,
+        id: currentItem.id,
+        image: currentItem.image,
+        isGift: currentItem.is_gift == 1 ? true : false,
+        quantity: currentOrderItem.quantity,
+        MRP: oldestBatch.MRP,
+        salePrice:
+          currentOrderItem.is_offer === 1
+            ? currentOffer.amount_of_discount
+              ? currentOrderItem.offer_price
+              : oldestBatch.sale_price
+            : oldestBatch.sale_price,
+        discount: oldestBatch.discount,
+        isOffer: currentOrderItem.is_offer === 1 ? true : false,
+        canEdit: currentOrderItem.is_offer === 1 ? (isEdit ? true : false) : "",
+        offerDetails: currentOffer
+          ? {
+            offerID: currentOffer.id,
+            offerType: currentOffer.type,
+            itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
+            quantityOfItemX: currentOffer.item_1_quantity
+              ? currentOffer.item_1_quantity
+              : "",
+            itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
+            quantityOfItemY: currentOffer.item_2_quantity
+              ? currentOffer.item_2_quantity
+              : "",
+            itemID: currentOffer.item_id ? currentOffer.item_id : "",
+            amountOfDiscount: currentOffer.amount_of_discount
+              ? currentOffer.amount_of_discount
+              : "",
+            isPercentage: currentOffer.is_percentage ? true : false,
+            isActive: currentOffer.is_active ? true : false,
+          }
+          : "",
+      };
+    });
+
+    const responseArray = await Promise.all(promises);
+
+    let orderTotal = 0;
+    responseArray.map((current) => {
+      orderTotal += current.quantity * current.MRP;
+    });
+
+    return res.status(200).send({
+      success: true,
+      data: {
+        orderID: singleOrder[0].order_id,
+        Date: singleOrder[0].created_at,
+        status: singleOrder[0].status,
+        orderTotal,
+        itemDetails: responseArray,
+      },
+      message: "Order successfully fetched for the user",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "Error while fetching orders for current user",
+    });
+  }
+};
+
+const getOrderDetails_unused = async (req, res, next) => {
   const orderId = req.body.orderId;
   // console.log("get order details", orderId);
 
