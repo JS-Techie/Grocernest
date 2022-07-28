@@ -358,10 +358,11 @@ const cancelOrder = async (req, res, next) => {
     });
 
 
-    if (singleOrder.wallet_balance_used != 0) {
-      let walletService = new WalletService();
-      await walletService.creditAmount(singleOrder.wallet_balance_used, singleOrder.cust_no, "cancelled order ID-" + singleOrder.order_id + " wallet balance refunded.");
-    }
+    // wallet refund when user cancels order
+    // if (singleOrder.wallet_balance_used != 0) {
+    //   let walletService = new WalletService();
+    //   await walletService.creditAmount(singleOrder.wallet_balance_used, singleOrder.cust_no, "cancelled order ID-" + singleOrder.order_id + " wallet balance refunded.");
+    // }
 
     // send mail to the user
     const cust = await Customer.findOne({
