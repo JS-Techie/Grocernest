@@ -12,6 +12,7 @@ const Customer = db.CustomerModel;
 const OrderItem = db.OrderItemsModel;
 const Item = db.ItemModel;
 const Inventory = db.InventoryModel;
+const Category = db.LkpCategoryModel;
 
 const getAllPendingOrders = async (req, res, next) => {
   try {
@@ -183,7 +184,8 @@ const getOrderDetails = async (req, res, next) => {
     );
 
     const [singleOrder, metadata] =
-      await sequelize.query(`select t_lkp_order.order_id, t_lkp_order.created_at, t_lkp_order.status, t_item.id, t_item.name, t_order_items.quantity, t_item.image,
+      await sequelize.query(`
+      select t_lkp_order.order_id, t_lkp_order.created_at, t_lkp_order.status, t_item.id, t_item.name, t_order_items.quantity, t_item.image,
       t_order_items.is_offer, t_order_items.is_gift, t_order_items.offer_price
     from ((t_lkp_order
     inner join t_order_items on t_order_items.order_id = t_lkp_order.order_id)
@@ -224,6 +226,10 @@ const getOrderDetails = async (req, res, next) => {
         where: { id: currentOrderItem.id },
       });
 
+      const category = await Category.findOne({
+        where: { id: currentItem.category_id }
+      })
+
       let oldestBatch = null;
       const batches = await Batch.findAll({
         where: { item_id: currentOrderItem.id },
@@ -235,6 +241,8 @@ const getOrderDetails = async (req, res, next) => {
       return {
         itemName: currentItem.name,
         id: currentItem.id,
+        category: category ? category.group_name : '',
+        itemCd: currentItem.item_cd,
         image: currentItem.image,
         isGift: currentItem.is_gift == 1 ? true : false,
         quantity: currentOrderItem.quantity,
