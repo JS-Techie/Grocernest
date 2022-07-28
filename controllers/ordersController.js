@@ -2,6 +2,9 @@ const { Op } = require("sequelize");
 const { sequelize } = require("../models");
 const db = require("../models");
 const WalletService = require('../adminControllers/service/walletService');
+const {
+  sendCancelledByUserStatusEmail
+} = require("../services/mail/mailService");
 const Order = db.OrderModel;
 const OrderItems = db.OrderItemsModel;
 const Item = db.ItemModel;
@@ -354,10 +357,22 @@ const cancelOrder = async (req, res, next) => {
       where: { order_id: singleOrder.order_id },
     });
 
+
     if (singleOrder.wallet_balance_used != 0) {
       let walletService = new WalletService();
       await walletService.creditAmount(singleOrder.wallet_balance_used, singleOrder.cust_no, "cancelled order ID-" + singleOrder.order_id + " wallet balance refunded.");
     }
+
+    // send mail to the user
+    const cust = await Customer.findOne({
+      where: {
+        cust_no: singleOrder.cust_no,
+      },
+    })
+    let email = cust.dataValues.email;
+    sendCancelledByUserStatusEmail(email.toString(), singleOrder.order_id);
+
+
     return res.status(200).send({
       success: true,
       data: {
