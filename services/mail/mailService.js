@@ -67,7 +67,7 @@ const sendCancelledByUserStatusEmail = async (mailid, orderId) => {
         from: 'grocernest@gmail.com',
         to: mailid,
         subject: 'Grocernest Order Status',
-        html: await ejs.renderFile('./services/mail/templates/cancelledOrder.ejs', {
+        html: await ejs.renderFile('./services/mail/templates/userCancelledOrders.ejs', {
             orderId: orderId
         })
     };

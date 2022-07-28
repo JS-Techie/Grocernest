@@ -371,7 +371,7 @@ const cancelOrder = async (req, res, next) => {
         cust_no: singleOrder.cust_no,
       },
     })
-    let email = cust.dataValues.email;
+    let email = cust.email;
     sendCancelledByUserStatusEmail(email.toString(), singleOrder.order_id);
 
 
