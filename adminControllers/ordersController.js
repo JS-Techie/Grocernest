@@ -165,6 +165,23 @@ const getOrderDetails = async (req, res, next) => {
   try {
     //Get that order according to its id
 
+    const [cust_result, metadata2] = await sequelize.query(
+      `
+            select 
+            tc.id ,
+            tc.cust_no ,
+            tc.cust_name ,
+            tlo.address ,
+            tc.email ,
+            tc.contact_no ,
+            tc.comments 
+            from t_customer tc inner join t_lkp_order tlo 
+            where
+            tc.cust_no = tlo.cust_no and
+            tlo.order_id = "${orderId}"
+            `
+    );
+
     const [singleOrder, metadata] =
       await sequelize.query(`select t_lkp_order.order_id, t_lkp_order.created_at, t_lkp_order.status, t_item.id, t_item.name, t_order_items.quantity, t_item.image,
       t_order_items.is_offer, t_order_items.is_gift, t_order_items.offer_price
@@ -269,6 +286,7 @@ const getOrderDetails = async (req, res, next) => {
         status: singleOrder[0].status,
         orderTotal,
         itemDetails: responseArray,
+        customer_details: cust_result[0]
       },
       message: "Order successfully fetched for the user",
     });
