@@ -11,6 +11,7 @@ const Item = db.ItemModel;
 const Batch = db.BatchModel;
 const Offers = db.OffersModel;
 const Inventory = db.InventoryModel;
+const Customer = db.CustomerModel;
 
 const getAllOrders = async (req, res, next) => {
   //Get currentUser from req.payload.cust_no
