@@ -93,7 +93,7 @@ const sendOrderPlacedEmail = async (mailid, orderId) => {
         }),
         attachments: [{
             filename: 'invoice.pdf',
-            path: './invoice.pdf',
+            path: `./invoice-${orderId}.pdf`,
             contentType: 'application/pdf'
         }],
     };
@@ -103,6 +103,8 @@ const sendOrderPlacedEmail = async (mailid, orderId) => {
             console.log(error);
         } else {
             console.log('Email sent: ' + info.response);
+            // delete the invoice
+            fs.unlinkSync(`invoice-${orderId}.pdf`);
         }
     });
 }

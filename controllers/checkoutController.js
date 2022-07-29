@@ -566,7 +566,7 @@ const InvoiceGen = async (cust_no, order_id) => {
       orderItems: resolved,
     };
 
-    let writeStream = await generatePdf(response, "invoice.pdf");
+    let writeStream = await generatePdf(response, `invoice-${currentOrder.order_id}.pdf`);
 
     writeStream.on("finish", async () => {
       console.log("stored pdf on local");
