@@ -92,7 +92,7 @@ const sendOrderPlacedEmail = async (mailid, orderId) => {
             orderId: orderId,
         }),
         attachments: [{
-            filename: `./invoice-${orderId}.pdf`,
+            filename: `invoice-${orderId}.pdf`,
             path: `./invoice-${orderId}.pdf`,
             contentType: 'application/pdf'
         }],
