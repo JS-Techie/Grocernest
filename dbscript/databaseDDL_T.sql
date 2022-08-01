@@ -52,3 +52,30 @@ CREATE TABLE `t_address` (
 
 ALTER TABLE ecomm.t_customer ADD referral_code varchar(100) NULL;
 ALTER TABLE ecomm.t_customer ADD referred_by varchar(20) NULL;
+
+
+
+
+
+CREATE TABLE `t_milk_items` (
+  `item_id` varchar(255) NOT NULL,
+  `brand` varchar(100) NULL,
+  `type` varchar(100) NULL,
+  `weight` varchar(255) NULL,
+  `cost_price` decimal(10,2) NULL,
+  `selling_price` decimal(10,2) NULL, 
+  `MRP` decimal(10,2) NOT NULL,
+  `CGST` decimal(10,2) NULL,
+  `SGST` decimal(10,2) NULL,
+  `IGST` decimal(10,2) NULL,
+  `other_tax` decimal(10,2) NULL,
+  `discount` decimal(10,2) NULL,
+  `UOM` varchar(50) NULL,
+  `image` varchar(255) NULL,
+
+  `created_by` bigint(20) NOT NULL,
+  `updated_by` bigint(20) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`item_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
