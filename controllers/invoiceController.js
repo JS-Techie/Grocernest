@@ -1,9 +1,7 @@
 const { generatePdf } = require("../utils/generatePdf");
 const fs = require("fs");
-const path = require("path");
-const pdfParse = require("pdf-parse");
 const db = require("../models");
-const { uploadToS3, getFromS3 } = require("../services/s3Service");
+const { uploadToS3 } = require("../services/s3Service");
 
 const Order = db.OrderModel;
 const OrderItems = db.OrderItemsModel;

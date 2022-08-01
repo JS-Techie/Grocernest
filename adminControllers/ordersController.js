@@ -468,10 +468,24 @@ const changeOrderStatus = async (req, res, next) => {
   console.log("change order status");
 
   let wallet_balance_used = 0;
+  let orderId = req.body.orderId;
   let cancellationReason = req.body.cancellataionReason
     ? req.body.cancellataionReason
     : "";
   // console.log("cancellationReason", cancellationReason);
+
+  const order = await Order.findOne({
+    where: { order_id: orderId },
+  });
+
+  if (order.status === "Cancelled") {
+    return res.status(400).send({
+      success: false,
+      data: "",
+      message: "This order is already cancelled",
+    });
+  }
+
 
   Order.update(
     {

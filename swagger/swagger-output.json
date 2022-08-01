@@ -1376,9 +1376,6 @@
           "200": {
             "description": "OK"
           },
-          "201": {
-            "description": "Created"
-          },
           "400": {
             "description": "Bad Request"
           },
@@ -1403,13 +1400,13 @@
             "schema": {
               "type": "object",
               "properties": {
+                "orderId": {
+                  "example": "any"
+                },
                 "cancellataionReason": {
                   "example": "any"
                 },
                 "status": {
-                  "example": "any"
-                },
-                "orderId": {
                   "example": "any"
                 }
               }
