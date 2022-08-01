@@ -2,7 +2,7 @@ const { Op } = require("sequelize");
 const cron = require('node-cron');
 const uniqid = require('uniqid');
 
-const db = require("./models");
+const db = require("../models");
 
 const Customers = db.CustomerModel
 const Order = db.OrderModel;

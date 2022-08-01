@@ -1,8 +1,8 @@
 require("dotenv").config();
-const refferal_job = require("./CRON_REF_1");
+const refferal_job = require("./utils/CRON_REF_1");
 // Swagger UI Setup
 const swaggerUI = require("swagger-ui-express");
-const endPoint = require("./swagger/swagger-output.json");
+const endPoint = require("./services/swagger/swagger-output.json");
 
 //Express Setup
 const bodyParser = require("body-parser");
