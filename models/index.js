@@ -11,15 +11,27 @@ db.GrnDetailsModel = require("./t_grn_details")(db.sequelize, Sequelize);
 
 db.GrnModel = require("./t_grn")(db.sequelize, Sequelize);
 
-db.InventoryAuditModel = require("./t_inventory_audit")(db.sequelize, Sequelize);
+db.InventoryAuditModel = require("./t_inventory_audit")(
+  db.sequelize,
+  Sequelize
+);
 
 db.InventoryModel = require("./t_inventory")(db.sequelize, Sequelize);
 
-db.InvoiceItemDtlsModel = require("./t_invoice_item_dtls")(db.sequelize, Sequelize);
+db.InvoiceItemDtlsModel = require("./t_invoice_item_dtls")(
+  db.sequelize,
+  Sequelize
+);
 
-db.InvoiceOutOfStockModel = require("./t_invoice_out_of_stock")(db.sequelize, Sequelize);
+db.InvoiceOutOfStockModel = require("./t_invoice_out_of_stock")(
+  db.sequelize,
+  Sequelize
+);
 
-db.InvoicePartPaymentModel = require("./t_invoice_part_payment")(db.sequelize, Sequelize);
+db.InvoicePartPaymentModel = require("./t_invoice_part_payment")(
+  db.sequelize,
+  Sequelize
+);
 
 db.InvoiceModel = require("./t_invoice")(db.sequelize, Sequelize);
 
@@ -27,7 +39,10 @@ db.ItemTaxInfoModel = require("./t_item_tax_info")(db.sequelize, Sequelize);
 
 db.ItemModel = require("./t_item")(db.sequelize, Sequelize);
 
-db.LkpBalanceTypeModel = require("./t_lkp_balance_type")(db.sequelize, Sequelize);
+db.LkpBalanceTypeModel = require("./t_lkp_balance_type")(
+  db.sequelize,
+  Sequelize
+);
 
 db.LkpBrandModel = require("./t_lkp_brand")(db.sequelize, Sequelize);
 
@@ -43,9 +58,15 @@ db.LkpLocationModel = require("./t_lkp_location")(db.sequelize, Sequelize);
 
 db.LkpSizeModel = require("./t_lkp_size")(db.sequelize, Sequelize);
 
-db.LkpSubCategoryModel = require("./t_lkp_sub_category")(db.sequelize, Sequelize);
+db.LkpSubCategoryModel = require("./t_lkp_sub_category")(
+  db.sequelize,
+  Sequelize
+);
 
-db.LowStockConfigModel = require("./t_low_stock_config")(db.sequelize, Sequelize);
+db.LowStockConfigModel = require("./t_low_stock_config")(
+  db.sequelize,
+  Sequelize
+);
 
 db.ModuleRoleModel = require("./t_module_role")(db.sequelize, Sequelize);
 
@@ -57,9 +78,15 @@ db.RegionModel = require("./t_region")(db.sequelize, Sequelize);
 
 db.RoleModel = require("./t_role")(db.sequelize, Sequelize);
 
-db.StockAdjustmentModel = require("./t_stock_adjustment")(db.sequelize, Sequelize);
+db.StockAdjustmentModel = require("./t_stock_adjustment")(
+  db.sequelize,
+  Sequelize
+);
 
-db.StockTransferDetailsModel = require("./t_stock_transfer_details")(db.sequelize, Sequelize);
+db.StockTransferDetailsModel = require("./t_stock_transfer_details")(
+  db.sequelize,
+  Sequelize
+);
 
 db.StockTransferModel = require("./t_stock_transfer")(db.sequelize, Sequelize);
 
@@ -69,13 +96,16 @@ db.UserRoleModel = require("./t_user_role")(db.sequelize, Sequelize);
 
 db.UserModel = require("./t_user")(db.sequelize, Sequelize);
 
-db.WalletTransactionModel = require("./t_wallet_transaction")(db.sequelize, Sequelize);
+db.WalletTransactionModel = require("./t_wallet_transaction")(
+  db.sequelize,
+  Sequelize
+);
 
 db.WalletModel = require("./t_wallet")(db.sequelize, Sequelize);
 
 db.WishlistModel = require("./t_lkp_wishlist")(db.sequelize, Sequelize);
 
-db.AddressModel = require("./t_address")(db.sequelize, Sequelize)
+db.AddressModel = require("./t_address")(db.sequelize, Sequelize);
 
 db.WishlistItemsModel = require("./t_wishlist_items")(db.sequelize, Sequelize);
 
@@ -97,42 +127,40 @@ db.OffersModel = require("./t_offers")(db.sequelize, Sequelize);
 
 db.OffersCacheModel = require("./t_offer_cache")(db.sequelize, Sequelize);
 
+db.MilkItemsModel = require("./t_milk_items")(db.sequelize, Sequelize);
+
 // Relations between tables
 
-db.WalletModel.hasMany(db.WalletTransactionModel, { foreignKey: "wallet_id" });      //one to many mapping
-
+db.WalletModel.hasMany(db.WalletTransactionModel, { foreignKey: "wallet_id" }); //one to many mapping
 
 // //One wishlist has many wishlist items
 // db.WishlistModel.hasMany(db.WishlistItemsModel, { foreignKey: "wishlist_id" });
 
 //One order has many order items
-db.OrderModel.hasMany(db.OrderItemsModel, { foreignKey: "order_id" })
-db.OrderItemsModel.hasMany(db.ItemModel, { foreignKey: "id" })
+db.OrderModel.hasMany(db.OrderItemsModel, { foreignKey: "order_id" });
+db.OrderItemsModel.hasMany(db.ItemModel, { foreignKey: "id" });
 
 // db.OrderModel.hasMany(db.CustomerModel, { foreignKey: "cust_no" })
 
-
 //One category has many subcategories
-db.LkpCategoryModel.hasMany(db.LkpSubCategoryModel, { foreignKey: "category_id" })
+db.LkpCategoryModel.hasMany(db.LkpSubCategoryModel, {
+  foreignKey: "category_id",
+});
 
 //One category has many items
-db.LkpCategoryModel.hasMany(db.ItemModel, { foreignKey: "category_id" })
+db.LkpCategoryModel.hasMany(db.ItemModel, { foreignKey: "category_id" });
 
 //One subcategory has many items
-db.LkpSubCategoryModel.hasMany(db.ItemModel, { foreignKey: "sub_category_id" })
+db.LkpSubCategoryModel.hasMany(db.ItemModel, { foreignKey: "sub_category_id" });
 
 //One brand has many items
-db.LkpBrandModel.hasMany(db.ItemModel, { foreignKey: "brand_id" })
+db.LkpBrandModel.hasMany(db.ItemModel, { foreignKey: "brand_id" });
 
-db.WalletModel.hasMany(db.WalletTransactionModel, { foreignKey: "wallet_id" });      //one to many mapping
+db.WalletModel.hasMany(db.WalletTransactionModel, { foreignKey: "wallet_id" }); //one to many mapping
 
 // Address table
 db.CustomerModel.hasMany(db.AddressModel, { foreignKey: "cust_no" });
 
-db.CartModel.hasMany(db.ItemModel, { foreignKey: "id" })
-
-
-
+db.CartModel.hasMany(db.ItemModel, { foreignKey: "id" });
 
 module.exports = db;
-

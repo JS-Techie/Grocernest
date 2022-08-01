@@ -227,6 +227,15 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "supplier_disc"
+    },
+    expiry_date: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "expiry_date"
     }
   };
   const options = {

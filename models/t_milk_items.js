@@ -4,35 +4,116 @@ const {
 
 module.exports = sequelize => {
   const attributes = {
-    id: {
-      type: DataTypes.BIGINT,
+    item_id: {
+      type: DataTypes.STRING(255),
       allowNull: false,
       defaultValue: null,
       primaryKey: true,
       autoIncrement: false,
       comment: null,
-      field: "id"
+      field: "item_id"
     },
-    name: {
-      type: DataTypes.STRING(250),
+    brand: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "brand"
+    },
+    type: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "type"
+    },
+    weight: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "weight"
+    },
+    cost_price: {
+      type: DataTypes.DECIMAL,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "cost_price"
+    },
+    selling_price: {
+      type: DataTypes.DECIMAL,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "selling_price"
+    },
+    MRP: {
+      type: DataTypes.DECIMAL,
       allowNull: false,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "name"
+      field: "MRP"
     },
-    item_cd: {
-      type: DataTypes.STRING(250),
-      allowNull: false,
+    CGST: {
+      type: DataTypes.DECIMAL,
+      allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "item_cd"
+      field: "CGST"
+    },
+    SGST: {
+      type: DataTypes.DECIMAL,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "SGST"
+    },
+    IGST: {
+      type: DataTypes.DECIMAL,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "IGST"
+    },
+    other_tax: {
+      type: DataTypes.DECIMAL,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "other_tax"
+    },
+    discount: {
+      type: DataTypes.DECIMAL,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "discount"
     },
     UOM: {
-      type: DataTypes.STRING(45),
+      type: DataTypes.STRING(50),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
@@ -40,86 +121,14 @@ module.exports = sequelize => {
       comment: null,
       field: "UOM"
     },
-    units: {
-      type: DataTypes.DECIMAL,
+    image: {
+      type: DataTypes.STRING(255),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "units"
-    },
-    brand_id: {
-      type: DataTypes.BIGINT,
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "brand_id"
-    },
-    div_id: {
-      type: DataTypes.BIGINT,
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "div_id"
-    },
-    category_id: {
-      type: DataTypes.BIGINT,
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "category_id"
-    },
-    sub_category_id: {
-      type: DataTypes.BIGINT,
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "sub_category_id"
-    },
-    department_id: {
-      type: DataTypes.BIGINT,
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "department_id"
-    },
-    color_id: {
-      type: DataTypes.BIGINT,
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "color_id"
-    },
-    size_id: {
-      type: DataTypes.BIGINT,
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "size_id"
-    },
-    active_ind: {
-      type: DataTypes.CHAR(1),
-      allowNull: false,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "active_ind"
+      field: "image"
     },
     created_by: {
       type: DataTypes.BIGINT,
@@ -157,66 +166,21 @@ module.exports = sequelize => {
       comment: null,
       field: "updated_at"
     },
-    image: {
-      type: DataTypes.STRING(255),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "image"
-    },
-    description: {
-      type: DataTypes.STRING(100),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "description"
-    },
-    available_for_ecomm: {
+    is_percentage: {
       type: DataTypes.INTEGER(1),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "available_for_ecomm"
-    },
-    is_gift: {
-      type: DataTypes.INTEGER(1),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "is_gift"
-    },
-    is_grocernest: {
-      type: DataTypes.INTEGER(1),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "is_grocernest"
-    },
-    selected_batch: {
-      type: DataTypes.BIGINT,
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "selected_batch"
+      field: "is_percentage"
     }
   };
   const options = {
-    tableName: "t_item",
+    tableName: "t_milk_items",
     comment: "",
     indexes: []
   };
-  const TItemModel = sequelize.define("t_item_model", attributes, options);
-  return TItemModel;
+  const TMilkItemsModel = sequelize.define("t_milk_items_model", attributes, options);
+  return TMilkItemsModel;
 };

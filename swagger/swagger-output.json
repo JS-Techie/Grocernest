@@ -2264,6 +2264,206 @@
           }
         }
       }
+    },
+    "/admin/milk/item/view/all": {
+      "get": {
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/admin/milk/item/view/{itemID}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "itemID",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/admin/milk/item/create": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "brand": {
+                  "example": "any"
+                },
+                "type": {
+                  "example": "any"
+                },
+                "weight": {
+                  "example": "any"
+                },
+                "cost_price": {
+                  "example": "any"
+                },
+                "selling_price": {
+                  "example": "any"
+                },
+                "MRP": {
+                  "example": "any"
+                },
+                "CGST": {
+                  "example": "any"
+                },
+                "SGST": {
+                  "example": "any"
+                },
+                "IGST": {
+                  "example": "any"
+                },
+                "other_tax": {
+                  "example": "any"
+                },
+                "discount": {
+                  "example": "any"
+                },
+                "UOM": {
+                  "example": "any"
+                },
+                "is_percentage": {
+                  "example": "any"
+                },
+                "base64": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/admin/milk/item/edit/{itemID}": {
+      "patch": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "itemID",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "brand": {
+                  "example": "any"
+                },
+                "type": {
+                  "example": "any"
+                },
+                "weight": {
+                  "example": "any"
+                },
+                "cost_price": {
+                  "example": "any"
+                },
+                "selling_price": {
+                  "example": "any"
+                },
+                "MRP": {
+                  "example": "any"
+                },
+                "CGST": {
+                  "example": "any"
+                },
+                "SGST": {
+                  "example": "any"
+                },
+                "IGST": {
+                  "example": "any"
+                },
+                "other_tax": {
+                  "example": "any"
+                },
+                "discount": {
+                  "example": "any"
+                },
+                "UOM": {
+                  "example": "any"
+                },
+                "base64": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/admin/milk/item/delete/{itemID}": {
+      "delete": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "itemID",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
     }
   }
 }
