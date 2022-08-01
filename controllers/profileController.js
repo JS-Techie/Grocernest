@@ -148,7 +148,7 @@ const editProfile = async (req, res, next) => {
       {
         cust_name: enteredFirstName + " " + enteredLastName,
         email: email ? email : "",
-        image : base64 ? url : null
+        image : currentUserProfile.image ? currentUserProfile.image : base64 ? url : null
       },
       { where: { cust_no: currentUser } }
     );
