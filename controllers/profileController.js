@@ -3,7 +3,7 @@ const { generateOTP, sendOTPToPhoneNumber } = require("../services/otpService");
 const db = require("../models");
 const S3 = require("aws-sdk/clients/s3");
 const s3Config = require("../config/s3Config");
-const uniqid = require("uniqid")
+const uniqid = require("uniqid");
 
 const s3 = new S3(s3Config);
 
@@ -129,7 +129,7 @@ const editProfile = async (req, res, next) => {
     };
 
     const s3UploadResponse = await s3.upload(params).promise();
-     url = s3UploadResponse.Location;
+    url = s3UploadResponse.Location;
   }
   try {
     const currentUserProfile = await Customer.findOne({
@@ -148,7 +148,11 @@ const editProfile = async (req, res, next) => {
       {
         cust_name: enteredFirstName + " " + enteredLastName,
         email: email ? email : "",
-        image : currentUserProfile.image ? currentUserProfile.image : base64 ? url : null
+        image: base64
+          ? url
+          : currentUserProfile.image
+          ? currentUserProfile.image
+          : null,
       },
       { where: { cust_no: currentUser } }
     );
