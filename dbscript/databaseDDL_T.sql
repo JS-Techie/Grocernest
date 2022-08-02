@@ -79,6 +79,8 @@ CREATE TABLE `t_milk_items` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`item_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+ALTER TABLE ecomm.t_milk_items ADD item_code varchar(100) NULL;
+
 
 
 CREATE TABLE `t_subscription` (

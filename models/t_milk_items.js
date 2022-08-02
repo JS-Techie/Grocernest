@@ -183,6 +183,15 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "category"
+    },
+    item_code: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "item_code"
     }
   };
   const options = {
