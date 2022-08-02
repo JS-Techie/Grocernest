@@ -80,7 +80,7 @@ const createItem = async (req, res, next) => {
     UOM,
     is_percentage,
     base64,
-    category
+    category,
   } = req.body;
 
   try {
@@ -119,7 +119,7 @@ const createItem = async (req, res, next) => {
       created_by: 1,
       updated_by: 1,
       image: url,
-      category
+      category,
     });
 
     return res.status(201).send({
@@ -153,7 +153,8 @@ const editItem = async (req, res, next) => {
     discount,
     UOM,
     base64,
-    category
+    category,
+    is_percentage,
   } = req.body;
 
   try {
@@ -204,7 +205,8 @@ const editItem = async (req, res, next) => {
         discount,
         UOM,
         image: base64 ? url : existingItem.image,
-        category
+        category,
+        is_percentage: is_percentage === true ? 1 : null,
       },
       { where: { item_id: itemID } }
     );
