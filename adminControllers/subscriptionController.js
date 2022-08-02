@@ -32,6 +32,7 @@ const getAllSubscriptions = async (req, res, next) => {
     });
   }
 };
+
 const getSubscriptionById = async (req, res, next) => {
   const id = req.params.subscriptionID;
   try {
@@ -61,10 +62,16 @@ const getSubscriptionById = async (req, res, next) => {
     });
   }
 };
+
 const editSubscription = async (req, res, next) => {};
+
+const generateInvoice = async (req, res, next) => {};
+
+
 
 module.exports = {
   getAllSubscriptions,
   getSubscriptionById,
   editSubscription,
+  generateInvoice,
 };

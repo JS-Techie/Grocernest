@@ -129,6 +129,10 @@ db.OffersCacheModel = require("./t_offer_cache")(db.sequelize, Sequelize);
 
 db.MilkItemsModel = require("./t_milk_items")(db.sequelize, Sequelize);
 
+db.SubscriptionsModel = require("./t_subscription")(db.sequelize, Sequelize);
+
+db.SubscriptionItemsModel = require("./t_subscription_items")(db.sequelize, Sequelize)
+
 // Relations between tables
 
 db.WalletModel.hasMany(db.WalletTransactionModel, { foreignKey: "wallet_id" }); //one to many mapping
@@ -162,5 +166,7 @@ db.WalletModel.hasMany(db.WalletTransactionModel, { foreignKey: "wallet_id" }); 
 db.CustomerModel.hasMany(db.AddressModel, { foreignKey: "cust_no" });
 
 db.CartModel.hasMany(db.ItemModel, { foreignKey: "id" });
+
+db.SubscriptionsModel.hasMany(db.SubscriptionItemsModel,{foreignKey : "subscription_id"})
 
 module.exports = db;
