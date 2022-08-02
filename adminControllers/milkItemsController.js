@@ -81,6 +81,7 @@ const createItem = async (req, res, next) => {
     is_percentage,
     base64,
     category,
+    item_code
   } = req.body;
 
   try {
@@ -120,6 +121,7 @@ const createItem = async (req, res, next) => {
       updated_by: 1,
       image: url,
       category,
+      item_code
     });
 
     return res.status(201).send({
@@ -155,6 +157,7 @@ const editItem = async (req, res, next) => {
     base64,
     category,
     is_percentage,
+    item_code
   } = req.body;
 
   try {
@@ -207,6 +210,7 @@ const editItem = async (req, res, next) => {
         image: base64 ? url : existingItem.image,
         category,
         is_percentage: is_percentage === true ? 1 : null,
+        item_code,
       },
       { where: { item_id: itemID } }
     );
