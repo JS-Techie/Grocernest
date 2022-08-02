@@ -79,3 +79,32 @@ CREATE TABLE `t_milk_items` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`item_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+CREATE TABLE `t_subscription` (
+  `id` varchar(255) NOT NULL,
+  `cust_no` varchar(100) NULL,
+  `status` enum('Paused','Ongoing','Cancelled') NULL,
+  `admin_status` enum('Accepted','Declined','Started','Canceled') NULL,
+  `start_date` timestamp NULL,
+  `end_date` timestamp NULL, 
+  `created_by` bigint(20) NOT NULL,
+  `updated_by` bigint(20) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TABLE `t_subscription_items` (
+  `id` bigint(20) NOT NULL,
+  `subscription_id` varchar(255) NULL,
+  
+  `item_id` varchar(255) NULL,
+  `quantity` bigint(20) NULL,
+
+  `created_by` bigint(20) NOT NULL,
+  `updated_by` bigint(20) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
