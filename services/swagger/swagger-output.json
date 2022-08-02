@@ -2376,6 +2376,9 @@
                 },
                 "category": {
                   "example": "any"
+                },
+                "item_code": {
+                  "example": "any"
                 }
               }
             }
@@ -2458,6 +2461,9 @@
                   "example": "any"
                 },
                 "is_percentage": {
+                  "example": "any"
+                },
+                "item_code": {
                   "example": "any"
                 }
               }

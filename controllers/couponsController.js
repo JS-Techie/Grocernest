@@ -62,6 +62,8 @@ const getAllAvailableCoupons = async (req, res, next) => {
         });
       }
 
+      
+
       const promises = await coupons.map(async (current) => {
         if (current.expiry_date !== null) {
           if (new Date(current.expiry_date) >= Date.now()) {
@@ -85,6 +87,7 @@ const getAllAvailableCoupons = async (req, res, next) => {
       });
 
       const resolved = await Promise.all(promises);
+
       const resolvedWithoutUndefined = await resolved.filter((current) => {
         return current !== undefined;
       });
@@ -107,31 +110,52 @@ const getAllAvailableCoupons = async (req, res, next) => {
       });
 
       const [coupons, metadata] =
-        await sequelize.query(`select t_coupons.code, t_coupons.amount_of_discount ,t_coupons.is_percentage ,t_coupons.description
+        await sequelize.query(`select t_coupons.code, t_coupons.amount_of_discount ,t_coupons.is_percentage ,t_coupons.description,t_coupons.expiry_date
         from ecomm.t_coupons
         where t_coupons.item_id = ${currentItem.id} OR t_coupons.cat_id = ${currentItem.category_id} OR t_coupons.sub_cat_id = ${currentItem.sub_category_id} or t_coupons.brand_id = ${currentItem.brand_id} 
         or t_coupons.assigned_user = "${currentUser}" or (${total} <= t_coupons.max_purchase and ${total} >= t_coupons.min_purchase )`);
-
-      const innerPromise = coupons.map((currentCoupon) => {
-        return {
-          couponCode: currentCoupon.code,
-          amount: currentCoupon.amount_of_discount,
-          description: currentCoupon.description,
-        };
+    
+      const innerPromise = coupons.map((current) => {
+        if (current.expiry_date !== null) {
+          if (new Date(current.expiry_date) >= Date.now()) {
+            return {
+              couponCode: current.code,
+              amount: current.is_percentage
+                ? current.amount_of_discount + " %"
+                : current.amount_of_discount,
+              description: current.description,
+            };
+          }
+        } else {
+          return {
+            couponCode: current.code,
+            amount: current.is_percentage
+              ? current.amount_of_discount + " %"
+              : current.amount_of_discount,
+            description: current.description,
+          };
+        }
       });
 
       return await Promise.all(innerPromise);
     });
 
     const resolved = await Promise.all(promiseArray);
+    console.log(resolved);
+
     const response = resolved.filter((value, index, self) => {
       return self.indexOf(value) === index;
     });
+  
 
     const flattenedArray = response.flat(1);
+    
+    const resolvedWithoutUndefined =  flattenedArray.filter((current) => {
+      return current !== undefined;
+    });
     const responseArray = [
       ...new Map(
-        flattenedArray.map((item) => [item["couponCode"], item])
+        resolvedWithoutUndefined.map((item) => [item["couponCode"], item])
       ).values(),
     ];
 
