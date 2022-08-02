@@ -2,6 +2,10 @@ const uniqid = require("uniqid");
 
 const db = require("../models");
 const MilkItems = db.MilkItemsModel;
+const S3 = require("aws-sdk/clients/s3");
+const s3Config = require("../config/s3Config");
+
+const s3 = new S3(s3Config);
 
 const getAllItems = async (req, res, next) => {
   try {
@@ -80,6 +84,21 @@ const createItem = async (req, res, next) => {
 
   try {
     //upload base64 image to AWS and assign image to the URL
+    const base64Data = new Buffer.from(
+      base64.replace(/^data:image\/\w+;base64,/, ""),
+      "base64"
+    );
+    //const type = base64.split(";")[0].split("/")[1];
+    const params = {
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Key: `profile/images/${uniqid()}.jpeg`,
+      Body: base64Data,
+      ContentEncoding: "base64",
+      ContentType: `image/jpeg`,
+    };
+
+    const s3UploadResponse = await s3.upload(params).promise();
+    const url = s3UploadResponse.Location;
 
     const newItem = await MilkItems.create({
       item_id: uniqid(),
@@ -98,6 +117,7 @@ const createItem = async (req, res, next) => {
       is_percentage: is_percentage === true ? 1 : null,
       created_by: 1,
       updated_by: 1,
+      image: url,
     });
 
     return res.status(201).send({
@@ -135,6 +155,24 @@ const editItem = async (req, res, next) => {
 
   try {
     //If image, upload to AWS and assign URL to image
+    let url;
+    if (base64) {
+      const base64Data = new Buffer.from(
+        base64.replace(/^data:image\/\w+;base64,/, ""),
+        "base64"
+      );
+      //const type = base64.split(";")[0].split("/")[1];
+      const params = {
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: `profile/images/${uniqid()}.jpeg`,
+        Body: base64Data,
+        ContentEncoding: "base64",
+        ContentType: `image/jpeg`,
+      };
+
+      const s3UploadResponse = await s3.upload(params).promise();
+      url = s3UploadResponse.Location;
+    }
 
     const existingItem = await MilkItems.findOne({
       where: { item_id: itemID },
@@ -162,6 +200,7 @@ const editItem = async (req, res, next) => {
         other_tax,
         discount,
         UOM,
+        image: url,
       },
       { where: { item_id: itemID } }
     );
