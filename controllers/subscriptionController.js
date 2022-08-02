@@ -3,6 +3,7 @@ const uniqid = require("uniqid");
 const db = require("../models");
 const Subscriptions = db.SubscriptionsModel;
 const SubscriptionItems = db.SubscriptionItemsModel;
+const MilkItems = db.MilkItemsModel;
 
 const createSubscription = async (req, res, next) => {
   const currentUser = req.cust_no;
@@ -260,6 +261,7 @@ const getAllSubscriptions = async (req, res, next) => {
     });
   }
 };
+
 const getSubscriptionById = async (req, res, next) => {
   const cust_no = req.cust_no;
   const subs_id = req.params.id;
@@ -296,6 +298,30 @@ const getSubscriptionById = async (req, res, next) => {
   }
 };
 
+const getAllItems = async(req,res,next) => {
+
+    try {
+        const items = await MilkItems.findAll();
+        if(items.length === 0){
+            return res.status(200).send({
+                success : true,
+                data : [],
+                message : "There are no items to show right now"
+            })
+        }
+        return res.status(200).send({
+            success : true,
+            data : items,
+            message : "Fetched all items successfully"
+        })
+    } catch (error) {
+        return res.status(400).send({
+            success : false,
+            data : error.message,
+            message : "Something went wrong while fetching items, please check data field for more details"
+        })
+    }
+}
 module.exports = {
   getAllSubscriptions,
   getSubscriptionById,
@@ -303,4 +329,5 @@ module.exports = {
   editSubscriptionDetails,
   modifySubscriptionStatus,
   deleteSubscription,
+  getAllItems
 };
