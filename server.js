@@ -62,6 +62,9 @@ const adminCouponsRouter = require("./adminRoutes/couponRoutes");
 const adminOffersRouter = require("./adminRoutes/offerRoutes");
 const adminMilkItemsRouter = require("./adminRoutes/milkItemsRoutes");
 
+// milk routes
+const SubscriptionRouter = require("./routes/subscriptionRoutes");
+
 //routes
 app.get("/responses", (req, res) => {
   res.send(endPoint);
@@ -93,6 +96,10 @@ app.use("/admin/gift", adminGiftRouter);
 app.use("/admin/coupons", adminCouponsRouter);
 app.use("/admin/offers", adminOffersRouter);
 app.use("/admin/milk/item", adminMilkItemsRouter);
+
+// milk
+app.use("/subscription", SubscriptionRouter);
+
 
 //Start server and connect to DB
 const db = require("./services/dbSetupService.js");
