@@ -11,10 +11,10 @@ const {
   deleteItem,
 } = require("../adminControllers/milkItemsController");
 
-router.route("/view/all").get(getAllItems);
-router.route("/view/:itemID").get(getItemByID);
-router.route("/create").post(createItem);
-router.route("/edit/:itemID").patch(editItem);
-router.route("/delete/:itemID").delete(deleteItem);
+router.route("/view/all").get(admin, getAllItems);
+router.route("/view/:itemID").get(admin, getItemByID);
+router.route("/create").post(admin, createItem);
+router.route("/edit/:itemID").patch(admin, editItem);
+router.route("/delete/:itemID").delete(admin, deleteItem);
 
 module.exports = router;
