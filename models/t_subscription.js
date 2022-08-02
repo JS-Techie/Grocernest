@@ -23,7 +23,7 @@ module.exports = sequelize => {
       field: "cust_no"
     },
     status: {
-      type: DataTypes.ENUM('Paused', 'Ongoing', 'Cancelled'),
+      type: DataTypes.ENUM('Paused', 'Pending', 'Ongoing', 'Cancelled'),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
@@ -32,7 +32,7 @@ module.exports = sequelize => {
       field: "status"
     },
     admin_status: {
-      type: DataTypes.ENUM('Accepted', 'Declined', 'Started', 'Canceled'),
+      type: DataTypes.ENUM('Accepted', 'Pending', 'Declined', 'Started', 'Canceled'),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
@@ -93,6 +93,24 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "updated_at"
+    },
+    type: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "type"
+    },
+    name: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "name"
     }
   };
   const options = {

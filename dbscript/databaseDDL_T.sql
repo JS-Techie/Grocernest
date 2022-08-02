@@ -84,6 +84,8 @@ CREATE TABLE `t_milk_items` (
 CREATE TABLE `t_subscription` (
   `id` varchar(255) NOT NULL,
   `cust_no` varchar(100) NULL,
+  `name` varchar(100) NULL,
+  `type` varchar(100) NULL,
   `status` enum('Paused','Ongoing','Cancelled') NULL,
   `admin_status` enum('Accepted','Declined','Started','Canceled') NULL,
   `start_date` timestamp NULL,
