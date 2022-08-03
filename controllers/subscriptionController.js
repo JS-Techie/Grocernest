@@ -23,7 +23,7 @@ const createSubscription = async (req, res, next) => {
 
     const promises = items.map(async (current) => {
       return {
-        id: current.item_id,
+        item_id: current.item_id,
         quantity: current.quantity,
         subscription_id: newSubscription.id,
         created_by: 1,
@@ -56,7 +56,8 @@ const createSubscription = async (req, res, next) => {
 const editSubscriptionDetails = async (req, res, next) => {
   //get current user from JWT
   const currentUser = req.cust_no;
-  const { subscription_id, item_id, quantity, name, type } = req.body;
+  const subscription_id = req.params.id;
+  const { item_id, quantity, name, type } = req.body;
   try {
     const existingSub = await Subscriptions.findOne({
       where: { id: subscription_id, cust_no: currentUser },
@@ -74,7 +75,7 @@ const editSubscriptionDetails = async (req, res, next) => {
       where: { subscription_id, item_id },
     });
 
-    const updateName = await existingItemInSub.update(
+    const updateName = await existingSub.update(
       {
         name,
         type,
@@ -153,7 +154,7 @@ const modifySubscriptionStatus = async (req, res, next) => {
       }
     );
 
-    const updatedSub = await SubscriptionItems.findOne({
+    const updatedSub = await Subscriptions.findOne({
       where: { cust_no: currentUser, id },
     });
 

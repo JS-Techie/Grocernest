@@ -64,6 +64,7 @@ const adminMilkItemsRouter = require("./routes/admin/milkItemsRoutes");
 
 // milk routes
 const SubscriptionRouter = require("./routes/subscriptionRoutes");
+const deliveryRouter = require("./routes/deliveryRoutes");
 
 //routes
 app.get("/responses", (req, res) => {
@@ -99,7 +100,7 @@ app.use("/admin/milk/item", adminMilkItemsRouter);
 
 // milk
 app.use("/subscription", SubscriptionRouter);
-
+app.use("/delivery", deliveryRouter);
 
 //Start server and connect to DB
 const db = require("./services/dbSetupService.js");

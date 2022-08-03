@@ -184,4 +184,19 @@ ALTER TABLE ecomm.t_order_items ADD is_offer BOOL NULL;
 ALTER TABLE ecomm.t_order_items ADD offer_price DECIMAL(10,2) NULL;
 ALTER TABLE ecomm.t_customer ADD image varchar(255) NULL;
 
-
+CREATE TABLE ecomm.t_milk_delivery  (
+	delivery_boy varchar(100) NULL,
+	subscription_id varchar(255) NULL,
+	cust_no varchar(20) NULL,
+	id BIGINT(20) auto_increment NOT NULL,
+	address_id varchar(255) NULL,
+	status ENUM("Pending","Delivered","Accepted") NULL,
+	`created_by` bigint(20) NOT NULL,
+  	`updated_by` bigint(20) DEFAULT NULL,
+  	`created_at` timestamp NULL DEFAULT current_timestamp(),
+  	`updated_at` timestamp NULL DEFAULT NULL,
+  	primary key (`id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_general_ci;

@@ -133,6 +133,8 @@ db.SubscriptionsModel = require("./t_subscription")(db.sequelize, Sequelize);
 
 db.SubscriptionItemsModel = require("./t_subscription_items")(db.sequelize, Sequelize)
 
+db.MilkDeliveryModel = require("./t_milk_delivery")(db.sequelize, Sequelize)
+
 // Relations between tables
 
 db.WalletModel.hasMany(db.WalletTransactionModel, { foreignKey: "wallet_id" }); //one to many mapping

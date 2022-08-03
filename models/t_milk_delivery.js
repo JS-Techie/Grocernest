@@ -4,17 +4,26 @@ const {
 
 module.exports = sequelize => {
   const attributes = {
-    id: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
+    delivery_boy: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
       defaultValue: null,
-      primaryKey: true,
+      primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "id"
+      field: "delivery_boy"
+    },
+    subscription_id: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "subscription_id"
     },
     cust_no: {
-      type: DataTypes.STRING(100),
+      type: DataTypes.STRING(20),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
@@ -22,41 +31,32 @@ module.exports = sequelize => {
       comment: null,
       field: "cust_no"
     },
+    id: {
+      type: DataTypes.BIGINT,
+      allowNull: false,
+      defaultValue: null,
+      primaryKey: true,
+      autoIncrement: true,
+      comment: null,
+      field: "id"
+    },
+    address_id: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "address_id"
+    },
     status: {
-      type: DataTypes.ENUM('Paused', 'Pending', 'Ongoing', 'Cancelled'),
+      type: DataTypes.ENUM('Pending', 'Delivered', 'Accepted'),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
       field: "status"
-    },
-    admin_status: {
-      type: DataTypes.ENUM('Accepted', 'Pending', 'Declined', 'Started', 'Canceled'),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "admin_status"
-    },
-    start_date: {
-      type: DataTypes.DATE,
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "start_date"
-    },
-    end_date: {
-      type: DataTypes.DATE,
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "end_date"
     },
     created_by: {
       type: DataTypes.BIGINT,
@@ -78,7 +78,7 @@ module.exports = sequelize => {
     },
     created_at: {
       type: DataTypes.DATE,
-      allowNull: false,
+      allowNull: true,
       defaultValue: sequelize.fn('current_timestamp'),
       primaryKey: false,
       autoIncrement: false,
@@ -93,40 +93,13 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "updated_at"
-    },
-    type: {
-      type: DataTypes.STRING(100),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "type"
-    },
-    name: {
-      type: DataTypes.STRING(100),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "name"
-    },
-    cancellation_reason: {
-      type: DataTypes.STRING(255),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "cancellation_reason"
     }
   };
   const options = {
-    tableName: "t_subscription",
+    tableName: "t_milk_delivery",
     comment: "",
     indexes: []
   };
-  const TSubscriptionModel = sequelize.define("t_subscription_model", attributes, options);
-  return TSubscriptionModel;
+  const TMilkDeliveryModel = sequelize.define("t_milk_delivery_model", attributes, options);
+  return TMilkDeliveryModel;
 };
