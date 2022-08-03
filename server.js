@@ -60,10 +60,18 @@ const adminCustomerRouter = require("./routes/admin/customerRoutes");
 const adminGiftRouter = require("./routes/admin/giftRoutes");
 const adminCouponsRouter = require("./routes/admin/couponRoutes");
 const adminOffersRouter = require("./routes/admin/offerRoutes");
+
+
+// milk routes import (user)
+
+
+// milk routes import (admin)
 const adminMilkItemsRouter = require("./routes/admin/milkItemsRoutes");
 
-// milk routes
 const SubscriptionRouter = require("./routes/subscriptionRoutes");
+const adminMilkSubscriptionRouter = require("./routes/admin/milkSubscriptionRoutes");
+
+
 
 //routes
 app.get("/responses", (req, res) => {
@@ -95,10 +103,18 @@ app.use("/admin/customer", adminCustomerRouter);
 app.use("/admin/gift", adminGiftRouter);
 app.use("/admin/coupons", adminCouponsRouter);
 app.use("/admin/offers", adminOffersRouter);
-app.use("/admin/milk/item", adminMilkItemsRouter);
 
-// milk
+
+// milk (user)
 app.use("/subscription", SubscriptionRouter);
+
+
+// milk (admin)
+app.use("/admin/milk/item", adminMilkItemsRouter);
+app.use("/admin/milk/subscription", adminMilkSubscriptionRouter);
+
+
+
 
 
 //Start server and connect to DB
