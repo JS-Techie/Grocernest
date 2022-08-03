@@ -105,23 +105,90 @@ const getAllSubscriptionsWithFilter = async (req, res, next) => {
 };
 
 const getSubscriptionDetailsById = async (req, res, next) => {
-    const id = req.params.subscriptionID;
+
     try {
-        const subscription = await Subscription.findOne({
-            include: { model: SubscriptionItems },
-            where: { id },
-        });
-        if (!subscription) {
+        const subscriptionId = req.params.subscriptionID;
+
+        const [cust_result, metadata] = await sequelize.query(
+            `
+                  select 
+                  tc.cust_no ,
+                  tc.cust_name ,
+                  tc.email ,
+                  tc.contact_no ,
+                  tc.comments 
+                  from t_customer tc inner join t_subscription ts 
+                  where
+                  tc.cust_no = ts.cust_no and
+                  ts.id = "${subscriptionId}"
+                  `
+        );
+
+        const [subs_result, metadata3] = await sequelize.query(
+            `
+                  select 
+                  ts.id ,
+                  ts.status ,
+                  ts.admin_status ,
+                  ts.start_date,
+                  ts.end_date ,
+                  ts.type,
+                  ts.name,
+                  ts.address_id,
+                  ts.cancellation_reason 
+                  from t_subscription ts
+                  where
+                  ts.id = "${subscriptionId}"
+                  `
+        );
+
+        const [item_result, metadata2] = await sequelize.query(`
+            SELECT ts.id,
+            tsi.item_id ,
+            tmi.brand ,
+            tmi.type ,
+            tmi.weight ,
+            tmi.cost_price ,
+            tmi.selling_price ,
+            tmi.MRP ,
+            tmi.CGST ,
+            tmi.SGST ,
+            tmi.IGST ,
+            tmi.other_tax ,
+            tmi.discount ,
+            tmi.UOM ,
+            tmi.image ,
+            tmi.is_percentage ,
+            tmi.category ,
+            tmi.item_code ,
+            tsi.quantity
+            from t_subscription ts 
+            inner join t_subscription_items tsi 
+            inner join t_milk_items tmi 
+            where 
+            ts.id = tsi.subscription_id 
+            AND 
+            tsi.item_id  = tmi.item_id 
+            AND 
+            ts.id ="${subscriptionId}"
+`);
+
+        if (item_result.length == 0) {
             return res.status(404).send({
                 success: false,
-                data: [],
-                message: "Requested subscription not found",
+                data: null,
+                message: "Could not fetch requested subscription for the current id",
             });
         }
 
         return res.status(200).send({
             success: true,
-            data: subscription,
+            data: {
+
+                customer_details: cust_result[0],
+                subscription_details: subs_result,
+                itemDetails: item_result
+            },
             message: "Successfully fetched requested subscription",
         });
     } catch (error) {
@@ -129,7 +196,7 @@ const getSubscriptionDetailsById = async (req, res, next) => {
             success: false,
             data: error.message,
             message:
-                "Something went wrong while fetching subscriptions, please check data field for more details",
+                "Something went wrong while subscription details, please check data field for more details",
         });
     }
 };
