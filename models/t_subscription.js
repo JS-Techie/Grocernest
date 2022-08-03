@@ -120,6 +120,15 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "cancellation_reason"
+    },
+    address_id: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "address_id"
     }
   };
   const options = {
