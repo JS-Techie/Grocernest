@@ -1,6 +1,6 @@
 const cc = require("coupon-code");
 
-const db = require("../models");
+const db = require("../../models");
 
 const Coupons = db.CouponsModel;
 const Category = db.LkpCategoryModel;

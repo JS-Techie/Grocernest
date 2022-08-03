@@ -1,7 +1,7 @@
 const { Op } = require("sequelize");
 const { sequelize } = require("../models");
 const db = require("../models");
-const WalletService = require('../adminControllers/service/walletService');
+const WalletService = require('../services/walletService');
 const {
   sendCancelledByUserStatusEmail
 } = require("../services/mail/mailService");

@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const admin = require("../middleware/authenticateAdmin");
+const admin = require("../../middleware/authenticateAdmin");
 
 const {
   getGifts,
@@ -10,7 +10,7 @@ const {
   updateStrategy,
   deleteStrategy,
   getStrategyById,
-} = require("../adminControllers/giftController");
+} = require("../../controllers/admin/giftController");
 
 router.route("/all").get(admin, getGifts);
 router.route("/strategy/all").get(admin, viewStrategies);

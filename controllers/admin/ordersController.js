@@ -1,12 +1,12 @@
-const { sequelize } = require("../models");
+const { sequelize } = require("../../models");
 const { Op } = require("sequelize");
-const db = require("../models");
+const db = require("../../models");
 const Order = db.OrderModel;
 const {
   sendOrderStatusEmail,
   sendCancelledStatusEmail,
-} = require("../services/mail/mailService");
-const WalletService = require('./service/walletService');
+} = require("../../services/mail/mailService");
+const WalletService = require('../../services/walletService');
 // const Customer = db.CustomerModel;
 const Batch = db.BatchModel;
 const Customer = db.CustomerModel;

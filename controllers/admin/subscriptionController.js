@@ -1,4 +1,4 @@
-const db = require("../models");
+const db = require("../../models");
 const Subscription = db.SubscriptionModel;
 const SubscriptionItems = db.SubscriptionItemsModel;
 
@@ -63,9 +63,9 @@ const getSubscriptionById = async (req, res, next) => {
   }
 };
 
-const editSubscription = async (req, res, next) => {};
+const editSubscription = async (req, res, next) => { };
 
-const generateInvoice = async (req, res, next) => {};
+const generateInvoice = async (req, res, next) => { };
 
 
 

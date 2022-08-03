@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const authenticateAdmin = require("../middleware/authenticateAdmin")
+const authenticateAdmin = require("../../middleware/authenticateAdmin")
 
 const {
     getAllPendingOrders,
@@ -13,7 +13,7 @@ const {
     getDeliveredOrders,
     getCanceledorders,
     getAllOrderByPhoneNumber
-} = require("../adminControllers/ordersController.js");
+} = require("../../controllers/admin/ordersController.js");
 
 router.route('/pending').get(authenticateAdmin, getAllPendingOrders);
 

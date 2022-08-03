@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
 
-const admin = require("../middleware/authenticateAdmin")
+const admin = require("../../middleware/authenticateAdmin")
 
-const {getAllSubscriptions,getSubscriptionById,editSubscription,generateInvoice} = require("../adminControllers/subscriptionController");
+const { getAllSubscriptions, getSubscriptionById, editSubscription, generateInvoice } = require("../../adminControllers/subscriptionController");
 
 router.route("/view/all").get(getAllSubscriptions);
 router.route("/view/:subscriptionID").get(getSubscriptionById);

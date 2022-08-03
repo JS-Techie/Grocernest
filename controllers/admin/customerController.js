@@ -1,6 +1,6 @@
-const { sequelize } = require("../models");
+const { sequelize } = require("../../models");
 const Sequelize = require('sequelize');
-const db = require("../models");
+const db = require("../../models");
 const Op = Sequelize.Op;
 const Customer = db.CustomerModel
 

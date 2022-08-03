@@ -1,16 +1,16 @@
 const express = require("express");
 const router = express.Router();
 
-const admin = require("../middleware/authenticateAdmin");
+const admin = require("../../middleware/authenticateAdmin");
 
-const{
+const {
     getAllOffers,
     getOfferById,
     createOffer,
     updateOffer,
     deleteOffer,
     activateOffer,
-} = require("../adminControllers/offerController");
+} = require("../../controllers/admin/offerController");
 
 router.route("/view/all").get(admin, getAllOffers)
 router.route("/view/:id").get(admin, getOfferById)

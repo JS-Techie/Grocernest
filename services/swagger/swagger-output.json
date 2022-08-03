@@ -2132,6 +2132,9 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "OK"
+          },
           "400": {
             "description": "Bad Request"
           },
@@ -2158,6 +2161,9 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "OK"
+          },
           "400": {
             "description": "Bad Request"
           },
@@ -2175,9 +2181,45 @@
             "name": "authorization",
             "in": "header",
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "example": "any"
+                },
+                "item_id_1": {
+                  "example": "any"
+                },
+                "item_id_2": {
+                  "example": "any"
+                },
+                "item_1_quantity": {
+                  "example": "any"
+                },
+                "item_2_quantity": {
+                  "example": "any"
+                },
+                "item_id": {
+                  "example": "any"
+                },
+                "amount_of_discount": {
+                  "example": "any"
+                },
+                "is_percentage": {
+                  "example": "any"
+                }
+              }
+            }
           }
         ],
         "responses": {
+          "201": {
+            "description": "Created"
+          },
           "400": {
             "description": "Bad Request"
           },
@@ -2201,9 +2243,48 @@
             "name": "authorization",
             "in": "header",
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "example": "any"
+                },
+                "item_id_1": {
+                  "example": "any"
+                },
+                "item_id_2": {
+                  "example": "any"
+                },
+                "item_1_quantity": {
+                  "example": "any"
+                },
+                "item_2_quantity": {
+                  "example": "any"
+                },
+                "item_id": {
+                  "example": "any"
+                },
+                "amount_of_discount": {
+                  "example": "any"
+                },
+                "is_percentage": {
+                  "example": "any"
+                },
+                "is_active": {
+                  "example": "any"
+                }
+              }
+            }
           }
         ],
         "responses": {
+          "200": {
+            "description": "OK"
+          },
           "400": {
             "description": "Bad Request"
           },
@@ -2230,6 +2311,9 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "OK"
+          },
           "400": {
             "description": "Bad Request"
           },
@@ -2256,6 +2340,9 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "OK"
+          },
           "400": {
             "description": "Bad Request"
           },

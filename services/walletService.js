@@ -1,5 +1,5 @@
-const db = require('../../models');
-const { sequelize } = require("../../models");
+const db = require('../models');
+const { sequelize } = require("../models");
 const uniqid = require('uniqid');
 
 // const Wallet = db.WalletModel

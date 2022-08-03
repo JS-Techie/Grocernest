@@ -1,13 +1,13 @@
 const express = require("express");
 const router = express.Router();
 
-const authenticateAdmin = require("../middleware/authenticateAdmin")
+const authenticateAdmin = require("../../middleware/authenticateAdmin")
 
 const {
     checkWalletDetails,
     creditAmountToWallet,
     debitAmountFromWallet
-} = require("../adminControllers/walletController.js");
+} = require("../../controllers/admin/walletController.js");
 
 router.route('/check/details/:cust_no').get(authenticateAdmin, checkWalletDetails);
 

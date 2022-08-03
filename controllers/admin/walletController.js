@@ -1,7 +1,7 @@
-const db = require('../models');
-const { sequelize } = require("../models");
+const db = require('../../models');
+const { sequelize } = require("../../models");
 const uniqid = require('uniqid');
-const WalletService = require('./service/walletService');
+const WalletService = require('../../services/walletService');
 
 const Wallet = db.WalletModel
 const WalletTransaction = db.WalletTransactionModel;

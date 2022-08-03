@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const admin = require("../middleware/authenticateAdmin");
+const admin = require("../../middleware/authenticateAdmin");
 
 const {
   getAllItems,
@@ -9,7 +9,7 @@ const {
   createItem,
   editItem,
   deleteItem,
-} = require("../adminControllers/milkItemsController");
+} = require("../../controllers/admin/milkItemsController");
 
 router.route("/view/all").get(admin, getAllItems);
 router.route("/view/:itemID").get(admin, getItemByID);

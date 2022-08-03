@@ -54,13 +54,13 @@ const invoiceRouter = require("./routes/invoiceRoutes");
 const offerRouter = require("./routes/offerRoutes");
 
 // admin routers import
-const adminOrderRouter = require("./adminRoutes/orderRoutes");
-const adminWalletRouter = require("./adminRoutes/walletRoutes");
-const adminCustomerRouter = require("./adminRoutes/customerRoutes");
-const adminGiftRouter = require("./adminRoutes/giftRoutes");
-const adminCouponsRouter = require("./adminRoutes/couponRoutes");
-const adminOffersRouter = require("./adminRoutes/offerRoutes");
-const adminMilkItemsRouter = require("./adminRoutes/milkItemsRoutes");
+const adminOrderRouter = require("./routes/admin/orderRoutes");
+const adminWalletRouter = require("./routes/admin/walletRoutes");
+const adminCustomerRouter = require("./routes/admin/customerRoutes");
+const adminGiftRouter = require("./routes/admin/giftRoutes");
+const adminCouponsRouter = require("./routes/admin/couponRoutes");
+const adminOffersRouter = require("./routes/admin/offerRoutes");
+const adminMilkItemsRouter = require("./routes/admin/milkItemsRoutes");
 
 // milk routes
 const SubscriptionRouter = require("./routes/subscriptionRoutes");

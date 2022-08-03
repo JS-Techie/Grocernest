@@ -1,4 +1,4 @@
-const db = require("../models");
+const db = require("../../models");
 
 const Item = db.ItemModel;
 const Batch = db.BatchModel;

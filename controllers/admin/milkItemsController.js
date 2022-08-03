@@ -1,9 +1,9 @@
 const uniqid = require("uniqid");
 
-const db = require("../models");
+const db = require("../../models");
 const MilkItems = db.MilkItemsModel;
 const S3 = require("aws-sdk/clients/s3");
-const s3Config = require("../config/s3Config");
+const s3Config = require("../../config/s3Config");
 
 const s3 = new S3(s3Config);
 
