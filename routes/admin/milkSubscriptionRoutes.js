@@ -9,7 +9,7 @@ const {
     editSubscription,
 } = require("../../controllers/admin/milkSubscriptionController");
 
-router.route("/view/all").get(admin, getAllSubscriptionsWithFilter);
+router.route("/view/all").post(admin, getAllSubscriptionsWithFilter);
 router.route("/view/:subscriptionID").get(admin, getSubscriptionDetailsById);
 router.route("/edit/:subscriptionID").post(admin, editSubscription);
 
