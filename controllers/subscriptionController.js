@@ -71,40 +71,51 @@ const editSubscriptionDetails = async (req, res, next) => {
       });
     }
 
-    const existingItemInSub = await SubscriptionItems.findOne({
-      where: { subscription_id, item_id },
-    });
-
     const updateName = await existingSub.update(
       {
-        name,
-        type,
+        name: name ? name : existingSub.name,
+        type: type ? type : existingSub.type,
       },
       {
         where: { subscription_id, item_id },
       }
     );
 
-    if (!existingItemInSub) {
-      return res.status(404).send({
-        success: false,
-        data: [],
-        message: "Requested item does not exist in current subscription",
+    let updatedItem = null;
+    let updatedRows = null;
+    let existingItemInSub = null;
+
+    if (item_id) {
+      if (!quantity) {
+        return res.status(400).send({
+          success: false,
+          data: [],
+          message: "Please enter the quantity of the item to be updated",
+        });
+      }
+      existingItemInSub = await SubscriptionItems.findOne({
+        where: { subscription_id, item_id },
+      });
+      if (!existingItemInSub) {
+        return res.status(404).send({
+          success: false,
+          data: [],
+          message: "Requested item does not exist in current subscription",
+        });
+      }
+      updatedRows = await SubscriptionItems.update(
+        {
+          quantity,
+        },
+        {
+          where: { subscription_id, item_id },
+        }
+      );
+
+      updatedItem = await SubscriptionItems.findOne({
+        where: { subscription_id, item_id },
       });
     }
-
-    const updatedRows = await SubscriptionItems.update(
-      {
-        quantity,
-      },
-      {
-        where: { subscription_id, item_id },
-      }
-    );
-
-    const updatedItem = await SubscriptionItems.findOne({
-      where: { subscription_id, item_id },
-    });
 
     return res.status(200).send({
       success: true,
@@ -114,7 +125,7 @@ const editSubscriptionDetails = async (req, res, next) => {
         numberOfSubscriptionItemUpdated: updatedRows,
         newItemDetails: updatedItem,
       },
-      message: "Updated quantity of item in subscription",
+      message: "Updated quantity of item/type and name in subscription",
     });
   } catch (error) {
     return res.status(400).send({
@@ -299,30 +310,30 @@ const getSubscriptionById = async (req, res, next) => {
   }
 };
 
-const getAllItems = async(req,res,next) => {
-
-    try {
-        const items = await MilkItems.findAll();
-        if(items.length === 0){
-            return res.status(200).send({
-                success : true,
-                data : [],
-                message : "There are no items to show right now"
-            })
-        }
-        return res.status(200).send({
-            success : true,
-            data : items,
-            message : "Fetched all items successfully"
-        })
-    } catch (error) {
-        return res.status(400).send({
-            success : false,
-            data : error.message,
-            message : "Something went wrong while fetching items, please check data field for more details"
-        })
+const getAllItems = async (req, res, next) => {
+  try {
+    const items = await MilkItems.findAll();
+    if (items.length === 0) {
+      return res.status(200).send({
+        success: true,
+        data: [],
+        message: "There are no items to show right now",
+      });
     }
-}
+    return res.status(200).send({
+      success: true,
+      data: items,
+      message: "Fetched all items successfully",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message:
+        "Something went wrong while fetching items, please check data field for more details",
+    });
+  }
+};
 module.exports = {
   getAllSubscriptions,
   getSubscriptionById,
@@ -330,5 +341,5 @@ module.exports = {
   editSubscriptionDetails,
   modifySubscriptionStatus,
   deleteSubscription,
-  getAllItems
+  getAllItems,
 };
