@@ -1,10 +1,9 @@
-// const uniqid = require("uniqid");
-const { Op } = require("sequelize");
 const { sequelize } = require("../../models");
-const db = require("../../models");
-const MilkItems = db.MilkItemsModel;
-const Subscription = db.SubscriptionsModel;
-const SubscriptionItems = db.SubscriptionItemsModel;
+// const db = require("../../models");
+// const MilkItems = db.MilkItemsModel;
+// const Subscription = db.SubscriptionsModel;
+// const SubscriptionItems = db.SubscriptionItemsModel;
+const concatAddress = require("../../utils/concatAddress");
 
 
 
@@ -129,13 +128,18 @@ const getSubscriptionDetailsById = async (req, res, next) => {
                   tc.cust_name ,
                   tc.email ,
                   tc.contact_no ,
-                  tc.comments 
+                  tc.comments,
+                  ts.address_id
                   from t_customer tc inner join t_subscription ts 
                   where
                   tc.cust_no = ts.cust_no and
                   ts.id = "${subscriptionId}"
                   `
         );
+
+        const address_id = cust_result[0].address_id;
+
+        const address = await Promise.resolve(concatAddress(address_id));
 
         const [subs_result, metadata3] = await sequelize.query(
             `
@@ -194,10 +198,10 @@ const getSubscriptionDetailsById = async (req, res, next) => {
             });
         }
 
+        cust_result[0].address = address
         return res.status(200).send({
             success: true,
             data: {
-
                 customer_details: cust_result[0],
                 subscription_details: subs_result,
                 itemDetails: item_result
