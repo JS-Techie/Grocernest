@@ -1,8 +1,8 @@
 const { sequelize } = require("../../models");
-// const db = require("../../models");
-// const MilkItems = db.MilkItemsModel;
-// const Subscription = db.SubscriptionsModel;
-// const SubscriptionItems = db.SubscriptionItemsModel;
+const db = require("../../models");
+const MilkItems = db.MilkItemsModel;
+const Subscription = db.SubscriptionsModel;
+const SubscriptionItems = db.SubscriptionItemsModel;
 const concatAddress = require("../../utils/concatAddress");
 
 
@@ -222,6 +222,50 @@ const getSubscriptionDetailsById = async (req, res, next) => {
 
 const editSubscription = async (req, res, next) => {
 
+    const subscription_id = req.params.subscriptionID;
+    const order_type = req.body.orderType;
+    const cancellation_reason = req.body.cancellationReason;
+
+
+
+    try {
+        const existingSub = await Subscription.findOne({
+            where: {
+                id: subscription_id
+            }
+        })
+        if (existingSub.length == 0) {
+            return res.status(404).send({
+                success: false,
+                data: "",
+                message: "No subscriptions found",
+            });
+        }
+
+        const subscription = await Subscription.update(
+            {
+                admin_status: order_type,
+                cancellation_reason: order_type == "Cancelled" ? cancellation_reason : existingSub.cancellation_reason,
+                start_date: order_type == "Accepted" ? new Date(new Date().getTime() + 24 * 60 * 60 * 1000) : existingSub.start_date,
+                end_date: order_type == "Cancelled" ? new Date(new Date().getTime()) : existingSub.end_date
+            },
+            {
+                where: { id: subscription_id }
+            }
+        );
+
+        return res.status(200).send({
+            success: true,
+            data: "",
+            message: "Subscription updated successfully",
+        });
+    } catch (error) {
+        return res.status(400).send({
+            success: false,
+            data: error.message,
+            message: "Error occurred while updating subscription details",
+        });
+    }
 };
 
 const generateInvoice = async (req, res, next) => { };
