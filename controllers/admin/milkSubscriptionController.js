@@ -30,7 +30,19 @@ const getAllSubscriptionsWithFilter = async (req, res, next) => {
                 : " AND ts.id LIKE '%" + subscriptionId + "%'";
 
 
-        const dateQuery =
+        const dateQuery = orderType == "Pending" ?
+
+            startDate == undefined ||
+                startDate == "" ||
+                endDate == undefined ||
+                endDate == ""
+                ? ""
+                : " AND ts.created_at BETWEEN '" +
+                startDate +
+                "' AND (SELECT DATE_ADD('" +
+                endDate +
+                "', INTERVAL 1 DAY))"
+            :
             startDate == undefined ||
                 startDate == "" ||
                 endDate == undefined ||
@@ -40,7 +52,8 @@ const getAllSubscriptionsWithFilter = async (req, res, next) => {
                 startDate +
                 "' AND (SELECT DATE_ADD('" +
                 endDate +
-                "', INTERVAL 1 DAY))";
+                "', INTERVAL 1 DAY))"
+            ;
 
         const [results, metadata] = await sequelize.query(`
         select
