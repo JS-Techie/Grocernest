@@ -23,7 +23,7 @@ const getAllGifts = async (req, res, next) => {
       return res.status(200).send({
         success: true,
         data: {
-          noOfGiftsApplicable : 0,
+          noOfGiftsApplicable: 0,
         },
         message:
           "This user has no previous orders, therefore gifts are not applicable",
@@ -38,6 +38,17 @@ const getAllGifts = async (req, res, next) => {
     //     message : "No "
     //   })
     // }
+
+    const previousOrder = ordersForCurrentUser[0];
+    console.log(previousOrder)
+    if (previousOrder.status === "Cancelled") {
+      return res.status(200).send({
+        success: true,
+        data: [],
+        message:
+          "There are no gifts for current user because their previous order was cancelled",
+      });
+    }
     const latestOrder = ordersForCurrentUser[0].total;
 
     console.log(latestOrder);
@@ -130,15 +141,14 @@ const getAllGifts = async (req, res, next) => {
       return res.status(200).send({
         success: true,
         data: {
-          gifts : [],
-          noOfGiftsApplicable : 0,
+          gifts: [],
+          noOfGiftsApplicable: 0,
         },
         message: "No gift strategies found",
       });
     }
 
     response = giftsArray.slice(0, strategy.no_of_gifts + 4);
-  
 
     return res.status(200).send({
       success: true,
@@ -171,7 +181,7 @@ const applyGifts = async (req, res, next) => {
         item_id: current,
         quantity: 1,
         created_by: 1,
-        is_gift : 1,
+        is_gift: 1,
       };
     });
 

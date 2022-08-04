@@ -2507,10 +2507,7 @@
             "schema": {
               "type": "object",
               "properties": {
-                "item_id": {
-                  "example": "any"
-                },
-                "quantity": {
+                "items": {
                   "example": "any"
                 },
                 "name": {
@@ -3073,6 +3070,47 @@
                   "example": "any"
                 },
                 "cancellationReason": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/admin/milk/subscription/edit/quantity/{subscriptionID}": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "subscriptionID",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "items": {
                   "example": "any"
                 }
               }

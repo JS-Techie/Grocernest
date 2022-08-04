@@ -273,7 +273,9 @@ const getSubscriptionById = async (req, res, next) => {
       });
     }
 
-    const address = await concatAddress(subscriptions.address_id)
+    const address = await Promise.resolve(
+      concatAddress(subscriptions.address_id)
+    );
     subscriptions.address = address;
 
     // if subs available
