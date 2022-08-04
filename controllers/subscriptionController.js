@@ -19,6 +19,7 @@ const createSubscription = async (req, res, next) => {
       cust_no: currentUser,
       admin_status: "Pending",
       status: "Pending",
+      address_id,
     });
 
     const promises = items.map(async (current) => {
@@ -57,7 +58,7 @@ const editSubscriptionDetails = async (req, res, next) => {
   //get current user from JWT
   const currentUser = req.cust_no;
   const subscription_id = req.params.id;
-  const { item_id, quantity, name, type } = req.body;
+  const { items, name, type } = req.body;
   try {
     const existingSub = await Subscriptions.findOne({
       where: { id: subscription_id, cust_no: currentUser },
@@ -81,39 +82,16 @@ const editSubscriptionDetails = async (req, res, next) => {
       }
     );
 
-    let updatedItem = null;
-    let updatedRows = null;
-    let existingItemInSub = null;
-
-    if (item_id) {
-      if (!quantity) {
-        return res.status(400).send({
-          success: false,
-          data: [],
-          message: "Please enter the quantity of the item to be updated",
-        });
-      }
-      existingItemInSub = await SubscriptionItems.findOne({
-        where: { subscription_id, item_id },
-      });
-      if (!existingItemInSub) {
-        return res.status(404).send({
-          success: false,
-          data: [],
-          message: "Requested item does not exist in current subscription",
-        });
-      }
-      updatedRows = await SubscriptionItems.update(
-        {
-          quantity,
-        },
-        {
-          where: { subscription_id, item_id },
-        }
-      );
-
-      updatedItem = await SubscriptionItems.findOne({
-        where: { subscription_id, item_id },
+    if (items.length === 0) {
+      items.map(async (current) => {
+        await SubscriptionItems.update(
+          {
+            quantity: current.quantity,
+          },
+          {
+            where: { subscription_id, item_id: current.item_id },
+          }
+        );
       });
     }
 
@@ -122,8 +100,6 @@ const editSubscriptionDetails = async (req, res, next) => {
       data: {
         oldItem: existingItemInSub,
         subscriptionDetailsUpdated: updateName,
-        numberOfSubscriptionItemUpdated: updatedRows,
-        newItemDetails: updatedItem,
       },
       message: "Updated quantity of item/type and name in subscription",
     });
