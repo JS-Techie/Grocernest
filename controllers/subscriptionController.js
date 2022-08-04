@@ -1,5 +1,7 @@
 const uniqid = require("uniqid");
 
+const concatAddress = require("../utils/concatAddress");
+
 const db = require("../models");
 const Subscriptions = db.SubscriptionsModel;
 const SubscriptionItems = db.SubscriptionItemsModel;
@@ -254,7 +256,7 @@ const getSubscriptionById = async (req, res, next) => {
   const cust_no = req.cust_no;
   const subs_id = req.params.id;
   try {
-    const subscriptions = await Subscriptions.findAll({
+    const subscriptions = await Subscriptions.findOne({
       include: { model: SubscriptionItems },
       where: {
         cust_no: cust_no,
@@ -263,13 +265,16 @@ const getSubscriptionById = async (req, res, next) => {
     });
 
     // if no subs available
-    if (subscriptions.length == 0) {
+    if (!subscriptions) {
       return res.status(200).send({
         success: true,
         data: [],
         message: "No subscription found",
       });
     }
+
+    const address = await concatAddress(subscriptions.address_id)
+    subscriptions.address = address;
 
     // if subs available
     return res.status(200).send({
