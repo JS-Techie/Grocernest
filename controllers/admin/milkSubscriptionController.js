@@ -218,8 +218,6 @@ const getSubscriptionDetailsById = async (req, res, next) => {
     }
 };
 
-
-
 const editSubscription = async (req, res, next) => {
 
     const subscription_id = req.params.subscriptionID;
@@ -268,6 +266,38 @@ const editSubscription = async (req, res, next) => {
     }
 };
 
+const editQuantity = async (req, res, next) => {
+
+    const subs_id = req.params.subscriptionID;
+    const items = req.body.items;
+
+    try {
+        items.map(async (current) => {
+            await SubscriptionItems.update({
+                quantity: current.quantity
+            },
+                {
+                    where: {
+                        item_id: current.itemid,
+                        subscription_id: subs_id
+                    }
+                })
+        })
+        return res.status(200).send({
+            success: true,
+            data: "",
+            message: "Item quantity updated successfully",
+        });
+    }
+    catch (error) {
+        return res.status(400).send({
+            success: false,
+            data: error.data,
+            message: "error occurred while updating quantity",
+        });
+    }
+}
+
 const generateInvoice = async (req, res, next) => { };
 
 
@@ -275,5 +305,6 @@ module.exports = {
     getAllSubscriptionsWithFilter,
     getSubscriptionDetailsById,
     editSubscription,
-    generateInvoice
+    generateInvoice,
+    editQuantity
 };
