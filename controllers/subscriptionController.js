@@ -9,7 +9,7 @@ const MilkItems = db.MilkItemsModel;
 
 const createSubscription = async (req, res, next) => {
   const currentUser = req.cust_no;
-  const { items, type, name } = req.body;
+  const { items, type, name, address_id } = req.body;
 
   try {
     const newSubscription = await Subscriptions.create({
