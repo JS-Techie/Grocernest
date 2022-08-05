@@ -224,8 +224,6 @@ const editSubscription = async (req, res, next) => {
     const order_type = req.body.orderType;
     const cancellation_reason = req.body.cancellationReason;
 
-
-
     try {
         const existingSub = await Subscription.findOne({
             where: {

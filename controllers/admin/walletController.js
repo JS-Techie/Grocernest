@@ -61,27 +61,28 @@ const debitAmountFromWallet = async (req, res, next) => {
     let transaction_id = uniqid();
 
     try {
-        const [results, metadata] =
-            await sequelize.query(`
-            UPDATE t_wallet
-            SET balance = (select balance from t_wallet where cust_no="${cust_no}")-${amount}
-            WHERE cust_no = "${cust_no}"
+        if (amount > 0) {
+            const [results, metadata] =
+                await sequelize.query(`
+                UPDATE t_wallet
+                SET balance = (select balance from t_wallet where cust_no="${cust_no}")-${amount}
+                WHERE cust_no = "${cust_no}"
           `);
 
-        const [results2, metadata2] =
-            await sequelize.query(`
-          INSERT INTO t_wallet_transaction
-          (wallet_id, transaction_id, transaction_type, transaction_amount, transaction_details, transaction_date_time, created_by, updated_by, created_at, updated_at)
-          VALUES((
-          select wallet_id from t_wallet where cust_no="${cust_no}"
-          ), "${transaction_id}", "D", ${amount}, "${details}", current_timestamp(), 2, NULL, current_timestamp(), current_timestamp()); 
+            const [results2, metadata2] =
+                await sequelize.query(`
+                INSERT INTO t_wallet_transaction
+                (wallet_id, transaction_id, transaction_type, transaction_amount, transaction_details, transaction_date_time, created_by, updated_by, created_at, updated_at)
+                VALUES((
+                select wallet_id from t_wallet where cust_no="${cust_no}"
+                ), "${transaction_id}", "D", ${amount}, "${details}", current_timestamp(), 2, NULL, current_timestamp(), current_timestamp()); 
       `);
 
-        const [results3, metadata3] =
-            await sequelize.query(`
-            select balance from t_wallet where cust_no="${cust_no}"
+            const [results3, metadata3] =
+                await sequelize.query(`
+                select balance from t_wallet where cust_no="${cust_no}"
           `);
-
+        }
         return res.status(200).send({
             success: true,
             data: results3[0],
