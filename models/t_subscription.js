@@ -32,7 +32,7 @@ module.exports = sequelize => {
       field: "status"
     },
     admin_status: {
-      type: DataTypes.ENUM('Accepted', 'Pending', 'Started', 'Cancelled'),
+      type: DataTypes.ENUM('Accepted', 'Pending', 'Paused', 'Cancelled'),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,

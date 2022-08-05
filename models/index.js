@@ -135,6 +135,8 @@ db.SubscriptionItemsModel = require("./t_subscription_items")(db.sequelize, Sequ
 
 db.MilkDeliveryModel = require("./t_milk_delivery")(db.sequelize, Sequelize)
 
+db.GatewayTransactionModel = require("./t_gateway_transaction")(db.sequelize, Sequelize)
+
 // Relations between tables
 
 db.WalletModel.hasMany(db.WalletTransactionModel, { foreignKey: "wallet_id" }); //one to many mapping
@@ -169,6 +171,6 @@ db.CustomerModel.hasMany(db.AddressModel, { foreignKey: "cust_no" });
 
 db.CartModel.hasMany(db.ItemModel, { foreignKey: "id" });
 
-db.SubscriptionsModel.hasMany(db.SubscriptionItemsModel,{foreignKey : "subscription_id"})
+db.SubscriptionsModel.hasMany(db.SubscriptionItemsModel, { foreignKey: "subscription_id" })
 
 module.exports = db;

@@ -112,3 +112,18 @@ CREATE TABLE `t_subscription_items` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+
+
+CREATE TABLE `t_gateway_transaction` (
+  `transaction_id` varchar(255) NOT NULL,
+  `cust_no` varchar(100) NULL,
+  `status` varchar(100) NULL,
+
+  `created_by` bigint(20) NOT NULL,
+  `updated_by` bigint(20) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`transaction_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;

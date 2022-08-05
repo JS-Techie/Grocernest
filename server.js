@@ -52,6 +52,7 @@ const referralRouter = require("./routes/referralRoutes");
 const giftRouter = require("./routes/giftRoutes");
 const invoiceRouter = require("./routes/invoiceRoutes");
 const offerRouter = require("./routes/offerRoutes");
+const gatewayRouter = require("./routes/gatewayRoute");
 
 // admin routers import
 const adminOrderRouter = require("./routes/admin/orderRoutes");
@@ -96,6 +97,7 @@ app.use("/referral/view", referralRouter);
 app.use("/gift", giftRouter);
 app.use("/coupons", couponRouter);
 app.use("/offers", offerRouter);
+app.use("/gateway", gatewayRouter);
 
 // admin routes
 app.use("/admin/orders", adminOrderRouter);
