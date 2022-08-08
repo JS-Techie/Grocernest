@@ -1,4 +1,11 @@
+
 const { optIn, optOut } = require('../services/whatsapp/optInOut');
+
+const db = require('../models');
+// const { sequelize } = require("./models");
+
+const Customer = db.CustomerModel;
+
 const optInUser = async (req, res, next) => {
 
     try {
@@ -10,7 +17,16 @@ const optInUser = async (req, res, next) => {
                 message: "mobile number not present",
             });
 
-        let response = await Promise.resolve(optIn("91" + mobile_number));
+        const response = await Promise.resolve(optIn("91" + mobile_number));
+
+        const cust_update = await Customer.update({
+            opt_in: 1
+        }, {
+            where: {
+                contact_no: mobile_number
+            }
+        })
+
         if (response == 202)
             return res.status(200).send({
                 success: true,
@@ -19,7 +35,7 @@ const optInUser = async (req, res, next) => {
             });
 
         return res.status(400).send({
-            success: true,
+            success: false,
             data: "",
             message: "error occured while opt in whatsapp number",
         });
@@ -43,6 +59,15 @@ const optOutUser = async (req, res, next) => {
                 data: "",
                 message: "mobile number not present",
             });
+
+        const cust_update = await Customer.update({
+            opt_in: null
+        }, {
+            where: {
+                contact_no: mobile_number
+            }
+        })
+
 
         let response = await Promise.resolve(optOut("91" + mobile_number));
         if (response == 202)

@@ -225,7 +225,7 @@ const verifyOTP = async (req, res, next) => {
       });
     }
 
-    console.log("===============", newUser);
+    // console.log("===============", newUser);
 
     const response = await Customer.create({
       id: newUser.id,
