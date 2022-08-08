@@ -8,7 +8,7 @@ const {
     optOutUser
 } = require("../controllers/whatsappController")
 
-router.route('/opt/in').post(authenticate, optInUser);
+router.route('/opt/in').post(optInUser);
 router.route('/opt/out').post(authenticate, optOutUser);
 
 
