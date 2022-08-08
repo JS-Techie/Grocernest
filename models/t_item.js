@@ -201,15 +201,6 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "is_grocernest"
-    },
-    selected_batch: {
-      type: DataTypes.BIGINT,
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "selected_batch"
     }
   };
   const options = {

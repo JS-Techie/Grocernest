@@ -160,6 +160,15 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "expiry_date"
+    },
+    mark_selected: {
+      type: DataTypes.INTEGER(1),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "mark_selected"
     }
   };
   const options = {

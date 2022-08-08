@@ -83,7 +83,7 @@ const login = async (req, res, next) => {
 const register = async (req, res, next) => {
   try {
     //Get the user details from the form
-    const { firstName, lastName, phoneNumber, email, password, referral_code } = req.body;
+    const { firstName, lastName, phoneNumber, email, password, referral_code, opt_in } = req.body;
     let referrer_cust_id = "";
     //Check if all required input is recieved
     if (!phoneNumber || !password || !firstName || !lastName) {
@@ -149,7 +149,8 @@ const register = async (req, res, next) => {
           password: encryptedPassword,
           created_by: 13,
           referral_code: ref_code,
-          referred_by: referrer_cust_id
+          referred_by: referrer_cust_id,
+          opt_in
         };
 
         const serverGeneratedOTP = generateOTP();
@@ -224,6 +225,8 @@ const verifyOTP = async (req, res, next) => {
       });
     }
 
+    console.log("===============", newUser);
+
     const response = await Customer.create({
       id: newUser.id,
       cust_no: newUser.cust_no,
@@ -234,7 +237,8 @@ const verifyOTP = async (req, res, next) => {
       password: newUser.password,
       created_by: newUser.created_by,
       referral_code: newUser.referral_code,
-      referred_by: newUser.referred_by
+      referred_by: newUser.referred_by,
+      opt_in: newUser.opt_in
     });
 
     // creating blank wallet while successful reg.

@@ -53,6 +53,7 @@ const giftRouter = require("./routes/giftRoutes");
 const invoiceRouter = require("./routes/invoiceRoutes");
 const offerRouter = require("./routes/offerRoutes");
 const gatewayRouter = require("./routes/gatewayRoute");
+const whatsappRouter = require('./routes/whatsappRoutes');
 
 // admin routers import
 const adminOrderRouter = require("./routes/admin/orderRoutes");
@@ -98,6 +99,7 @@ app.use("/gift", giftRouter);
 app.use("/coupons", couponRouter);
 app.use("/offers", offerRouter);
 app.use("/gateway", gatewayRouter);
+app.use("/whatsapp", whatsappRouter);
 
 // admin routes
 app.use("/admin/orders", adminOrderRouter);
