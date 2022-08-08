@@ -43,6 +43,7 @@ const getProfile = async (req, res, next) => {
           ? currentUserProfile.image
           : generator.generateRandomAvatar(),
         referral_code: currentUserProfile.referral_code,
+        opt_in : currentUserProfile.opt_in == 1 ? true : false,
       },
     });
   } catch (error) {
