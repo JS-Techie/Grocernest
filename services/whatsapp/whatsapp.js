@@ -4,7 +4,7 @@ let client = new Gupshup({
     apiKey: 'hm7797tb46hrtrgcsqksvxs69yj9zza4'
 });
 
-const sendMsgToWhatsapp = (phno) => {
+const sendInvoiceToWhatsapp = (phno) => {
     console.log("Sending sms to whatsapp..");
     client.message.send({
         channel: "whatsapp",
@@ -25,18 +25,18 @@ const sendMsgToWhatsapp = (phno) => {
 
 }
 
-const sendInvoiceToWhatsapp = (phno, link) => {
+const sendTextMsg = (phno, msg) => {
     console.log("Sending Invoice to whatsapp..");
 
     client.message.send({
         channel: "whatsapp",
         source: "917834811114",
-        destination: "918910443583",
+        destination: phno.toString(),
         'src.name': "Grocernest",
         message: {
             isHSM: "false",
             type: "text",
-            text: "hi there"
+            text: msg
         }
     }).then((response) => {
         console.log("Text message sent", response)
@@ -45,7 +45,11 @@ const sendInvoiceToWhatsapp = (phno, link) => {
     })
 }
 
+const sendRegistrationWhatsapp = (phno) => {
+    let msg = "Welcome to GrocerNest! You have successfully registered.";
+    sendTextMsg(phno, msg);
+}
 module.exports = {
-    sendMsgToWhatsapp,
-    sendInvoiceToWhatsapp
+    sendInvoiceToWhatsapp,
+    sendRegistrationWhatsapp
 };
