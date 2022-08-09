@@ -9,7 +9,7 @@ const sendInvoiceToWhatsapp = (phno) => {
     client.message.send({
         channel: "whatsapp",
         source: "917834811114",
-        destination: phno.toString(),
+        destination: phno,
         'src.name': "Grocernest",
         message: {
             type: "file",
