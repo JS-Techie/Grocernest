@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const referralCodeGenerator = require('referral-code-generator')
 const bcrypt = require("bcryptjs");
 const uniqid = require("uniqid");
-const { sendRegistrationWhatsapp } = require('../services/whatsapp/whatsapp');
+// const { sendRegistrationWhatsapp } = require('../services/whatsapp/whatsapp');
 const { sendRegistrationEmail } = require('../services/mail/mailService');
 const db = require("../models");
 
@@ -256,8 +256,8 @@ const verifyOTP = async (req, res, next) => {
 
 
     // send whatsapp msg if available
-    if (newUser.opt_in == 1)
-      sendRegistrationWhatsapp(newUser.contact_no);
+    // if (newUser.opt_in == 1)
+    // sendRegistrationWhatsapp(newUser.contact_no);
 
 
     // creating new coupon while successful reg.
