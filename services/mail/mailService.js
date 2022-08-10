@@ -4,7 +4,10 @@ const fs = require('fs');
 
 const sendRegistrationEmail = async (mailid) => {
     var mailOptions = {
-        from: 'grocernest@gmail.com',
+        from: {
+            name: 'GrocerNest',
+            address: 'noreply.grocernest@gmail.com'
+        },
         to: mailid,
         subject: 'Grocernest Registration',
         html: await ejs.renderFile('./services/mail/templates/registration.ejs')
