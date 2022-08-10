@@ -25,7 +25,10 @@ const sendRegistrationEmail = async (mailid) => {
 const sendOrderStatusEmail = async (mailid, orderId, msg) => {
 
     var mailOptions = {
-        from: 'grocernest@gmail.com',
+        from: {
+            name: 'GrocerNest',
+            address: 'noreply.grocernest@gmail.com'
+        },
         to: mailid,
         subject: 'Grocernest Order Status',
         html: await ejs.renderFile('./services/mail/templates/orderstatus.ejs', {
@@ -45,7 +48,10 @@ const sendOrderStatusEmail = async (mailid, orderId, msg) => {
 
 const sendCancelledStatusEmail = async (mailid, orderId, cancellation_reason) => {
     var mailOptions = {
-        from: 'grocernest@gmail.com',
+        from: {
+            name: 'GrocerNest',
+            address: 'noreply.grocernest@gmail.com'
+        },
         to: mailid,
         subject: 'Grocernest Order Status',
         html: await ejs.renderFile('./services/mail/templates/cancelledOrder.ejs', {
@@ -67,7 +73,10 @@ const sendCancelledStatusEmail = async (mailid, orderId, cancellation_reason) =>
 
 const sendCancelledByUserStatusEmail = async (mailid, orderId) => {
     var mailOptions = {
-        from: 'grocernest@gmail.com',
+        from: {
+            name: 'GrocerNest',
+            address: 'noreply.grocernest@gmail.com'
+        },
         to: mailid,
         subject: 'Grocernest Order Status',
         html: await ejs.renderFile('./services/mail/templates/userCancelledOrders.ejs', {
@@ -88,7 +97,10 @@ const sendCancelledByUserStatusEmail = async (mailid, orderId) => {
 // order placed mail with invoice attached
 const sendOrderPlacedEmail = async (mailid, orderId) => {
     var mailOptions = {
-        from: 'grocernest@gmail.com',
+        from: {
+            name: 'GrocerNest',
+            address: 'noreply.grocernest@gmail.com'
+        },
         to: mailid,
         subject: 'Grocernest Order Status',
         html: await ejs.renderFile('./services/mail/templates/orderPlaced.ejs', {
