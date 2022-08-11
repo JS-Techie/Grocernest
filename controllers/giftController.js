@@ -70,10 +70,12 @@ const getAllGifts = async (req, res, next) => {
         where: { item_id: current.id, mark_selected: 1 },
       });
 
-      const currentItem = await Inventory.findOne({
-        where: { item_id: current.id, batch_id: oldestBatch.id },
-      });
-
+      let currentItem;
+      if (oldestBatch) {
+        currentItem = await Inventory.findOne({
+          where: { item_id: current.id, batch_id: oldestBatch.id },
+        });
+      }
       if (oldestBatch) {
         return {
           itemID: current.id,
@@ -93,12 +95,19 @@ const getAllGifts = async (req, res, next) => {
     });
 
     const resolved = await Promise.all(promises);
+    const resolvedWithoutUndefined = resolved.filter((current)=>{
+      return current!==undefined
+    })
+
+    console.log(resolvedWithoutUndefined);
 
     //returning only distinct items and not duplicates
-    const giftsArray = [
-      ...new Map(resolved.map((item) => [item["itemID"], item])).values(),
-    ];
-
+    let giftsArray;
+    if (resolvedWithoutUndefined.length !== 0) {
+      giftsArray = [
+        ...new Map(resolved.map((item) => [item["itemID"], item])).values(),
+      ];
+    }
     console.log(giftsArray);
 
     //response array based on rule engine
@@ -146,13 +155,13 @@ const getAllGifts = async (req, res, next) => {
       });
     }
 
-    response = giftsArray.slice(0, strategy.no_of_gifts + 4);
+    response = giftsArray? giftsArray.slice(0, strategy.no_of_gifts + 4) : [];
 
     return res.status(200).send({
       success: true,
       data: {
         gifts: response,
-        noOfGiftsApplicable: strategy.no_of_gifts ? strategy.no_of_gifts : 0,
+        noOfGiftsApplicable: giftsArray ? strategy.no_of_gifts ? strategy.no_of_gifts : 0 : 0,
       },
       message: "Found all gifts",
     });
