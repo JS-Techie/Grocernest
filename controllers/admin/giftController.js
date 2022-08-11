@@ -24,9 +24,12 @@ const getGifts = async (req, res, next) => {
         where: { item_id: current.id, mark_selected: 1 },
       });
 
-      const currentItem = await Inventory.findOne({
-        where: { batch_id: oldestBatch.id, item_id: current.id },
-      });
+      let currentItem = null;
+      if (oldestBatch) {
+        currentItem = await Inventory.findOne({
+          where: { batch_id: oldestBatch.id, item_id: current.id },
+        });
+      }
 
       if (oldestBatch) {
         return {

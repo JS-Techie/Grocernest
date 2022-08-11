@@ -59,6 +59,7 @@ const downloadInvoice = async (req, res, next) => {
 
     const resolved = await Promise.all(promises);
 
+
     const response = {
       customerName: currentUser.cust_name,
       orderID: currentOrder.order_id,

@@ -18,7 +18,7 @@ const getAllGifts = async (req, res, next) => {
     const ordersForCurrentUser = await Order.findAll({
       where: { cust_no: currentUser },
       order: [["created_at", "DESC"]],
-    });
+    }); 
 
     if (ordersForCurrentUser.length === 0) {
       return res.status(200).send({
