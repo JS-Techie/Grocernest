@@ -106,13 +106,19 @@ const checkoutFromCart = async (req, res, next) => {
       created_by: 2,
     });
 
+    let oldestBatch = null;
     const promises = cartForUser.map(async (currentItem) => {
-      const batches = await Batch.findAll({
-        where: { item_id: currentItem.item_id },
-        order: [["created_at", "asc"]],
+      oldestBatch = await Batch.findOne({
+        where: { item_id: currentItem.item_id, mark_selected: 1 },
       });
 
-      const oldestBatch = batches[0];
+      if (!oldestBatch) {
+        return res.status(200).send({
+          success: true,
+          data: [],
+          message: "No batch is selected for current item",
+        });
+      }
 
       return {
         order_id: newOrder.order_id,
@@ -146,30 +152,23 @@ const checkoutFromCart = async (req, res, next) => {
     }
 
     const orderItemsPromises = newOrderItems.map(async (currentItem) => {
-      let oldestBatch = null;
-      const batches = await Batch.findAll({
-        where: { item_id: currentItem.item_id },
-        order: [["created_by", "asc"]],
+      const oldestBatch = await Batch.findOne({
+        where: { item_id: currentItem.item_id, mark_selected: 1 },
       });
 
-      if (batches.length > 0) {
-        oldestBatch = batches[0];
-        // batches.map((currentBatch) => {
-        //   availableQuantity += currentBatch.quantity;
-        // });
+      if (oldestBatch) {
+        return {
+          itemID: currentItem.item_id,
+          quantity: currentItem.quantity,
+          isOffer: currentItem.is_offer === 1 ? true : false,
+          isGift: currentItem.is_gift === 1 ? true : false,
+          salePrice:
+            currentItem.is_offer === 1
+              ? currentItem.offer_price
+              : oldestBatch.sale_price,
+          oldestBatch,
+        };
       }
-
-      return {
-        itemID: currentItem.item_id,
-        quantity: currentItem.quantity,
-        isOffer: currentItem.is_offer === 1 ? true : false,
-        isGift: currentItem.is_gift === 1 ? true : false,
-        salePrice:
-          currentItem.is_offer === 1
-            ? currentItem.offer_price
-            : oldestBatch.sale_price,
-        oldestBatch,
-      };
     });
 
     const orderItems = await Promise.all(orderItemsPromises);
@@ -282,7 +281,7 @@ const buyNow = async (req, res, next) => {
             INNER join t_lkp_sub_category on t_lkp_sub_category.id = t_item.sub_category_id)
             inner join t_lkp_brand on t_lkp_brand.id = t_item.brand_id)
             inner join t_inventory on t_inventory.item_id = t_item.id)
-             where t_item.id = ${itemID} and t_inventory.location_id = 4 and t_lkp_category.available_for_ecomm = 1 and t_item.available_for_ecomm = 1 order by t_batch.created_at;`);
+             where t_item.id = ${itemID} and t_inventory.location_id = 4 and t_lkp_category.available_for_ecomm = 1 and t_item.available_for_ecomm = 1`);
 
     if (currentItemDetails.length === 0) {
       return res.status(404).send({
@@ -359,23 +358,21 @@ const buyNow = async (req, res, next) => {
       where: { is_active: 1, item_id: itemID },
     });
 
-    const batches = await Batch.findAll({
-      where: { item_id: itemID },
+    const oldestBatch = await Batch.findOne({
+      where: { item_id: itemID, mark_selected: 1 },
     });
-    let oldestBatch = null;
-    if (batches.length > 0) {
-      oldestBatch = batches[0];
-    }
 
     let newSalePrice = null;
 
     if (offer) {
-      if (offer.is_percentage) {
-        newSalePrice =
-          oldestBatch.sale_price -
-          (amount_of_discount / 100) * oldestBatch.sale_price;
-      } else {
-        newSalePrice = oldestBatch.sale_price - offer.amount_of_discount;
+      if (oldestBatch) {
+        if (offer.is_percentage) {
+          newSalePrice =
+            oldestBatch.sale_price -
+            (amount_of_discount / 100) * oldestBatch.sale_price;
+        } else {
+          newSalePrice = oldestBatch.sale_price - offer.amount_of_discount;
+        }
       }
     }
 
@@ -476,10 +473,9 @@ const buyNow = async (req, res, next) => {
       sendOrderPlacedEmail(email, newOrder.order_id);
     });
 
-
     const deletedItemsFromCart = await Cart.destroy({
       where: { cust_no: currentUser, is_gift: 1 },
-    })
+    });
     return res.status(201).send({
       success: true,
       data: {
@@ -529,26 +525,22 @@ const InvoiceGen = async (cust_no, order_id) => {
         where: { id: current.item_id },
       });
 
-      const batches = await Batch.findAll({
-        where: { item_id: current.item_id },
-        order: [["created_at", "ASC"]],
+      const oldestBatch = await Batch.findOne({
+        where: { item_id: current.item_id, mark_selected: 1 },
       });
 
-      let oldestBatch;
-      if (batches.length !== 0) {
-        oldestBatch = batches[0];
+      if (oldestBatch) {
+        return {
+          itemName: item.name,
+          quantity: current.quantity,
+          MRP: oldestBatch ? oldestBatch.MRP : "",
+          image: item.image,
+          description: item.description,
+          isGift: item.is_gift == 1 ? true : false,
+          isOffer: item.is_offer == 1 ? true : false,
+          offerPrice: item.is_offer == 1 ? offer_price : "",
+        };
       }
-
-      return {
-        itemName: item.name,
-        quantity: current.quantity,
-        MRP: oldestBatch ? oldestBatch.MRP : "",
-        image: item.image,
-        description: item.description,
-        isGift: item.is_gift == 1 ? true : false,
-        isOffer: item.is_offer == 1 ? true : false,
-        offerPrice: item.is_offer == 1 ? offer_price : "",
-      };
     });
 
     const resolved = await Promise.all(promises);
@@ -566,7 +558,10 @@ const InvoiceGen = async (cust_no, order_id) => {
       orderItems: resolved,
     };
 
-    let writeStream = await generatePdf(response, `invoice-${currentOrder.order_id}.pdf`);
+    let writeStream = await generatePdf(
+      response,
+      `invoice-${currentOrder.order_id}.pdf`
+    );
 
     writeStream.on("finish", async () => {
       console.log("stored pdf on local");
@@ -577,6 +572,7 @@ const InvoiceGen = async (cust_no, order_id) => {
     return "error";
   }
 };
+
 module.exports = {
   checkoutFromCart,
   buyNow,

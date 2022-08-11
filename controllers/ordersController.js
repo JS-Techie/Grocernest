@@ -1,9 +1,9 @@
 const { Op } = require("sequelize");
 const { sequelize } = require("../models");
 const db = require("../models");
-const WalletService = require('../services/walletService');
+const WalletService = require("../services/walletService");
 const {
-  sendCancelledByUserStatusEmail
+  sendCancelledByUserStatusEmail,
 } = require("../services/mail/mailService");
 const Order = db.OrderModel;
 const OrderItems = db.OrderItemsModel;
@@ -61,51 +61,48 @@ const getAllOrders = async (req, res, next) => {
           where: { id: currentOrderItem.item_id },
         });
 
-        const batches = await Batch.findAll({
-          where: { item_id: currentOrderItem.item_id },
-          order: [["created_at", "ASC"]],
+        const oldestBatch = await Batch.findOne({
+          where: { item_id: currentOrderItem.item_id, mark_selected: 1 },
         });
-        let oldestBatch = null;
-        if (batches.length > 0) {
-          oldestBatch = batches[0];
-        }
 
-        return {
-          itemName: currentItem.name,
-          id: currentItem.id,
-          image: currentItem.image,
-          quantity: currentOrderItem.quantity,
-          MRP: oldestBatch.MRP,
-          salePrice:
-            currentOrderItem.is_offer === 1
-              ? currentOrderItem.offer_price
-              : oldestBatch.sale_price,
-          discount: oldestBatch.discount,
-          isGift: currentItem.is_gift === 1 ? true : false,
-          isOffer: currentOrderItem.is_offer === 1 ? true : false,
-          canEdit:
-            currentOrderItem.is_offer === 1 ? (isEdit ? true : false) : "",
-          offerDetails: currentOffer
-            ? {
-              offerID: currentOffer.id,
-              offerType: currentOffer.type,
-              itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
-              quantityOfItemX: currentOffer.item_1_quantity
-                ? currentOffer.item_1_quantity
-                : "",
-              itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
-              quantityOfItemY: currentOffer.item_2_quantity
-                ? currentOffer.item_2_quantity
-                : "",
-              itemID: currentOffer.item_id ? currentOffer.item_id : "",
-              amountOfDiscount: currentOffer.amount_of_discount
-                ? currentOffer.amount_of_discount
-                : "",
-              isPercentage: currentOffer.is_percentage ? true : false,
-              isActive: currentOffer.is_active ? true : false,
-            }
-            : "",
-        };
+        if (oldestBatch) {
+          return {
+            itemName: currentItem.name,
+            id: currentItem.id,
+            image: currentItem.image,
+            quantity: currentOrderItem.quantity,
+            MRP: oldestBatch.MRP,
+            salePrice:
+              currentOrderItem.is_offer === 1
+                ? currentOrderItem.offer_price
+                : oldestBatch.sale_price,
+            discount: oldestBatch.discount,
+            isGift: currentItem.is_gift === 1 ? true : false,
+            isOffer: currentOrderItem.is_offer === 1 ? true : false,
+            canEdit:
+              currentOrderItem.is_offer === 1 ? (isEdit ? true : false) : "",
+            offerDetails: currentOffer
+              ? {
+                  offerID: currentOffer.id,
+                  offerType: currentOffer.type,
+                  itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
+                  quantityOfItemX: currentOffer.item_1_quantity
+                    ? currentOffer.item_1_quantity
+                    : "",
+                  itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
+                  quantityOfItemY: currentOffer.item_2_quantity
+                    ? currentOffer.item_2_quantity
+                    : "",
+                  itemID: currentOffer.item_id ? currentOffer.item_id : "",
+                  amountOfDiscount: currentOffer.amount_of_discount
+                    ? currentOffer.amount_of_discount
+                    : "",
+                  isPercentage: currentOffer.is_percentage ? true : false,
+                  isActive: currentOffer.is_active ? true : false,
+                }
+              : "",
+          };
+        }
       });
 
       const orderItemsArray = await Promise.all(orderItemPromises);
@@ -197,51 +194,50 @@ const getOrderByOrderId = async (req, res, next) => {
         where: { id: currentOrderItem.id },
       });
 
-      let oldestBatch = null;
-      const batches = await Batch.findAll({
-        where: { item_id: currentOrderItem.id },
-        order: [["created_at", "ASC"]],
+      const oldestBatch = await Batch.findOne({
+        where: { item_id: currentOrderItem.id, mark_selected: 1 },
       });
 
-      oldestBatch = batches[0];
-
-      return {
-        itemName: currentItem.name,
-        id: currentItem.id,
-        image: currentItem.image,
-        isGift: currentItem.is_gift == 1 ? true : false,
-        quantity: currentOrderItem.quantity,
-        MRP: oldestBatch.MRP,
-        salePrice:
-          currentOrderItem.is_offer === 1
-            ? currentOffer.amount_of_discount
-              ? currentOrderItem.offer_price
-              : oldestBatch.sale_price
-            : oldestBatch.sale_price,
-        discount: oldestBatch.discount,
-        isOffer: currentOrderItem.is_offer === 1 ? true : false,
-        canEdit: currentOrderItem.is_offer === 1 ? (isEdit ? true : false) : "",
-        offerDetails: currentOffer
-          ? {
-            offerID: currentOffer.id,
-            offerType: currentOffer.type,
-            itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
-            quantityOfItemX: currentOffer.item_1_quantity
-              ? currentOffer.item_1_quantity
-              : "",
-            itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
-            quantityOfItemY: currentOffer.item_2_quantity
-              ? currentOffer.item_2_quantity
-              : "",
-            itemID: currentOffer.item_id ? currentOffer.item_id : "",
-            amountOfDiscount: currentOffer.amount_of_discount
+      if (oldestBatch) {
+        return {
+          itemName: currentItem.name,
+          id: currentItem.id,
+          image: currentItem.image,
+          isGift: currentItem.is_gift == 1 ? true : false,
+          quantity: currentOrderItem.quantity,
+          MRP: oldestBatch.MRP,
+          salePrice:
+            currentOrderItem.is_offer === 1
               ? currentOffer.amount_of_discount
-              : "",
-            isPercentage: currentOffer.is_percentage ? true : false,
-            isActive: currentOffer.is_active ? true : false,
-          }
-          : "",
-      };
+                ? currentOrderItem.offer_price
+                : oldestBatch.sale_price
+              : oldestBatch.sale_price,
+          discount: oldestBatch.discount,
+          isOffer: currentOrderItem.is_offer === 1 ? true : false,
+          canEdit:
+            currentOrderItem.is_offer === 1 ? (isEdit ? true : false) : "",
+          offerDetails: currentOffer
+            ? {
+                offerID: currentOffer.id,
+                offerType: currentOffer.type,
+                itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
+                quantityOfItemX: currentOffer.item_1_quantity
+                  ? currentOffer.item_1_quantity
+                  : "",
+                itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
+                quantityOfItemY: currentOffer.item_2_quantity
+                  ? currentOffer.item_2_quantity
+                  : "",
+                itemID: currentOffer.item_id ? currentOffer.item_id : "",
+                amountOfDiscount: currentOffer.amount_of_discount
+                  ? currentOffer.amount_of_discount
+                  : "",
+                isPercentage: currentOffer.is_percentage ? true : false,
+                isActive: currentOffer.is_active ? true : false,
+              }
+            : "",
+        };
+      }
     });
 
     const responseArray = await Promise.all(promises);
@@ -358,7 +354,6 @@ const cancelOrder = async (req, res, next) => {
       where: { order_id: singleOrder.order_id },
     });
 
-
     // wallet refund when user cancels order
     // if (singleOrder.wallet_balance_used != 0) {
     //   let walletService = new WalletService();
@@ -370,10 +365,9 @@ const cancelOrder = async (req, res, next) => {
       where: {
         cust_no: singleOrder.cust_no,
       },
-    })
+    });
     let email = cust.email;
     sendCancelledByUserStatusEmail(email.toString(), singleOrder.order_id);
-
 
     return res.status(200).send({
       success: true,

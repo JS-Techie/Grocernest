@@ -7,6 +7,7 @@ const db = require("../models");
 const WishlistItems = db.WishlistItemsModel;
 const Offers = db.OffersModel;
 const Item = db.ItemModel;
+const Inventory = db.InventoryModel;
 
 const { findCustomerNumber } = require("../middleware/customerNumber");
 
@@ -25,14 +26,14 @@ const getItemsInCategory = async (req, res, next) => {
       await sequelize.query(`select distinct t_item.id, t_item.name,t_item.brand_id,t_item.UOM ,t_item.category_id ,t_item.sub_category_id ,
       t_item.image ,t_item.description ,t_item.available_for_ecomm ,t_batch.batch_no ,
       t_batch.location_id ,t_batch.MRP ,t_batch.discount ,t_batch.cost_price ,t_batch.mfg_date ,t_batch.sale_price ,
-      t_batch.created_at,t_lkp_color.color_name, t_lkp_brand.brand_name, t_lkp_category.group_name
+      t_batch.created_at,t_lkp_color.color_name, t_lkp_brand.brand_name, t_lkp_category.group_name, t_batch.mark_selected
       from (((((ecomm.t_item
             inner join t_batch on t_batch.item_id = t_item.id )
             inner join t_lkp_color on t_lkp_color.id = t_item.color_id)
             inner join t_lkp_category on t_lkp_category.id = t_item.category_id)
             inner join t_lkp_brand on t_lkp_brand.id = t_item.brand_id)
             inner join t_inventory on t_inventory.item_id = t_item.id)
-             where t_lkp_category.id = ${category} and t_inventory.location_id = 4 and t_lkp_category.available_for_ecomm = 1 and t_item.available_for_ecomm = 1 order by created_at desc;
+             where t_lkp_category.id = ${category} and t_inventory.location_id = 4 and t_lkp_category.available_for_ecomm = 1 and t_item.available_for_ecomm = 1 order by created_at and t_batch.mark_selected = 1;
     `);
 
     if (itemsInACategory.length === 0) {
@@ -147,7 +148,7 @@ const getItemsInSubcategory = async (req, res, next) => {
       await sequelize.query(`select distinct t_item.id, t_item.name,t_item.brand_id,t_item.UOM ,t_item.category_id ,t_item.sub_category_id ,
     t_item.image ,t_item.description ,t_item.available_for_ecomm ,t_batch.batch_no ,
     t_batch.location_id ,t_batch.MRP ,t_batch.discount ,t_batch.cost_price ,t_batch.mfg_date ,t_batch.sale_price ,
-    t_batch.created_at,t_lkp_color.color_name, t_lkp_brand.brand_name ,t_lkp_sub_category.sub_cat_name, t_lkp_category.group_name
+    t_batch.created_at,t_lkp_color.color_name, t_lkp_brand.brand_name ,t_lkp_sub_category.sub_cat_name, t_lkp_category.group_name,t_batch.mark_selected
     from ((((((ecomm.t_item
           inner join t_batch on t_batch.item_id = t_item.id )
           inner join t_lkp_color on t_lkp_color.id = t_item.color_id)
@@ -155,7 +156,7 @@ const getItemsInSubcategory = async (req, res, next) => {
           inner join t_lkp_sub_category on t_lkp_sub_category.id = t_item.sub_category_id)
           inner join t_lkp_brand on t_lkp_brand.id = t_item.brand_id)
           inner join t_inventory on t_inventory.item_id = t_item.id)
-           where t_lkp_category.id = ${category} and t_lkp_sub_category.id = ${subcategory} and t_inventory.location_id = 4 and t_lkp_category.available_for_ecomm = 1 and t_lkp_sub_category.available_for_ecomm = 1 and t_item.available_for_ecomm = 1 order by t_batch.created_at desc;`);
+           where t_lkp_category.id = ${category} and t_lkp_sub_category.id = ${subcategory} and t_inventory.location_id = 4 and t_lkp_category.available_for_ecomm = 1 and t_lkp_sub_category.available_for_ecomm = 1 and t_item.available_for_ecomm = 1 and t_batch.mark_selected = 1;`);
 
     if (ItemsInASubcategory.length === 0) {
       return res.status(404).send({
@@ -268,7 +269,7 @@ const getItemsBySearchTerm = async (req, res, next) => {
       await sequelize.query(`select distinct t_item.id, t_item.name,t_item.brand_id,t_item.UOM ,t_item.category_id, t_lkp_category.group_name,t_item.sub_category_id , t_lkp_sub_category.sub_cat_name 
     ,t_item.image ,t_item.description ,t_item.available_for_ecomm ,t_batch.batch_no ,
     t_batch.location_id ,t_batch.MRP ,t_batch.discount ,t_batch.cost_price ,t_batch.mfg_date ,t_batch.sale_price ,
-    t_batch.created_at,t_lkp_color.color_name,t_batch.quantity, t_lkp_brand.brand_name
+    t_batch.created_at,t_lkp_color.color_name,t_batch.quantity, t_lkp_brand.brand_name,t_batch.mark_selected
     from ((((((ecomm.t_item
           inner join t_batch on t_batch.item_id = t_item.id )
           inner join t_lkp_color on t_lkp_color.id = t_item.color_id)
@@ -276,7 +277,7 @@ const getItemsBySearchTerm = async (req, res, next) => {
           inner join t_lkp_sub_category on t_lkp_sub_category.id = t_item.sub_category_id)
           inner join t_lkp_brand on t_lkp_brand.id = t_item.brand_id)
           inner join t_inventory on t_inventory.item_id = t_item.id)
-          where(t_item.name like "%${searchTerm}%" or t_lkp_category.group_name like "%${searchTerm}%" or t_lkp_brand.brand_name like "%${searchTerm}%" or t_lkp_sub_category.sub_cat_name like "%${searchTerm}%")  and t_inventory.location_id = 4 and t_lkp_category.available_for_ecomm = 1 and t_item.available_for_ecomm = 1 and t_lkp_sub_category.available_for_ecomm = 1 order by t_batch.created_at desc`);
+          where(t_item.name like "%${searchTerm}%" or t_lkp_category.group_name like "%${searchTerm}%" or t_lkp_brand.brand_name like "%${searchTerm}%" or t_lkp_sub_category.sub_cat_name like "%${searchTerm}%")  and t_inventory.location_id = 4 and t_lkp_category.available_for_ecomm = 1 and t_item.available_for_ecomm = 1 and t_lkp_sub_category.available_for_ecomm = 1 and t_batch.mark_selected = 1`);
 
     if (results.length === 0) {
       return res.status(404).send({
@@ -392,7 +393,7 @@ const getItemById = async (req, res, next) => {
       ,t_item.image ,t_item.description ,t_item.available_for_ecomm ,t_batch.batch_no ,
       t_batch.location_id ,t_batch.MRP ,t_batch.discount ,t_batch.cost_price ,t_batch.mfg_date ,t_batch.sale_price ,
       t_batch.expiry_date,
-      t_batch.created_at,t_lkp_color.color_name,t_batch.quantity, t_lkp_brand.brand_name
+      t_batch.created_at,t_lkp_color.color_name,t_batch.quantity, t_lkp_brand.brand_name,t_batch.mark_selected
       from ((((((ecomm.t_item
             inner join t_batch on t_batch.item_id = t_item.id )
             inner join t_lkp_color on t_lkp_color.id = t_item.color_id)
@@ -400,7 +401,7 @@ const getItemById = async (req, res, next) => {
             INNER join t_lkp_sub_category on t_lkp_sub_category.id = t_item.sub_category_id)
             inner join t_lkp_brand on t_lkp_brand.id = t_item.brand_id)
             inner join t_inventory on t_inventory.item_id = t_item.id)
-             where t_item.id = ${currentItemId} and t_inventory.location_id = 4 and t_lkp_category.available_for_ecomm = 1 and t_item.available_for_ecomm = 1 order by t_batch.created_at;`);
+             where t_item.id = ${currentItemId} and t_inventory.location_id = 4 and t_lkp_category.available_for_ecomm = 1 and t_item.available_for_ecomm = 1 and t_batch.mark_selected = 1;`);
 
     if (itemResults.length == 0) {
       return res.status(404).send({
@@ -411,10 +412,6 @@ const getItemById = async (req, res, next) => {
     }
     const item = await itemResults[0];
 
-    let availableQuantity = 0;
-    itemResults.map((current) => {
-      availableQuantity += current.quantity;
-    });
 
     let itemInWishlist;
     if (currentUser) {

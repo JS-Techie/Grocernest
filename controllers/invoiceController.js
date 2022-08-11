@@ -8,6 +8,7 @@ const OrderItems = db.OrderItemsModel;
 const Item = db.ItemModel;
 const Batch = db.BatchModel;
 const Customer = db.CustomerModel;
+const Inventory = db.InventoryModel;
 
 const downloadInvoice = async (req, res, next) => {
   //Get current user from jwt
@@ -38,26 +39,22 @@ const downloadInvoice = async (req, res, next) => {
         where: { id: current.item_id },
       });
 
-      const batches = await Batch.findAll({
-        where: { item_id: current.item_id },
-        order: [["created_at", "ASC"]],
+      const oldestBatch = await Batch.findOne({
+        where: { item_id: current.item_id, mark_selected: 1 },
       });
 
-      let oldestBatch;
-      if (batches.length !== 0) {
-        oldestBatch = batches[0];
+      if (oldestBatch) {
+        return {
+          itemName: item.name,
+          quantity: current.quantity,
+          MRP: oldestBatch ? oldestBatch.MRP : "",
+          image: item.image,
+          description: item.description,
+          isGift: item.is_gift == 1 ? true : false,
+          isOffer: item.is_offer == 1 ? true : false,
+          offerPrice: item.is_offer == 1 ? offer_price : "",
+        };
       }
-
-      return {
-        itemName: item.name,
-        quantity: current.quantity,
-        MRP: oldestBatch ? oldestBatch.MRP : "",
-        image: item.image,
-        description: item.description,
-        isGift: item.is_gift == 1 ? true : false,
-        isOffer: item.is_offer == 1 ? true : false,
-        offerPrice: item.is_offer == 1 ? offer_price : "",
-      };
     });
 
     const resolved = await Promise.all(promises);

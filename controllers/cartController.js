@@ -6,6 +6,7 @@ const Cart = db.CartModel;
 const Item = db.ItemModel;
 const Batch = db.BatchModel;
 const Offers = db.OffersModel;
+const Inventory = db.InventoryModel;
 
 const saveCart = async (req, res, next) => {
   //Get current user from JWT
@@ -401,24 +402,25 @@ const getCart = async (req, res, next) => {
         }
       }
 
-      let availableQuantity = 0;
-      let oldestBatch = null;
-      const batches = await Batch.findAll({
-        where: { item_id: current.item_id },
-        order: [["created_by", "asc"]],
+      const oldestBatch = await Batch.findOne({
+        where: { item_id: current.item_id, mark_selected: 1 },
       });
 
-      if (batches.length > 0) {
-        oldestBatch = batches[0];
-        batches.map((currentBatch) => {
-          availableQuantity += currentBatch.quantity;
+      if (!oldestBatch) {
+        return res.status(200).send({
+          success: true,
+          data: [],
+          message: "No batch is selected for current item",
         });
       }
+      const currentItem = Inventory.findOne({
+        where: { batch_id: oldestBatch.id, item_id: current.item_id },
+      });
 
       return {
         itemID: current.item_id,
         quantity: current.quantity,
-        availableQuantity,
+        availableQuantity: currentItem.quantity,
         itemName: current.name,
         description: current.description,
         image: current.image,

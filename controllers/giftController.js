@@ -7,6 +7,7 @@ const Order = db.OrderModel;
 const Batch = db.BatchModel;
 const Cart = db.CartModel;
 const Strategy = db.GiftStrategyModel;
+const Inventory = db.InventoryModel;
 
 const getAllGifts = async (req, res, next) => {
   //Get current user from jwt
@@ -40,7 +41,7 @@ const getAllGifts = async (req, res, next) => {
     // }
 
     const previousOrder = ordersForCurrentUser[0];
-    console.log(previousOrder)
+    console.log(previousOrder);
     if (previousOrder.status === "Cancelled") {
       return res.status(200).send({
         success: true,
@@ -63,35 +64,32 @@ const getAllGifts = async (req, res, next) => {
   `);
 
     //Get all the gifts that exist
+    let oldestBatch = null;
     const promises = gifts.map(async (current) => {
-      const batches = await Batch.findAll({
-        where: { item_id: current.id },
-        order: [["created_at", "ASC"]],
+      oldestBatch = await Batch.findOne({
+        where: { item_id: current.id, mark_selected: 1 },
       });
 
-      let oldestBatch;
-      let availableQuantity = 0;
-      if (batches.length !== 0) {
-        oldestBatch = batches[0];
-        batches.map((currentBatch) => {
-          availableQuantity += currentBatch.quantity;
-        });
-      }
+      const currentItem = await Inventory.findOne({
+        where: { item_id: current.id, batch_id: oldestBatch.id },
+      });
 
-      return {
-        itemID: current.id,
-        itemName: current.name,
-        availableQuantity,
-        categoryID: current.category_id,
-        subcategoryID: current.sub_category_id,
-        MRP: oldestBatch ? oldestBatch.MRP : "",
-        discount: oldestBatch ? oldestBatch.discount : "",
-        costPrice: oldestBatch ? oldestBatch.cost_price : "",
-        mfgDate: oldestBatch ? oldestBatch.mfg_date : "",
-        salePrice: oldestBatch ? oldestBatch.sale_price : "",
-        color: current.color_name,
-        brand: current.brand_name,
-      };
+      if (oldestBatch) {
+        return {
+          itemID: current.id,
+          itemName: current.name,
+          availableQuantity: currentItem.quantity,
+          categoryID: current.category_id,
+          subcategoryID: current.sub_category_id,
+          MRP: oldestBatch ? oldestBatch.MRP : "",
+          discount: oldestBatch ? oldestBatch.discount : "",
+          costPrice: oldestBatch ? oldestBatch.cost_price : "",
+          mfgDate: oldestBatch ? oldestBatch.mfg_date : "",
+          salePrice: oldestBatch ? oldestBatch.sale_price : "",
+          color: current.color_name,
+          brand: current.brand_name,
+        };
+      }
     });
 
     const resolved = await Promise.all(promises);

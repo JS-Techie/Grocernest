@@ -95,10 +95,18 @@ const offerForItem = async (req, res, next) => {
       });
     }
 
-    const batches = await Batch.findAll({
-      where: { item_id: itemID },
+    const oldestBatch = await Batch.findOne({
+      where: { item_id: itemID, mark_selected: 1 },
     });
-    const oldestBatch = batches[0];
+
+    if (!oldestBatch) {
+      return res.status(200).send({
+        success: true,
+        data: [],
+        message: "No batch is selected for current item",
+      });
+    }
+
     discount = offer.amount_of_discount;
     isPercentage = offer.is_percentage;
 
@@ -175,12 +183,17 @@ const offerForItemBuyNow = async (req, res, next) => {
       where: { id: itemID },
     });
 
-    const batches = await Batch.findAll({
-      where: { item_id: itemID },
-      order: [["created_at", "asc"]],
+    const oldestBatch = await Batch.findOne({
+      where: { item_id: itemID, mark_selected: 1 },
     });
 
-    const oldestBatch = batches[0];
+    if (!oldestBatch) {
+      return res.status(200).send({
+        success: true,
+        data: [],
+        message: "No batch is selected for current item",
+      });
+    }
 
     if (!offer) {
       return res.status(200).send({
@@ -200,12 +213,9 @@ const offerForItemBuyNow = async (req, res, next) => {
     if (offer.item_id_1) {
       offerItemID = offer.item_id_2;
 
-      const batches = await Batch.findAll({
-        where: { item_id: itemID },
-        order: [["created_at", "asc"]],
+      const oldestBatch = await Batch.findOne({
+        where: { item_id: itemID, mark_selected: 1 },
       });
-
-      const oldestBatch = batches[0];
 
       const Xitem = await Item.findOne({
         where: { id: offer.item_id_1 },
@@ -252,12 +262,9 @@ const offerForItemBuyNow = async (req, res, next) => {
       where: { id: offer.item_id },
     });
 
-    let batchesForOfferItem = await Batch.findAll({
-      where: { item_id: offer.item_id },
-      order: [["created_at", "asc"]],
+    let oldestBatchForOfferItem = await Batch.findOne({
+      where: { item_id: offer.item_id, mark_selected: 1 },
     });
-
-    const oldestBatchForOfferItem = batchesForOfferItem[0];
 
     if (offer.is_percentage) {
       newSalePrice =

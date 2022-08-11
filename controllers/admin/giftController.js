@@ -3,6 +3,7 @@ const db = require("../../models");
 const Item = db.ItemModel;
 const Batch = db.BatchModel;
 const Strategy = db.GiftStrategyModel;
+const Inventory = db.InventoryModel;
 
 const getGifts = async (req, res, next) => {
   try {
@@ -19,34 +20,32 @@ const getGifts = async (req, res, next) => {
     }
 
     const promises = gifts.map(async (current) => {
-      const batches = await Batch.findAll({
-        where: { item_id: current.id },
-        order: [["created_at", "ASC"]],
+      const oldestBatch = await Batch.findOne({
+        where: { item_id: current.id, mark_selected: 1 },
       });
 
-      let availableQuantity = 0;
-      batches.map((current) => {
-        availableQuantity += current.quantity;
+      const currentItem = await Inventory.findOne({
+        where: { batch_id: oldestBatch.id, item_id: current.id },
       });
 
-      const oldestBatch = batches[0];
-
-      return {
-        itemID: current.id,
-        name: current.name,
-        UOM: current.UOM,
-        availableQuantity,
-        categoryID: current.category_id,
-        subcategoryID: current.sub_category_id,
-        brandID: current.brand_id,
-        colorID: current.color_id,
-        batchNumber: oldestBatch.batch_no,
-        MRP: oldestBatch.MRP,
-        discount: oldestBatch.discount,
-        costPrice: oldestBatch.cost_price,
-        salePrice: oldestBatch.sale_price,
-        mfgDate: oldestBatch.mfg_date,
-      };
+      if (oldestBatch) {
+        return {
+          itemID: current.id,
+          name: current.name,
+          UOM: current.UOM,
+          availableQuantity: currentItem.quantity,
+          categoryID: current.category_id,
+          subcategoryID: current.sub_category_id,
+          brandID: current.brand_id,
+          colorID: current.color_id,
+          batchNumber: oldestBatch.batch_no,
+          MRP: oldestBatch.MRP,
+          discount: oldestBatch.discount,
+          costPrice: oldestBatch.cost_price,
+          salePrice: oldestBatch.sale_price,
+          mfgDate: oldestBatch.mfg_date,
+        };
+      }
     });
 
     const response = await Promise.all(promises);

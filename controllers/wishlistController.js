@@ -4,6 +4,7 @@ const db = require("../models");
 const Wishlist = db.WishlistItemsModel;
 const Batch = db.BatchModel;
 const Item = db.ItemModel;
+const Inventory = db.InventoryModel;
 
 const createWishlist = async (req, res, next) => {
   //get current user from jwt
@@ -37,32 +38,33 @@ const getWishlist = async (req, res, next) => {
     }
 
     const promises = wishlist.map(async (current) => {
-      let availableQuantity = 0;
-      const batches = await Batch.findAll({
-        where: { item_id: current.item_id },
+      const oldestBatch = await Batch.findOne({
+        where: { item_id: current.item_id, mark_selected: 1 },
       });
 
-      batches.map((currentBatch) => {
-        availableQuantity += currentBatch.quantity;
+      const currentItem = await Inventory.findOne({
+        where: { item_id: current.item_id, batch_id: oldestBatch.id },
       });
 
-      return {
-        itemID: current.item_id,
-        itemName: current.name,
-        UOM: current.UOM,
-        availableQuantity,
-        categoryName: current.group_name,
-        categoryID: current.category_id,
-        image: current.image,
-        description: current.description,
-        MRP: current.MRP,
-        discount: current.discount,
-        sale_price: current.sale_price,
-        mfg_date: current.mfg_date,
-        color: current.color_name,
-        brand: current.brand_name,
-        inWishlist : true,
-      };
+      if (oldestBatch) {
+        return {
+          itemID: current.item_id,
+          itemName: current.name,
+          UOM: current.UOM,
+          availableQuantity: currentItem.quantity,
+          categoryName: current.group_name,
+          categoryID: current.category_id,
+          image: current.image,
+          description: current.description,
+          MRP: current.MRP,
+          discount: current.discount,
+          sale_price: current.sale_price,
+          mfg_date: current.mfg_date,
+          color: current.color_name,
+          brand: current.brand_name,
+          inWishlist: true,
+        };
+      }
     });
 
     const resolved = await Promise.all(promises);
@@ -225,5 +227,3 @@ module.exports = {
   removeItemFromWishlist,
   deleteWishlist,
 };
-
-
