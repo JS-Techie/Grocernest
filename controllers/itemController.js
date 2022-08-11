@@ -411,6 +411,9 @@ const getItemById = async (req, res, next) => {
       });
     }
     const item = await itemResults[0];
+    const currentItem = await Inventory.findOne({
+      where : {item_id : item.item_id, batch_id : item.batch_id}
+    })
 
 
     let itemInWishlist;
@@ -445,7 +448,7 @@ const getItemById = async (req, res, next) => {
       data: {
         itemName: item.name,
         itemID: item.id,
-        quantity: availableQuantity,
+        quantity: currentItem.quantity,
         UOM: item.UOM,
         categoryName: item.group_name,
         categoryID: item.category_id,
