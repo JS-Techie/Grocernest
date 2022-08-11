@@ -33,7 +33,7 @@ const getItemsInCategory = async (req, res, next) => {
             inner join t_lkp_category on t_lkp_category.id = t_item.category_id)
             inner join t_lkp_brand on t_lkp_brand.id = t_item.brand_id)
             inner join t_inventory on t_inventory.item_id = t_item.id)
-             where t_lkp_category.id = ${category} and t_inventory.location_id = 4 and t_lkp_category.available_for_ecomm = 1 and t_item.available_for_ecomm = 1 order by created_at and t_batch.mark_selected = 1;
+             where t_lkp_category.id = ${category} and t_inventory.location_id = 4 and t_lkp_category.available_for_ecomm = 1 and t_item.available_for_ecomm = 1 and t_batch.mark_selected = 1;
     `);
 
     if (itemsInACategory.length === 0) {
