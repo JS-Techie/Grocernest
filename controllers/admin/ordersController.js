@@ -233,52 +233,51 @@ const getOrderDetails = async (req, res, next) => {
         where: { id: currentItem.category_id }
       })
 
-      let oldestBatch = null;
-      const batches = await Batch.findAll({
-        where: { item_id: currentOrderItem.id },
-        order: [["created_at", "ASC"]],
+      const oldestBatch = await Batch.findAll({
+        where: { item_id: currentOrderItem.id, mark_selected: 1 },
       });
 
-      oldestBatch = batches[0];
 
-      return {
-        itemName: currentItem.name,
-        id: currentItem.id,
-        category: category ? category.group_name : '',
-        itemCd: currentItem.item_cd,
-        image: currentItem.image,
-        isGift: currentItem.is_gift == 1 ? true : false,
-        quantity: currentOrderItem.quantity,
-        MRP: oldestBatch.MRP,
-        salePrice:
-          currentOffer
-            ? currentOffer.amount_of_discount
-              ? currentOrderItem.offer_price
-              : oldestBatch.sale_price
-            : oldestBatch.sale_price,
-        discount: oldestBatch.discount,
-        isOffer: currentOrderItem.is_offer === 1 ? true : false,
-        canEdit: currentOrderItem.is_offer === 1 ? (isEdit ? true : false) : "",
-        offerDetails: currentOffer
-          ? {
-            offerID: currentOffer.id,
-            offerType: currentOffer.type,
-            itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
-            quantityOfItemX: currentOffer.item_1_quantity
-              ? currentOffer.item_1_quantity
-              : "",
-            itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
-            quantityOfItemY: currentOffer.item_2_quantity
-              ? currentOffer.item_2_quantity
-              : "",
-            itemID: currentOffer.item_id ? currentOffer.item_id : "",
-            amountOfDiscount: currentOffer.amount_of_discount
+      if (oldestBatch) {
+        return {
+          itemName: currentItem.name,
+          id: currentItem.id,
+          category: category ? category.group_name : '',
+          itemCd: currentItem.item_cd,
+          image: currentItem.image,
+          isGift: currentItem.is_gift == 1 ? true : false,
+          quantity: currentOrderItem.quantity,
+          MRP: oldestBatch.MRP,
+          salePrice:
+            currentOffer
               ? currentOffer.amount_of_discount
-              : "",
-            isPercentage: currentOffer.is_percentage ? true : false,
-            isActive: currentOffer.is_active ? true : false,
-          }
-          : "",
+                ? currentOrderItem.offer_price
+                : oldestBatch.sale_price
+              : oldestBatch.sale_price,
+          discount: oldestBatch.discount,
+          isOffer: currentOrderItem.is_offer === 1 ? true : false,
+          canEdit: currentOrderItem.is_offer === 1 ? (isEdit ? true : false) : "",
+          offerDetails: currentOffer
+            ? {
+              offerID: currentOffer.id,
+              offerType: currentOffer.type,
+              itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
+              quantityOfItemX: currentOffer.item_1_quantity
+                ? currentOffer.item_1_quantity
+                : "",
+              itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
+              quantityOfItemY: currentOffer.item_2_quantity
+                ? currentOffer.item_2_quantity
+                : "",
+              itemID: currentOffer.item_id ? currentOffer.item_id : "",
+              amountOfDiscount: currentOffer.amount_of_discount
+                ? currentOffer.amount_of_discount
+                : "",
+              isPercentage: currentOffer.is_percentage ? true : false,
+              isActive: currentOffer.is_active ? true : false,
+            }
+            : "",
+        }
       };
     });
 
@@ -390,47 +389,49 @@ const getOrderDetails_unused = async (req, res, next) => {
     }
 
     const promises = results.map(async (current) => {
-      const batches = await Batch.findAll({
-        where: { item_id: current.item_id },
+      const oldestBatch = await Batch.findOne({
+        where: { item_id: current.item_id, mark_selected: 1 },
       });
 
-      const oldestBatch = batches[0];
+      // const oldestBatch = batches[0];
 
-      return {
-        item_id: current.item_id,
-        name: current.name,
-        quantity: current.quantity,
-        item_cd: current.item_cd,
-        units: current.units,
-        UOM: current.UOM,
-        category: current.category,
-        subcategory: current.subcategory,
-        brand_id: current.brand_id,
-        div_id: current.div_id,
-        department_id: current.department_id,
-        size_id: current.size_id,
-        description: current.description,
-        cost_price: oldestBatch.cost_price,
-        sale_price: oldestBatch.sale_price,
-        MRP: oldestBatch.MRP,
-        discount: oldestBatch.discount,
-        // is_free: oldestBatch.sale_price === 0 ? true : false,
-        is_offer: current.is_offer === 1 ? true : false,
-        is_gift: current.is_gift === 1 ? true : false,
-        can_edit: current.amount_of_discount ? true : false,
+      if (oldestBatch) {
+        return {
+          item_id: current.item_id,
+          name: current.name,
+          quantity: current.quantity,
+          item_cd: current.item_cd,
+          units: current.units,
+          UOM: current.UOM,
+          category: current.category,
+          subcategory: current.subcategory,
+          brand_id: current.brand_id,
+          div_id: current.div_id,
+          department_id: current.department_id,
+          size_id: current.size_id,
+          description: current.description,
+          cost_price: oldestBatch.cost_price,
+          sale_price: oldestBatch.sale_price,
+          MRP: oldestBatch.MRP,
+          discount: oldestBatch.discount,
+          // is_free: oldestBatch.sale_price === 0 ? true : false,
+          is_offer: current.is_offer === 1 ? true : false,
+          is_gift: current.is_gift === 1 ? true : false,
+          can_edit: current.amount_of_discount ? true : false,
 
-        type: current.type,
-        amount_of_discount: current.amount_of_discount,
-        is_percentage: current.amount_of_discount
-          ? current.is_percentage === 1
-            ? true
-            : false
-          : "",
-        offer_item_id: current.offer_item_id,
-        item_id_1: current.item_id_1,
-        item_id_2: current.item_id_2,
-        item_1_quantity: current.item_1_quantity,
-        item_2_quantity: current.item_2_quantity,
+          type: current.type,
+          amount_of_discount: current.amount_of_discount,
+          is_percentage: current.amount_of_discount
+            ? current.is_percentage === 1
+              ? true
+              : false
+            : "",
+          offer_item_id: current.offer_item_id,
+          item_id_1: current.item_id_1,
+          item_id_2: current.item_id_2,
+          item_1_quantity: current.item_1_quantity,
+          item_2_quantity: current.item_2_quantity,
+        }
       };
     });
 
@@ -530,63 +531,73 @@ const changeOrderStatus = async (req, res, next) => {
                   id: currentItem.item_id,
                 },
               }).then((item) => {
-                Batch.findAll({
+                Batch.findOne({
                   where: {
                     item_id: item.id,
+                    mark_selected: 1
                   },
-                }).then((batches) => {
-                  console.log("oldest batch is", batches[0]);
-                  console.log("BATCH id=>>>", batches[0].id);
-                  if (req.body.status === "Accepted") {
-                    Batch.update(
-                      {
-                        quantity: batches[0].quantity - currentItem.quantity,
-                      },
-                      {
-                        where: {
-                          id: batches[0].id,
-                        },
-                      }
-                    );
-
-                    //TODO update inventory table quantity as well
-                  } else if (req.body.status === "Cancelled") {
-                    Batch.update(
-                      {
-                        quantity: batches[0].quantity + currentItem.quantity,
-                      },
-                      {
-                        where: {
-                          id: batches[0].id,
-                        },
-                      }
-                    );
-
-                    //TODO, update inventory table quantity as well
+                }).then((batch) => {
+                  if (!batch) {
+                    return res.status(200).send({
+                      success: true,
+                      data: "",
+                      message: "Successfully changed order status",
+                    });
                   }
-                  Inventory.update(
-                    {
-                      balance_type:
-                        req.body.status !== "Cancelled"
-                          ? req.body.status === "Accepted"
-                            ? 2
-                            : 7
-                          : 1,
-                    },
-                    {
-                      where: {
-                        item_id: batches[0].item_id,
-                        batch_id: batches[0].id,
-                      },
-                    }
-                  );
+
+                  // console.log("oldest batch is", batches[0]);
+                  // console.log("BATCH id=>>>", batches[0].id);
+                  // if (req.body.status === "Accepted") {
+                  //   Batch.update(
+                  //     {
+                  //       quantity: batches[0].quantity - currentItem.quantity,
+                  //     },
+                  //     {
+                  //       where: {
+                  //         id: batches[0].id,
+                  //       },
+                  //     }
+                  //   );
+
+                  //TODO update inventory table quantity as well
+                  // } else if (req.body.status === "Cancelled") {
+                  //   Batch.update(
+                  //     {
+                  //       quantity: batches[0].quantity + currentItem.quantity,
+                  //     },
+                  //     {
+                  //       where: {
+                  //         id: batches[0].id,
+                  //       },
+                  //     }
+                  //   );
+
+                  //TODO, update inventory table quantity as well
+                  // }
+                  // Inventory.update(
+                  //   {
+                  //     balance_type:
+                  //       req.body.status !== "Cancelled"
+                  //         ? req.body.status === "Accepted"
+                  //           ? 2
+                  //           : 7
+                  //         : 1,
+                  //   },
+                  //   {
+                  //     where: {
+                  //       item_id: batches[0].item_id,
+                  //       batch_id: batches[0].id,
+                  //     },
+                  //   }
+                  // );
                 });
               });
             });
           });
-        } else if (req.body.status === "Cancelled") {
-          //Why is this else if there, it has already been declared
         }
+        // else if (req.body.status === "Cancelled") {
+        //Why is this else if there, it has already been declared
+        // }
 
         // let cust_no = res.dataValues.cust_no
         Customer.findOne({
