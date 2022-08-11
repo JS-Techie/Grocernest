@@ -412,7 +412,7 @@ const getItemById = async (req, res, next) => {
     }
     const item = await itemResults[0];
     const currentItem = await Inventory.findOne({
-      where : {item_id : item.item_id, batch_id : item.batch_id}
+      where : {item_id : item.id, batch_id : item.batch_id}
     })
 
 
@@ -426,7 +426,7 @@ const getItemById = async (req, res, next) => {
     const offer = await Offers.findOne({
       where: {
         is_active: 1,
-        [Op.or]: [{ item_id_1: item.id }, { item_id: item.item_id }],
+        [Op.or]: [{ item_id_1: item.id }, { item_id: item.id }],
       },
     });
 
