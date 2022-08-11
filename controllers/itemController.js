@@ -426,7 +426,7 @@ const getItemById = async (req, res, next) => {
     const offer = await Offers.findOne({
       where: {
         is_active: 1,
-        [Op.or]: [{ item_id_1: item.id }, { item_id: item.id }],
+        [Op.or]: [{ item_id_1: item.id }, { item_id: item.item_id }],
       },
     });
 
