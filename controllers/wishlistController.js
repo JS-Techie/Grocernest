@@ -42,9 +42,12 @@ const getWishlist = async (req, res, next) => {
         where: { item_id: current.item_id, mark_selected: 1 },
       });
 
-      const currentItem = await Inventory.findOne({
-        where: { item_id: current.item_id, batch_id: oldestBatch.id },
-      });
+      let currentItem = null;
+      if (oldestBatch) {
+        currentItem = await Inventory.findOne({
+          where: { item_id: current.item_id, batch_id: oldestBatch.id },
+        });
+      }
 
       if (oldestBatch) {
         return {
@@ -68,8 +71,13 @@ const getWishlist = async (req, res, next) => {
     });
 
     const resolved = await Promise.all(promises);
+    const resolvedWithoutUndefined = await resolved.filter((current) => {
+      return current !== undefined;
+    });
     const responseArray = [
-      ...new Map(resolved.map((item) => [item["itemID"], item])).values(),
+      ...new Map(
+        resolvedWithoutUndefined.map((item) => [item["itemID"], item])
+      ).values(),
     ];
 
     return res.status(200).send({
