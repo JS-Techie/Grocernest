@@ -52,8 +52,8 @@ const getGifts = async (req, res, next) => {
     });
 
     const response = await Promise.all(promises);
-    const responseWithoutNull = response.filter((current)=>{
-      return current!==null;
+    const responseWithoutNull = response.filter((current) => {
+      return current !== undefined;
     })
 
     return res.status(200).send({
