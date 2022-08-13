@@ -106,6 +106,9 @@ const getAllOrders = async (req, res, next) => {
       });
 
       const orderItemsArray = await Promise.all(orderItemPromises);
+      const responseWithoutUndefined = orderItemsArray.filter((current)=>{
+        return current!==undefined;
+      })
 
       // let orderTotal = 0;
       // orderItemsArray.map((current) => {
@@ -119,7 +122,7 @@ const getAllOrders = async (req, res, next) => {
         orderTotal: currentOrder.total,
         applied_discount: currentOrder.applied_discount,
         final_payable_amount: currentOrder.final_payable_amount,
-        itemDetails: orderItemsArray,
+        itemDetails: responseWithoutUndefined,
       };
     });
 
