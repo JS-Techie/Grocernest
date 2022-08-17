@@ -7,6 +7,10 @@ const {
   sendCancelledStatusEmail,
 } = require("../../services/mail/mailService");
 const WalletService = require('../../services/walletService');
+
+// whatsapp
+const { sendOrderStatusWhatsapp } = require('../../services/whatsapp/whatsapp');
+
 // const Customer = db.CustomerModel;
 const Batch = db.BatchModel;
 const Customer = db.CustomerModel;
@@ -600,6 +604,16 @@ const changeOrderStatus = async (req, res, next) => {
         // }
 
         // let cust_no = res.dataValues.cust_no
+
+
+
+
+
+
+
+
+
+
         Customer.findOne({
           where: {
             cust_no: res.dataValues.cust_no,
@@ -608,12 +622,21 @@ const changeOrderStatus = async (req, res, next) => {
           let email = cust.dataValues.email;
           if (email !== null)
             if (req.body.status === "Cancelled") {
+              // email
               sendCancelledStatusEmail(
                 email.toString(),
                 req.body.orderId,
                 req.body.cancellataionReason
               );
+              // whatsapp
+              sendOrderStatusWhatsapp(
+                cust.contact_no, "Your order " +
+                req.body.orderId +
+                " has been cancelled due to this reason: " +
+              req.body.cancellataionReason
+              )
             } else {
+              //email
               sendOrderStatusEmail(
                 email.toString(),
                 req.body.orderId,
@@ -622,6 +645,13 @@ const changeOrderStatus = async (req, res, next) => {
                 " has been " +
                 req.body.status
               );
+              // whatsapp
+              sendOrderStatusWhatsapp(
+                cust.contact_no, "Your order " +
+                req.body.orderId +
+                " has been " +
+              req.body.status
+              )
             }
         });
       });
@@ -709,6 +739,7 @@ const assignTransporter = async (req, res, next) => {
             cust_no: res.dataValues.cust_no,
           },
         }).then((cust) => {
+          // send email
           let email = cust.dataValues.email;
           if (email !== null)
             sendOrderStatusEmail(
@@ -719,6 +750,19 @@ const assignTransporter = async (req, res, next) => {
               " has been Shipped. Your order will be delivered by " +
               transporterName
             );
+
+          // send whatsapp
+          let contact_no = cust.dataValues.contact_no;
+          let opt_in = cust.dataValues.opt_in;
+
+          // if (opt_in == 1) {
+          sendOrderStatusWhatsapp(
+            contact_no, "Your order " +
+            req.body.orderId +
+            " has been Shipped. Your order will be delivered by " +
+            transporterName + "."
+          )
+          // }
         });
       });
 
