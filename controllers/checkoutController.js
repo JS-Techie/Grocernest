@@ -588,7 +588,7 @@ const InvoiceGen = async (cust_no, order_id, email, contact_no, opt_in) => {
       if (email != "") {
         sendOrderPlacedEmail(email, response.orderID);
       }
-      if (contact_no != "" && opt_in == 1) {
+      if (contact_no != "") {
         sendInvoiceToWhatsapp(contact_no, invoice_link, response.orderID);
       }
 

@@ -43,7 +43,7 @@ const getProfile = async (req, res, next) => {
           ? currentUserProfile.image
           : generator.generateRandomAvatar(),
         referral_code: currentUserProfile.referral_code,
-        opt_in : currentUserProfile.opt_in == 1 ? true : false,
+        opt_in: currentUserProfile.opt_in == 1 ? true : false,
       },
     });
   } catch (error) {
@@ -152,8 +152,8 @@ const editProfile = async (req, res, next) => {
         image: base64
           ? url
           : currentUserProfile.image
-          ? currentUserProfile.image
-          : null,
+            ? currentUserProfile.image
+            : null,
       },
       { where: { cust_no: currentUser } }
     );
