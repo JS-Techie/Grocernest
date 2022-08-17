@@ -406,37 +406,39 @@ const getCart = async (req, res, next) => {
         where: { item_id: current.item_id, mark_selected: 1 },
       });
 
-      if (!oldestBatch) {
-        return res.status(200).send({
-          success: true,
-          data: [],
-          message: "No batch is selected for current item",
-        });
-      }
-      const currentItem = Inventory.findOne({
-        where: { batch_id: oldestBatch.id, item_id: current.item_id },
-      });
+      if (oldestBatch) {
+        //   return res.status(200).send({
+        //     success: true,
+        //     data: [],
+        //     message: "No batch is selected for current item",
+        //   });
 
-      return {
-        itemID: current.item_id,
-        quantity: current.quantity,
-        availableQuantity: currentItem.quantity,
-        itemName: current.name,
-        description: current.description,
-        image: current.image,
-        MRP: oldestBatch.MRP,
-        salePrice:
-          current.is_offer === 1
-            ? current.offer_item_price
-            : oldestBatch.sale_price,
-        discount: current.discount,
-        color: current.color_name,
-        brand: current.brand_name,
-        isGift: current.is_gift === 1 ? true : false,
-        isOffer: current.is_offer === 1 ? true : false,
-        canEdit: current.is_offer === 1 ? (isEdit ? true : false) : "",
-      };
+        const currentItem = Inventory.findOne({
+          where: { batch_id: oldestBatch.id, item_id: current.item_id },
+        });
+
+        return {
+          itemID: current.item_id,
+          quantity: current.quantity,
+          availableQuantity: currentItem.quantity,
+          itemName: current.name,
+          description: current.description,
+          image: current.image,
+          MRP: oldestBatch.MRP,
+          salePrice:
+            current.is_offer === 1
+              ? current.offer_item_price
+              : oldestBatch.sale_price,
+          discount: current.discount,
+          color: current.color_name,
+          brand: current.brand_name,
+          isGift: current.is_gift === 1 ? true : false,
+          isOffer: current.is_offer === 1 ? true : false,
+          canEdit: current.is_offer === 1 ? (isEdit ? true : false) : "",
+        };
+      }
     });
+
 
     const resolved = await Promise.all(promises);
     const responseArray = [
