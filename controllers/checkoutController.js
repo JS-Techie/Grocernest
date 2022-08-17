@@ -3,7 +3,8 @@ const { sequelize } = require("../models");
 const db = require("../models");
 const uniqid = require("uniqid");
 const { generatePdf } = require("../utils/generatePdf");
-const { sendInvoiceToWhatsapp } = require("../services/whatsapp/whatsapp");
+const { uploadToS3, getFromS3 } = require("../services/s3Service");
+const { sendInvoiceToWhatsapp, sendRegistrationWhatsapp } = require("../services/whatsapp/whatsapp");
 
 const Order = db.OrderModel;
 const OrderItems = db.OrderItemsModel;
@@ -196,15 +197,18 @@ const checkoutFromCart = async (req, res, next) => {
     //   );
     // });
 
-    await InvoiceGen(currentUser, newOrder.order_id);
     let email = "";
+    let contact_no = "";
     Customer.findOne({
       where: {
         cust_no: currentUser,
       },
-    }).then((cust) => {
+    }).then(async (cust) => {
       email = cust.dataValues.email;
-      sendOrderPlacedEmail(email, newOrder.order_id);
+      contact_no = cust.dataValues.contact_no;
+      let opt_in = cust.dataValues.opt_in;
+
+      await InvoiceGen(currentUser, newOrder.order_id, email, contact_no, opt_in);
     });
 
     const deletedItemsFromCart = await Cart.destroy({
@@ -463,19 +467,18 @@ const buyNow = async (req, res, next) => {
     //   );
     // });
 
-    const url = await InvoiceGen(currentUser, newOrder.order_id);
     let email = "";
+    let contact_no = "";
     Customer.findOne({
       where: {
         cust_no: currentUser,
       },
     }).then(async (cust) => {
       email = cust.dataValues.email;
-      const contact_no = cust.dataValues.contact_no
-      await sendOrderPlacedEmail(email, newOrder.order_id);
-      // whatsapp send
-      console.log(contact_no, url.link);
-      sendInvoiceToWhatsapp(contact_no, url.link)
+      contact_no = cust.dataValues.contact_no
+      let opt_in = cust.dataValues.opt_in
+
+      await InvoiceGen(currentUser, newOrder.order_id, email, contact_no, opt_in);
     });
 
     const deletedItemsFromCart = await Cart.destroy({
@@ -504,7 +507,7 @@ const buyNow = async (req, res, next) => {
   }
 };
 
-const InvoiceGen = async (cust_no, order_id) => {
+const InvoiceGen = async (cust_no, order_id, email, contact_no, opt_in) => {
   const currentCustomer = cust_no;
   const orderID = order_id;
   try {
@@ -567,19 +570,30 @@ const InvoiceGen = async (cust_no, order_id) => {
       response,
       `invoice-${currentOrder.order_id}.pdf`
     );
-
+    let uploadResponse = null;
     writeStream.on("finish", async () => {
-      // s3
-      let uploadResponse = await uploadToS3(
+      console.log("stored pdf on local");
+
+      // s3 upload
+      uploadResponse = await uploadToS3(
         `invoice-${response.orderID}.pdf`,
         "pdfs/invoices/invoice-" + response.orderID + ".pdf"
       );
-      console.log("stored pdf on local");
-      let result = {
-        "link": uploadResponse.Location
+      console.log("stored on s3");
+      const invoice_link = uploadResponse.Location;
+
+      // console.log("final here==>>>", email, contact_no, invoice_link);
+
+      // send email
+      if (email != "") {
+        sendOrderPlacedEmail(email, response.orderID);
       }
-      return result;
+      if (contact_no != "" && opt_in == 1) {
+        sendInvoiceToWhatsapp(contact_no, invoice_link, response.orderID);
+      }
+
     });
+    return uploadResponse.Location;
   } catch (error) {
     console.log(error);
     return "error";
