@@ -3,6 +3,7 @@ const { sequelize } = require("../models");
 const db = require("../models");
 const uniqid = require("uniqid");
 const { generatePdf } = require("../utils/generatePdf");
+const { sendInvoiceToWhatsapp } = require("../services/whatsapp/whatsapp");
 
 const Order = db.OrderModel;
 const OrderItems = db.OrderItemsModel;
@@ -462,15 +463,19 @@ const buyNow = async (req, res, next) => {
     //   );
     // });
 
-    await InvoiceGen(currentUser, newOrder.order_id);
+    const url = await InvoiceGen(currentUser, newOrder.order_id);
     let email = "";
     Customer.findOne({
       where: {
         cust_no: currentUser,
       },
-    }).then((cust) => {
+    }).then(async (cust) => {
       email = cust.dataValues.email;
-      sendOrderPlacedEmail(email, newOrder.order_id);
+      const contact_no = cust.dataValues.contact_no
+      await sendOrderPlacedEmail(email, newOrder.order_id);
+      // whatsapp send
+      console.log(contact_no, url.link);
+      sendInvoiceToWhatsapp(contact_no, url.link)
     });
 
     const deletedItemsFromCart = await Cart.destroy({
@@ -564,8 +569,16 @@ const InvoiceGen = async (cust_no, order_id) => {
     );
 
     writeStream.on("finish", async () => {
+      // s3
+      let uploadResponse = await uploadToS3(
+        `invoice-${response.orderID}.pdf`,
+        "pdfs/invoices/invoice-" + response.orderID + ".pdf"
+      );
       console.log("stored pdf on local");
-      return "done";
+      let result = {
+        "link": uploadResponse.Location
+      }
+      return result;
     });
   } catch (error) {
     console.log(error);

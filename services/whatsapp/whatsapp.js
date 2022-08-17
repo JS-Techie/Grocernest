@@ -4,7 +4,7 @@ let client = new Gupshup({
     apiKey: 'hm7797tb46hrtrgcsqksvxs69yj9zza4'
 });
 
-const sendInvoiceToWhatsapp = (phno) => {
+const sendInvoiceToWhatsapp = (phno, link) => {
     console.log("Sending sms to whatsapp..");
     client.message.send({
         channel: "whatsapp",
@@ -13,16 +13,15 @@ const sendInvoiceToWhatsapp = (phno) => {
         'src.name': "Grocernest",
         message: {
             type: "file",
-            url: "http://www.africau.edu/images/default/sample.pdf",
+            url: link.toString(),
             filename: "Invoice",
-            text: "hi there"
+            text: "Invoice"
         }
     }).then((response) => {
         console.log("Document message sent", response)
     }).catch(err => {
         console.log("Document message err:", err)
     })
-
 }
 
 const sendTextMsg = (phno, msg) => {
