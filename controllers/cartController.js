@@ -441,8 +441,11 @@ const getCart = async (req, res, next) => {
 
 
     const resolved = await Promise.all(promises);
+    const response_without_undefined = resolved.filter((current) => {
+      return current != undefined
+    })
     const responseArray = [
-      ...new Map(resolved.map((item) => [item["itemID"], item])).values(),
+      ...new Map(response_without_undefined.map((item) => [item["itemID"], item])).values(),
     ];
 
     return res.status(200).send({
