@@ -92,21 +92,23 @@ const checkoutFromCart = async (req, res, next) => {
       },
     });
 
-    const wallet = await Wallet.update(
-      {
-        balance: user_wallet.balance - wallet_balance_used,
-      },
-      { where: { wallet_id: wallet_id } }
-    );
+    if (wallet_balance_used > 0) {
+      const wallet = await Wallet.update(
+        {
+          balance: user_wallet.balance - wallet_balance_used,
+        },
+        { where: { wallet_id: wallet_id } }
+      );
 
-    const wallet_transaction = await Wallet_Transaction.create({
-      wallet_id: wallet_id,
-      transaction_id: uniqid(),
-      transaction_type: "D",
-      transaction_amount: wallet_balance_used,
-      transaction_details: newOrder.order_id,
-      created_by: 2,
-    });
+      const wallet_transaction = await Wallet_Transaction.create({
+        wallet_id: wallet_id,
+        transaction_id: uniqid(),
+        transaction_type: "D",
+        transaction_amount: wallet_balance_used,
+        transaction_details: newOrder.order_id,
+        created_by: 2,
+      });
+    }
 
     let oldestBatch = null;
     const promises = cartForUser.map(async (currentItem) => {
@@ -328,21 +330,23 @@ const buyNow = async (req, res, next) => {
       },
     });
 
-    const wallet = await Wallet.update(
-      {
-        balance: user_wallet.balance - wallet_balance_used,
-      },
-      { where: { wallet_id: wallet_id } }
-    );
+    if (wallet_balance_used > 0) {
+      const wallet = await Wallet.update(
+        {
+          balance: user_wallet.balance - wallet_balance_used,
+        },
+        { where: { wallet_id: wallet_id } }
+      );
 
-    const wallet_transaction = await Wallet_Transaction.create({
-      wallet_id: wallet_id,
-      transaction_id: uniqid(),
-      transaction_type: "D",
-      transaction_amount: wallet_balance_used,
-      transaction_details: newOrder.order_id,
-      created_by: 2,
-    });
+      const wallet_transaction = await Wallet_Transaction.create({
+        wallet_id: wallet_id,
+        transaction_id: uniqid(),
+        transaction_type: "D",
+        transaction_amount: wallet_balance_used,
+        transaction_details: newOrder.order_id,
+        created_by: 2,
+      });
+    }
 
     let promises = [];
     if (userGifts.length !== 0) {

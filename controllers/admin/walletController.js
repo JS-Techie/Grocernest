@@ -61,7 +61,7 @@ const debitAmountFromWallet = async (req, res, next) => {
     let transaction_id = uniqid();
 
     try {
-        if (parseInt(amount) > 0) {
+        if (amount > 0) {
             const [results, metadata] =
                 await sequelize.query(`
                 UPDATE t_wallet
