@@ -5,24 +5,29 @@ let client = new Gupshup({
 });
 
 const sendInvoiceToWhatsapp = (phno, link, order_id) => {
-    console.log("Sending sms to whatsapp..");
-    client.message.send({
-        channel: "whatsapp",
-        source: "917834811114",
-        destination: "91" + phno.toString(),
-        'src.name': "Grocernest",
-        message: {
-            type: "file",
-            url: "https://www.buildquickbots.com/whatsapp/media/sample/pdf/sample01.pdf",
-            // url: "http://ecomm-dev.s3.ap-south-1.amazonaws.com/pdfs/invoices/invoice-7094387.pdf",
-            filename: "Invoice-" + order_id,
-            caption: "Hi, Your order(" + order_id + ") is placed successfully. Please find the attached Invoice. Thank you.."
-        }
-    }).then((response) => {
-        console.log("Document message sent", response);
-    }).catch(err => {
-        console.log("Document message err:", err);
-    })
+    // console.log("Sending sms to whatsapp..");
+    // client.message.send({
+    //     channel: "whatsapp",
+    //     source: "917834811114",
+    //     destination: "91" + phno.toString(),
+    //     template: {
+    //         "id": "28f663d7-b8c5-4ebe-897d-330d4b5493e7",
+    //         "params": ["Iphone", "49999"]
+    //     },
+    //     'src.name': "Grocernest",
+    //     message: {}
+    // message: {
+    //     type: "file",
+    //     url: "https://www.buildquickbots.com/whatsapp/media/sample/pdf/sample01.pdf",
+    //     // url: "http://ecomm-dev.s3.ap-south-1.amazonaws.com/pdfs/invoices/invoice-7094387.pdf",
+    //     filename: "Invoice-" + order_id,
+    //     caption: "Hi, Your order(" + order_id + ") is placed successfully. Please find the attached Invoice. Thank you.."
+    // }
+    // }).then((response) => {
+    //     console.log("Document message sent", response);
+    // }).catch(err => {
+    //     console.log("Document message err:", err);
+    // })
 }
 
 const sendTextMsg = (phno, msg) => {
