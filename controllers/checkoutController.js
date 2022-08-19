@@ -178,7 +178,10 @@ const checkoutFromCart = async (req, res, next) => {
       }
     });
 
-    const orderItems = await Promise.all(orderItemsPromises);
+    let orderItems = await Promise.all(orderItemsPromises);
+    orderItems = orderItems.filter((current) => {
+      return current !== undefined;
+    });
 
     //update inventory
     orderItems.map(async (currentItem) => {
@@ -190,6 +193,7 @@ const checkoutFromCart = async (req, res, next) => {
           balance_type: 1,
         },
       });
+      console.log(currentInventory);
       const currentInventoryToBeBlocked = await Inventory.findOne({
         where: {
           batch_id: currentItem.oldestBatch.id,
@@ -198,7 +202,7 @@ const checkoutFromCart = async (req, res, next) => {
           balance_type: 7,
         },
       });
-
+      console.log(currentInventoryToBeBlocked);
       if (!currentInventoryToBeBlocked) {
         const newInventory = await Inventory.create({
           batch_id: currentItem.oldestBatch.id,
@@ -208,8 +212,10 @@ const checkoutFromCart = async (req, res, next) => {
           active_ind: "Y",
           created_by: 1,
         });
+
+        console.log("updatedInventory=====>", newInventory);
       } else {
-        await Inventory.update(
+        const updateInventory = await Inventory.update(
           {
             quantity:
               currentInventoryToBeBlocked.quantity + currentItem.quantity,
@@ -223,8 +229,12 @@ const checkoutFromCart = async (req, res, next) => {
             },
           }
         );
+        console.log(
+          "else when there is no row with balance type 7",
+          updateInventory
+        );
       }
-      await Inventory.update(
+      const updatedInventory = await Inventory.update(
         {
           quantity: currentInventory.quantity - currentItem.quantity,
         },
@@ -236,6 +246,10 @@ const checkoutFromCart = async (req, res, next) => {
             balance_type: 1,
           },
         }
+      );
+      console.log(
+        "updating main inventory with balance type 1",
+        updatedInventory
       );
     });
 
