@@ -183,37 +183,43 @@ const checkoutFromCart = async (req, res, next) => {
       return current !== undefined;
     });
 
+    console.log(orderItems);
+
     //update inventory
     orderItems.map(async (currentItem) => {
       const currentInventory = await Inventory.findOne({
         where: {
           batch_id: currentItem.oldestBatch.id,
-          item_id: currentItem.item_id,
+          item_id: currentItem.itemID,
           location_id: 4,
           balance_type: 1,
         },
       });
-      console.log(currentInventory);
+      console.log("Current item with balance type 1", currentInventory);
       const currentInventoryToBeBlocked = await Inventory.findOne({
         where: {
           batch_id: currentItem.oldestBatch.id,
-          item_id: currentItem.item_id,
+          item_id: currentItem.itemID,
           location_id: 4,
           balance_type: 7,
         },
       });
-      console.log(currentInventoryToBeBlocked);
+      console.log(
+        "Current inventory to be blocked",
+        currentInventoryToBeBlocked
+      );
       if (!currentInventoryToBeBlocked) {
         const newInventory = await Inventory.create({
           batch_id: currentItem.oldestBatch.id,
-          item_id: currentItem.item_id,
+          item_id: currentItem.itemID,
+          quantity: currentItem.quantity,
           location_id: 4,
           balance_type: 7,
           active_ind: "Y",
           created_by: 1,
         });
 
-        console.log("updatedInventory=====>", newInventory);
+        console.log("No row with balance type 7", newInventory);
       } else {
         const updateInventory = await Inventory.update(
           {
@@ -223,16 +229,13 @@ const checkoutFromCart = async (req, res, next) => {
           {
             where: {
               batch_id: currentItem.oldestBatch.id,
-              item_id: currentItem.item_id,
+              item_id: currentItem.itemID,
               location_id: 4,
               balance_type: 7,
             },
           }
         );
-        console.log(
-          "else when there is no row with balance type 7",
-          updateInventory
-        );
+        console.log("Yes row with balance type 7", updateInventory);
       }
       const updatedInventory = await Inventory.update(
         {
@@ -240,8 +243,8 @@ const checkoutFromCart = async (req, res, next) => {
         },
         {
           where: {
-            batch_id: current.oldestBatch.id,
-            item_id: currentItem.item_id,
+            batch_id: currentItem.oldestBatch.id,
+            item_id: currentItem.itemID,
             location_id: 4,
             balance_type: 1,
           },
@@ -504,6 +507,8 @@ const buyNow = async (req, res, next) => {
         },
       });
 
+      console.log("current inventory with balance type 1", currentInventory);
+
       const currentInventoryToBeBlocked = await Inventory.findOne({
         where: {
           batch_id: oldestBatch.id,
@@ -513,17 +518,28 @@ const buyNow = async (req, res, next) => {
         },
       });
 
+      console.log(
+        "blocked inventory with balance type 1",
+        currentInventoryToBeBlocked
+      );
+
       if (!currentInventoryToBeBlocked) {
         const newInventory = await Inventory.create({
           batch_id: oldestBatch.id,
           item_id: currentItem.item_id,
           location_id: 4,
+          quantity: currentItem.quantity,
           balance_type: 7,
           active_ind: "Y",
           created_by: 1,
         });
+
+        console.log(
+          "If there is no inventory to be blocked, make a new row",
+          newInventory
+        );
       } else {
-        await Inventory.update(
+        const updatedInventory = await Inventory.update(
           {
             quantity:
               currentInventoryToBeBlocked.quantity + currentItem.quantity,
@@ -537,8 +553,13 @@ const buyNow = async (req, res, next) => {
             },
           }
         );
+
+        console.log(
+          "updated inventory row with balance type 7",
+          updatedInventory
+        );
       }
-      await Inventory.update(
+      const updateInventory = await Inventory.update(
         {
           quantity: currentInventory.quantity - currentItem.quantity,
         },
@@ -551,6 +572,8 @@ const buyNow = async (req, res, next) => {
           },
         }
       );
+
+      console.log("updated inventory row with balance type 1", updateInventory);
     });
 
     const response = orderItems.map((current) => {
