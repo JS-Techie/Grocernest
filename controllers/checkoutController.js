@@ -585,8 +585,9 @@ const buyNow = async (req, res, next) => {
       };
     });
 
-    await InvoiceGen(currentUser, newOrder.order_id);
+    // await InvoiceGen(currentUser, newOrder.order_id);
 
+    console.log("jjjjjjjjjjjjjjjjjjjjjjjjjjjjjj")
     let email = "";
     let contact_no = "";
     Customer.findOne({
@@ -597,6 +598,8 @@ const buyNow = async (req, res, next) => {
       email = cust.dataValues.email;
       contact_no = cust.dataValues.contact_no;
       let opt_in = cust.dataValues.opt_in;
+
+      console.log("jjjjjjjjjjjjjjjjjjjjjjjjjjjjjj")
 
       await InvoiceGen(
         currentUser,
@@ -634,6 +637,7 @@ const buyNow = async (req, res, next) => {
 };
 
 const InvoiceGen = async (cust_no, order_id, email, contact_no, opt_in) => {
+  console.log("INVOICE GENNNN")
   const currentCustomer = cust_no;
   const orderID = order_id;
   try {
@@ -701,12 +705,12 @@ const InvoiceGen = async (cust_no, order_id, email, contact_no, opt_in) => {
       console.log("stored pdf on local");
 
       // s3 upload
-      uploadResponse = await uploadToS3(
-        `invoice-${response.orderID}.pdf`,
-        "pdfs/invoices/invoice-" + response.orderID + ".pdf"
-      );
-      console.log("stored on s3");
-      const invoice_link = uploadResponse.Location;
+      // uploadResponse = await uploadToS3(
+      //   `invoice-${response.orderID}.pdf`,
+      //   "pdfs/invoices/invoice-" + response.orderID + ".pdf"
+      // );
+      // console.log("stored on s3");
+      // const invoice_link = uploadResponse.Location;
 
       // console.log("final here==>>>", email, contact_no, invoice_link);
 
@@ -714,11 +718,11 @@ const InvoiceGen = async (cust_no, order_id, email, contact_no, opt_in) => {
       if (email != "") {
         sendOrderPlacedEmail(email, response.orderID);
       }
-      if (contact_no != "") {
-        sendInvoiceToWhatsapp(contact_no, invoice_link, response.orderID);
-      }
+      // if (contact_no != "") {
+      //   sendInvoiceToWhatsapp(contact_no, invoice_link, response.orderID);
+      // }
     });
-    return uploadResponse.Location;
+
   } catch (error) {
     console.log(error);
     return "error";
