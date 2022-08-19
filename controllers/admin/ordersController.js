@@ -2,11 +2,15 @@ const { sequelize } = require("../../models");
 const { Op } = require("sequelize");
 const db = require("../../models");
 const Order = db.OrderModel;
+const OrderItems = db.OrderItemsModel;
 const {
   sendOrderStatusEmail,
   sendCancelledStatusEmail,
 } = require("../../services/mail/mailService");
 const WalletService = require('../../services/walletService');
+
+// whatsapp
+const { sendOrderStatusWhatsapp } = require('../../services/whatsapp/whatsapp');
 // const Customer = db.CustomerModel;
 const Batch = db.BatchModel;
 const Customer = db.CustomerModel;
@@ -530,13 +534,13 @@ const changeOrderStatus = async (req, res, next) => {
                 where: {
                   id: currentItem.item_id,
                 },
-              }).then((item) => {
+              }).then(async (item) => {
                 Batch.findOne({
                   where: {
                     item_id: item.id,
                     mark_selected: 1
                   },
-                }).then((batch) => {
+                }).then(async (batch) => {
                   if (!batch) {
                     return res.status(200).send({
                       success: true,
@@ -545,61 +549,101 @@ const changeOrderStatus = async (req, res, next) => {
                     });
                   }
 
-                  // console.log("oldest batch is", batches[0]);
-                  // console.log("BATCH id=>>>", batches[0].id);
-                  // if (req.body.status === "Accepted") {
-                  //   Batch.update(
-                  //     {
-                  //       quantity: batches[0].quantity - currentItem.quantity,
-                  //     },
-                  //     {
-                  //       where: {
-                  //         id: batches[0].id,
-                  //       },
-                  //     }
-                  //   );
 
-                  //TODO update inventory table quantity as well
-                  // } else if (req.body.status === "Cancelled") {
-                  //   Batch.update(
-                  //     {
-                  //       quantity: batches[0].quantity + currentItem.quantity,
-                  //     },
-                  //     {
-                  //       where: {
-                  //         id: batches[0].id,
-                  //       },
-                  //     }
-                  //   );
+                  //TODO update inventory table quantity as well                  
 
-                  //TODO, update inventory table quantity as well
-                  // }
-                  // Inventory.update(
-                  //   {
-                  //     balance_type:
-                  //       req.body.status !== "Cancelled"
-                  //         ? req.body.status === "Accepted"
-                  //           ? 2
-                  //           : 7
-                  //         : 1,
-                  //   },
-                  //   {
-                  //     where: {
-                  //       item_id: batches[0].item_id,
-                  //       batch_id: batches[0].id,
-                  //     },
-                  //   }
-                  // );
+                  if (req.body.status == "Cancelled") {
+
+                    const itemsInOrder = await OrderItems.findAll({
+                      where: { order_id: res.dataValues.order_id },
+                    });
+                    if (itemsInOrder.length > 0) {
+                      itemsInOrder.map(async (currentItem) => {
+                        const oldestBatch = await Batch.findOne({
+                          where: { item_id: currentItem.item_id, mark_selected: 1 },
+                        });
+
+                        if (oldestBatch) {
+                          const currentInventory = await Inventory.findOne({
+                            where: {
+                              item_id: currentItem.item_id,
+                              batch_id: oldestBatch.id,
+                              balance_type: 1,
+                              location_id: 4,
+                            },
+                          });
+
+                          const blockedInventory = await Inventory.findOne({
+                            where: {
+                              item_id: currentItem.item_id,
+                              batch_id: oldestBatch.id,
+                              balance_type: 7,
+                              quantity: {
+                                [Op.gt]: 0,
+                              },
+                            },
+                          });
+
+                          if (blockedInventory) {
+                            updateBlockedItem = await Inventory.update(
+                              {
+                                quantity: blockedInventory.quantity - currentItem.quantity,
+                              },
+                              {
+                                where: {
+                                  batch_id: oldestBatch.id,
+                                  item_id: currentItem.item_id,
+                                  balance_type: 7,
+                                },
+                              }
+                            );
+                          }
+
+                          updateInventory = await Inventory.update(
+                            {
+                              quantity: currentItem.quantity + currentInventory.quantity,
+                            },
+                            {
+                              where: {
+                                batch_id: oldestBatch.id,
+                                item_id: currentItem.item_id,
+                                balance_type: 1,
+                                location_id: 4,
+                              },
+                            }
+                          );
+                        }
+                      });
+                    }
+
+                  }
+                  else if (req.body.status == "Delivered") {
+                    const current_inventory_to_be_blocked = await Inventory.findOne({
+                      where: {
+                        item_id: batch.item_id,
+                        batch_id: batch.id,
+                        balance_type: 7
+                      }
+                    })
+                    await Inventory.update(
+                      {
+                        quantity: current_inventory_to_be_blocked.quantity - currentItem.quantity,
+                      },
+                      {
+                        where: {
+                          batch_id: batch.id,
+                          item_id: batch.item_id,
+                          balance_type: 1,
+                        },
+                      })
+                  }
+
                 });
               });
             });
           });
         }
-        // else if (req.body.status === "Cancelled") {
-        //Why is this else if there, it has already been declared
-        // }
 
-        // let cust_no = res.dataValues.cust_no
         Customer.findOne({
           where: {
             cust_no: res.dataValues.cust_no,
@@ -608,12 +652,21 @@ const changeOrderStatus = async (req, res, next) => {
           let email = cust.dataValues.email;
           if (email !== null)
             if (req.body.status === "Cancelled") {
+              // email
               sendCancelledStatusEmail(
                 email.toString(),
                 req.body.orderId,
                 req.body.cancellataionReason
               );
+              // whatsapp
+              sendOrderStatusWhatsapp(
+                cust.contact_no, "Your order " +
+                req.body.orderId +
+                " has been cancelled due to this reason: " +
+              req.body.cancellataionReason
+              )
             } else {
+              //email
               sendOrderStatusEmail(
                 email.toString(),
                 req.body.orderId,
@@ -622,6 +675,13 @@ const changeOrderStatus = async (req, res, next) => {
                 " has been " +
                 req.body.status
               );
+              // whatsapp
+              sendOrderStatusWhatsapp(
+                cust.contact_no, "Your order " +
+                req.body.orderId +
+                " has been " +
+              req.body.status
+              )
             }
         });
       });
@@ -709,6 +769,7 @@ const assignTransporter = async (req, res, next) => {
             cust_no: res.dataValues.cust_no,
           },
         }).then((cust) => {
+          // send email
           let email = cust.dataValues.email;
           if (email !== null)
             sendOrderStatusEmail(
@@ -719,6 +780,19 @@ const assignTransporter = async (req, res, next) => {
               " has been Shipped. Your order will be delivered by " +
               transporterName
             );
+
+          // send whatsapp
+          let contact_no = cust.dataValues.contact_no;
+          let opt_in = cust.dataValues.opt_in;
+
+          // if (opt_in == 1) {
+          sendOrderStatusWhatsapp(
+            contact_no, "Your order " +
+            req.body.orderId +
+            " has been Shipped. Your order will be delivered by " +
+            transporterName + "."
+          )
+          // }
         });
       });
 

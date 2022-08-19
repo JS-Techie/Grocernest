@@ -449,6 +449,7 @@ const getCart = async (req, res, next) => {
     });
 
     const resolved = await Promise.all(promises);
+
     const resolvedWithoutUndefined = await resolved.filter((current) => {
       return current !== undefined;
     });

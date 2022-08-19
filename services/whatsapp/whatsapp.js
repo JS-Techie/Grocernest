@@ -4,34 +4,39 @@ let client = new Gupshup({
     apiKey: 'hm7797tb46hrtrgcsqksvxs69yj9zza4'
 });
 
-const sendInvoiceToWhatsapp = (phno) => {
-    console.log("Sending sms to whatsapp..");
-    client.message.send({
-        channel: "whatsapp",
-        source: "917834811114",
-        destination: phno,
-        'src.name': "Grocernest",
-        message: {
-            type: "file",
-            url: "http://www.africau.edu/images/default/sample.pdf",
-            filename: "Invoice",
-            text: "hi there"
-        }
-    }).then((response) => {
-        console.log("Document message sent", response)
-    }).catch(err => {
-        console.log("Document message err:", err)
-    })
-
+const sendInvoiceToWhatsapp = (phno, link, order_id) => {
+    // console.log("Sending sms to whatsapp..");
+    // client.message.send({
+    //     channel: "whatsapp",
+    //     source: "917834811114",
+    //     destination: "91" + phno.toString(),
+    //     template: {
+    //         "id": "28f663d7-b8c5-4ebe-897d-330d4b5493e7",
+    //         "params": ["Iphone", "49999"]
+    //     },
+    //     'src.name': "Grocernest",
+    //     message: {}
+    // message: {
+    //     type: "file",
+    //     url: "https://www.buildquickbots.com/whatsapp/media/sample/pdf/sample01.pdf",
+    //     // url: "http://ecomm-dev.s3.ap-south-1.amazonaws.com/pdfs/invoices/invoice-7094387.pdf",
+    //     filename: "Invoice-" + order_id,
+    //     caption: "Hi, Your order(" + order_id + ") is placed successfully. Please find the attached Invoice. Thank you.."
+    // }
+    // }).then((response) => {
+    //     console.log("Document message sent", response);
+    // }).catch(err => {
+    //     console.log("Document message err:", err);
+    // })
 }
 
 const sendTextMsg = (phno, msg) => {
-    console.log("Sending Invoice to whatsapp..");
+    console.log("Sending update to user using whatsapp..");
 
     client.message.send({
         channel: "whatsapp",
         source: "917834811114",
-        destination: phno.toString(),
+        destination: "91" + phno.toString(),
         'src.name': "Grocernest",
         message: {
             isHSM: "false",
@@ -45,11 +50,12 @@ const sendTextMsg = (phno, msg) => {
     })
 }
 
-const sendRegistrationWhatsapp = (phno) => {
-    let msg = "Welcome to GrocerNest! You have successfully registered.";
+const sendOrderStatusWhatsapp = (phno, msg) => {
     sendTextMsg(phno, msg);
 }
 module.exports = {
     sendInvoiceToWhatsapp,
-    sendRegistrationWhatsapp
+    // sendRegistrationWhatsapp,
+
+    sendOrderStatusWhatsapp,
 };

@@ -3,6 +3,11 @@ const { sequelize } = require("../models");
 const db = require("../models");
 const uniqid = require("uniqid");
 const { generatePdf } = require("../utils/generatePdf");
+const { uploadToS3, getFromS3 } = require("../services/s3Service");
+const {
+  sendInvoiceToWhatsapp,
+  sendRegistrationWhatsapp,
+} = require("../services/whatsapp/whatsapp");
 
 const Order = db.OrderModel;
 const OrderItems = db.OrderItemsModel;
@@ -90,21 +95,23 @@ const checkoutFromCart = async (req, res, next) => {
       },
     });
 
-    const wallet = await Wallet.update(
-      {
-        balance: user_wallet.balance - wallet_balance_used,
-      },
-      { where: { wallet_id: wallet_id } }
-    );
+    if (wallet_balance_used > 0) {
+      const wallet = await Wallet.update(
+        {
+          balance: user_wallet.balance - wallet_balance_used,
+        },
+        { where: { wallet_id: wallet_id } }
+      );
 
-    const wallet_transaction = await Wallet_Transaction.create({
-      wallet_id: wallet_id,
-      transaction_id: uniqid(),
-      transaction_type: "D",
-      transaction_amount: wallet_balance_used,
-      transaction_details: newOrder.order_id,
-      created_by: 2,
-    });
+      const wallet_transaction = await Wallet_Transaction.create({
+        wallet_id: wallet_id,
+        transaction_id: uniqid(),
+        transaction_type: "D",
+        transaction_amount: wallet_balance_used,
+        transaction_details: newOrder.order_id,
+        created_by: 2,
+      });
+    }
 
     let oldestBatch = null;
     const promises = cartForUser.map(async (currentItem) => {
@@ -232,15 +239,24 @@ const checkoutFromCart = async (req, res, next) => {
       );
     });
 
-    await InvoiceGen(currentUser, newOrder.order_id);
     let email = "";
+    let contact_no = "";
     Customer.findOne({
       where: {
         cust_no: currentUser,
       },
-    }).then((cust) => {
+    }).then(async (cust) => {
       email = cust.dataValues.email;
-      sendOrderPlacedEmail(email, newOrder.order_id);
+      contact_no = cust.dataValues.contact_no;
+      let opt_in = cust.dataValues.opt_in;
+
+      await InvoiceGen(
+        currentUser,
+        newOrder.order_id,
+        email,
+        contact_no,
+        opt_in
+      );
     });
 
     const deletedItemsFromCart = await Cart.destroy({
@@ -360,21 +376,23 @@ const buyNow = async (req, res, next) => {
       },
     });
 
-    const wallet = await Wallet.update(
-      {
-        balance: user_wallet.balance - wallet_balance_used,
-      },
-      { where: { wallet_id: wallet_id } }
-    );
+    if (wallet_balance_used > 0) {
+      const wallet = await Wallet.update(
+        {
+          balance: user_wallet.balance - wallet_balance_used,
+        },
+        { where: { wallet_id: wallet_id } }
+      );
 
-    const wallet_transaction = await Wallet_Transaction.create({
-      wallet_id: wallet_id,
-      transaction_id: uniqid(),
-      transaction_type: "D",
-      transaction_amount: wallet_balance_used,
-      transaction_details: newOrder.order_id,
-      created_by: 2,
-    });
+      const wallet_transaction = await Wallet_Transaction.create({
+        wallet_id: wallet_id,
+        transaction_id: uniqid(),
+        transaction_type: "D",
+        transaction_amount: wallet_balance_used,
+        transaction_details: newOrder.order_id,
+        created_by: 2,
+      });
+    }
 
     let promises = [];
     if (userGifts.length !== 0) {
@@ -531,14 +549,25 @@ const buyNow = async (req, res, next) => {
     });
 
     await InvoiceGen(currentUser, newOrder.order_id);
+
     let email = "";
+    let contact_no = "";
     Customer.findOne({
       where: {
         cust_no: currentUser,
       },
-    }).then((cust) => {
+    }).then(async (cust) => {
       email = cust.dataValues.email;
-      sendOrderPlacedEmail(email, newOrder.order_id);
+      contact_no = cust.dataValues.contact_no;
+      let opt_in = cust.dataValues.opt_in;
+
+      await InvoiceGen(
+        currentUser,
+        newOrder.order_id,
+        email,
+        contact_no,
+        opt_in
+      );
     });
 
     const deletedItemsFromCart = await Cart.destroy({
@@ -567,7 +596,7 @@ const buyNow = async (req, res, next) => {
   }
 };
 
-const InvoiceGen = async (cust_no, order_id) => {
+const InvoiceGen = async (cust_no, order_id, email, contact_no, opt_in) => {
   const currentCustomer = cust_no;
   const orderID = order_id;
   try {
@@ -630,11 +659,29 @@ const InvoiceGen = async (cust_no, order_id) => {
       response,
       `invoice-${currentOrder.order_id}.pdf`
     );
-
+    let uploadResponse = null;
     writeStream.on("finish", async () => {
       console.log("stored pdf on local");
-      return "done";
+
+      // s3 upload
+      uploadResponse = await uploadToS3(
+        `invoice-${response.orderID}.pdf`,
+        "pdfs/invoices/invoice-" + response.orderID + ".pdf"
+      );
+      console.log("stored on s3");
+      const invoice_link = uploadResponse.Location;
+
+      // console.log("final here==>>>", email, contact_no, invoice_link);
+
+      // send email
+      if (email != "") {
+        sendOrderPlacedEmail(email, response.orderID);
+      }
+      if (contact_no != "") {
+        sendInvoiceToWhatsapp(contact_no, invoice_link, response.orderID);
+      }
     });
+    return uploadResponse.Location;
   } catch (error) {
     console.log(error);
     return "error";

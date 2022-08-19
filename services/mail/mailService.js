@@ -118,9 +118,9 @@ const sendOrderPlacedEmail = async (mailid, orderId) => {
             console.log(error);
         } else {
             console.log('Email sent: ' + info.response);
-            // delete the invoice
-            fs.unlinkSync(`invoice-${orderId}.pdf`);
         }
+        // delete the invoice
+        fs.unlinkSync(`invoice-${orderId}.pdf`);
     });
 }
 
