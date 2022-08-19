@@ -54,6 +54,7 @@ const invoiceRouter = require("./routes/invoiceRoutes");
 const offerRouter = require("./routes/offerRoutes");
 const gatewayRouter = require("./routes/gatewayRoute");
 const whatsappRouter = require('./routes/whatsappRoutes');
+const leaveRouter = require('./routes/leaveRoutes');
 
 // admin routers import
 const adminOrderRouter = require("./routes/admin/orderRoutes");
@@ -62,6 +63,7 @@ const adminCustomerRouter = require("./routes/admin/customerRoutes");
 const adminGiftRouter = require("./routes/admin/giftRoutes");
 const adminCouponsRouter = require("./routes/admin/couponRoutes");
 const adminOffersRouter = require("./routes/admin/offerRoutes");
+const adminLeaveRouter = require("./routes/admin/leaveRoutes");
 
 
 // milk routes import (user)
@@ -100,6 +102,7 @@ app.use("/coupons", couponRouter);
 app.use("/offers", offerRouter);
 app.use("/gateway", gatewayRouter);
 app.use("/whatsapp", whatsappRouter);
+app.use("/leave", leaveRouter);
 
 // admin routes
 app.use("/admin/orders", adminOrderRouter);
@@ -108,6 +111,7 @@ app.use("/admin/customer", adminCustomerRouter);
 app.use("/admin/gift", adminGiftRouter);
 app.use("/admin/coupons", adminCouponsRouter);
 app.use("/admin/offers", adminOffersRouter);
+app.use("/admin/leave",adminLeaveRouter);
 
 
 // milk (user)

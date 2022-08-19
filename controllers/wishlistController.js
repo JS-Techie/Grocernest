@@ -45,11 +45,16 @@ const getWishlist = async (req, res, next) => {
       let currentItem = null;
       if (oldestBatch) {
         currentItem = await Inventory.findOne({
-          where: { item_id: current.item_id, batch_id: oldestBatch.id },
+          where: {
+            item_id: current.item_id,
+            batch_id: oldestBatch.id,
+            location_id: 4,
+            balance_type: 1,
+          },
         });
       }
 
-      if (oldestBatch) {
+      if (oldestBatch && currentItem) {
         return {
           itemID: current.item_id,
           itemName: current.name,

@@ -137,6 +137,8 @@ db.MilkDeliveryModel = require("./t_milk_delivery")(db.sequelize, Sequelize)
 
 db.GatewayTransactionModel = require("./t_gateway_transaction")(db.sequelize, Sequelize)
 
+db.LeaveModel = require("./t_leave.js")(db.sequelize, Sequelize)
+
 // Relations between tables
 
 db.WalletModel.hasMany(db.WalletTransactionModel, { foreignKey: "wallet_id" }); //one to many mapping

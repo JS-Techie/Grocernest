@@ -27,11 +27,16 @@ const getGifts = async (req, res, next) => {
       let currentItem = null;
       if (oldestBatch) {
         currentItem = await Inventory.findOne({
-          where: { batch_id: oldestBatch.id, item_id: current.id },
+          where: {
+            batch_id: oldestBatch.id,
+            item_id: current.id,
+            location_id: 4,
+            balance_type: 1,
+          },
         });
       }
 
-      if (oldestBatch) {
+      if (oldestBatch && currentItem) {
         return {
           itemID: current.id,
           name: current.name,
@@ -54,7 +59,7 @@ const getGifts = async (req, res, next) => {
     const response = await Promise.all(promises);
     const responseWithoutNull = response.filter((current) => {
       return current !== undefined;
-    })
+    });
 
     return res.status(200).send({
       success: true,

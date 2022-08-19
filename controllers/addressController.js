@@ -5,7 +5,6 @@ const Address = db.AddressModel
 const Customer = db.CustomerModel;
 
 
-
 const getAllAddresses = async (req, res, next) => {
 
     // Get current user from JWT

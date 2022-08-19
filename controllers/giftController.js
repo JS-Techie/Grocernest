@@ -18,7 +18,7 @@ const getAllGifts = async (req, res, next) => {
     const ordersForCurrentUser = await Order.findAll({
       where: { cust_no: currentUser },
       order: [["created_at", "DESC"]],
-    }); 
+    });
 
     if (ordersForCurrentUser.length === 0) {
       return res.status(200).send({
@@ -73,10 +73,15 @@ const getAllGifts = async (req, res, next) => {
       let currentItem;
       if (oldestBatch) {
         currentItem = await Inventory.findOne({
-          where: { item_id: current.id, batch_id: oldestBatch.id },
+          where: {
+            item_id: current.id,
+            batch_id: oldestBatch.id,
+            balance_type: 1,
+            location_id: 4,
+          },
         });
       }
-      if (oldestBatch) {
+      if (oldestBatch && currentItem) {
         return {
           itemID: current.id,
           itemName: current.name,
@@ -95,9 +100,9 @@ const getAllGifts = async (req, res, next) => {
     });
 
     const resolved = await Promise.all(promises);
-    const resolvedWithoutUndefined = resolved.filter((current)=>{
-      return current!==undefined
-    })
+    const resolvedWithoutUndefined = resolved.filter((current) => {
+      return current !== undefined;
+    });
 
     console.log(resolvedWithoutUndefined);
 
@@ -155,13 +160,17 @@ const getAllGifts = async (req, res, next) => {
       });
     }
 
-    response = giftsArray? giftsArray.slice(0, strategy.no_of_gifts + 4) : [];
+    response = giftsArray ? giftsArray.slice(0, strategy.no_of_gifts + 4) : [];
 
     return res.status(200).send({
       success: true,
       data: {
         gifts: response,
-        noOfGiftsApplicable: giftsArray ? strategy.no_of_gifts ? strategy.no_of_gifts : 0 : 0,
+        noOfGiftsApplicable: giftsArray
+          ? strategy.no_of_gifts
+            ? strategy.no_of_gifts
+            : 0
+          : 0,
       },
       message: "Found all gifts",
     });
