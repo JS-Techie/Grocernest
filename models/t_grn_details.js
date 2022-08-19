@@ -236,6 +236,24 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "expiry_date"
+    },
+    cashBack_is_percentage: {
+      type: DataTypes.INTEGER(1),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "cashBack_is_percentage"
+    },
+    cashback: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "cashback"
     }
   };
   const options = {
