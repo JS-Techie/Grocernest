@@ -415,8 +415,6 @@ const getItemById = async (req, res, next) => {
       where: {
         item_id: item.id,
         batch_id: item.batch_id,
-        balance_type: 1,
-        location_id: 4,
       },
     });
 
@@ -447,53 +445,51 @@ const getItemById = async (req, res, next) => {
       });
     }
 
-    if (currentItem) {
-      return res.status(200).send({
-        success: true,
-        data: {
-          itemName: item.name,
-          itemID: item.id,
-          quantity: currentItem.quantity,
-          UOM: item.UOM,
-          categoryName: item.group_name,
-          categoryID: item.category_id,
-          subcategoryName: item.sub_cat_name,
-          subcategoryID: item.sub_category_id,
-          image: item.image,
-          description: item.description,
-          MRP: item.MRP,
-          discount: item.discount,
-          sale_price: item.sale_price,
-          mfg_date: item.mfg_date,
-          exp_date: item.expiry_date,
-          color: item.color_name,
-          brand: item.brand_name,
-          inWishlist: currentUser ? (itemInWishlist ? true : false) : "",
-          isOffer: offer ? true : false,
-          offerType: offer ? offer.type : "",
-          itemIDOfOfferItem,
-          XQuantity: offer
+    return res.status(200).send({
+      success: true,
+      data: {
+        itemName: item.name,
+        itemID: item.id,
+        quantity: currentItem.quantity,
+        UOM: item.UOM,
+        categoryName: item.group_name,
+        categoryID: item.category_id,
+        subcategoryName: item.sub_cat_name,
+        subcategoryID: item.sub_category_id,
+        image: item.image,
+        description: item.description,
+        MRP: item.MRP,
+        discount: item.discount,
+        sale_price: item.sale_price,
+        mfg_date: item.mfg_date,
+        exp_date: item.expiry_date,
+        color: item.color_name,
+        brand: item.brand_name,
+        inWishlist: currentUser ? (itemInWishlist ? true : false) : "",
+        isOffer: offer ? true : false,
+        offerType: offer ? offer.type : "",
+        itemIDOfOfferItem,
+        XQuantity: offer
+          ? offer.item_1_quantity
             ? offer.item_1_quantity
-              ? offer.item_1_quantity
-              : ""
-            : "",
-          YQuantity: offer
+            : ""
+          : "",
+        YQuantity: offer
+          ? offer.item_2_quantity
             ? offer.item_2_quantity
-              ? offer.item_2_quantity
-              : ""
-            : "",
-          YItemName: offerItem ? offerItem.name : "",
-          amountOfDiscount: offer
+            : ""
+          : "",
+        YItemName: offerItem ? offerItem.name : "",
+        amountOfDiscount: offer
+          ? offer.amount_of_discount
             ? offer.amount_of_discount
-              ? offer.amount_of_discount
-              : ""
-            : "",
-          isPercentage: offer ? (offer.is_percentage ? true : false) : "",
-          createdBy: offer ? (offer.created_by ? offer.created_by : "") : "",
-        },
-        message: "Details for requested item found",
-      });
-    }
+            : ""
+          : "",
+        isPercentage: offer ? (offer.is_percentage ? true : false) : "",
+        createdBy: offer ? (offer.created_by ? offer.created_by : "") : "",
+      },
+      message: "Details for requested item found",
+    });
   } catch (error) {
     return res.status(400).send({
       success: false,
