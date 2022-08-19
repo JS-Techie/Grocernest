@@ -415,6 +415,7 @@ const getItemById = async (req, res, next) => {
       where: {
         item_id: item.id,
         batch_id: item.batch_id,
+        balance_type: 1,
       },
     });
 
