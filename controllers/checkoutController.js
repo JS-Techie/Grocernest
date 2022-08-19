@@ -441,7 +441,7 @@ const buyNow = async (req, res, next) => {
         if (offer.is_percentage) {
           newSalePrice =
             oldestBatch.sale_price -
-            (amount_of_discount / 100) * oldestBatch.sale_price;
+            (offer.amount_of_discount / 100) * oldestBatch.sale_price;
         } else {
           newSalePrice = oldestBatch.sale_price - offer.amount_of_discount;
         }
