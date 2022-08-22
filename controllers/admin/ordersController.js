@@ -577,10 +577,7 @@ const changeOrderStatus = async (req, res, next) => {
                             where: {
                               item_id: currentItem.item_id,
                               batch_id: oldestBatch.id,
-                              balance_type: 7,
-                              quantity: {
-                                [Op.gt]: 0,
-                              },
+                              balance_type: 7
                             },
                           });
 
@@ -637,7 +634,6 @@ const changeOrderStatus = async (req, res, next) => {
                         },
                       })
                   }
-
                 });
               });
             });
