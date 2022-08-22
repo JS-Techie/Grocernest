@@ -23,7 +23,7 @@ const login = async (req, res, next) => {
     const responseFromGoogle = axios.post(
       "https://www.google.com/recaptcha/api/siteverify",
       {
-        secret: "6Lf2mZohAAAAAOv_tii4pRcP29HpX1HS8wCjumg6",
+        secret: "6Lf2mZohAAAAAOv_tii4pRcP29HpX1HS8wCjumg6", //process.env.SECRET_KEY
         response: recaptchaEnteredByUser,
       }
     );
