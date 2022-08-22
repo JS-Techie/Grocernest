@@ -106,19 +106,14 @@ const register = async (req, res, next) => {
     }
 
     //verify captcha, if success, continue else return from here
-    const promiseResponseFromGoogle = await axios.post(
-      "https://www.google.com/recaptcha/api/siteverify",
-      {
-        secret: "6Lf2mZohAAAAAOv_tii4pRcP29HpX1HS8wCjumg6", //process.env.SECRET_KEY
-        response: recaptchaEnteredByUser,
-      }
+    const responseFromGoogle = await axios.post(
+      `https://www.google.com/recaptcha/api/siteverify?secret=6Lf2mZohAAAAAOv_tii4pRcP29HpX1HS8wCjumg6&response=${recaptchaEnteredByUser}`
     );
 
-    const responseFromGoogle = await Promise.resolve(promiseResponseFromGoogle);
     if (responseFromGoogle.data.success == false) {
       return res.status(400).send({
         success: false,
-        data: [],
+        data: responseFromGoogle.data.error - codes,
         message: "Please enter captcha",
       });
     }
