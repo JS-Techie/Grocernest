@@ -16,26 +16,9 @@ const wallet = db.WalletModel;
 
 const login = async (req, res, next) => {
   //Get the user details from the form along with captcha
-  const { phoneNumber, password, recaptchaEnteredByUser } = req.body;
+  const { phoneNumber, password } = req.body;
 
   try {
-    //verify captcha, if success, continue else return from here
-    const responseFromGoogle = axios.post(
-      "https://www.google.com/recaptcha/api/siteverify",
-      {
-        secret: "6Lf2mZohAAAAAOv_tii4pRcP29HpX1HS8wCjumg6", //process.env.SECRET_KEY
-        response: recaptchaEnteredByUser,
-      }
-    );
-
-    if (responseFromGoogle.success == false) {
-      return res.status(400).send({
-        success: false,
-        data: [],
-        message: "Please enter captcha",
-      });
-    }
-
     //Check if customer exists
     const currentCustomer = await Customer.findOne({
       where: { contact_no: phoneNumber },
@@ -110,6 +93,7 @@ const register = async (req, res, next) => {
       password,
       referral_code,
       opt_in,
+      recaptchaEnteredByUser,
     } = req.body;
     let referrer_cust_id = "";
     //Check if all required input is recieved
@@ -118,6 +102,23 @@ const register = async (req, res, next) => {
         success: false,
         data: null,
         message: "All input is required",
+      });
+    }
+
+    //verify captcha, if success, continue else return from here
+    const responseFromGoogle = axios.post(
+      "https://www.google.com/recaptcha/api/siteverify",
+      {
+        secret: "6Lf2mZohAAAAAOv_tii4pRcP29HpX1HS8wCjumg6", //process.env.SECRET_KEY
+        response: recaptchaEnteredByUser,
+      }
+    );
+
+    if (responseFromGoogle.success == false) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "Please enter captcha",
       });
     }
 
