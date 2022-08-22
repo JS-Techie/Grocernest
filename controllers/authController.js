@@ -1,9 +1,10 @@
 const jwt = require("jsonwebtoken");
-const referralCodeGenerator = require('referral-code-generator')
+const referralCodeGenerator = require("referral-code-generator");
 const bcrypt = require("bcryptjs");
 const uniqid = require("uniqid");
+const axios = require("axios");
 // const { sendRegistrationWhatsapp } = require('../services/whatsapp/whatsapp');
-const { sendRegistrationEmail } = require('../services/mail/mailService');
+const { sendRegistrationEmail } = require("../services/mail/mailService");
 const db = require("../models");
 
 const { generateOTP, sendOTPToPhoneNumber } = require("../services/otpService");
@@ -14,10 +15,27 @@ const Coupon = db.CouponsModel;
 const wallet = db.WalletModel;
 
 const login = async (req, res, next) => {
-  //Get the user details from the form
-  const { phoneNumber, password } = req.body;
+  //Get the user details from the form along with captcha
+  const { phoneNumber, password, recaptchaEnteredByUser } = req.body;
 
   try {
+    //verify captcha, if success, continue else return from here
+    const responseFromGoogle = axios.post(
+      "https://www.google.com/recaptcha/api/siteverify",
+      {
+        secret: "6Lf2mZohAAAAAOv_tii4pRcP29HpX1HS8wCjumg6",
+        response: recaptchaEnteredByUser,
+      }
+    );
+
+    if (responseFromGoogle.success == false) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "Please enter captcha",
+      });
+    }
+
     //Check if customer exists
     const currentCustomer = await Customer.findOne({
       where: { contact_no: phoneNumber },
@@ -84,7 +102,15 @@ const login = async (req, res, next) => {
 const register = async (req, res, next) => {
   try {
     //Get the user details from the form
-    const { firstName, lastName, phoneNumber, email, password, referral_code, opt_in } = req.body;
+    const {
+      firstName,
+      lastName,
+      phoneNumber,
+      email,
+      password,
+      referral_code,
+      opt_in,
+    } = req.body;
     let referrer_cust_id = "";
     //Check if all required input is recieved
     if (!phoneNumber || !password || !firstName || !lastName) {
@@ -119,11 +145,10 @@ const register = async (req, res, next) => {
 
     try {
       if (referral_code != "") {
-        const referrer_customer = await Customer.findOne(
-          {
-            attributes: ["cust_no"],
-            where: { referral_code: referral_code },
-          });
+        const referrer_customer = await Customer.findOne({
+          attributes: ["cust_no"],
+          where: { referral_code: referral_code },
+        });
 
         if (!referrer_customer) {
           return res.status(404).send({
@@ -132,14 +157,17 @@ const register = async (req, res, next) => {
             message: "Referral code is not valid",
           });
         } else {
-          referrer_cust_id = referrer_customer.dataValues.cust_no
+          referrer_cust_id = referrer_customer.dataValues.cust_no;
         }
       }
 
-
       //Create new Customer
       try {
-        let ref_code = referralCodeGenerator.alpha('uppercase', 2) + "-" + referralCodeGenerator.alpha('uppercase', 1) + referralCodeGenerator.alphaNumeric('uppercase', 1, 4)
+        let ref_code =
+          referralCodeGenerator.alpha("uppercase", 2) +
+          "-" +
+          referralCodeGenerator.alpha("uppercase", 1) +
+          referralCodeGenerator.alphaNumeric("uppercase", 1, 4);
         const newUser = {
           id: Math.floor(Math.random() * 10000 + 1),
           cust_no: uniqid(),
@@ -151,7 +179,7 @@ const register = async (req, res, next) => {
           created_by: 13,
           referral_code: ref_code,
           referred_by: referrer_cust_id,
-          opt_in
+          opt_in,
         };
 
         const serverGeneratedOTP = generateOTP();
@@ -196,8 +224,7 @@ const register = async (req, res, next) => {
         message: "Could not register user",
       });
     }
-  }
-  catch (error) {
+  } catch (error) {
     return res.status(400).send({
       success: false,
       data: error.message,
@@ -239,7 +266,7 @@ const verifyOTP = async (req, res, next) => {
       created_by: newUser.created_by,
       referral_code: newUser.referral_code,
       referred_by: newUser.referred_by,
-      opt_in: newUser.opt_in
+      opt_in: newUser.opt_in,
     });
 
     // creating blank wallet while successful reg.
@@ -248,17 +275,14 @@ const verifyOTP = async (req, res, next) => {
       cust_no: newUser.cust_no,
       balance: 0,
       created_by: 2,
-    })
+    });
 
     // send email if available
-    if (newUser.email !== null)
-      sendRegistrationEmail(newUser.email.toString());
-
+    if (newUser.email !== null) sendRegistrationEmail(newUser.email.toString());
 
     // send whatsapp msg if available
     // if (newUser.opt_in == 1)
     // sendRegistrationWhatsapp(newUser.contact_no);
-
 
     // creating new coupon while successful reg.
     const newCoupon = await Coupon.create({
@@ -267,8 +291,8 @@ const verifyOTP = async (req, res, next) => {
       is_percentage: 1,
       assigned_user: newUser.cust_no,
       created_by: 1,
-      description: "Flat 10% off on your first purchase, use code FIRSTBUY"
-    })
+      description: "Flat 10% off on your first purchase, use code FIRSTBUY",
+    });
 
     const deletedField = await Cache.destroy({
       where: { generated_otp: userEnteredOTP },
@@ -280,7 +304,9 @@ const verifyOTP = async (req, res, next) => {
         created: response,
         coupon: {
           code: newCoupon.code,
-          amount: newCoupon.is_percentage ? newCoupon.amount_of_discount + "%" : newCoupon.amount_of_discount,
+          amount: newCoupon.is_percentage
+            ? newCoupon.amount_of_discount + "%"
+            : newCoupon.amount_of_discount,
           description: newCoupon.description,
         },
         deletedFromCache: deletedField,
@@ -455,7 +481,7 @@ const getOTP = async (req, res, next) => {
   });
 };
 
-const resendToken = async (req, res, next) => { };
+const resendToken = async (req, res, next) => {};
 
 module.exports = {
   login,
