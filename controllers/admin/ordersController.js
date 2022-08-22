@@ -633,7 +633,7 @@ const changeOrderStatus = async (req, res, next) => {
                         where: {
                           batch_id: batch.id,
                           item_id: batch.item_id,
-                          balance_type: 1,
+                          balance_type: 7,
                         },
                       })
                   }
