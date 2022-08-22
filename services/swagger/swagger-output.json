@@ -143,6 +143,9 @@
                 },
                 "password": {
                   "example": "any"
+                },
+                "recaptchaEnteredByUser": {
+                  "example": "any"
                 }
               }
             }
