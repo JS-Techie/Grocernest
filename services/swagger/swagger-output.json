@@ -63,6 +63,9 @@
                 },
                 "opt_in": {
                   "example": "any"
+                },
+                "recaptchaEnteredByUser": {
+                  "example": "any"
                 }
               }
             }
@@ -142,9 +145,6 @@
                   "example": "any"
                 },
                 "password": {
-                  "example": "any"
-                },
-                "recaptchaEnteredByUser": {
                   "example": "any"
                 }
               }

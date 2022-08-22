@@ -106,7 +106,7 @@ const register = async (req, res, next) => {
     }
 
     //verify captcha, if success, continue else return from here
-    const responseFromGoogle = axios.post(
+    const promiseResponseFromGoogle = await axios.post(
       "https://www.google.com/recaptcha/api/siteverify",
       {
         secret: "6Lf2mZohAAAAAOv_tii4pRcP29HpX1HS8wCjumg6", //process.env.SECRET_KEY
@@ -114,7 +114,8 @@ const register = async (req, res, next) => {
       }
     );
 
-    if (responseFromGoogle.success == false) {
+    const responseFromGoogle = await Promise.resolve(promiseResponseFromGoogle);
+    if (responseFromGoogle.data.success == false) {
       return res.status(400).send({
         success: false,
         data: [],
