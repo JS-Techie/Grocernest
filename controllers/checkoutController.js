@@ -237,19 +237,23 @@ const checkoutFromCart = async (req, res, next) => {
         );
         console.log("Yes row with balance type 7", updateInventory);
       }
-      const updatedInventory = await Inventory.update(
-        {
-          quantity: currentInventory.quantity - currentItem.quantity,
-        },
-        {
-          where: {
-            batch_id: currentItem.oldestBatch.id,
-            item_id: currentItem.itemID,
-            location_id: 4,
-            balance_type: 1,
+
+      if (currentInventory) {
+        const updatedInventory = await Inventory.update(
+          {
+            quantity: currentInventory.quantity - currentItem.quantity,  //error in this line
           },
-        }
-      );
+          {
+            where: {
+              batch_id: currentItem.oldestBatch.id,
+              item_id: currentItem.itemID,
+              location_id: 4,
+              balance_type: 1,
+            },
+          }
+        );
+      }
+
       console.log(
         "updating main inventory with balance type 1",
         updatedInventory
@@ -559,19 +563,21 @@ const buyNow = async (req, res, next) => {
           updatedInventory
         );
       }
-      const updateInventory = await Inventory.update(
-        {
-          quantity: currentInventory.quantity - currentItem.quantity,
-        },
-        {
-          where: {
-            batch_id: oldestBatch.id,
-            item_id: currentItem.item_id,
-            location_id: 4,
-            balance_type: 1,
+      if (currentInventory) {
+        const updateInventory = await Inventory.update(
+          {
+            quantity: currentInventory.quantity - currentItem.quantity,
           },
-        }
-      );
+          {
+            where: {
+              batch_id: oldestBatch.id,
+              item_id: currentItem.item_id,
+              location_id: 4,
+              balance_type: 1,
+            },
+          }
+        );
+      }
 
       console.log("updated inventory row with balance type 1", updateInventory);
     });
