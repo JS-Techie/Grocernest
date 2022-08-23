@@ -93,7 +93,14 @@ const getLeaveByStatus = async (req, res, next) => {
 
 const createLeave = async (req, res, next) => {
   const user_id = req.user_id;
-  const { start_date, end_date, no_of_days, leave_reason } = req.body;
+  const {
+    start_date,
+    end_date,
+    no_of_days,
+    leave_reason,
+    leave_type,
+    half_day,
+  } = req.body;
   try {
     const newLeave = await Leave.create({
       user_id,
@@ -104,6 +111,8 @@ const createLeave = async (req, res, next) => {
       status: "Pending",
       created_by: 1,
       updated_by: 1,
+      half_day: half_day == true ? 1 : null,
+      leave_type,
     });
 
     return res.status(201).send({
@@ -122,7 +131,14 @@ const createLeave = async (req, res, next) => {
 
 const editLeave = async (req, res, next) => {
   const user_id = req.user_id;
-  const { start_date, end_date, no_of_days, leave_reason } = req.body;
+  const {
+    start_date,
+    end_date,
+    no_of_days,
+    leave_reason,
+    leave_type,
+    half_day,
+  } = req.body;
   const id = req.params.id;
   try {
     const currentLeave = await Leave.findOne({
@@ -143,6 +159,8 @@ const editLeave = async (req, res, next) => {
         end_date,
         no_of_days,
         leave_reason,
+        half_day: half_day == true ? 1 : null,
+        leave_type,
       },
       {
         where: { id, user_id },

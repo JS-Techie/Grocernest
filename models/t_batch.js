@@ -169,6 +169,15 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "mark_selected"
+    },
+    grn_id: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "grn_id"
     }
   };
   const options = {

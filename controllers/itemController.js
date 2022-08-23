@@ -8,6 +8,7 @@ const WishlistItems = db.WishlistItemsModel;
 const Offers = db.OffersModel;
 const Item = db.ItemModel;
 const Inventory = db.InventoryModel;
+const Coupons = db.CouponsModel;
 
 const { findCustomerNumber } = require("../middleware/customerNumber");
 
@@ -446,6 +447,10 @@ const getItemById = async (req, res, next) => {
       });
     }
 
+    const couponForCurrentItem = await Coupons.findAll({
+      where: { item_id: item.id },
+    });
+
     return res.status(200).send({
       success: true,
       data: {
@@ -490,6 +495,7 @@ const getItemById = async (req, res, next) => {
           : "",
         isPercentage: offer ? (offer.is_percentage ? true : false) : "",
         createdBy: offer ? (offer.created_by ? offer.created_by : "") : "",
+        coupon: couponForCurrentItem ? couponForCurrentItem : "",
       },
       message: "Details for requested item found",
     });

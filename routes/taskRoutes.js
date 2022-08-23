@@ -10,9 +10,9 @@ const {
   editTaskStatus,
 } = require("../controllers/taskController");
 
-router.route("/view/all").get(getAllTasks);
-router.route("/view/:id").get(getTaskById);
-router.route("/view/:status").get(getTasksByStatus);
-router.route("/:id/:status").patch(editTaskStatus);
+router.route("/view/all").get(authenticateUser, getAllTasks);
+router.route("/view/:id").get(authenticateUser, getTaskById);
+router.route("/view/:status").get(authenticateUser, getTasksByStatus);
+router.route("/:id/:status").patch(authenticateUser, editTaskStatus);
 
 module.exports = router;
