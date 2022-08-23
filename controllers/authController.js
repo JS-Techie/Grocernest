@@ -107,11 +107,7 @@ const register = async (req, res, next) => {
 
     //verify captcha, if success, continue else return from here
     const responseFromGoogle = await axios.post(
-      `https://www.google.com/recaptcha/api/siteverify`,
-      {
-        secret: "6Lf2mZohAAAAAOv_tii4pRcP29HpX1HS8wCjumg6",
-        response: recaptchaEnteredByUser,
-      }
+      `https://www.google.com/recaptcha/api/siteverify?secret=6Lf2mZohAAAAAOv_tii4pRcP29HpX1HS8wCjumg6&response=${recaptchaEnteredByUser}&remoteip=${req.connection.remoteAddress}`
     );
 
     if (responseFromGoogle.data.success == false) {
