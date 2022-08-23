@@ -440,7 +440,7 @@ const getCart = async (req, res, next) => {
               : oldestBatch.sale_price,
           discount: current.discount,
           cashback: currentItem.cashback,
-          cashback_percentage: currentItem.cashback_is_percentage,
+          cashback_is_percentage: currentItem.cashback_is_percentage,
           color: current.color_name,
           brand: current.brand_name,
           isGift: current.is_gift === 1 ? true : false,
