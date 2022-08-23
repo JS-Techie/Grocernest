@@ -8,21 +8,21 @@ const Customers = db.CustomerModel
 const Order = db.OrderModel;
 const Wallet = db.WalletModel;
 const Wallet_Transaction = db.WalletTransactionModel;
+const WalletService = require('../services/walletService');
 
 
 
 
 
-const job = async () => {
+const cashback_job = async () => {
 
     try {
+        let walletService = new WalletService();
 
         const AllCustomers = await Customers.findAll({});
 
         const list_user = AllCustomers.map(async (currentUser) => {
-
-            console.log("===============>", currentUser.cust_name);
-
+            // console.log("===============>", currentUser.cust_name);
             const all_orders = await Order.findAll({
                 where: {
                     cust_no: currentUser.cust_no,
@@ -32,15 +32,37 @@ const job = async () => {
             });
 
             await all_orders.map(async (current_order) => {
-                if (current_order.dataValues.cashback_processed == null)
-                    console.log(current_order.dataValues);
+                if (current_order.dataValues.cashback_processed == null) // which cashback is not processed
+                {
+                    console.log("Cashback amount credited=>", current_order.dataValues.cust_no);
+
+                    let cust_no = current_order.dataValues.cust_no;
+                    let cashback_amount = current_order.dataValues.cashback_amount;
+                    let order_id = current_order.dataValues.order_id;
+
+                    // credit cashback
+                    await walletService.creditAmount(cashback_amount, cust_no, "Cashback added for order-" + order_id);
+
+                    // mark as cashback processed
+                    await Order.update(
+                        {
+                            cashback_processed: 1
+                        },
+                        {
+                            where: {
+                                order_id: order_id,
+                                cust_no: cust_no,
+                            }
+                        })
+                }
+
             })
 
         })
 
     }
     catch (err) {
-        console.log("CRON ERROR=>", err);
+        console.log("CASHBACK CRON JOB ERROR=>", err);
     }
 }
 
