@@ -26,16 +26,16 @@ const job = async () => {
             const all_orders = await Order.findAll({
                 where: {
                     cust_no: currentUser.cust_no,
-                    status: "Delivered"
+                    // status: "Delivered",
+                    cashback_amount: { [Op.ne]: null }
                 }
             });
-            all_orders.map((current_order) => {
-                if (current_order.cashback_amount != 0)
-                    if (!current_order.cashback_processed) {
-                        // balance add
 
-                    }
+            await all_orders.map(async (current_order) => {
+                if (current_order.dataValues.cashback_processed == null)
+                    console.log(current_order.dataValues);
             })
+
         })
 
     }
