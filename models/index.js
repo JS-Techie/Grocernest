@@ -131,13 +131,21 @@ db.MilkItemsModel = require("./t_milk_items")(db.sequelize, Sequelize);
 
 db.SubscriptionsModel = require("./t_subscription")(db.sequelize, Sequelize);
 
-db.SubscriptionItemsModel = require("./t_subscription_items")(db.sequelize, Sequelize)
+db.SubscriptionItemsModel = require("./t_subscription_items")(
+  db.sequelize,
+  Sequelize
+);
 
-db.MilkDeliveryModel = require("./t_milk_delivery")(db.sequelize, Sequelize)
+db.MilkDeliveryModel = require("./t_milk_delivery")(db.sequelize, Sequelize);
 
-db.GatewayTransactionModel = require("./t_gateway_transaction")(db.sequelize, Sequelize)
+db.GatewayTransactionModel = require("./t_gateway_transaction")(
+  db.sequelize,
+  Sequelize
+);
 
-db.LeaveModel = require("./t_leave.js")(db.sequelize, Sequelize)
+db.LeaveModel = require("./t_leave.js")(db.sequelize, Sequelize);
+
+db.TaskModel = require("./t_task")(db.sequelize, Sequelize);
 
 // Relations between tables
 
@@ -173,6 +181,8 @@ db.CustomerModel.hasMany(db.AddressModel, { foreignKey: "cust_no" });
 
 db.CartModel.hasMany(db.ItemModel, { foreignKey: "id" });
 
-db.SubscriptionsModel.hasMany(db.SubscriptionItemsModel, { foreignKey: "subscription_id" })
+db.SubscriptionsModel.hasMany(db.SubscriptionItemsModel, {
+  foreignKey: "subscription_id",
+});
 
 module.exports = db;
