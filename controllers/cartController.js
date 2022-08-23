@@ -439,8 +439,8 @@ const getCart = async (req, res, next) => {
               ? current.offer_item_price
               : oldestBatch.sale_price,
           discount: current.discount,
-          cashback: currentItem.cashback,
-          cashback_is_percentage: currentItem.cashback_is_percentage,
+          cashback: currentItem.cashback ? currentItem.cashback : 0,
+          cashback_is_percentage: currentItem.cashback_is_percentage ? true : false,
           color: current.color_name,
           brand: current.brand_name,
           isGift: current.is_gift === 1 ? true : false,
