@@ -447,7 +447,7 @@ const getItemById = async (req, res, next) => {
       });
     }
 
-    const couponForCurrentItem = await Coupons.findOne({
+    const couponForCurrentItem = await Coupons.findAll({
       where: { item_id: item.id },
     });
 
