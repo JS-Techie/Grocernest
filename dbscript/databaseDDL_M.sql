@@ -219,3 +219,11 @@ CREATE TABLE ecomm.t_task (
 ENGINE=InnoDB
 DEFAULT CHARSET=utf8mb4
 COLLATE=utf8mb4_general_ci;
+
+ALTER TABLE ecomm.t_leave ADD half_day BOOL NULL;
+ALTER TABLE ecomm.t_leave ADD leave_id BIGINT(20) NULL;
+ALTER TABLE ecomm.t_leave MODIFY COLUMN no_of_days DECIMAL(10,2) NOT NULL;
+
+ALTER TABLE ecomm.t_leave MODIFY COLUMN leave_type ENUM("Annual/Casual","Maternity","Paternity","Sick") DEFAULT NULL NULL;
+
+

@@ -66,7 +66,7 @@ const getAllAvailableCoupons = async (req, res, next) => {
 
       const promises = await coupons.map(async (current) => {
         if (current.expiry_date !== null) {
-          if (new Date(current.expiry_date) >= Date.now()) {
+          if (new Date(current.expiry_date) >= Date.now()-1) {
             return {
               couponCode: current.code,
               amount: current.is_percentage

@@ -41,7 +41,7 @@ module.exports = sequelize => {
       field: "end_date"
     },
     no_of_days: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.DECIMAL,
       allowNull: false,
       defaultValue: null,
       primaryKey: false,
@@ -111,6 +111,24 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "reject_reason"
+    },
+    half_day: {
+      type: DataTypes.INTEGER(1),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "half_day"
+    },
+    leave_type: {
+      type: DataTypes.ENUM('Annual/Casual', 'Maternity', 'Paternity', 'Sick'),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "leave_type"
     }
   };
   const options = {
