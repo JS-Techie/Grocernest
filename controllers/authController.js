@@ -113,7 +113,7 @@ const register = async (req, res, next) => {
     if (responseFromGoogle.data.success == false) {
       return res.status(400).send({
         success: false,
-        data: responseFromGoogle.data.error - codes,
+        data: responseFromGoogle.data,
         message: "Please enter captcha",
       });
     }

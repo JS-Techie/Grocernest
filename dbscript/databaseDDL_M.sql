@@ -200,3 +200,22 @@ CREATE TABLE ecomm.t_milk_delivery  (
 ENGINE=InnoDB
 DEFAULT CHARSET=utf8mb4
 COLLATE=utf8mb4_general_ci;
+
+
+CREATE TABLE ecomm.t_task (
+	id BIGINT(20) auto_increment NULL,
+	user_id BIGINT(20) NULL,
+	start_date DATETIME NULL,
+	end_date DATETIME NULL,
+	no_of_days BIGINT(20) NULL,
+	status ENUM("Pending","In Progress","Done") NULL,
+	description varchar(255) NULL,
+	`created_by` bigint(20) NOT NULL,
+  `updated_by` bigint(20) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT NULL,
+	CONSTRAINT t_task_PK PRIMARY KEY (id)
+)
+ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_general_ci;
