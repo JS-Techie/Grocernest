@@ -1592,6 +1592,12 @@
                 },
                 "leave_reason": {
                   "example": "any"
+                },
+                "leave_type": {
+                  "example": "any"
+                },
+                "half_day": {
+                  "example": "any"
                 }
               }
             }
@@ -1641,6 +1647,12 @@
                   "example": "any"
                 },
                 "leave_reason": {
+                  "example": "any"
+                },
+                "leave_type": {
+                  "example": "any"
+                },
+                "half_day": {
                   "example": "any"
                 }
               }
@@ -2926,6 +2938,12 @@
                 },
                 "leave_reason": {
                   "example": "any"
+                },
+                "leave_type": {
+                  "example": "any"
+                },
+                "half_day": {
+                  "example": "any"
                 }
               }
             }
@@ -2978,6 +2996,12 @@
                   "example": "any"
                 },
                 "leave_reason": {
+                  "example": "any"
+                },
+                "leave_type": {
+                  "example": "any"
+                },
+                "half_day": {
                   "example": "any"
                 }
               }
