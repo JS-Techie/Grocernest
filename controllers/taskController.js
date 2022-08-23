@@ -3,7 +3,8 @@ const db = require("../models");
 const Task = db.TaskModel;
 
 const getAllTasks = async (req, res, next) => {
-  const { user_id } = req.body;
+  //Get current user from jWt
+  const { user_id } = req;
 
   try {
     const tasks = await Task.findAll({
@@ -33,7 +34,7 @@ const getAllTasks = async (req, res, next) => {
 };
 
 const getTaskById = async (req, res, next) => {
-  const { user_id } = req.body;
+  const { user_id } = req;
   const { id } = req.params;
 
   try {
@@ -51,7 +52,7 @@ const getTaskById = async (req, res, next) => {
     return res.status(200).send({
       success: true,
       data: task,
-      message: "Found all tasks for current user",
+      message: "Found requested task for current user",
     });
   } catch (error) {
     return res.status(400).send({
@@ -63,7 +64,7 @@ const getTaskById = async (req, res, next) => {
 };
 
 const getTasksByStatus = async (req, res, next) => {
-  const { user_id } = req.body;
+  const { user_id } = req;
   const { status } = req.params;
 
   try {
@@ -71,7 +72,7 @@ const getTasksByStatus = async (req, res, next) => {
       where: { user_id, status },
     });
 
-    if (!tasks) {
+    if (tasks.length == 0) {
       return res.status(200).send({
         success: true,
         data: [],
@@ -93,7 +94,7 @@ const getTasksByStatus = async (req, res, next) => {
 };
 
 const editTaskStatus = async (req, res, next) => {
-  const { user_id } = req.body;
+  const { user_id } = req;
   const { status, id } = req.params;
 
   try {

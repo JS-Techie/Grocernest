@@ -1,10 +1,12 @@
 const { sequelize } = require("../models");
+const { Op } = require("sequelize");
 const db = require("../models");
 
 const Wishlist = db.WishlistItemsModel;
 const Batch = db.BatchModel;
 const Item = db.ItemModel;
 const Inventory = db.InventoryModel;
+const Offers = db.OffersModel;
 
 const createWishlist = async (req, res, next) => {
   //get current user from jwt
@@ -52,26 +54,66 @@ const getWishlist = async (req, res, next) => {
             balance_type: 1,
           },
         });
-      }
 
-      if (oldestBatch && currentItem) {
-        return {
-          itemID: current.item_id,
-          itemName: current.name,
-          UOM: current.UOM,
-          availableQuantity: currentItem.quantity,
-          categoryName: current.group_name,
-          categoryID: current.category_id,
-          image: current.image,
-          description: current.description,
-          MRP: oldestBatch.MRP,
-          discount: oldestBatch.discount,
-          sale_price: oldestBatch.sale_price,
-          mfg_date: oldestBatch.mfg_date,
-          color: current.color_name,
-          brand: current.brand_name,
-          inWishlist: true,
-        };
+        const offer = await Offers.findOne({
+          where: {
+            is_active: 1,
+            [Op.or]: [{ item_id_1: current.item_id }, { item_id: current.item_id }],
+          },
+        });
+
+        let itemIDOfOfferItem;
+        let offerItem;
+        if (offer) {
+          if (offer.item_id) {
+            itemIDOfOfferItem = offer.item_id;
+          } else {
+            itemIDOfOfferItem = offer.item_id_2;
+          }
+          offerItem = await Item.findOne({
+            where: { id: itemIDOfOfferItem },
+          });
+        }
+
+        if (oldestBatch && currentItem) {
+          return {
+            itemID: current.item_id,
+            itemName: current.name,
+            UOM: current.UOM,
+            availableQuantity: currentItem.quantity,
+            categoryName: current.group_name,
+            categoryID: current.category_id,
+            image: current.image,
+            description: current.description,
+            MRP: oldestBatch.MRP,
+            discount: oldestBatch.discount,
+            sale_price: oldestBatch.sale_price,
+            mfg_date: oldestBatch.mfg_date,
+            color: current.color_name,
+            brand: current.brand_name,
+            inWishlist: true,
+            isOffer: offer ? true : false,
+            offerType: offer ? offer.type : "",
+            itemIDOfOfferItem,
+            XQuantity: offer
+              ? offer.item_1_quantity
+                ? offer.item_1_quantity
+                : ""
+              : "",
+            YQuantity: offer
+              ? offer.item_2_quantity
+                ? offer.item_2_quantity
+                : ""
+              : "",
+            YItemName: offerItem ? offerItem.name : "",
+            amountOfDiscount: offer
+              ? offer.amount_of_discount
+                ? offer.amount_of_discount
+                : ""
+              : "",
+            isPercentage: offer ? (offer.is_percentage ? true : false) : "",
+          };
+        }
       }
     });
 
