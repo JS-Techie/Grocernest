@@ -328,6 +328,7 @@ const buyNow = async (req, res, next) => {
     final_payable_amount,
     wallet_balance_used,
     wallet_id,
+    cashback_amount
   } = req.body;
 
   if (!total) {
@@ -393,6 +394,7 @@ const buyNow = async (req, res, next) => {
       applied_discount: applied_discount,
       wallet_balance_used: wallet_balance_used,
       final_payable_amount: final_payable_amount,
+      cashback_amount: cashback_amount
     });
 
     const user_wallet = await Wallet.findOne({
