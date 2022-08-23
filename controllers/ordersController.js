@@ -83,23 +83,23 @@ const getAllOrders = async (req, res, next) => {
               currentOrderItem.is_offer === 1 ? (isEdit ? true : false) : "",
             offerDetails: currentOffer
               ? {
-                  offerID: currentOffer.id,
-                  offerType: currentOffer.type,
-                  itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
-                  quantityOfItemX: currentOffer.item_1_quantity
-                    ? currentOffer.item_1_quantity
-                    : "",
-                  itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
-                  quantityOfItemY: currentOffer.item_2_quantity
-                    ? currentOffer.item_2_quantity
-                    : "",
-                  itemID: currentOffer.item_id ? currentOffer.item_id : "",
-                  amountOfDiscount: currentOffer.amount_of_discount
-                    ? currentOffer.amount_of_discount
-                    : "",
-                  isPercentage: currentOffer.is_percentage ? true : false,
-                  isActive: currentOffer.is_active ? true : false,
-                }
+                offerID: currentOffer.id,
+                offerType: currentOffer.type,
+                itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
+                quantityOfItemX: currentOffer.item_1_quantity
+                  ? currentOffer.item_1_quantity
+                  : "",
+                itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
+                quantityOfItemY: currentOffer.item_2_quantity
+                  ? currentOffer.item_2_quantity
+                  : "",
+                itemID: currentOffer.item_id ? currentOffer.item_id : "",
+                amountOfDiscount: currentOffer.amount_of_discount
+                  ? currentOffer.amount_of_discount
+                  : "",
+                isPercentage: currentOffer.is_percentage ? true : false,
+                isActive: currentOffer.is_active ? true : false,
+              }
               : "",
           };
         }
@@ -122,6 +122,7 @@ const getAllOrders = async (req, res, next) => {
         orderTotal: currentOrder.total,
         applied_discount: currentOrder.applied_discount,
         final_payable_amount: currentOrder.final_payable_amount,
+        cashback_amount: currentOrder.cashback_amount,
         itemDetails: responseWithoutUndefined,
       };
     });
@@ -221,23 +222,23 @@ const getOrderByOrderId = async (req, res, next) => {
             currentOrderItem.is_offer === 1 ? (isEdit ? true : false) : "",
           offerDetails: currentOffer
             ? {
-                offerID: currentOffer.id,
-                offerType: currentOffer.type,
-                itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
-                quantityOfItemX: currentOffer.item_1_quantity
-                  ? currentOffer.item_1_quantity
-                  : "",
-                itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
-                quantityOfItemY: currentOffer.item_2_quantity
-                  ? currentOffer.item_2_quantity
-                  : "",
-                itemID: currentOffer.item_id ? currentOffer.item_id : "",
-                amountOfDiscount: currentOffer.amount_of_discount
-                  ? currentOffer.amount_of_discount
-                  : "",
-                isPercentage: currentOffer.is_percentage ? true : false,
-                isActive: currentOffer.is_active ? true : false,
-              }
+              offerID: currentOffer.id,
+              offerType: currentOffer.type,
+              itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
+              quantityOfItemX: currentOffer.item_1_quantity
+                ? currentOffer.item_1_quantity
+                : "",
+              itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
+              quantityOfItemY: currentOffer.item_2_quantity
+                ? currentOffer.item_2_quantity
+                : "",
+              itemID: currentOffer.item_id ? currentOffer.item_id : "",
+              amountOfDiscount: currentOffer.amount_of_discount
+                ? currentOffer.amount_of_discount
+                : "",
+              isPercentage: currentOffer.is_percentage ? true : false,
+              isActive: currentOffer.is_active ? true : false,
+            }
             : "",
         };
       }
