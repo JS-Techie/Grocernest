@@ -67,6 +67,6 @@ const cashback_job = async () => {
 }
 
 
-job();
+cashback_job();
 // job();
 // module.exports = refferal_job;
