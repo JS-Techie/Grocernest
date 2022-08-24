@@ -118,7 +118,7 @@ const getLeaveByUserId = async (req, res, next) => {
 };
 
 const approveLeave = async (req, res, next) => {
-  const id = ParseInt(req.params.id);
+  const id = parseInt(req.params.id);
   try {
     const currentLeave = await Leave.findOne({
       where: { id },
@@ -163,7 +163,7 @@ const approveLeave = async (req, res, next) => {
 
 const rejectLeave = async (req, res, next) => {
   const { reject_reason } = req.body;
-  const id = ParseInt(req.params.id);
+  const id = parseInt(req.params.id);
   try {
     const currentLeave = await Leave.findOne({
       where: { id },
