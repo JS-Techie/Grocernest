@@ -4,58 +4,88 @@ let client = new Gupshup({
     apiKey: 'hm7797tb46hrtrgcsqksvxs69yj9zza4'
 });
 
-const sendInvoiceToWhatsapp = (phno, link, order_id) => {
-    // console.log("Sending sms to whatsapp..");
-    // client.message.send({
-    //     channel: "whatsapp",
-    //     source: "917834811114",
-    //     destination: "91" + phno.toString(),
-    //     template: {
-    //         "id": "28f663d7-b8c5-4ebe-897d-330d4b5493e7",
-    //         "params": ["Iphone", "49999"]
-    //     },
-    //     'src.name': "Grocernest",
-    //     message: {}
-    // message: {
-    //     type: "file",
-    //     url: "https://www.buildquickbots.com/whatsapp/media/sample/pdf/sample01.pdf",
-    //     // url: "http://ecomm-dev.s3.ap-south-1.amazonaws.com/pdfs/invoices/invoice-7094387.pdf",
-    //     filename: "Invoice-" + order_id,
-    //     caption: "Hi, Your order(" + order_id + ") is placed successfully. Please find the attached Invoice. Thank you.."
-    // }
-    // }).then((response) => {
-    //     console.log("Document message sent", response);
-    // }).catch(err => {
-    //     console.log("Document message err:", err);
-    // })
-}
-
-const sendTextMsg = (phno, msg) => {
-    console.log("Sending update to user using whatsapp..");
-
+const sendInvoiceToWhatsapp = (phno, order_id, link) => {
+    console.log("Sending sms to whatsapp..");
     client.message.send({
         channel: "whatsapp",
-        source: "917834811114",
+        source: "919433804769",
         destination: "91" + phno.toString(),
-        'src.name': "Grocernest",
+        'src.name': "grocernest",
         message: {
-            isHSM: "false",
+            isHSM: "true",
             type: "text",
-            text: msg
+            text: "Hi, Your order with order ID " + "*" + order_id + "*" + " is placed Successfully,  you can download your invoice by clicking this link " + link
         }
     }).then((response) => {
-        console.log("Text message sent", response)
+        console.log("Template message sent", response);
     }).catch(err => {
-        console.log("Text message err:", err)
+        console.log("Template message err:", err);
     })
 }
 
-const sendOrderStatusWhatsapp = (phno, msg) => {
-    sendTextMsg(phno, msg);
+const sendOrderStatusToWhatsapp = (phno, order_id, status) => {
+    console.log("Sending sms to whatsapp..");
+    client.message.send({
+        channel: "whatsapp",
+        source: "919433804769",
+        destination: "91" + phno.toString(),
+        'src.name': "grocernest",
+        message: {
+            isHSM: "true",
+            type: "text",
+            text: "Your order with order ID " + "*" + order_id + "*" + " has been " + "*" + status + "*" + "."
+        }
+    }).then((response) => {
+        console.log("Template message sent", response);
+    }).catch(err => {
+        console.log("Template message err:", err);
+    })
 }
+
+const sendOrderShippedToWhatsapp = (phno, order_id, status, delivery_boy) => {
+    // Your order with order ID [123456] has been [Shipped]. Your order will be delivered by [Somename].
+
+    client.message.send({
+        channel: "whatsapp",
+        source: "919433804769",
+        destination: "91" + phno.toString(),
+        'src.name': "grocernest",
+        message: {
+            isHSM: "true",
+            type: "text",
+            text: "Your order with order ID " + "*" + order_id + "*" + " has been " + "*" + status + "*" + ". Your order will be delivered by " + "*" + delivery_boy + "*" + "."
+        }
+    }).then((response) => {
+        console.log("Template message sent", response);
+    }).catch(err => {
+        console.log("Template message err:", err);
+    })
+}
+
+const sendAdminCancelledOrderStatusToWhatsapp = (phno, order_id, cancellation_reason) => {
+    // Your order with order ID [123456] has been canceled. Cancellation reason: [some issue]
+    client.message.send({
+        channel: "whatsapp",
+        source: "919433804769",
+        destination: "91" + phno.toString(),
+        'src.name': "grocernest",
+        message: {
+            isHSM: "true",
+            type: "text",
+            text: "Your order with order ID " + "*" + order_id + "*" + " has been canceled. Cancellation reason: " + "*" + cancellation_reason + "*"
+        }
+    }).then((response) => {
+        console.log("Template message sent", response);
+    }).catch(err => {
+        console.log("Template message err:", err);
+    })
+}
+
+
+
 module.exports = {
     sendInvoiceToWhatsapp,
-    // sendRegistrationWhatsapp,
-
-    sendOrderStatusWhatsapp,
+    sendOrderStatusToWhatsapp,
+    sendOrderShippedToWhatsapp,
+    sendAdminCancelledOrderStatusToWhatsapp
 };

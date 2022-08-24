@@ -70,7 +70,6 @@ const sendCancelledStatusEmail = async (mailid, orderId, cancellation_reason) =>
 }
 
 // user cancel email
-
 const sendCancelledByUserStatusEmail = async (mailid, orderId) => {
     var mailOptions = {
         from: {
@@ -92,7 +91,6 @@ const sendCancelledByUserStatusEmail = async (mailid, orderId) => {
         }
     });
 }
-
 
 // order placed mail with invoice attached
 const sendOrderPlacedEmail = async (mailid, orderId) => {

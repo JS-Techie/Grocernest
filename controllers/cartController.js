@@ -7,6 +7,12 @@ const Item = db.ItemModel;
 const Batch = db.BatchModel;
 const Offers = db.OffersModel;
 const Inventory = db.InventoryModel;
+const {
+  sendInvoiceToWhatsapp,
+  sendOrderStatusToWhatsapp,
+  sendOrderShippedToWhatsapp,
+  sendAdminCancelledOrderStatusToWhatsapp
+} = require("../services/whatsapp/whatsapp");
 
 const saveCart = async (req, res, next) => {
   //Get current user from JWT
@@ -353,6 +359,14 @@ const getItemCount = async (req, res, next) => {
 };
 
 const getCart = async (req, res, next) => {
+
+  // console.log("===========whatsapp testing==============");
+  // sendInvoiceToWhatsapp("9163540343", "123456774", "https://ecomm-dev.s3.ap-south-1.amazonaws.com/pdfs/invoices/invoice-9619381.pdf");
+  // sendOrderStatusToWhatsapp("9163540343", "123456774", "Shipped");
+  // sendOrderShippedToWhatsapp("9163540343", "123456", "Shipped", "Tanmoy");
+  // sendAdminCancelledOrderStatusToWhatsapp("9163540343", "12345", "no items");
+
+
   //Get currentUser from JWT
   const currentUser = req.cust_no;
 

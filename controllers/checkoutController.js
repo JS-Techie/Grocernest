@@ -716,12 +716,12 @@ const InvoiceGen = async (cust_no, order_id, email, contact_no, opt_in) => {
       console.log("stored pdf on local");
 
       // s3 upload
-      // uploadResponse = await uploadToS3(
-      //   `invoice-${response.orderID}.pdf`,
-      //   "pdfs/invoices/invoice-" + response.orderID + ".pdf"
-      // );
-      // console.log("stored on s3");
-      // const invoice_link = uploadResponse.Location;
+      uploadResponse = await uploadToS3(
+        `invoice-${response.orderID}.pdf`,
+        "pdfs/invoices/invoice-" + response.orderID + ".pdf"
+      );
+      console.log("stored on s3");
+      const invoice_link = uploadResponse.Location;
 
       // console.log("final here==>>>", email, contact_no, invoice_link);
 
@@ -729,9 +729,10 @@ const InvoiceGen = async (cust_no, order_id, email, contact_no, opt_in) => {
       if (email != "") {
         sendOrderPlacedEmail(email, response.orderID);
       }
-      // if (contact_no != "") {
-      //   sendInvoiceToWhatsapp(contact_no, invoice_link, response.orderID);
-      // }
+      // send whatsapp
+      if (contact_no != "") {
+        sendInvoiceToWhatsapp(contact_no, response.orderID, invoice_link);
+      }
     });
 
   } catch (error) {
