@@ -478,7 +478,10 @@ const getItemById = async (req, res, next) => {
       });
     }
 
-    const couponForCurrentItem = await Promise.all(promises);
+    const resolved = await Promise.all(promises);
+    const couponForCurrentItem = resolved.filter((current) => {
+      return current != undefined;
+    });
 
     return res.status(200).send({
       success: true,
