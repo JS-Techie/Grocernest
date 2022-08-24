@@ -17,8 +17,8 @@ const {
 
 router.route("/view/all").get(authenticateAdmin, getAllLeaves);
 router.route("/view/:id").get(authenticateAdmin, getLeaveById);
-router.route("/view/:status").get(authenticateAdmin, getLeaveByStatus);
-router.route("/view/:userId").get(authenticateAdmin, getLeaveByUserId);
+router.route("/view/status/:status").get(authenticateAdmin, getLeaveByStatus);
+router.route("/view/user/:userId").get(authenticateAdmin, getLeaveByUserId);
 router.route("/approve/:id").patch(authenticateAdmin, approveLeave);
 router.route("/cancel/:id").patch(authenticateAdmin, rejectLeave);
 router.route("/create").post(authenticateAdmin, createLeave);

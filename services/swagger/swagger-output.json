@@ -1537,7 +1537,7 @@
         }
       }
     },
-    "/leave/view/{status}": {
+    "/leave/view/status/{status}": {
       "get": {
         "description": "",
         "parameters": [
@@ -2781,7 +2781,7 @@
         }
       }
     },
-    "/admin/leave/view/{status}": {
+    "/admin/leave/view/status/{status}": {
       "get": {
         "description": "",
         "parameters": [
@@ -2810,7 +2810,7 @@
         }
       }
     },
-    "/admin/leave/view/{userId}": {
+    "/admin/leave/view/user/{userId}": {
       "get": {
         "description": "",
         "parameters": [
