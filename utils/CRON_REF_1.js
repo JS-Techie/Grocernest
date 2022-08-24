@@ -10,7 +10,7 @@ const WalletService = require('../services/walletService');
 
 
 const refferal_job = () => {
-    cron.schedule("0 10 15 * * *", () => {
+    cron.schedule("0 45 9 * * *", () => {
         console.log("Running scheduled CRON-JOB.....");
 
         // referral task
