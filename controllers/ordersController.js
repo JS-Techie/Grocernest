@@ -13,6 +13,8 @@ const Offers = db.OffersModel;
 const Inventory = db.InventoryModel;
 const Customer = db.CustomerModel;
 
+const { sendOrderStatusToWhatsapp } = require("../services/whatsapp/whatsapp");
+
 const getAllOrders = async (req, res, next) => {
   //Get currentUser from req.payload.cust_no
   const currentUser = req.cust_no;
@@ -83,23 +85,23 @@ const getAllOrders = async (req, res, next) => {
               currentOrderItem.is_offer === 1 ? (isEdit ? true : false) : "",
             offerDetails: currentOffer
               ? {
-                  offerID: currentOffer.id,
-                  offerType: currentOffer.type,
-                  itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
-                  quantityOfItemX: currentOffer.item_1_quantity
-                    ? currentOffer.item_1_quantity
-                    : "",
-                  itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
-                  quantityOfItemY: currentOffer.item_2_quantity
-                    ? currentOffer.item_2_quantity
-                    : "",
-                  itemID: currentOffer.item_id ? currentOffer.item_id : "",
-                  amountOfDiscount: currentOffer.amount_of_discount
-                    ? currentOffer.amount_of_discount
-                    : "",
-                  isPercentage: currentOffer.is_percentage ? true : false,
-                  isActive: currentOffer.is_active ? true : false,
-                }
+                offerID: currentOffer.id,
+                offerType: currentOffer.type,
+                itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
+                quantityOfItemX: currentOffer.item_1_quantity
+                  ? currentOffer.item_1_quantity
+                  : "",
+                itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
+                quantityOfItemY: currentOffer.item_2_quantity
+                  ? currentOffer.item_2_quantity
+                  : "",
+                itemID: currentOffer.item_id ? currentOffer.item_id : "",
+                amountOfDiscount: currentOffer.amount_of_discount
+                  ? currentOffer.amount_of_discount
+                  : "",
+                isPercentage: currentOffer.is_percentage ? true : false,
+                isActive: currentOffer.is_active ? true : false,
+              }
               : "",
           };
         }
@@ -222,23 +224,23 @@ const getOrderByOrderId = async (req, res, next) => {
             currentOrderItem.is_offer === 1 ? (isEdit ? true : false) : "",
           offerDetails: currentOffer
             ? {
-                offerID: currentOffer.id,
-                offerType: currentOffer.type,
-                itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
-                quantityOfItemX: currentOffer.item_1_quantity
-                  ? currentOffer.item_1_quantity
-                  : "",
-                itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
-                quantityOfItemY: currentOffer.item_2_quantity
-                  ? currentOffer.item_2_quantity
-                  : "",
-                itemID: currentOffer.item_id ? currentOffer.item_id : "",
-                amountOfDiscount: currentOffer.amount_of_discount
-                  ? currentOffer.amount_of_discount
-                  : "",
-                isPercentage: currentOffer.is_percentage ? true : false,
-                isActive: currentOffer.is_active ? true : false,
-              }
+              offerID: currentOffer.id,
+              offerType: currentOffer.type,
+              itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
+              quantityOfItemX: currentOffer.item_1_quantity
+                ? currentOffer.item_1_quantity
+                : "",
+              itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
+              quantityOfItemY: currentOffer.item_2_quantity
+                ? currentOffer.item_2_quantity
+                : "",
+              itemID: currentOffer.item_id ? currentOffer.item_id : "",
+              amountOfDiscount: currentOffer.amount_of_discount
+                ? currentOffer.amount_of_discount
+                : "",
+              isPercentage: currentOffer.is_percentage ? true : false,
+              isActive: currentOffer.is_active ? true : false,
+            }
             : "",
         };
       }
@@ -396,7 +398,11 @@ const cancelOrder = async (req, res, next) => {
       },
     });
     let email = cust.email;
+    // send email
     sendCancelledByUserStatusEmail(email.toString(), singleOrder.order_id);
+
+    // send whatsapp
+    sendOrderStatusToWhatsapp(cust.contact_no, singleOrder.order_id, "Cancelled");
 
     return res.status(200).send({
       success: true,
