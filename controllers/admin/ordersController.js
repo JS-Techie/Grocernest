@@ -237,7 +237,7 @@ const getOrderDetails = async (req, res, next) => {
         where: { id: currentItem.category_id }
       })
 
-      const oldestBatch = await Batch.findAll({
+      const oldestBatch = await Batch.findOne({
         where: { item_id: currentOrderItem.id, mark_selected: 1 },
       });
 
