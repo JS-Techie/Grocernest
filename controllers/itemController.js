@@ -454,8 +454,8 @@ const getItemById = async (req, res, next) => {
         [Op.or]: [
           { item_id: item.id },
           { brand_id: item.brand_id },
-          { category_id: item.category_id },
-          { subcategory_id: item.sub_category_id },
+          { cat_id: item.category_id },
+          { sub_cat_id: item.sub_category_id },
         ],
       },
     });
