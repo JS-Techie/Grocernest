@@ -62,11 +62,14 @@ const getAllAvailableCoupons = async (req, res, next) => {
         });
       }
 
-      
+      console.log(coupons);
 
       const promises = await coupons.map(async (current) => {
         if (current.expiry_date !== null) {
-          if (new Date(current.expiry_date) >= Date.now()-1) {
+          const today = new Date();
+          const yesterday = new Date(today);
+          yesterday.setDate(yesterday.getDate() - 1);
+          if (new Date(current.expiry_date) >= yesterday) {
             return {
               couponCode: current.code,
               amount: current.is_percentage
@@ -114,10 +117,18 @@ const getAllAvailableCoupons = async (req, res, next) => {
         from ecomm.t_coupons
         where t_coupons.item_id = ${currentItem.id} OR t_coupons.cat_id = ${currentItem.category_id} OR t_coupons.sub_cat_id = ${currentItem.sub_category_id} or t_coupons.brand_id = ${currentItem.brand_id} 
         or t_coupons.assigned_user = "${currentUser}" or (${total} <= t_coupons.max_purchase and ${total} >= t_coupons.min_purchase )`);
-    
+
       const innerPromise = coupons.map((current) => {
         if (current.expiry_date !== null) {
-          if (new Date(current.expiry_date) >= Date.now()) {
+          // console.log("current coupon code ====>", current.code);
+          // console.log("Expiry date for current coupon===>",new Date(current.expiry_date))
+          // console.log("Current date====>", new Date());
+
+          const today = new Date();
+          const yesterday = new Date(today);
+          yesterday.setDate(yesterday.getDate() - 1);
+
+          if (new Date(current.expiry_date) >= yesterday) {
             return {
               couponCode: current.code,
               amount: current.is_percentage
@@ -127,6 +138,9 @@ const getAllAvailableCoupons = async (req, res, next) => {
             };
           }
         } else {
+          console.log(new Date(current.expiry_date));
+          console.log(Date.now());
+          console.log(new Date());
           return {
             couponCode: current.code,
             amount: current.is_percentage
@@ -146,11 +160,10 @@ const getAllAvailableCoupons = async (req, res, next) => {
     const response = resolved.filter((value, index, self) => {
       return self.indexOf(value) === index;
     });
-  
 
     const flattenedArray = response.flat(1);
-    
-    const resolvedWithoutUndefined =  flattenedArray.filter((current) => {
+
+    const resolvedWithoutUndefined = flattenedArray.filter((current) => {
       return current !== undefined;
     });
     const responseArray = [
