@@ -10,7 +10,9 @@ const WalletService = require('../services/walletService');
 
 
 const refferal_job = () => {
-    cron.schedule("0 45 9 * * *", () => {
+
+    // schedule time is a utc time (11.30pm ist = 6:00pm utc)
+    cron.schedule("0 0 6 * * *", () => {
         console.log("Running scheduled CRON-JOB.....");
 
         // referral task
