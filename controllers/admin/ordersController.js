@@ -7,10 +7,10 @@ const {
   sendOrderStatusEmail,
   sendCancelledStatusEmail,
 } = require("../../services/mail/mailService");
-const WalletService = require('../../services/walletService');
+const WalletService = require("../../services/walletService");
 
 // whatsapp
-const { sendOrderStatusWhatsapp } = require('../../services/whatsapp/whatsapp');
+const { sendOrderStatusWhatsapp } = require("../../services/whatsapp/whatsapp");
 // const Customer = db.CustomerModel;
 const Batch = db.BatchModel;
 const Customer = db.CustomerModel;
@@ -78,15 +78,15 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
       : " AND tc.contact_no LIKE '%" + phno + "%'";
   const dateQuery =
     startDate == undefined ||
-      startDate == "" ||
-      endDate == undefined ||
-      endDate == ""
+    startDate == "" ||
+    endDate == undefined ||
+    endDate == ""
       ? ""
       : " AND tlo.created_at BETWEEN '" +
-      startDate +
-      "' AND (SELECT DATE_ADD('" +
-      endDate +
-      "', INTERVAL 1 DAY))";
+        startDate +
+        "' AND (SELECT DATE_ADD('" +
+        endDate +
+        "', INTERVAL 1 DAY))";
   const orderId =
     orderid == undefined || orderid == ""
       ? ""
@@ -163,7 +163,6 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
 const getOrderDetails = async (req, res, next) => {
   //Get currentUser from req.cust_no
 
-
   // const currentUser = req.cust_no;
 
   //Get order id from req.params
@@ -189,8 +188,7 @@ const getOrderDetails = async (req, res, next) => {
             `
     );
 
-    const [singleOrder, metadata] =
-      await sequelize.query(`
+    const [singleOrder, metadata] = await sequelize.query(`
       select t_lkp_order.order_id, t_lkp_order.created_at, t_lkp_order.status, t_item.id, t_item.name, t_order_items.quantity, t_item.image,
       t_order_items.is_offer, t_order_items.is_gift, t_order_items.offer_price
     from ((t_lkp_order
@@ -234,55 +232,54 @@ const getOrderDetails = async (req, res, next) => {
       });
 
       const category = await Category.findOne({
-        where: { id: currentItem.category_id }
-      })
+        where: { id: currentItem.category_id },
+      });
 
       const oldestBatch = await Batch.findOne({
         where: { item_id: currentOrderItem.id, mark_selected: 1 },
       });
 
-
       if (oldestBatch) {
         return {
           itemName: currentItem.name,
           id: currentItem.id,
-          category: category ? category.group_name : '',
+          category: category ? category.group_name : "",
           itemCd: currentItem.item_cd,
           image: currentItem.image,
           isGift: currentItem.is_gift == 1 ? true : false,
           quantity: currentOrderItem.quantity,
           MRP: oldestBatch.MRP,
-          salePrice:
-            currentOffer
-              ? currentOffer.amount_of_discount
-                ? currentOrderItem.offer_price
-                : oldestBatch.sale_price
-              : oldestBatch.sale_price,
+          salePrice: currentOffer
+            ? currentOffer.amount_of_discount
+              ? currentOrderItem.offer_price
+              : oldestBatch.sale_price
+            : oldestBatch.sale_price,
           discount: oldestBatch.discount,
           isOffer: currentOrderItem.is_offer === 1 ? true : false,
-          canEdit: currentOrderItem.is_offer === 1 ? (isEdit ? true : false) : "",
+          canEdit:
+            currentOrderItem.is_offer === 1 ? (isEdit ? true : false) : "",
           offerDetails: currentOffer
             ? {
-              offerID: currentOffer.id,
-              offerType: currentOffer.type,
-              itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
-              quantityOfItemX: currentOffer.item_1_quantity
-                ? currentOffer.item_1_quantity
-                : "",
-              itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
-              quantityOfItemY: currentOffer.item_2_quantity
-                ? currentOffer.item_2_quantity
-                : "",
-              itemID: currentOffer.item_id ? currentOffer.item_id : "",
-              amountOfDiscount: currentOffer.amount_of_discount
-                ? currentOffer.amount_of_discount
-                : "",
-              isPercentage: currentOffer.is_percentage ? true : false,
-              isActive: currentOffer.is_active ? true : false,
-            }
+                offerID: currentOffer.id,
+                offerType: currentOffer.type,
+                itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
+                quantityOfItemX: currentOffer.item_1_quantity
+                  ? currentOffer.item_1_quantity
+                  : "",
+                itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
+                quantityOfItemY: currentOffer.item_2_quantity
+                  ? currentOffer.item_2_quantity
+                  : "",
+                itemID: currentOffer.item_id ? currentOffer.item_id : "",
+                amountOfDiscount: currentOffer.amount_of_discount
+                  ? currentOffer.amount_of_discount
+                  : "",
+                isPercentage: currentOffer.is_percentage ? true : false,
+                isActive: currentOffer.is_active ? true : false,
+              }
             : "",
-        }
-      };
+        };
+      }
     });
 
     const responseArray = await Promise.all(promises);
@@ -295,12 +292,15 @@ const getOrderDetails = async (req, res, next) => {
     return res.status(200).send({
       success: true,
       data: {
+        cashbackAmount: singleOrder[0].cashback_amount
+          ? singleOrder[0].cashback_amount
+          : 0,
         orderID: singleOrder[0].order_id,
         Date: singleOrder[0].created_at,
         status: singleOrder[0].status,
         orderTotal,
         itemDetails: responseArray,
-        customer_details: cust_result[0]
+        customer_details: cust_result[0],
       },
       message: "Order successfully fetched for the user",
     });
@@ -435,13 +435,11 @@ const getOrderDetails_unused = async (req, res, next) => {
           item_id_2: current.item_id_2,
           item_1_quantity: current.item_1_quantity,
           item_2_quantity: current.item_2_quantity,
-        }
-      };
+        };
+      }
     });
 
-
     //Free item is item_id_2 in offers not is_free flag from batch
-
 
     const resolvedArray = await Promise.all(promises);
 
@@ -491,7 +489,6 @@ const changeOrderStatus = async (req, res, next) => {
     });
   }
 
-
   Order.update(
     {
       status: req.body.status,
@@ -517,13 +514,18 @@ const changeOrderStatus = async (req, res, next) => {
               order_id: res.dataValues.order_id,
             },
           }).then(async (res2) => {
-
             if (req.body.status === "Cancelled") {
               // if order cancelled give user the deducted wallet balance
               if (res.dataValues.wallet_balance_used != 0) {
                 console.log("add the deducted balance to the user wallet");
                 let walletService = new WalletService();
-                let result = await walletService.creditAmount(res.dataValues.wallet_balance_used, res.dataValues.cust_no, "cancelled order ID-" + req.body.orderId + " wallet balance refunded.");
+                let result = await walletService.creditAmount(
+                  res.dataValues.wallet_balance_used,
+                  res.dataValues.cust_no,
+                  "cancelled order ID-" +
+                    req.body.orderId +
+                    " wallet balance refunded."
+                );
               }
             }
 
@@ -538,7 +540,7 @@ const changeOrderStatus = async (req, res, next) => {
                 Batch.findOne({
                   where: {
                     item_id: item.id,
-                    mark_selected: 1
+                    mark_selected: 1,
                   },
                 }).then(async (batch) => {
                   if (!batch) {
@@ -549,18 +551,19 @@ const changeOrderStatus = async (req, res, next) => {
                     });
                   }
 
-
-                  //TODO update inventory table quantity as well                  
+                  //TODO update inventory table quantity as well
 
                   if (req.body.status == "Cancelled") {
-
                     const itemsInOrder = await OrderItems.findAll({
                       where: { order_id: res.dataValues.order_id },
                     });
                     if (itemsInOrder.length > 0) {
                       itemsInOrder.map(async (currentItem) => {
                         const oldestBatch = await Batch.findOne({
-                          where: { item_id: currentItem.item_id, mark_selected: 1 },
+                          where: {
+                            item_id: currentItem.item_id,
+                            mark_selected: 1,
+                          },
                         });
 
                         if (oldestBatch) {
@@ -577,14 +580,16 @@ const changeOrderStatus = async (req, res, next) => {
                             where: {
                               item_id: currentItem.item_id,
                               batch_id: oldestBatch.id,
-                              balance_type: 7
+                              balance_type: 7,
                             },
                           });
 
                           if (blockedInventory) {
                             updateBlockedItem = await Inventory.update(
                               {
-                                quantity: blockedInventory.quantity - currentItem.quantity,
+                                quantity:
+                                  blockedInventory.quantity -
+                                  currentItem.quantity,
                               },
                               {
                                 where: {
@@ -598,7 +603,9 @@ const changeOrderStatus = async (req, res, next) => {
 
                           updateInventory = await Inventory.update(
                             {
-                              quantity: currentItem.quantity + currentInventory.quantity,
+                              quantity:
+                                currentItem.quantity +
+                                currentInventory.quantity,
                             },
                             {
                               where: {
@@ -612,19 +619,20 @@ const changeOrderStatus = async (req, res, next) => {
                         }
                       });
                     }
-
-                  }
-                  else if (req.body.status == "Delivered") {
-                    const current_inventory_to_be_blocked = await Inventory.findOne({
-                      where: {
-                        item_id: batch.item_id,
-                        batch_id: batch.id,
-                        balance_type: 7
-                      }
-                    })
+                  } else if (req.body.status == "Delivered") {
+                    const current_inventory_to_be_blocked =
+                      await Inventory.findOne({
+                        where: {
+                          item_id: batch.item_id,
+                          batch_id: batch.id,
+                          balance_type: 7,
+                        },
+                      });
                     await Inventory.update(
                       {
-                        quantity: current_inventory_to_be_blocked.quantity - currentItem.quantity,
+                        quantity:
+                          current_inventory_to_be_blocked.quantity -
+                          currentItem.quantity,
                       },
                       {
                         where: {
@@ -632,7 +640,8 @@ const changeOrderStatus = async (req, res, next) => {
                           item_id: batch.item_id,
                           balance_type: 7,
                         },
-                      })
+                      }
+                    );
                   }
                 });
               });
@@ -656,28 +665,30 @@ const changeOrderStatus = async (req, res, next) => {
               );
               // whatsapp
               sendOrderStatusWhatsapp(
-                cust.contact_no, "Your order " +
-                req.body.orderId +
-                " has been cancelled due to this reason: " +
-              req.body.cancellataionReason
-              )
+                cust.contact_no,
+                "Your order " +
+                  req.body.orderId +
+                  " has been cancelled due to this reason: " +
+                  req.body.cancellataionReason
+              );
             } else {
               //email
               sendOrderStatusEmail(
                 email.toString(),
                 req.body.orderId,
                 "Your order " +
-                req.body.orderId +
-                " has been " +
-                req.body.status
+                  req.body.orderId +
+                  " has been " +
+                  req.body.status
               );
               // whatsapp
               sendOrderStatusWhatsapp(
-                cust.contact_no, "Your order " +
-                req.body.orderId +
-                " has been " +
-              req.body.status
-              )
+                cust.contact_no,
+                "Your order " +
+                  req.body.orderId +
+                  " has been " +
+                  req.body.status
+              );
             }
         });
       });
@@ -772,9 +783,9 @@ const assignTransporter = async (req, res, next) => {
               email.toString(),
               req.body.orderId,
               "Your order " +
-              req.body.orderId +
-              " has been Shipped. Your order will be delivered by " +
-              transporterName
+                req.body.orderId +
+                " has been Shipped. Your order will be delivered by " +
+                transporterName
             );
 
           // send whatsapp
@@ -783,11 +794,13 @@ const assignTransporter = async (req, res, next) => {
 
           // if (opt_in == 1) {
           sendOrderStatusWhatsapp(
-            contact_no, "Your order " +
-            req.body.orderId +
-            " has been Shipped. Your order will be delivered by " +
-            transporterName + "."
-          )
+            contact_no,
+            "Your order " +
+              req.body.orderId +
+              " has been Shipped. Your order will be delivered by " +
+              transporterName +
+              "."
+          );
           // }
         });
       });
@@ -806,6 +819,7 @@ const assignTransporter = async (req, res, next) => {
       });
     });
 };
+
 const getShippedOrders = async (req, res, next) => {
   try {
     const [results, metadata] = await sequelize.query(`
