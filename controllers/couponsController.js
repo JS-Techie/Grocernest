@@ -138,9 +138,9 @@ const getAllAvailableCoupons = async (req, res, next) => {
             };
           }
         } else {
-          console.log(new Date(current.expiry_date));
-          console.log(Date.now());
-          console.log(new Date());
+          // console.log(new Date(current.expiry_date));
+          // console.log(Date.now());
+          // console.log(new Date());
           return {
             couponCode: current.code,
             amount: current.is_percentage
