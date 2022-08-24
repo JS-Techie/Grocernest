@@ -50,7 +50,7 @@ module.exports = sequelize => {
       field: "no_of_days"
     },
     status: {
-      type: DataTypes.ENUM('Pending', 'In Progress', 'Done'),
+      type: DataTypes.ENUM('Pending', 'In Progress', 'Hold', 'Done'),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,

@@ -14,7 +14,7 @@ const {
 
 router.route("/view/all").get(authenticate, getAllLeaves);
 router.route("/view/:id").get(authenticate, getLeaveById);
-router.route("/view/:status").get(authenticate, getLeaveByStatus);
+router.route("/view/status/:status").get(authenticate, getLeaveByStatus);
 router.route("/create").post(authenticate, createLeave);
 router.route("/edit/:id").patch(authenticate, editLeave);
 router.route("/delete/:id").delete(authenticate, deleteLeave);

@@ -53,8 +53,9 @@ const giftRouter = require("./routes/giftRoutes");
 const invoiceRouter = require("./routes/invoiceRoutes");
 const offerRouter = require("./routes/offerRoutes");
 const gatewayRouter = require("./routes/gatewayRoute");
-const whatsappRouter = require('./routes/whatsappRoutes');
-const leaveRouter = require('./routes/leaveRoutes');
+const whatsappRouter = require("./routes/whatsappRoutes");
+const leaveRouter = require("./routes/leaveRoutes");
+const taskRouter = require("./routes/taskRoutes");
 
 // admin routers import
 const adminOrderRouter = require("./routes/admin/orderRoutes");
@@ -64,19 +65,15 @@ const adminGiftRouter = require("./routes/admin/giftRoutes");
 const adminCouponsRouter = require("./routes/admin/couponRoutes");
 const adminOffersRouter = require("./routes/admin/offerRoutes");
 const adminLeaveRouter = require("./routes/admin/leaveRoutes");
-
+const adminTaskRouter = require("./routes/admin/taskRoutes");
 
 // milk routes import (user)
-
 
 // milk routes import (admin)
 const adminMilkItemsRouter = require("./routes/admin/milkItemsRoutes");
 const SubscriptionRouter = require("./routes/subscriptionRoutes");
 const deliveryRouter = require("./routes/deliveryRoutes");
 const adminMilkSubscriptionRouter = require("./routes/admin/milkSubscriptionRoutes");
-
-
-
 
 //routes
 app.get("/responses", (req, res) => {
@@ -103,6 +100,7 @@ app.use("/offers", offerRouter);
 app.use("/gateway", gatewayRouter);
 app.use("/whatsapp", whatsappRouter);
 app.use("/leave", leaveRouter);
+app.use("/task", taskRouter);
 
 // admin routes
 app.use("/admin/orders", adminOrderRouter);
@@ -111,8 +109,8 @@ app.use("/admin/customer", adminCustomerRouter);
 app.use("/admin/gift", adminGiftRouter);
 app.use("/admin/coupons", adminCouponsRouter);
 app.use("/admin/offers", adminOffersRouter);
-app.use("/admin/leave",adminLeaveRouter);
-
+app.use("/admin/leave", adminLeaveRouter);
+app.use("/admin/task", adminTaskRouter);
 
 // milk (user)
 app.use("/subscription", SubscriptionRouter);
@@ -121,10 +119,6 @@ app.use("/delivery", deliveryRouter);
 // milk (admin)
 app.use("/admin/milk/item", adminMilkItemsRouter);
 app.use("/admin/milk/subscription", adminMilkSubscriptionRouter);
-
-
-
-
 
 //Start server and connect to DB
 const db = require("./services/dbSetupService.js");

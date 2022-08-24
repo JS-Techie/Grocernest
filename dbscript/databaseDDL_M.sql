@@ -225,5 +225,6 @@ ALTER TABLE ecomm.t_leave ADD leave_id BIGINT(20) NULL;
 ALTER TABLE ecomm.t_leave MODIFY COLUMN no_of_days DECIMAL(10,2) NOT NULL;
 
 ALTER TABLE ecomm.t_leave MODIFY COLUMN leave_type ENUM("Annual/Casual","Maternity","Paternity","Sick") DEFAULT NULL NULL;
+ALTER TABLE ecomm.t_task MODIFY COLUMN status enum('Pending','In Progress','Hold','Done') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL NULL;
 
 
