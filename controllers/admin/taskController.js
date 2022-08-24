@@ -67,6 +67,7 @@ const createTask = async (req, res, next) => {
       description,
       user_id,
       no_of_days,
+      status: "Pending",
       created_by: 1,
     });
 

@@ -449,8 +449,38 @@ const getItemById = async (req, res, next) => {
       });
     }
 
-    const couponForCurrentItem = await Coupons.findAll({
-      where: { item_id: item.id },
+    const coupons = await Coupons.findAll({
+      where: {
+        [Op.or]: [
+          { item_id: item.id },
+          { brand_id: item.brand_id },
+          { cat_id: item.category_id },
+          { sub_cat_id: item.sub_category_id },
+        ],
+      },
+    });
+
+    // const [couponForCurrentItem, metadataForCoupons] = await sequelize.query(
+    //   `select t_coupons.code, t_coupons.amount_of_discount ,t_coupons.is_percentage ,t_coupons.description, t_coupons.expiry_date, t_coupons.created_at
+    //   from ecomm.t_coupons where t_coupons.item_id = ${item.id} OR t_coupons.cat_id = ${item.category_id} OR t_coupons.sub_cat_id = ${item.sub_category_id} or t_coupons.brand_id = ${item.brand_id}`
+    // );
+    let promises = [];
+    if (coupons.length != 0) {
+      promises = coupons.map((current) => {
+        if (current.expiry_date !== null) {
+          const today = new Date();
+          const yesterday = new Date(today);
+          yesterday.setDate(yesterday.getDate() - 1);
+          if (new Date(current.expiry_date) >= yesterday) {
+            return current;
+          }
+        }
+      });
+    }
+
+    const resolved = await Promise.all(promises);
+    const couponForCurrentItem = resolved.filter((current) => {
+      return current != undefined;
     });
 
     return res.status(200).send({
@@ -474,7 +504,9 @@ const getItemById = async (req, res, next) => {
         color: item.color_name,
         brand: item.brand_name,
         cashback: currentItem.cashback ? currentItem.cashback : 0,
-        cashback_is_percentage: currentItem.cashback_is_percentage ? true : false,
+        cashback_is_percentage: currentItem.cashback_is_percentage
+          ? true
+          : false,
         inWishlist: currentUser ? (itemInWishlist ? true : false) : "",
         isOffer: offer ? true : false,
         offerType: offer ? offer.type : "",
