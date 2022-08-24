@@ -119,6 +119,7 @@ const getLeaveByUserId = async (req, res, next) => {
 
 const approveLeave = async (req, res, next) => {
   const id = parseInt(req.params.id);
+  const { bypass } = req.body;
   try {
     const currentLeave = await Leave.findOne({
       where: { id },
