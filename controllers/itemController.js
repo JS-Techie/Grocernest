@@ -455,7 +455,7 @@ const getItemById = async (req, res, next) => {
           { item_id: item.id },
           { brand_id: item.brand_id },
           { category_id: item.category_id },
-          { subcategory_id: item.subcategory_id },
+          { subcategory_id: item.sub_category_id },
         ],
       },
     });
