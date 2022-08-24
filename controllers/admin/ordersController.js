@@ -190,7 +190,7 @@ const getOrderDetails = async (req, res, next) => {
 
     const [singleOrder, metadata] = await sequelize.query(`
       select t_lkp_order.order_id, t_lkp_order.created_at, t_lkp_order.status, t_item.id, t_item.name, t_order_items.quantity, t_item.image,
-      t_order_items.is_offer, t_order_items.is_gift, t_order_items.offer_price
+      t_order_items.is_offer, t_order_items.is_gift, t_order_items.offer_price,t_lkp_order.cashback_amount
     from ((t_lkp_order
     inner join t_order_items on t_order_items.order_id = t_lkp_order.order_id)
     inner join t_item on t_item.id = t_order_items.item_id)
