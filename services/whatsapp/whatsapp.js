@@ -42,7 +42,7 @@ const sendOrderStatusToWhatsapp = (phno, order_id, status) => {
     })
 }
 
-const sendOrderShippedToWhatsapp = (phno, order_id, status, delivery_boy) => {
+const sendOrderShippedToWhatsapp = (phno, order_id, delivery_boy) => {
     // Your order with order ID [123456] has been [Shipped]. Your order will be delivered by [Somename].
 
     client.message.send({
@@ -53,7 +53,7 @@ const sendOrderShippedToWhatsapp = (phno, order_id, status, delivery_boy) => {
         message: {
             isHSM: "true",
             type: "text",
-            text: "Your order with order ID " + "*" + order_id + "*" + " has been " + "*" + status + "*" + ". Your order will be delivered by " + "*" + delivery_boy + "*" + "."
+            text: "Your order with order ID " + "*" + order_id + "*" + " has been " + "*" + "Shipped" + "*" + ". Your order will be delivered by " + "*" + delivery_boy + "*" + "."
         }
     }).then((response) => {
         console.log("Template message sent", response);
