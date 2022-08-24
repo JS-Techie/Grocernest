@@ -83,23 +83,23 @@ const getAllOrders = async (req, res, next) => {
               currentOrderItem.is_offer === 1 ? (isEdit ? true : false) : "",
             offerDetails: currentOffer
               ? {
-                offerID: currentOffer.id,
-                offerType: currentOffer.type,
-                itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
-                quantityOfItemX: currentOffer.item_1_quantity
-                  ? currentOffer.item_1_quantity
-                  : "",
-                itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
-                quantityOfItemY: currentOffer.item_2_quantity
-                  ? currentOffer.item_2_quantity
-                  : "",
-                itemID: currentOffer.item_id ? currentOffer.item_id : "",
-                amountOfDiscount: currentOffer.amount_of_discount
-                  ? currentOffer.amount_of_discount
-                  : "",
-                isPercentage: currentOffer.is_percentage ? true : false,
-                isActive: currentOffer.is_active ? true : false,
-              }
+                  offerID: currentOffer.id,
+                  offerType: currentOffer.type,
+                  itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
+                  quantityOfItemX: currentOffer.item_1_quantity
+                    ? currentOffer.item_1_quantity
+                    : "",
+                  itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
+                  quantityOfItemY: currentOffer.item_2_quantity
+                    ? currentOffer.item_2_quantity
+                    : "",
+                  itemID: currentOffer.item_id ? currentOffer.item_id : "",
+                  amountOfDiscount: currentOffer.amount_of_discount
+                    ? currentOffer.amount_of_discount
+                    : "",
+                  isPercentage: currentOffer.is_percentage ? true : false,
+                  isActive: currentOffer.is_active ? true : false,
+                }
               : "",
           };
         }
@@ -222,23 +222,23 @@ const getOrderByOrderId = async (req, res, next) => {
             currentOrderItem.is_offer === 1 ? (isEdit ? true : false) : "",
           offerDetails: currentOffer
             ? {
-              offerID: currentOffer.id,
-              offerType: currentOffer.type,
-              itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
-              quantityOfItemX: currentOffer.item_1_quantity
-                ? currentOffer.item_1_quantity
-                : "",
-              itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
-              quantityOfItemY: currentOffer.item_2_quantity
-                ? currentOffer.item_2_quantity
-                : "",
-              itemID: currentOffer.item_id ? currentOffer.item_id : "",
-              amountOfDiscount: currentOffer.amount_of_discount
-                ? currentOffer.amount_of_discount
-                : "",
-              isPercentage: currentOffer.is_percentage ? true : false,
-              isActive: currentOffer.is_active ? true : false,
-            }
+                offerID: currentOffer.id,
+                offerType: currentOffer.type,
+                itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
+                quantityOfItemX: currentOffer.item_1_quantity
+                  ? currentOffer.item_1_quantity
+                  : "",
+                itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
+                quantityOfItemY: currentOffer.item_2_quantity
+                  ? currentOffer.item_2_quantity
+                  : "",
+                itemID: currentOffer.item_id ? currentOffer.item_id : "",
+                amountOfDiscount: currentOffer.amount_of_discount
+                  ? currentOffer.amount_of_discount
+                  : "",
+                isPercentage: currentOffer.is_percentage ? true : false,
+                isActive: currentOffer.is_active ? true : false,
+              }
             : "",
         };
       }
@@ -270,6 +270,7 @@ const getOrderByOrderId = async (req, res, next) => {
     });
   }
 };
+
 const cancelOrder = async (req, res, next) => {
   //get currentUser from req.cust_no
   const currentUser = req.cust_no;
@@ -413,6 +414,7 @@ const cancelOrder = async (req, res, next) => {
     });
   }
 };
+
 const returnOrder = async (req, res, next) => {
   //get currentUser from req.cust_no
   const currentUser = req.cust_no;
@@ -465,6 +467,7 @@ const returnOrder = async (req, res, next) => {
     });
   }
 };
+
 const trackOrder = async (req, res, next) => {
   //get currentUser from req.cust_no
   const currentUser = req.cust_no;

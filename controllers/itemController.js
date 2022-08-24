@@ -417,6 +417,8 @@ const getItemById = async (req, res, next) => {
       where: {
         item_id: item.id,
         batch_id: item.batch_id,
+        balance_type: 1,
+        location_id: 4,
       },
     });
 
@@ -471,8 +473,8 @@ const getItemById = async (req, res, next) => {
         exp_date: item.expiry_date,
         color: item.color_name,
         brand: item.brand_name,
-        cashback: item.cashback ? item.cashback : 0,
-        cashback_is_percentage: item.cashback_is_percentage ? true : false,
+        cashback: currentItem.cashback ? currentItem.cashback : 0,
+        cashback_is_percentage: currentItem.cashback_is_percentage ? true : false,
         inWishlist: currentUser ? (itemInWishlist ? true : false) : "",
         isOffer: offer ? true : false,
         offerType: offer ? offer.type : "",
