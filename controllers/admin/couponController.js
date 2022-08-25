@@ -211,15 +211,15 @@ const createCoupon = async (req, res, next) => {
 
     if (newCoupon.assigned_user) {
       const currentCustomer = await Customer.findOne({
-        where: { id: assigned_user },
+        where: { cust_no: assigned_user },
       });
 
       sendCouponToUser(
         currentCustomer.cust_name.split(" ")[0],
         newCoupon.code,
-        newCoupon.is_percentage,
-        newCoupon.amount_of_discount,
-        currentCustomer.contact_no
+        newCoupon.is_percentage.toString(),
+        newCoupon.amount_of_discount.toString(),
+        currentCustomer.contact_no.toString()
       );
     }
 
