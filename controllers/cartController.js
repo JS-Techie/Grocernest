@@ -14,6 +14,13 @@ const {
   sendAdminCancelledOrderStatusToWhatsapp,
 } = require("../services/whatsapp/whatsapp");
 
+const {
+  sendCouponToUser,
+  sendOfferToUser,
+  sendPOSInvoiceToUser,
+  sendFirstCouponToUser,
+} = require("../services/whatsapp/whatsappMessages");
+
 const saveCart = async (req, res, next) => {
   //Get current user from JWT
   //const currentUser = req.cust_no
@@ -115,9 +122,11 @@ const addItemToCart = async (req, res, next) => {
         return res.status(402).send({
           success: false,
           data: currentInventory,
-          message: `Could not add item to cart as available quantity is ${currentInventory.quantity
-            } and your requested quantity is ${enteredQuantity + itemAlreadyExists.quantity
-            } `,
+          message: `Could not add item to cart as available quantity is ${
+            currentInventory.quantity
+          } and your requested quantity is ${
+            enteredQuantity + itemAlreadyExists.quantity
+          } `,
         });
       }
 
@@ -420,6 +429,9 @@ const getCart = async (req, res, next) => {
   // sendOrderStatusToWhatsapp("9163540343", "123456774", "Shipped");
   // sendOrderShippedToWhatsapp("9163540343", "123456", "Shipped", "Tanmoy");
   // sendAdminCancelledOrderStatusToWhatsapp("9163540343", "12345", "no items");
+
+  sendCouponToUser("Mehul", "Hello", 1, 20, "79809976735");
+  //sendFirstCouponToUser("Mehul", "7980996735", "FIRSTBUY");
 
   //Get currentUser from JWT
   const currentUser = req.cust_no;

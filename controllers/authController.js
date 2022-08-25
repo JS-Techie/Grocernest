@@ -9,6 +9,10 @@ const db = require("../models");
 
 const { generateOTP, sendOTPToPhoneNumber } = require("../services/otpService");
 
+const {
+  sendFirstCouponToUser,
+} = require("../services/whatsapp/whatsappMessages");
+
 const Customer = db.CustomerModel;
 const Cache = db.CacheModel;
 const Coupon = db.CouponsModel;
@@ -252,7 +256,7 @@ const verifyOTP = async (req, res, next) => {
 
     // console.log("===============", newUser);
 
-    const response = await Customer.create({
+    const newCustomer = await Customer.create({
       id: newUser.id,
       cust_no: newUser.cust_no,
       active_ind: newUser.active_ind,
@@ -291,6 +295,12 @@ const verifyOTP = async (req, res, next) => {
       description: "Flat 10% off on your first purchase, use code FIRSTBUY",
     });
 
+    sendFirstCouponToUser(
+      newCustomer.cust_name.split(" ")[0],
+      newCustomer.contact_no,
+      newCoupon.code
+    );
+
     const deletedField = await Cache.destroy({
       where: { generated_otp: userEnteredOTP },
     });
@@ -298,7 +308,7 @@ const verifyOTP = async (req, res, next) => {
     return res.status(200).send({
       success: true,
       data: {
-        created: response,
+        created: newCustomer,
         coupon: {
           code: newCoupon.code,
           amount: newCoupon.is_percentage
