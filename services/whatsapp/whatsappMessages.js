@@ -15,7 +15,7 @@ const sendCouponToUser = async (
     const off =
       parseInt(isPercentage) === 1
         ? `${parseInt(amountOfDiscount)}%`
-        : `${parseInt(amountOfDiscount)}`;
+        : `₹ ${parseInt(amountOfDiscount)}`;
 
     console.log(off);
 
