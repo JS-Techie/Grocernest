@@ -3,6 +3,10 @@ const db = require("../../models");
 
 const Offers = db.OffersModel;
 const Item = db.ItemModel;
+const Customer = db.CustomerModel;
+
+// const { sendOfferToUser } = require("../../services/whatsapp/whatsappMessages");
+
 const getAllOffers = async (req, res, next) => {
   //Get current user from JWT
 
@@ -181,6 +185,12 @@ const createOffer = async (req, res, next) => {
     });
 
     console.log("after offer query");
+
+    // const allCustomers = await Customer.findAll({})
+
+    // allCustomers.map((currentCustomer)=>{
+    //   sendOfferToUser(currentCustomer.cust_name.split(" ")[0], newOffer.item_id_1,)
+    // })
 
     return res.status(201).send({
       success: true,

@@ -9,6 +9,10 @@ const Item = db.ItemModel;
 const Brand = db.LkpBrandModel;
 const Customer = db.CustomerModel;
 
+const {
+  sendCouponToUser,
+} = require("../../services/whatsapp/whatsappMessages");
+
 const getAllCoupons = async (req, res, next) => {
   try {
     const coupons = await Coupons.findAll();
@@ -205,6 +209,20 @@ const createCoupon = async (req, res, next) => {
       type,
     });
 
+    if (newCoupon.assigned_user) {
+      const currentCustomer = await Customer.findOne({
+        where: { id: assigned_user },
+      });
+
+      sendCouponToUser(
+        currentCustomer.cust_name.split(" ")[0],
+        newCoupon.code,
+        newCoupon.is_percentage,
+        newCoupon.amount_of_discount,
+        currentCustomer.contact_no
+      );
+    }
+
     return res.status(201).send({
       success: true,
       data: newCoupon,
@@ -276,6 +294,23 @@ const updateCoupon = async (req, res, next) => {
       }
     );
 
+    const newCoupon = await Coupons.findOne({
+      where: { id: couponID },
+    });
+
+    if (newCoupon.assigned_user) {
+      const currentCustomer = await Customer.findOne({
+        where: { id: assigned_user },
+      });
+
+      sendCouponToUser(
+        currentCustomer.cust_name.split(" ")[0],
+        newCoupon.code,
+        newCoupon.is_percentage,
+        newCoupon.amount_of_discount,
+        currentCustomer.contact_no
+      );
+    }
     return res.status(200).send({
       success: true,
       data: {
