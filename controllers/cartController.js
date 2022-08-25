@@ -11,7 +11,7 @@ const {
   sendInvoiceToWhatsapp,
   sendOrderStatusToWhatsapp,
   sendOrderShippedToWhatsapp,
-  sendAdminCancelledOrderStatusToWhatsapp
+  sendAdminCancelledOrderStatusToWhatsapp,
 } = require("../services/whatsapp/whatsapp");
 
 const saveCart = async (req, res, next) => {
@@ -38,7 +38,39 @@ const addItemToCart = async (req, res, next) => {
       },
     });
 
+    const oldestBatch = await Batch.findOne({
+      where: { item_id: itemId, mark_selected: 1 },
+    });
+
+    if (!oldestBatch) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "There is no batch selected for current item",
+      });
+    }
+
     if (!itemAlreadyExists) {
+      // fetch avl qty if item
+      //if current cart qty + entered qty is greater than avl qty, i will not let them add
+
+      const currentInventory = await Inventory.findOne({
+        where: {
+          item_id: itemId,
+          batch_id: oldestBatch.id,
+          location_id: 4,
+          balance_type: 1,
+        },
+      });
+
+      if (enteredQuantity > currentInventory.quantity) {
+        return res.status(400).send({
+          success: false,
+          data: currentInventory,
+          message: `Could not add item to cart as available quantity is ${currentInventory.quantity} and your requested quantity is ${enteredQuantity} `,
+        });
+      }
+
       try {
         const newItem = await Cart.create({
           cust_no: currentUser,
@@ -65,6 +97,32 @@ const addItemToCart = async (req, res, next) => {
 
     //If the item already exists just increase the quantity
     try {
+      // fetch avl qty if item
+      //if current cart qty + entered qty is greater than avl qty, i will not let them add
+      const currentInventory = await Inventory.findOne({
+        where: {
+          item_id: itemId,
+          batch_id: oldestBatch.id,
+          location_id: 4,
+          balance_type: 1,
+        },
+      });
+
+      if (
+        enteredQuantity + itemAlreadyExists.quantity >
+        currentInventory.quantity
+      ) {
+        return res.status(400).send({
+          success: false,
+          data: currentInventory,
+          message: `Could not add item to cart as available quantity is ${
+            currentInventory.quantity
+          } and your requested quantity is ${
+            enteredQuantity + itemAlreadyExists.quantity
+          } `,
+        });
+      }
+
       const updatedItem = await Cart.update(
         { quantity: itemAlreadyExists.quantity + enteredQuantity },
         { where: { item_id: itemId, cust_no: currentUser } }
@@ -359,13 +417,11 @@ const getItemCount = async (req, res, next) => {
 };
 
 const getCart = async (req, res, next) => {
-
   // console.log("===========whatsapp testing==============");
   // sendInvoiceToWhatsapp("9163540343", "123456774", "https://ecomm-dev.s3.ap-south-1.amazonaws.com/pdfs/invoices/invoice-9619381.pdf");
   // sendOrderStatusToWhatsapp("9163540343", "123456774", "Shipped");
   // sendOrderShippedToWhatsapp("9163540343", "123456", "Shipped", "Tanmoy");
   // sendAdminCancelledOrderStatusToWhatsapp("9163540343", "12345", "no items");
-
 
   //Get currentUser from JWT
   const currentUser = req.cust_no;
@@ -454,7 +510,9 @@ const getCart = async (req, res, next) => {
               : oldestBatch.sale_price,
           discount: current.discount,
           cashback: currentItem.cashback ? currentItem.cashback : 0,
-          cashback_is_percentage: currentItem.cashback_is_percentage ? true : false,
+          cashback_is_percentage: currentItem.cashback_is_percentage
+            ? true
+            : false,
           color: current.color_name,
           brand: current.brand_name,
           isGift: current.is_gift === 1 ? true : false,
