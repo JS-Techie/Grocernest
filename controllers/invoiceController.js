@@ -53,6 +53,7 @@ const downloadInvoice = async (req, res, next) => {
           isGift: item.is_gift == 1 ? true : false,
           isOffer: item.is_offer == 1 ? true : false,
           offerPrice: item.is_offer == 1 ? offer_price : "",
+          salePrice: oldestBatch.sale_price
         };
       }
     });

@@ -29,7 +29,7 @@ const generateHeader = (doc) => {
   doc
     .image("assets/logo.png", 50, 20, { width: 80 })
     .fillColor("#444444")
-    .fontSize(10);
+    .fontSize(15);
   // .text("330, M.G.Road, 1st floor", 200, 65, { align: "right" })
   // .text("Kabardanga More, Kolkata, 700104", 200, 80, { align: "right" })
   // .moveDown();
@@ -45,7 +45,7 @@ const generateCustomerInformation = (doc, invoice) => {
 
   doc
     .font("Helvetica-Bold")
-    .text(`Payable total: ${invoice.payableTotal}`, 50, 95, {
+    .text(`Payable total: ${invoice.payableTotal}`, 50, 130, {
       align: "center",
     });
 };
@@ -53,7 +53,7 @@ const generateCustomerInformation = (doc, invoice) => {
 function generateTableRow(doc, y, c1, c4, c5) {
   doc
     .font("Helvetica")
-    .fontSize(8)
+    .fontSize(15)
     .text(c1, 50, y)
     .text(c4, 370, y, { width: 90, align: "center" })
     .text(c5, 0, y, { align: "right" });
@@ -61,20 +61,36 @@ function generateTableRow(doc, y, c1, c4, c5) {
 function generateTableRow1(doc, y, c1, c4, c5) {
   doc
     .font("Helvetica-Bold")
-    .fontSize(8)
+    .fontSize(15)
     .text(c1, 50, y)
     .text(c4, 370, y, { width: 90, align: "center" })
     .text(c5, 0, y, { align: "right" });
 }
 
 function generateInvoiceTable(doc, invoice) {
+
+
+  console.log("===================", invoice);
+
+
   let i,
     invoiceTableTop = 130;
   const position = invoiceTableTop + 1 * 30;
-  generateTableRow1(doc, position, "Item Name", "Quantity", "MRP");
+  generateTableRow1(doc, position, "Item Name", "Quantity", "Sale Price");
 
-  for (i = 0; i < invoice.orderItems.length; i++) {
-    const item = invoice.orderItems[i];
+  const orderItems = invoice.orderItems.filter((currentItem) => {
+    return currentItem != undefined;
+  })
+
+  console.log(orderItems);
+
+  for (i = 0; i < orderItems.length; i++) {
+
+
+    const item = orderItems[i];
+
+    console.log(item.salePrice);
+
     const position = invoiceTableTop + (i + 2) * 30;
     generateTableRow(
       doc,
@@ -82,10 +98,10 @@ function generateInvoiceTable(doc, invoice) {
       item.isGift === true
         ? `${item.itemName} (gift)`
         : item.isOffer === true
-        ? `${item.itemName} (offer)`
-        : item.itemName,
+          ? `${item.itemName} (offer)`
+          : item.itemName,
       item.quantity,
-      item.isGift === true ? 0 : item.MRP
+      item.isGift === true ? 0 : item.salePrice
     );
     generateHr(doc, position + 20);
   }
