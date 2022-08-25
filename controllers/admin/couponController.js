@@ -313,7 +313,9 @@ const updateCoupon = async (req, res, next) => {
         sendCouponToUser(
           currentCustomer.cust_name.split(" ")[0],
           newCoupon.code,
-          newCoupon.is_percentage,
+          newCoupon.is_percentage === 1
+            ? newCoupon.is_percentage.toString()
+            : "",
           newCoupon.amount_of_discount,
           currentCustomer.contact_no
         );
