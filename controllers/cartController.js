@@ -430,7 +430,7 @@ const getCart = async (req, res, next) => {
   // sendOrderShippedToWhatsapp("9163540343", "123456", "Shipped", "Tanmoy");
   // sendAdminCancelledOrderStatusToWhatsapp("9163540343", "12345", "no items");
 
-  sendCouponToUser("Mehul", "Hello", 1, 20, "79809976735");
+sendCouponToUser("Mehul","Hello","1","20","7980996735")
   //sendFirstCouponToUser("Mehul", "7980996735", "FIRSTBUY");
 
   //Get currentUser from JWT

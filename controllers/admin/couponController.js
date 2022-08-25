@@ -303,13 +303,15 @@ const updateCoupon = async (req, res, next) => {
         where: { id: assigned_user },
       });
 
-      sendCouponToUser(
-        currentCustomer.cust_name.split(" ")[0],
-        newCoupon.code,
-        newCoupon.is_percentage,
-        newCoupon.amount_of_discount,
-        currentCustomer.contact_no
-      );
+      if (currentCustomer) {
+        sendCouponToUser(
+          currentCustomer.cust_name.split(" ")[0],
+          newCoupon.code,
+          newCoupon.is_percentage,
+          newCoupon.amount_of_discount,
+          currentCustomer.contact_no
+        );
+      }
     }
     return res.status(200).send({
       success: true,

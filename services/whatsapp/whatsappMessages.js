@@ -12,6 +12,14 @@ const sendCouponToUser = async (
   phoneNumber
 ) => {
   try {
+    const off =
+      parseInt(isPercentage) === 1
+        ? `${parseInt(amountOfDiscount)}%`
+        : `${parseInt(amountOfDiscount)}`;
+
+
+        console.log(off);
+
     const messageResponseFromGupshup = await client.message.send({
       channel: "whatsapp",
       source: "919433804769",
@@ -20,11 +28,7 @@ const sendCouponToUser = async (
       message: {
         isHSM: "true",
         type: "text",
-        text: `Hi, ${firstName}. Apply coupon ${couponCode} to receive ${
-          isPercentage === 1
-            ? `${amountOfDiscount}%`
-            : `Rs. ${amountOfDiscount}`
-        } off on your next order`,
+        text: `Hi, [Tanmoy]. Apply coupon [FIRSTBUY] to receive [20%] off on your next order.`,
       },
     });
 
