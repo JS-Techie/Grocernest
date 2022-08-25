@@ -22,7 +22,7 @@ const sendCouponToUser = async (
     const messageResponseFromGupshup = await client.message.send({
       channel: "whatsapp",
       source: "919433804769",
-      destination: "917980996735",
+      destination: "91" + phoneNumber.toString(),
       "src.name": "grocernest",
       message: {
         isHSM: "true",

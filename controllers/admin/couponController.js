@@ -214,10 +214,16 @@ const createCoupon = async (req, res, next) => {
         where: { cust_no: assigned_user },
       });
 
+      console.log(currentCustomer);
+      console.log(newCoupon.code);
+      console.log(newCoupon.is_percentage);
+      console.log(newCoupon.amount_of_discount);
+      console.log(currentCustomer.contact_no);
+
       sendCouponToUser(
         currentCustomer.cust_name.split(" ")[0],
         newCoupon.code,
-        newCoupon.is_percentage.toString(),
+        newCoupon.is_percentage === 1 ? newCoupon.is_percentage.toString() : "",
         newCoupon.amount_of_discount.toString(),
         currentCustomer.contact_no.toString()
       );
