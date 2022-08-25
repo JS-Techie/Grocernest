@@ -17,18 +17,17 @@ const sendCouponToUser = async (
         ? `${parseInt(amountOfDiscount)}%`
         : `${parseInt(amountOfDiscount)}`;
 
-
-        console.log(off);
+    console.log(off);
 
     const messageResponseFromGupshup = await client.message.send({
       channel: "whatsapp",
       source: "919433804769",
-      destination: "91" + phoneNumber.toString(),
+      destination: "917980996735",
       "src.name": "grocernest",
       message: {
         isHSM: "true",
         type: "text",
-        text: `Hi, [Tanmoy]. Apply coupon [FIRSTBUY] to receive [20%] off on your next order.`,
+        text: `Hi, ${firstName}. Apply coupon ${couponCode} to receive ${off} off on your next order. `,
       },
     });
 
