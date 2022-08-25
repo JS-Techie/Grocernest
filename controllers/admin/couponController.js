@@ -300,7 +300,7 @@ const updateCoupon = async (req, res, next) => {
 
     if (newCoupon.assigned_user) {
       const currentCustomer = await Customer.findOne({
-        where: { id: assigned_user },
+        where: { cust_no: assigned_user },
       });
 
       if (currentCustomer) {
