@@ -22,11 +22,10 @@ const cashback_job = async () => {
         const AllCustomers = await Customers.findAll({});
 
         const list_user = AllCustomers.map(async (currentUser) => {
-            // console.log("===============>", currentUser.cust_name);
             const all_orders = await Order.findAll({
                 where: {
                     cust_no: currentUser.cust_no,
-                    // status: "Delivered",
+                    status: "Delivered",
                     cashback_amount: { [Op.ne]: null }
                 }
             });
@@ -55,11 +54,8 @@ const cashback_job = async () => {
                             }
                         })
                 }
-
             })
-
         })
-
     }
     catch (err) {
         console.log("CASHBACK CRON JOB ERROR=>", err);
