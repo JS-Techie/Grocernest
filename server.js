@@ -56,6 +56,7 @@ const gatewayRouter = require("./routes/gatewayRoute");
 const whatsappRouter = require("./routes/whatsappRoutes");
 const leaveRouter = require("./routes/leaveRoutes");
 const taskRouter = require("./routes/taskRoutes");
+const posRouter = require("./routes/posRoutes");
 
 // admin routers import
 const adminOrderRouter = require("./routes/admin/orderRoutes");
@@ -101,6 +102,7 @@ app.use("/gateway", gatewayRouter);
 app.use("/whatsapp", whatsappRouter);
 app.use("/leave", leaveRouter);
 app.use("/task", taskRouter);
+app.use(posRouter);
 
 // admin routes
 app.use("/admin/orders", adminOrderRouter);
