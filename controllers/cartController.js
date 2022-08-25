@@ -64,7 +64,7 @@ const addItemToCart = async (req, res, next) => {
       });
 
       if (enteredQuantity > currentInventory.quantity) {
-        return res.status(400).send({
+        return res.status(402).send({
           success: false,
           data: currentInventory,
           message: `Could not add item to cart as available quantity is ${currentInventory.quantity} and your requested quantity is ${enteredQuantity} `,
@@ -112,7 +112,7 @@ const addItemToCart = async (req, res, next) => {
         enteredQuantity + itemAlreadyExists.quantity >
         currentInventory.quantity
       ) {
-        return res.status(400).send({
+        return res.status(402).send({
           success: false,
           data: currentInventory,
           message: `Could not add item to cart as available quantity is ${
