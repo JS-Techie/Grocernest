@@ -115,11 +115,9 @@ const addItemToCart = async (req, res, next) => {
         return res.status(402).send({
           success: false,
           data: currentInventory,
-          message: `Could not add item to cart as available quantity is ${
-            currentInventory.quantity
-          } and your requested quantity is ${
-            enteredQuantity + itemAlreadyExists.quantity
-          } `,
+          message: `Could not add item to cart as available quantity is ${currentInventory.quantity
+            } and your requested quantity is ${enteredQuantity + itemAlreadyExists.quantity
+            } `,
         });
       }
 
@@ -418,7 +416,7 @@ const getItemCount = async (req, res, next) => {
 
 const getCart = async (req, res, next) => {
   // console.log("===========whatsapp testing==============");
-  // sendInvoiceToWhatsapp("9163540343", "123456774", "https://ecomm-dev.s3.ap-south-1.amazonaws.com/pdfs/invoices/invoice-9619381.pdf");
+  // sendInvoiceToWhatsapp("8910443583", "123456774", "https://ecomm-dev.s3.ap-south-1.amazonaws.com/pdfs/invoices/invoice-9619381.pdf");
   // sendOrderStatusToWhatsapp("9163540343", "123456774", "Shipped");
   // sendOrderShippedToWhatsapp("9163540343", "123456", "Shipped", "Tanmoy");
   // sendAdminCancelledOrderStatusToWhatsapp("9163540343", "12345", "no items");
