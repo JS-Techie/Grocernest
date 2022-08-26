@@ -147,6 +147,15 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "cashback_amount"
+    },
+    coupon_id: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "coupon_id"
     }
   };
   const options = {

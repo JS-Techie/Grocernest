@@ -201,6 +201,15 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "is_grocernest"
+    },
+    image_present: {
+      type: DataTypes.INTEGER(1),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "image_present"
     }
   };
   const options = {
