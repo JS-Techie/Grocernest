@@ -110,17 +110,17 @@ const register = async (req, res, next) => {
     }
 
     //verify captcha, if success, continue else return from here
-    const responseFromGoogle = await axios.post(
-      `https://www.google.com/recaptcha/api/siteverify?secret=6Lf2mZohAAAAAOv_tii4pRcP29HpX1HS8wCjumg6&response=${recaptchaEnteredByUser}`
-    );
+    // const responseFromGoogle = await axios.post(
+    //   `https://www.google.com/recaptcha/api/siteverify?secret=6Lf2mZohAAAAAOv_tii4pRcP29HpX1HS8wCjumg6&response=${recaptchaEnteredByUser}`
+    // );
 
-    if (responseFromGoogle.data.success == false) {
-      return res.status(400).send({
-        success: false,
-        data: responseFromGoogle.data,
-        message: "Please enter captcha",
-      });
-    }
+    // if (responseFromGoogle.data.success == false) {
+    //   return res.status(400).send({
+    //     success: false,
+    //     data: responseFromGoogle.data,
+    //     message: "Please enter captcha",
+    //   });
+    // }
 
     console.log(firstName, lastName, password, email, phoneNumber);
 
@@ -169,6 +169,7 @@ const register = async (req, res, next) => {
           "-" +
           referralCodeGenerator.alpha("uppercase", 1) +
           referralCodeGenerator.alphaNumeric("uppercase", 1, 4);
+
         const newUser = {
           id: Math.floor(Math.random() * 10000 + 1),
           cust_no: uniqid(),
@@ -469,23 +470,25 @@ const getOTP = async (req, res, next) => {
   //For testing purposes
   const CacheDetails = await Cache.findAll();
 
-  if (CacheDetails.length !== 0) {
-    return res.status(200).send({
-      success: true,
-      data: {
-        // user: await JSON.parse(CacheDetails[0].user_details),
-        otp: await CacheDetails[0].generated_otp,
-      },
-      message:
-        "OTP generated and user created, waiting to store new user in DB",
+  try {
+    if (CacheDetails.length !== 0) {
+      return res.status(200).send({
+        success: true,
+        data: {
+          // user: await JSON.parse(CacheDetails[0].user_details),
+          otp: await CacheDetails[0].generated_otp,
+        },
+        message:
+          "OTP generated and user created, waiting to store new user in DB",
+      });
+    }
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "OTP not generated and sent",
     });
   }
-
-  return res.status(400).send({
-    success: false,
-    data: null,
-    message: "OTP not generated and sent",
-  });
 };
 
 const resendToken = async (req, res, next) => {};
