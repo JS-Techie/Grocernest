@@ -11,9 +11,9 @@
 
 module.exports = {
     HOST: "152.67.1.126",
-    USER: "ecomm",
-    PASSWORD: "ecomm@123",
-    DB: "ecomm",
+    USER: "grocernest_pre_prod",
+    PASSWORD: "grocernest_pre_prod",
+    DB: "grocernest_pre_prod",
 
     dialect: "mariadb",
     pool: {
