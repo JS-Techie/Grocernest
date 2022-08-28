@@ -91,9 +91,22 @@
       }
     },
     "/getOTP": {
-      "get": {
+      "post": {
         "description": "",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "cust_no": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -115,6 +128,9 @@
               "type": "object",
               "properties": {
                 "otp": {
+                  "example": "any"
+                },
+                "cust_no": {
                   "example": "any"
                 }
               }

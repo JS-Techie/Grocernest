@@ -13,7 +13,7 @@ const {
 } = require("../controllers/authController");
 
 router.route("/register").post(register);
-router.route("/getOTP").get(getOTP);
+router.route("/getOTP").post(getOTP);
 router.route("/verify").post(verifyOTP);
 router.route("/login").post(login);
 router.route("/forgotPassword").post(forgotPassword);

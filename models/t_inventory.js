@@ -9,7 +9,7 @@ module.exports = sequelize => {
       allowNull: false,
       defaultValue: null,
       primaryKey: true,
-      autoIncrement: true,
+      autoIncrement: false,
       comment: null,
       field: "id"
     },
@@ -184,7 +184,7 @@ module.exports = sequelize => {
       type: "BTREE",
       fields: ["location_id"]
     }, {
-      name: "balance_type_fkey_t_inventory",
+      name: "balance_type_fkey_t_inventory_audit",
       unique: false,
       type: "BTREE",
       fields: ["balance_type"]

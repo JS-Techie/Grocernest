@@ -189,6 +189,7 @@ const register = async (req, res, next) => {
 
         try {
           const response = await Cache.create({
+            cust_no: newUser.cust_no,
             user_details: JSON.stringify(newUser),
             generated_otp: serverGeneratedOTP,
             created_by: 6, //hardcoded for now
@@ -238,14 +239,25 @@ const register = async (req, res, next) => {
 const verifyOTP = async (req, res, next) => {
   //Get the user entered otp
   const userEnteredOTP = req.body.otp;
+  const { cust_no } = req.body;
 
   //Compare the entered otp and the generated otp
 
   try {
-    const CacheDetails = await Cache.findAll();
+    const CacheDetails = await Cache.findOne({
+      where: { cust_no },
+    });
 
-    const newUser = await JSON.parse(CacheDetails[0].user_details);
-    const sentOTP = await CacheDetails[0].generated_otp;
+    if (!cust_no) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "Please enter customer number in request body",
+      });
+    }
+
+    const newUser = await JSON.parse(CacheDetails.user_details);
+    const sentOTP = await CacheDetails.generated_otp;
 
     if (sentOTP !== userEnteredOTP) {
       return res.status(400).send({
@@ -303,7 +315,7 @@ const verifyOTP = async (req, res, next) => {
     );
 
     const deletedField = await Cache.destroy({
-      where: { generated_otp: userEnteredOTP },
+      where: { cust_no },
     });
 
     return res.status(200).send({
@@ -468,15 +480,30 @@ const changePassword = async (req, res, next) => {
 
 const getOTP = async (req, res, next) => {
   //For testing purposes
-  const CacheDetails = await Cache.findAll();
 
+  const { cust_no } = req.body;
+
+  if (!cust_no) {
+    return res.status(400).send({
+      success: false,
+      data: [],
+      message: "Please enter the cust_no in req.body",
+    });
+  }
+
+  const CacheDetails = await Cache.findOne({
+    where: { cust_no },
+  });
+
+  console.log(CacheDetails);
   try {
-    if (CacheDetails.length !== 0) {
+    if (CacheDetails) {
       return res.status(200).send({
         success: true,
         data: {
           // user: await JSON.parse(CacheDetails[0].user_details),
-          otp: await CacheDetails[0].generated_otp,
+          otp: await CacheDetails.generated_otp,
+          user : JSON.parse(CacheDetails.user_details),
         },
         message:
           "OTP generated and user created, waiting to store new user in DB",

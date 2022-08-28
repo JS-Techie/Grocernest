@@ -31,6 +31,15 @@ module.exports = sequelize => {
       comment: null,
       field: "sub_cat_name"
     },
+    category_id: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "category_id"
+    },
     active_ind: {
       type: DataTypes.CHAR(1),
       allowNull: false,
@@ -76,19 +85,6 @@ module.exports = sequelize => {
       comment: null,
       field: "updated_at"
     },
-    category_id: {
-      type: DataTypes.BIGINT,
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "category_id",
-      references: {
-        key: "id",
-        model: "t_lkp_category_model"
-      }
-    },
     image: {
       type: DataTypes.STRING(100),
       allowNull: true,
@@ -111,12 +107,7 @@ module.exports = sequelize => {
   const options = {
     tableName: "t_lkp_sub_category",
     comment: "",
-    indexes: [{
-      name: "t_lkp_sub_category_FK",
-      unique: false,
-      type: "BTREE",
-      fields: ["category_id"]
-    }]
+    indexes: []
   };
   const TLkpSubCategoryModel = sequelize.define("t_lkp_sub_category_model", attributes, options);
   return TLkpSubCategoryModel;
