@@ -217,6 +217,7 @@ const editPhoneNumber = async (req, res, next) => {
       data: {
         responseFromCacheTable,
         responseFromCustomerTable,
+        cust_no: currentUser,
       },
       message:
         "OTP successfully sent, validation required, get the otp from the /getToken route route",
