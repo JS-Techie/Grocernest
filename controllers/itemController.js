@@ -28,7 +28,7 @@ const getItemsInCategory = async (req, res, next) => {
       t_item.image ,t_item.description ,t_item.available_for_ecomm ,t_batch.batch_no ,
       t_batch.location_id ,t_batch.MRP ,t_batch.discount ,t_batch.cost_price ,t_batch.mfg_date ,t_batch.sale_price ,
       t_batch.created_at,t_lkp_color.color_name, t_lkp_brand.brand_name, t_lkp_category.group_name, t_batch.mark_selected,t_batch.id as "batch_id"
-      from (((((ecomm.t_item
+      from (((((grocernest_pre_prod.t_item
             inner join t_batch on t_batch.item_id = t_item.id )
             inner join t_lkp_color on t_lkp_color.id = t_item.color_id)
             inner join t_lkp_category on t_lkp_category.id = t_item.category_id)
@@ -150,7 +150,7 @@ const getItemsInSubcategory = async (req, res, next) => {
     t_item.image ,t_item.description ,t_item.available_for_ecomm ,t_batch.batch_no ,
     t_batch.location_id ,t_batch.MRP ,t_batch.discount ,t_batch.cost_price ,t_batch.mfg_date ,t_batch.sale_price ,
     t_batch.created_at,t_lkp_color.color_name, t_lkp_brand.brand_name ,t_lkp_sub_category.sub_cat_name, t_lkp_category.group_name,t_batch.mark_selected,t_batch.id as "batch_id"
-    from ((((((ecomm.t_item
+    from ((((((grocernest_pre_prod.t_item
           inner join t_batch on t_batch.item_id = t_item.id )
           inner join t_lkp_color on t_lkp_color.id = t_item.color_id)
           inner join t_lkp_category on t_lkp_category.id = t_item.category_id)
@@ -271,7 +271,7 @@ const getItemsBySearchTerm = async (req, res, next) => {
     ,t_item.image ,t_item.description ,t_item.available_for_ecomm ,t_batch.batch_no ,
     t_batch.location_id ,t_batch.MRP ,t_batch.discount ,t_batch.cost_price ,t_batch.mfg_date ,t_batch.sale_price ,
     t_batch.created_at,t_lkp_color.color_name,t_batch.quantity, t_lkp_brand.brand_name,t_batch.mark_selected,t_batch.id as "batch_id"
-    from ((((((ecomm.t_item
+    from ((((((grocernest_pre_prod.t_item
           inner join t_batch on t_batch.item_id = t_item.id )
           inner join t_lkp_color on t_lkp_color.id = t_item.color_id)
           inner join t_lkp_category on t_lkp_category.id = t_item.category_id)
@@ -396,7 +396,7 @@ const getItemById = async (req, res, next) => {
       t_batch.expiry_date,
       t_inventory.cashback, t_inventory.cashback_is_percentage,
       t_batch.created_at,t_lkp_color.color_name,t_batch.quantity, t_lkp_brand.brand_name,t_batch.mark_selected,t_batch.id as "batch_id"
-      from ((((((ecomm.t_item
+      from ((((((grocernest_pre_prod.t_item
             inner join t_batch on t_batch.item_id = t_item.id )
             inner join t_lkp_color on t_lkp_color.id = t_item.color_id)
             inner join t_lkp_category on t_lkp_category.id = t_item.category_id)

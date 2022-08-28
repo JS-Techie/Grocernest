@@ -334,11 +334,14 @@ const verifyOTP = async (req, res, next) => {
       message: "User successfully validated and registered",
     });
   } catch (error) {
+    const deletedField = await Cache.destroy({
+      where: { cust_no },
+    });
     return res.status(400).send({
       success: false,
       data: error.message,
       message:
-        "Something went wrong while validating OTP, please check data field for more details",
+        "Something went wrong while validating OTP, please check data field for more details and please register again",
     });
   }
 };
@@ -503,7 +506,7 @@ const getOTP = async (req, res, next) => {
         data: {
           // user: await JSON.parse(CacheDetails[0].user_details),
           otp: await CacheDetails.generated_otp,
-          user : JSON.parse(CacheDetails.user_details),
+          user: JSON.parse(CacheDetails.user_details),
         },
         message:
           "OTP generated and user created, waiting to store new user in DB",

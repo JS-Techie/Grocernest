@@ -152,8 +152,8 @@ const editProfile = async (req, res, next) => {
         image: base64
           ? url
           : currentUserProfile.image
-            ? currentUserProfile.image
-            : null,
+          ? currentUserProfile.image
+          : null,
       },
       { where: { cust_no: currentUser } }
     );
@@ -207,6 +207,7 @@ const editPhoneNumber = async (req, res, next) => {
     );
 
     const responseFromCacheTable = await Cache.create({
+      cust_no: currentUser,
       user_details: JSON.stringify(customerExists),
       generated_otp: serverGeneratedOTP,
       created_by: 6,
@@ -235,8 +236,18 @@ const changePhoneNumber = async (req, res, next) => {
   const userEnteredOTP = req.body.otp;
 
   try {
-    const cache = await Cache.findAll();
-    const serverGeneratedOTP = cache[0].generated_otp;
+    const cache = await Cache.findOne({
+      where: { cust_no: currentUser },
+    });
+
+    if (!cache) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "OTP has not been entered in cache yet",
+      });
+    }
+    const serverGeneratedOTP = cache.generated_otp;
 
     if (userEnteredOTP !== serverGeneratedOTP) {
       return res.status(400).send({
@@ -261,7 +272,7 @@ const changePhoneNumber = async (req, res, next) => {
     console.log(updatedPhoneNumber);
 
     const responseFromCacheTable = await Cache.destroy({
-      where: { generated_otp: userEnteredOTP },
+      where: { cust_no: currentUser },
     });
 
     return res.status(200).send({
@@ -270,6 +281,9 @@ const changePhoneNumber = async (req, res, next) => {
       message: "Successfully updated phone number",
     });
   } catch (error) {
+    const responseFromCacheTable = await Cache.destroy({
+      where: { cust_no: currentUser },
+    });
     return res.status(400).send({
       success: false,
       data: error.message,
