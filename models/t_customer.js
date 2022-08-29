@@ -127,7 +127,7 @@ module.exports = sequelize => {
     },
     password: {
       type: DataTypes.STRING(255),
-      allowNull: false,
+      allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
@@ -187,6 +187,15 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "opt_in"
+    },
+    registered_for_ecomm: {
+      type: DataTypes.INTEGER(1),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "registered_for_ecomm"
     }
   };
   const options = {

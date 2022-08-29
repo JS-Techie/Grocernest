@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const { Op } = require("sequelize");
 const referralCodeGenerator = require("referral-code-generator");
 const bcrypt = require("bcryptjs");
 const uniqid = require("uniqid");
@@ -110,33 +111,39 @@ const register = async (req, res, next) => {
     }
 
     //verify captcha, if success, continue else return from here
-    const responseFromGoogle = await axios.post(
-      `https://www.google.com/recaptcha/api/siteverify?secret=6Lf2mZohAAAAAOv_tii4pRcP29HpX1HS8wCjumg6&response=${recaptchaEnteredByUser}`
-    );
+    // const responseFromGoogle = await axios.post(
+    //   `https://www.google.com/recaptcha/api/siteverify?secret=6Lf2mZohAAAAAOv_tii4pRcP29HpX1HS8wCjumg6&response=${recaptchaEnteredByUser}`
+    // );
 
-    if (responseFromGoogle.data.success == false) {
-      return res.status(400).send({
-        success: false,
-        data: responseFromGoogle.data,
-        message: "Please enter captcha",
-      });
-    }
+    // if (responseFromGoogle.data.success == false) {
+    //   return res.status(400).send({
+    //     success: false,
+    //     data: responseFromGoogle.data,
+    //     message: "Please enter captcha",
+    //   });
+    // }
 
     console.log(firstName, lastName, password, email, phoneNumber);
 
-    //Check if user already exists
-    const existingCustomer = await Customer.findOne({
-      where: { contact_no: phoneNumber },
+    //Check if user already exists and is registered for ecomm
+
+    const existingCustomerRegisteredForEcomm = await Customer.findOne({
+      where: { contact_no: phoneNumber, registered_for_ecomm: 1 },
     });
 
     //If user already exists, ask them to login
-    if (existingCustomer) {
+    if (existingCustomerRegisteredForEcomm) {
+      console.log("Current customer already registered for ecomm");
       return res.status(409).send({
         success: false,
-        data: existingCustomer,
+        data: existingCustomerRegisteredForEcomm,
         message: "User already exists, please login!",
       });
     }
+
+    const existingCustomerNotRegisteredForEcomm = await Customer.findOne({
+      where: { contact_no: phoneNumber, registered_for_ecomm: null },
+    });
 
     let salt = bcrypt.genSaltSync(10);
     //Hash Password
@@ -170,19 +177,39 @@ const register = async (req, res, next) => {
           referralCodeGenerator.alpha("uppercase", 1) +
           referralCodeGenerator.alphaNumeric("uppercase", 1, 4);
 
-        const newUser = {
-          id: Math.floor(Math.random() * 10000 + 1),
-          cust_no: uniqid(),
-          active_ind: "Y",
-          cust_name: firstName + " " + lastName,
-          email: email ? email.toLowerCase() : null,
-          contact_no: phoneNumber.toString(),
-          password: encryptedPassword,
-          created_by: 13,
-          referral_code: ref_code,
-          referred_by: referrer_cust_id,
-          opt_in,
-        };
+        let newUser = null;
+
+        if (existingCustomerNotRegisteredForEcomm) {
+          console.log("Not registered for ecomm yet but existing");
+          newUser = {
+            id: existingCustomerNotRegisteredForEcomm.id,
+            cust_no: existingCustomerNotRegisteredForEcomm.cust_no,
+            active_ind: "Y",
+            cust_name: firstName + " " + lastName,
+            email: email ? email.toLowerCase() : null,
+            contact_no: phoneNumber.toString(),
+            password: encryptedPassword,
+            created_by: 13,
+            referral_code: ref_code,
+            referred_by: referrer_cust_id,
+            opt_in,
+          };
+        } else {
+          console.log("New Customer");
+          newUser = {
+            id: Math.floor(Math.random() * 10000 + 1),
+            cust_no: uniqid(),
+            active_ind: "Y",
+            cust_name: firstName + " " + lastName,
+            email: email ? email.toLowerCase() : null,
+            contact_no: phoneNumber.toString(),
+            password: encryptedPassword,
+            created_by: 13,
+            referral_code: ref_code,
+            referred_by: referrer_cust_id,
+            opt_in,
+          };
+        }
 
         const serverGeneratedOTP = generateOTP();
         // sendOTPToPhoneNumber(serverGeneratedOTP);
@@ -269,19 +296,56 @@ const verifyOTP = async (req, res, next) => {
 
     // console.log("===============", newUser);
 
-    const newCustomer = await Customer.create({
-      id: newUser.id,
-      cust_no: newUser.cust_no,
-      active_ind: newUser.active_ind,
-      cust_name: newUser.cust_name,
-      email: newUser.email,
-      contact_no: newUser.contact_no,
-      password: newUser.password,
-      created_by: newUser.created_by,
-      referral_code: newUser.referral_code,
-      referred_by: newUser.referred_by,
-      opt_in: newUser.opt_in,
+    const existingCustomerNotRegisteredForEcomm = await Customer.findOne({
+      where: {
+        contact_no: newUser.contact_no,
+        registered_for_ecomm: null,
+      },
     });
+
+    let newCustomer = null;
+    if (existingCustomerNotRegisteredForEcomm) {
+      console.log("Existing customer not registered for ecomm");
+      const updatedExistingCustomer = await Customer.update(
+        {
+          id: newUser.id,
+          cust_no: newUser.cust_no,
+          active_ind: newUser.active_ind,
+          cust_name: newUser.cust_name,
+          email: newUser.email,
+          contact_no: newUser.contact_no,
+          password: newUser.password,
+          created_by: newUser.created_by,
+          referral_code: newUser.referral_code,
+          referred_by: newUser.referred_by,
+          opt_in: newUser.opt_in,
+          registered_for_ecomm: 1,
+        },
+        {
+          where: { cust_no: existingCustomerNotRegisteredForEcomm.cust_no },
+        }
+      );
+
+      newCustomer = await Customer.findOne({
+        where: { cust_no: existingCustomerNotRegisteredForEcomm.cust_no },
+      });
+    } else {
+      console.log("New Customer");
+      newCustomer = await Customer.create({
+        id: newUser.id,
+        cust_no: newUser.cust_no,
+        active_ind: newUser.active_ind,
+        cust_name: newUser.cust_name,
+        email: newUser.email,
+        contact_no: newUser.contact_no,
+        password: newUser.password,
+        created_by: newUser.created_by,
+        referral_code: newUser.referral_code,
+        referred_by: newUser.referred_by,
+        opt_in: newUser.opt_in,
+        registered_for_ecomm: 1,
+      });
+    }
 
     // creating blank wallet while successful reg.
     const new_wallet = await wallet.create({
