@@ -33,7 +33,7 @@ const sendOrderStatusToWhatsapp = (phno, order_id, status) => {
         message: {
             isHSM: "true",
             type: "text",
-            text: "Hi, {{1}}. Apply coupon {{2}} to receive {{3}} off on your next order. "
+            text: "Your order with order ID " + "*" + order_id + "*" + " has been " + "*" + status + "*" + "."
         }
     }).then((response) => {
         console.log("Template message sent", response);
