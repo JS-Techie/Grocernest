@@ -32,7 +32,7 @@ const getWishlist = async (req, res, next) => {
       (
         (
           (
-            grocernest_pre_prod.t_wishlist_items 
+            t_wishlist_items 
             inner join t_item on t_item.id = t_wishlist_items.item_id
           ) 
           inner join t_lkp_category on t_lkp_category.id = t_item.category_id
