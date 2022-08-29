@@ -27,7 +27,7 @@ const sendCouponToUser = async (
       message: {
         isHSM: "true",
         type: "text",
-        text: `Hi, *${firstName}*. Apply coupon *${couponCode}* to receive *${off} off* on your next order. `,
+        text: `Hi, ${firstName}. Apply coupon ${couponCode} to receive ${off} off on your next order. `,
       },
     });
 
