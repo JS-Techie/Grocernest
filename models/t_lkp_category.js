@@ -84,13 +84,21 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "image"
+    },
+    available_for_ecomm: {
+      type: DataTypes.INTEGER(1),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "available_for_ecomm"
     }
   };
   const options = {
     tableName: "t_lkp_category",
     comment: "",
-    indexes: [],
-    timestamps : false,
+    indexes: []
   };
   const TLkpCategoryModel = sequelize.define("t_lkp_category_model", attributes, options);
   return TLkpCategoryModel;

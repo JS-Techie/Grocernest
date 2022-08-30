@@ -4,12 +4,11 @@ const router = express.Router();
 const authenticate = require("../middleware/authentication")
 
 const {
-    getAllAvailableCoupons,
-    validateCoupon
-} = require('../controllers/couponsController')
+  getAllAvailableCoupons,
+  validateCoupon,
+} = require("../controllers/couponsController");
 
-router.route('/available').get(authenticate,getAllAvailableCoupons)
-router.route('/validate').post(authenticate,validateCoupon)
-
+router.route("/available").post(authenticate,getAllAvailableCoupons);
+router.route("/validate").post(authenticate,validateCoupon);
 
 module.exports = router;

@@ -151,6 +151,33 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "mfg_date"
+    },
+    expiry_date: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "expiry_date"
+    },
+    mark_selected: {
+      type: DataTypes.INTEGER(1),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "mark_selected"
+    },
+    grn_id: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "grn_id"
     }
   };
   const options = {

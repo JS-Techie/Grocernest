@@ -77,11 +77,7 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "balance_type",
-      references: {
-        key: "id",
-        model: "t_lkp_balance_type_model"
-      }
+      field: "balance_type"
     }
   };
   const options = {
@@ -102,11 +98,6 @@ module.exports = sequelize => {
       unique: false,
       type: "BTREE",
       fields: ["batch_id"]
-    }, {
-      name: "balance_type_fkey_t_inventory_audit",
-      unique: false,
-      type: "BTREE",
-      fields: ["balance_type"]
     }]
   };
   const TInventoryAuditModel = sequelize.define("t_inventory_audit_model", attributes, options);

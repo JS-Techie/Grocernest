@@ -11,4 +11,4 @@ const{
 router.route("/categories").get(getAllCategories)
 router.route("/subcategory/:categoryId").get(getAllSubcategoriesInCategory);
 
-module.exports = router;
+module.exports = router

@@ -5,7 +5,7 @@ const {
 module.exports = sequelize => {
   const attributes = {
     wallet_id: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.STRING(20),
       allowNull: false,
       defaultValue: null,
       primaryKey: false,
@@ -14,7 +14,7 @@ module.exports = sequelize => {
       field: "wallet_id"
     },
     transaction_id: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.STRING(50),
       allowNull: false,
       defaultValue: null,
       primaryKey: true,
@@ -30,6 +30,15 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: "Possible values are D for Debit, C for Cradit",
       field: "transaction_type"
+    },
+    transaction_amount: {
+      type: DataTypes.DECIMAL,
+      allowNull: false,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "transaction_amount"
     },
     transaction_details: {
       type: DataTypes.STRING(250),
@@ -89,8 +98,12 @@ module.exports = sequelize => {
   const options = {
     tableName: "t_wallet_transaction",
     comment: "",
-    indexes: [],
-    timestamps: false,
+    indexes: [{
+      name: "t_wallet_transaction_fk",
+      unique: false,
+      type: "BTREE",
+      fields: ["wallet_id"]
+    }]
   };
   const TWalletTransactionModel = sequelize.define("t_wallet_transaction_model", attributes, options);
   return TWalletTransactionModel;

@@ -1,5 +1,5 @@
 const {
-  DataTypes
+  DataTypes, literal
 } = require('sequelize');
 
 module.exports = sequelize => {
@@ -7,9 +7,9 @@ module.exports = sequelize => {
     id: {
       type: DataTypes.BIGINT,
       allowNull: false,
-      defaultValue: null,
+      defaultValue: literal("nextval(t_inventory_seq)"),
       primaryKey: true,
-      autoIncrement: false,
+      autoIncrement: true,
       comment: null,
       field: "id"
     },
@@ -145,6 +145,24 @@ module.exports = sequelize => {
         key: "id",
         model: "t_lkp_balance_type_model"
       }
+    },
+    cashback: {
+      type: DataTypes.DECIMAL,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "cashback"
+    },
+    cashback_is_percentage: {
+      type: DataTypes.INTEGER(1),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "cashback_is_percentage"
     }
   };
   const options = {
@@ -166,7 +184,7 @@ module.exports = sequelize => {
       type: "BTREE",
       fields: ["location_id"]
     }, {
-      name: "balance_type_fkey_t_inventory",
+      name: "balance_type_fkey_t_inventory_audit",
       unique: false,
       type: "BTREE",
       fields: ["balance_type"]

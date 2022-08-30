@@ -13,6 +13,10 @@ module.exports = {
     DB: "grocernest",
 
     dialect: "mariadb",
+    define: {
+        timestamps: false
+    },
+    timestamps: false,
     pool: {
         max: 5,
         min: 0,
