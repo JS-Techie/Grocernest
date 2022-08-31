@@ -147,6 +147,12 @@ const editProfile = async (req, res, next) => {
       });
     }
 
+    if (currentUserProfile.email !== email) {
+      if (email !== null && validator.validate(email) == true) {
+        sendRegistrationEmail(email.toString());
+      }
+    }
+
     const updatedProfile = await Customer.update(
       {
         cust_name: enteredFirstName + " " + enteredLastName,
@@ -159,10 +165,6 @@ const editProfile = async (req, res, next) => {
       },
       { where: { cust_no: currentUser } }
     );
-
-    if (email !== null && validator.validate(email) == true) {
-      sendRegistrationEmail(email.toString());
-    }
 
     return res.status(200).send({
       success: true,
