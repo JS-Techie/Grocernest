@@ -111,17 +111,17 @@ const register = async (req, res, next) => {
     }
 
     //verify captcha, if success, continue else return from here
-    // const responseFromGoogle = await axios.post(
-    //   `https://www.google.com/recaptcha/api/siteverify?secret=6Lf2mZohAAAAAOv_tii4pRcP29HpX1HS8wCjumg6&response=${recaptchaEnteredByUser}`
-    // );
+    const responseFromGoogle = await axios.post(
+      `https://www.google.com/recaptcha/api/siteverify?secret=6Lf2mZohAAAAAOv_tii4pRcP29HpX1HS8wCjumg6&response=${recaptchaEnteredByUser}`
+    );
 
-    // if (responseFromGoogle.data.success == false) {
-    //   return res.status(400).send({
-    //     success: false,
-    //     data: responseFromGoogle.data,
-    //     message: "Please enter captcha",
-    //   });
-    // }
+    if (responseFromGoogle.data.success == false) {
+      return res.status(400).send({
+        success: false,
+        data: responseFromGoogle.data,
+        message: "Please enter captcha",
+      });
+    }
 
     console.log(firstName, lastName, password, email, phoneNumber);
 
@@ -232,6 +232,9 @@ const register = async (req, res, next) => {
               "User created and OTP successfully sent, find the OTP from getOTP route",
           });
         } catch (error) {
+          await Cache.destroy({
+            where: { cust_no: newUser.cust_no },
+          });
           return res.status(400).send({
             success: false,
             data: error.message,
@@ -435,6 +438,7 @@ const forgotPassword = async (req, res, next) => {
     //sendOTPToPhoneNumber(serverGeneratedOTP)
 
     const response = await Cache.create({
+      cust_no: customerExists.cust_no,
       user_details: JSON.stringify(customerExists),
       generated_otp: serverGeneratedOTP,
       created_by: 6,
@@ -442,11 +446,23 @@ const forgotPassword = async (req, res, next) => {
 
     return res.status(200).send({
       success: true,
-      data: response,
+      data: {
+        response,
+        cust_no: customerExists.cust_no,
+      },
       message:
         "OTP successfully sent, validation required, get the otp from the /getToken route route",
     });
   } catch (error) {
+    const cacheExists = await Cache.findOne({
+      where: { cust_no },
+    });
+
+    if (cacheExists) {
+      await Cache.destroy({
+        where: { cust_no },
+      });
+    }
     return res.status(400).send({
       success: false,
       data: error.message,
@@ -459,10 +475,16 @@ const forgotPassword = async (req, res, next) => {
 const verifyToken = async (req, res, next) => {
   //get the user entered OTP
   const userEnteredOTP = req.body.otp;
+  const { cust_no } = req.body;
 
   try {
-    const CacheDetails = await Cache.findAll();
-    const serverGeneratedOTP = await CacheDetails[0].generated_otp;
+    const CacheDetails = await Cache.findOne({
+      where: {cust_no}
+    });
+    const serverGeneratedOTP = await CacheDetails.generated_otp;
+
+    console.log(CacheDetails.generated_otp);
+    console.log(userEnteredOTP)
 
     if (serverGeneratedOTP !== userEnteredOTP) {
       return res.status(400).send({
@@ -474,7 +496,7 @@ const verifyToken = async (req, res, next) => {
 
     return res.status(200).send({
       success: true,
-      data: JSON.parse(CacheDetails[0].user_details),
+      data: CacheDetails,
       message:
         "OTP successfully validated, user can proceed to change password",
     });
@@ -490,15 +512,16 @@ const verifyToken = async (req, res, next) => {
 
 const changePassword = async (req, res, next) => {
   //Get the customer number from the body
-  const { newPassword } = req.body;
-  const customer = await Cache.findAll();
-  const customerDetails = JSON.parse(customer[0].user_details);
+  const { newPassword, cust_no } = req.body;
 
-  const customerNumber = customerDetails.cust_no;
+  const customer = await Cache.findOne({
+    where: { cust_no },
+  });
+  const customerDetails = JSON.parse(customer.user_details);
 
   try {
     const currentUser = await Customer.findOne({
-      where: { cust_no: customerNumber },
+      where: { cust_no },
     });
 
     if (!currentUser) {
@@ -518,13 +541,13 @@ const changePassword = async (req, res, next) => {
       },
       {
         where: {
-          cust_no: customerNumber,
+          cust_no,
         },
       }
     );
 
     const deletedField = await Cache.destroy({
-      where: { generated_otp: customer[0].generated_otp },
+      where: { cust_no },
     });
 
     return res.status(200).send({

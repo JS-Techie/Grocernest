@@ -225,6 +225,9 @@
               "properties": {
                 "otp": {
                   "example": "any"
+                },
+                "cust_no": {
+                  "example": "any"
                 }
               }
             }
@@ -251,6 +254,9 @@
               "type": "object",
               "properties": {
                 "newPassword": {
+                  "example": "any"
+                },
+                "cust_no": {
                   "example": "any"
                 }
               }
