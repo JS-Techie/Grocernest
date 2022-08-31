@@ -187,6 +187,18 @@ const editPhoneNumber = async (req, res, next) => {
       where: { cust_no: currentUser },
     });
 
+    const userWithSamePhoneNumber = await Customer.findOne({
+      where : {contact_no : new_phone_number}
+    })
+
+    if(userWithSamePhoneNumber){
+      return res.status(400).send({
+        success : false,
+        data : userWithSamePhoneNumber,
+        message : "Another user with the same phone number exists, please use a different one"
+      })
+    }
+
     if (!customerExists) {
       return res.status(404).send({
         success: false,
