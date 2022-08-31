@@ -420,7 +420,7 @@ const forgotPassword = async (req, res, next) => {
   try {
     //Check if the phone number exists
     const customerExists = await Customer.findOne({
-      where: { contact_no: phoneNumber },
+      where: { contact_no: phoneNumber, registered_for_ecomm : 1 },
     });
 
     console.log(customerExists);
