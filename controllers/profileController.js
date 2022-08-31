@@ -4,6 +4,8 @@ const db = require("../models");
 const S3 = require("aws-sdk/clients/s3");
 const s3Config = require("../config/s3Config");
 const uniqid = require("uniqid");
+const validator = require("email-validator");
+const { sendRegistrationEmail } = require("../services/mail/mailService");
 
 const s3 = new S3(s3Config);
 
@@ -158,6 +160,10 @@ const editProfile = async (req, res, next) => {
       { where: { cust_no: currentUser } }
     );
 
+    if (email !== null && validator.validate(email) == true) {
+      sendRegistrationEmail(email.toString());
+    }
+
     return res.status(200).send({
       success: true,
       data: {
@@ -188,15 +194,16 @@ const editPhoneNumber = async (req, res, next) => {
     });
 
     const userWithSamePhoneNumber = await Customer.findOne({
-      where : {contact_no : new_phone_number}
-    })
+      where: { contact_no: new_phone_number },
+    });
 
-    if(userWithSamePhoneNumber){
+    if (userWithSamePhoneNumber) {
       return res.status(400).send({
-        success : false,
-        data : userWithSamePhoneNumber,
-        message : "Another user with the same phone number exists, please use a different one"
-      })
+        success: false,
+        data: userWithSamePhoneNumber,
+        message:
+          "Another user with the same phone number exists, please use a different one",
+      });
     }
 
     if (!customerExists) {
