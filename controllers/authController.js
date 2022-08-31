@@ -420,7 +420,7 @@ const forgotPassword = async (req, res, next) => {
   try {
     //Check if the phone number exists
     const customerExists = await Customer.findOne({
-      where: { contact_no: phoneNumber, registered_for_ecomm : 1 },
+      where: { contact_no: phoneNumber, registered_for_ecomm: 1 },
     });
 
     console.log(customerExists);
@@ -479,12 +479,12 @@ const verifyToken = async (req, res, next) => {
 
   try {
     const CacheDetails = await Cache.findOne({
-      where: {cust_no}
+      where: { cust_no },
     });
     const serverGeneratedOTP = await CacheDetails.generated_otp;
 
     console.log(CacheDetails.generated_otp);
-    console.log(userEnteredOTP)
+    console.log(userEnteredOTP);
 
     if (serverGeneratedOTP !== userEnteredOTP) {
       return res.status(400).send({
