@@ -199,7 +199,7 @@ const register = async (req, res, next) => {
           console.log("New Customer");
 
           // opt in the user number for sending otp purpose
-          const response = await Promise.resolve(optIn("91" + mobile_number));
+          const response = await Promise.resolve(optIn("91" + phoneNumber.toString()));
           if (response != 202)
             return res.status(400).send({
               success: false,
