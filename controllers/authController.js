@@ -226,8 +226,7 @@ const register = async (req, res, next) => {
         const serverGeneratedOTP = generateOTP();
         // sendOTPToPhoneNumber(serverGeneratedOTP);
 
-        // sending OTP to whatsapp for now.
-        sendOTPToWhatsapp(phoneNumber.toString(), serverGeneratedOTP);
+
 
         try {
           const response = await Cache.create({
@@ -603,6 +602,10 @@ const getOTP = async (req, res, next) => {
   console.log(CacheDetails);
   try {
     if (CacheDetails) {
+
+      // sending OTP to whatsapp for now.
+      sendOTPToWhatsapp(CacheDetails.contact_no.toString(), CacheDetails.generated_otp);
+
       return res.status(200).send({
         success: true,
         data: {
