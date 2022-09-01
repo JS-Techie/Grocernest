@@ -4,6 +4,26 @@ let client = new Gupshup({
     apiKey: 'hm7797tb46hrtrgcsqksvxs69yj9zza4'
 });
 
+const sendOTPToWhatsapp = (phno, otp) => {
+    console.log("Sending OTP to whatsapp... ", otp);
+
+    client.message.send({
+        channel: "whatsapp",
+        source: "919433804769",
+        destination: "91" + phno.toString(),
+        'src.name': "grocernest",
+        message: {
+            isHSM: "true",
+            type: "text",
+            text: otp.toString() + " is your OTP (One Time Password) for logging into the Grocernest app. For Security Reasons don't share the OTP."
+        }
+    }).then((response) => {
+        console.log("Template message sent", response);
+    }).catch(err => {
+        console.log("Template message err:", err);
+    })
+}
+
 const sendInvoiceToWhatsapp = (phno, order_id, link) => {
     console.log("Sending sms to whatsapp..");
     client.message.send({
@@ -85,6 +105,7 @@ const sendAdminCancelledOrderStatusToWhatsapp = (phno, order_id, cancellation_re
 
 module.exports = {
     sendInvoiceToWhatsapp,
+    sendOTPToWhatsapp,
     sendOrderStatusToWhatsapp,
     sendOrderShippedToWhatsapp,
     sendAdminCancelledOrderStatusToWhatsapp

@@ -4,7 +4,8 @@ const referralCodeGenerator = require("referral-code-generator");
 const bcrypt = require("bcryptjs");
 const uniqid = require("uniqid");
 const axios = require("axios");
-// const { sendRegistrationWhatsapp } = require('../services/whatsapp/whatsapp');
+const { optIn, optOut } = require('../services/whatsapp/optInOut');
+const { sendOTPToWhatsapp } = require('../services/whatsapp/whatsapp');
 const { sendRegistrationEmail } = require("../services/mail/mailService");
 const db = require("../models");
 
@@ -196,6 +197,17 @@ const register = async (req, res, next) => {
           };
         } else {
           console.log("New Customer");
+
+          // opt in the user number for sending otp purpose
+          const response = await Promise.resolve(optIn("91" + mobile_number));
+          if (response != 202)
+            return res.status(400).send({
+              success: false,
+              data: "",
+              message: "error occured while opt in whatsapp number",
+            });
+          // that's it
+
           newUser = {
             id: Math.floor(Math.random() * 10000 + 1),
             cust_no: uniqid(),
@@ -213,6 +225,9 @@ const register = async (req, res, next) => {
 
         const serverGeneratedOTP = generateOTP();
         // sendOTPToPhoneNumber(serverGeneratedOTP);
+
+        // sending OTP to whatsapp for now.
+        sendOTPToWhatsapp(phoneNumber.toString(), serverGeneratedOTP);
 
         try {
           const response = await Cache.create({
@@ -608,7 +623,7 @@ const getOTP = async (req, res, next) => {
   }
 };
 
-const resendToken = async (req, res, next) => {};
+const resendToken = async (req, res, next) => { };
 
 module.exports = {
   login,
