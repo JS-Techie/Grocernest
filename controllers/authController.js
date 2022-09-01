@@ -599,12 +599,24 @@ const getOTP = async (req, res, next) => {
     where: { cust_no },
   });
 
+
+
+
   console.log(CacheDetails);
   try {
     if (CacheDetails) {
 
-      // sending OTP to whatsapp for now.
-      sendOTPToWhatsapp(JSON.parse(CacheDetails.user_details).contact_no.toString(), await CacheDetails.generated_otp);
+      let cacheParseData = JSON.parse(CacheDetails);
+
+      if (cacheParseData.new_phone_number) {
+        // sending OTP to whatsapp for now.
+        sendOTPToWhatsapp(JSON.parse(CacheDetails.user_details).new_phone_number.toString(), await CacheDetails.generated_otp);
+
+      }
+      else {
+        sendOTPToWhatsapp(JSON.parse(CacheDetails.user_details).contact_no.toString(), await CacheDetails.generated_otp);
+      }
+
 
       return res.status(200).send({
         success: true,
