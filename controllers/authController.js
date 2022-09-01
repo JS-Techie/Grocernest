@@ -604,7 +604,7 @@ const getOTP = async (req, res, next) => {
     if (CacheDetails) {
 
       // sending OTP to whatsapp for now.
-      sendOTPToWhatsapp(CacheDetails.contact_no.toString(), CacheDetails.generated_otp);
+      sendOTPToWhatsapp(await CacheDetails.contact_no.toString(), await CacheDetails.generated_otp);
 
       return res.status(200).send({
         success: true,
