@@ -275,7 +275,7 @@ const getItemsBySearchTerm = async (req, res, next) => {
           inner join t_batch on t_batch.item_id = t_item.id )
           inner join t_lkp_color on t_lkp_color.id = t_item.color_id)
           inner join t_lkp_category on t_lkp_category.id = t_item.category_id)
-          inner join t_lkp_sub_category on t_lkp_sub_category.id = t_item.sub_category_id)
+          left outer join t_lkp_sub_category on t_lkp_sub_category.id = t_item.sub_category_id)
           inner join t_lkp_brand on t_lkp_brand.id = t_item.brand_id)
           inner join t_inventory on t_inventory.item_id = t_item.id)
           where(t_item.name like "%${searchTerm}%" or t_lkp_category.group_name like "%${searchTerm}%" or t_lkp_brand.brand_name like "%${searchTerm}%" or t_lkp_sub_category.sub_cat_name like "%${searchTerm}%")  and t_inventory.location_id = 4 and t_lkp_category.available_for_ecomm = 1 and t_item.available_for_ecomm = 1 and t_lkp_sub_category.available_for_ecomm = 1 and t_batch.mark_selected = 1`);
@@ -400,7 +400,7 @@ const getItemById = async (req, res, next) => {
             inner join t_batch on t_batch.item_id = t_item.id )
             inner join t_lkp_color on t_lkp_color.id = t_item.color_id)
             inner join t_lkp_category on t_lkp_category.id = t_item.category_id)
-            INNER join t_lkp_sub_category on t_lkp_sub_category.id = t_item.sub_category_id)
+            left outer join t_lkp_sub_category on t_lkp_sub_category.id = t_item.sub_category_id)
             inner join t_lkp_brand on t_lkp_brand.id = t_item.brand_id)
             inner join t_inventory on t_inventory.item_id = t_item.id)
              where t_item.id = ${currentItemId} and t_inventory.location_id = 4 and t_lkp_category.available_for_ecomm = 1 and t_item.available_for_ecomm = 1 and t_batch.mark_selected = 1`);
