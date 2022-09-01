@@ -15,7 +15,7 @@ const sendOTPToWhatsapp = (phno, otp) => {
         message: {
             isHSM: "true",
             type: "text",
-            text: otp.toString() + " is your OTP (One Time Password) for logging into the Grocernest app. For Security Reasons don't share the OTP."
+            text: otp.toString() + " is your OTP(One Time Password) for Grocernest. For security reasons don't share the OTP."
         }
     }).then((response) => {
         console.log("Template message sent", response);
