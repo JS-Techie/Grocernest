@@ -604,7 +604,10 @@ const getOTP = async (req, res, next) => {
     if (CacheDetails) {
       let cacheParseData = JSON.parse(CacheDetails.user_details);
 
-      if (cacheParseData.new_phone_number) {
+      if (
+        cacheParseData.new_phone_number !== "" ||
+        cacheParseData.new_phone_number !== null
+      ) {
         // sending OTP to whatsapp for now.
         sendOTPToWhatsapp(
           cacheParseData.new_phone_number.toString(),
