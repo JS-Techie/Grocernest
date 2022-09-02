@@ -1,30 +1,28 @@
 const db = require("../models");
+const { Op } = require("sequelize");
 
 const Category = db.LkpCategoryModel;
 const Subcategory = db.LkpSubCategoryModel;
 const Item = db.ItemModel;
+const Brand = db.LkpBrandModel;
+const Offer = db.OffersModel;
 
 const getAllCategories = async (req, res, next) => {
-  
   //Fetch all categories and subcategories within them
   try {
     const categories = await Category.findAll({
-      where : {available_for_ecomm : 1},
+      where: { available_for_ecomm: 1 },
       include: [
         {
           model: Subcategory,
           //where : {available_for_ecomm : 1},
         },
-        
       ],
     });
 
     const categoryPromises = categories.map(async (currentCategory) => {
       const subcategoryPromises = currentCategory.t_lkp_sub_category_models.map(
         (currentSubcategory) => {
-
-         
-
           return {
             subName: currentSubcategory.sub_cat_name,
             id: currentSubcategory.id,
@@ -37,7 +35,7 @@ const getAllCategories = async (req, res, next) => {
 
       return {
         catName: currentCategory.group_name,
-        categoryId : currentCategory.id,
+        categoryId: currentCategory.id,
         img: currentCategory.image,
         subCategory: subcategoryResponseArray,
       };
@@ -111,7 +109,81 @@ const getAllSubcategoriesInCategory = async (req, res, next) => {
   }
 };
 
+const getAllBrands = async (req, res, next) => {
+  try {
+    const brands = await Brand.findAll({});
+
+    if (brands.length === 0) {
+      return res.status(200).send({
+        success: true,
+        data: [],
+        message: "There are no brands",
+      });
+    }
+
+    let response = brands;
+
+    if (brands.length > 50) {
+      response = brands.slice(0, 50);
+    }
+
+    return res.status(200).send({
+      success: true,
+      data: {
+        response,
+        number: response.length,
+      },
+      message: "Found all brands",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "Check data field for more details",
+    });
+  }
+};
+
+const getAllOffers = async (req, res, next) => {
+  try {
+    const offers = await Offer.findAll({
+      order: [["created_at", "DESC"]],
+    });
+
+    if (offers.length === 0) {
+      return res.status(200).send({
+        success: true,
+        data: [],
+        message: "There are no offers",
+      });
+    }
+
+    let response = offers;
+
+    if (offers.length > 10) {
+      response = offers.slice(0, 10);
+    }
+
+    return res.status(200).send({
+      success: true,
+      data: {
+        response,
+        number: response.length,
+      },
+      message: "Found all offers",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "Check data field for more details",
+    });
+  }
+};
+
 module.exports = {
   getAllCategories,
   getAllSubcategoriesInCategory,
+  getAllBrands,
+  getAllOffers,
 };
