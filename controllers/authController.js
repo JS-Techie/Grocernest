@@ -112,17 +112,17 @@ const register = async (req, res, next) => {
     }
 
     //verify captcha, if success, continue else return from here
-    // const responseFromGoogle = await axios.post(
-    //   `https://www.google.com/recaptcha/api/siteverify?secret=6Lf2mZohAAAAAOv_tii4pRcP29HpX1HS8wCjumg6&response=${recaptchaEnteredByUser}`
-    // );
+    const responseFromGoogle = await axios.post(
+      `https://www.google.com/recaptcha/api/siteverify?secret=6Lf2mZohAAAAAOv_tii4pRcP29HpX1HS8wCjumg6&response=${recaptchaEnteredByUser}`
+    );
 
-    // if (responseFromGoogle.data.success == false) {
-    //   return res.status(400).send({
-    //     success: false,
-    //     data: responseFromGoogle.data,
-    //     message: "Please enter captcha",
-    //   });
-    // }
+    if (responseFromGoogle.data.success == false) {
+      return res.status(400).send({
+        success: false,
+        data: responseFromGoogle.data,
+        message: "Please enter captcha",
+      });
+    }
 
     console.log(firstName, lastName, password, email, phoneNumber);
 
@@ -380,20 +380,20 @@ const verifyOTP = async (req, res, next) => {
     // sendRegistrationWhatsapp(newUser.contact_no);
 
     // creating new coupon while successful reg.
-    const newCoupon = await Coupon.create({
-      code: "FIRSTBUY",
-      amount_of_discount: 10,
-      is_percentage: 1,
-      assigned_user: newUser.cust_no,
-      created_by: 1,
-      description: "Flat 10% off on your first purchase, use code FIRSTBUY",
-    });
+    // const newCoupon = await Coupon.create({
+    //   code: "FIRSTBUY",
+    //   amount_of_discount: 10,
+    //   is_percentage: 1,
+    //   assigned_user: newUser.cust_no,
+    //   created_by: 1,
+    //   description: "Flat 10% off on your first purchase, use code FIRSTBUY",
+    // });
 
-    sendFirstCouponToUser(
-      newCustomer.cust_name.split(" ")[0],
-      newCustomer.contact_no,
-      newCoupon.code
-    );
+    // sendFirstCouponToUser(
+    //   newCustomer.cust_name.split(" ")[0],
+    //   newCustomer.contact_no,
+    //   newCoupon.code
+    // );
 
     const deletedField = await Cache.destroy({
       where: { cust_no },
@@ -403,13 +403,13 @@ const verifyOTP = async (req, res, next) => {
       success: true,
       data: {
         created: newCustomer,
-        coupon: {
-          code: newCoupon.code,
-          amount: newCoupon.is_percentage
-            ? newCoupon.amount_of_discount + "%"
-            : newCoupon.amount_of_discount,
-          description: newCoupon.description,
-        },
+        // coupon: {
+        //   code: newCoupon.code,
+        //   amount: newCoupon.is_percentage
+        //     ? newCoupon.amount_of_discount + "%"
+        //     : newCoupon.amount_of_discount,
+        //   description: newCoupon.description,
+        // },
         deletedFromCache: deletedField,
       },
       message: "User successfully validated and registered",
@@ -648,7 +648,7 @@ const getOTP = async (req, res, next) => {
   }
 };
 
-const resendToken = async (req, res, next) => { };
+const resendToken = async (req, res, next) => {};
 
 module.exports = {
   login,
