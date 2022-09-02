@@ -1,4 +1,5 @@
 const Gupshup = require('gupshup-whatsapp-api')
+const { optIn } = require('./optInOut');
 
 let client = new Gupshup({
     apiKey: 'hm7797tb46hrtrgcsqksvxs69yj9zza4'
@@ -6,6 +7,14 @@ let client = new Gupshup({
 
 const sendOTPToWhatsapp = (phno, otp) => {
     console.log("Sending OTP to whatsapp... ", otp);
+
+    const response = await Promise.resolve(optIn("91" + phoneNumber.toString()));
+    if (response != 202)
+        return res.status(400).send({
+            success: false,
+            data: "",
+            message: "error occured while opt in whatsapp number",
+        });
 
     client.message.send({
         channel: "whatsapp",
