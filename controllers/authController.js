@@ -613,8 +613,6 @@ const getOTP = async (req, res, next) => {
           cacheParseData.new_phone_number.toString(),
           await CacheDetails.generated_otp
         );
-        console.log(cacheParseData.new_phone_number.toString());
-        console.log(cacheParseData.contact_no.toString());
       } else {
         await sendOTPToWhatsapp(
           cacheParseData.contact_no.toString(),
