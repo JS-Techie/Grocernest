@@ -112,17 +112,17 @@ const register = async (req, res, next) => {
     }
 
     //verify captcha, if success, continue else return from here
-    const responseFromGoogle = await axios.post(
-      `https://www.google.com/recaptcha/api/siteverify?secret=6Lf2mZohAAAAAOv_tii4pRcP29HpX1HS8wCjumg6&response=${recaptchaEnteredByUser}`
-    );
+    // const responseFromGoogle = await axios.post(
+    //   `https://www.google.com/recaptcha/api/siteverify?secret=6Lf2mZohAAAAAOv_tii4pRcP29HpX1HS8wCjumg6&response=${recaptchaEnteredByUser}`
+    // );
 
-    if (responseFromGoogle.data.success == false) {
-      return res.status(400).send({
-        success: false,
-        data: responseFromGoogle.data,
-        message: "Please enter captcha",
-      });
-    }
+    // if (responseFromGoogle.data.success == false) {
+    //   return res.status(400).send({
+    //     success: false,
+    //     data: responseFromGoogle.data,
+    //     message: "Please enter captcha",
+    //   });
+    // }
 
     console.log(firstName, lastName, password, email, phoneNumber);
 
@@ -604,16 +604,20 @@ const getOTP = async (req, res, next) => {
     if (CacheDetails) {
       let cacheParseData = JSON.parse(CacheDetails.user_details);
 
-      if (
-        cacheParseData.new_phone_number !== "" ||
-        cacheParseData.new_phone_number !== null
-      ) {
+      console.log(cacheParseData);
+
+      console.log(cacheParseData.new_phone_number === "");
+      console.log(cacheParseData.new_phone_number);
+
+      if (cacheParseData.new_phone_number) {
+        console.log("In if");
         // sending OTP to whatsapp for now.
         await sendOTPToWhatsapp(
           cacheParseData.new_phone_number.toString(),
           await CacheDetails.generated_otp
         );
       } else {
+        console.log("In else");
         await sendOTPToWhatsapp(
           cacheParseData.contact_no.toString(),
           await CacheDetails.generated_otp
@@ -626,12 +630,6 @@ const getOTP = async (req, res, next) => {
           // user: await JSON.parse(CacheDetails[0].user_details),
           otp: await CacheDetails.generated_otp,
           user: cacheParseData,
-          new_phone_number: cacheParseData.new_phone_number
-            ? cacheParseData.new_phone_number.toString()
-            : null,
-          contact_no: cacheParseData.contact_no
-            ? cacheParseData.contact_no.toString()
-            : null,
         },
         message:
           "OTP generated and user created, waiting to store new user in DB",

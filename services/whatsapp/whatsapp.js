@@ -7,8 +7,10 @@ let client = new Gupshup({
 
 const sendOTPToWhatsapp = async (phno, otp) => {
     console.log("Sending OTP to whatsapp... ", otp);
+    console.log(phno);
 
     const response = await Promise.resolve(optIn("91" + phno.toString()));
+    console.log(response);
     if (response != 202)
         return res.status(400).send({
             success: false,
