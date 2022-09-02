@@ -147,6 +147,7 @@ const getAllBrands = async (req, res, next) => {
 const getAllOffers = async (req, res, next) => {
   try {
     const offers = await Offer.findAll({
+      where: { is_active: 1 },
       order: [["created_at", "DESC"]],
     });
 
@@ -194,8 +195,8 @@ const getAllOffers = async (req, res, next) => {
     console.log(resolved);
 
     let response = resolved;
-    if(resolved.length > 10){
-      response = resolved.slice(0,10)
+    if (resolved.length > 10) {
+      response = resolved.slice(0, 10);
     }
 
     return res.status(200).send({
