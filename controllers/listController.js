@@ -158,17 +158,46 @@ const getAllOffers = async (req, res, next) => {
       });
     }
 
-    let response = offers;
+    const promises = offers.map(async (currentOffer) => {
+      if (currentOffer.item_id) {
+        const discountItem = await Item.findOne({
+          where: { id: currentOffer.item_id },
+        });
 
-    if (offers.length > 10) {
-      response = offers.slice(0, 10);
-    }
+        return {
+          type: "discount",
+          discountItem,
+          amountOfDiscount: currentOffer.amount_of_discount,
+          isPercentage: currentOffer.is_percentage,
+        };
+      } else {
+        const xItem = await Item.findOne({
+          where: { id: currentOffer.item_id_1 },
+        });
+        const yItem = await Item.findOne({
+          where: { id: currentOffer.item_id_2 },
+        });
+
+        return {
+          type: "offer",
+          xItem,
+          yItem,
+          xItemQuantity: currentOffer.item_1_quantity,
+          yItemQuantity: currentOffer.item_2_quantity,
+        };
+      }
+    });
+
+    console.log(promises);
+
+    const resolved = await Promise.all(promises);
+    console.log(resolved);
 
     return res.status(200).send({
       success: true,
       data: {
-        response,
-        number: response.length,
+        resolved,
+        number: resolved.length,
       },
       message: "Found all offers",
     });
