@@ -1,5 +1,6 @@
 const db = require("../models");
 const { Op } = require("sequelize");
+const { sequelize } = require("../models");
 
 const Category = db.LkpCategoryModel;
 const Subcategory = db.LkpSubCategoryModel;
