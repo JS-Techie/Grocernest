@@ -625,8 +625,12 @@ const getOTP = async (req, res, next) => {
           // user: await JSON.parse(CacheDetails[0].user_details),
           otp: await CacheDetails.generated_otp,
           user: cacheParseData,
-          new_phone_number: cacheParseData.new_phone_number.toString(),
-          contact_no: cacheParseData.contact_no.toString(),
+          new_phone_number: cacheParseData.new_phone_number
+            ? cacheParseData.new_phone_number.toString()
+            : null,
+          contact_no: cacheParseData.contact_no
+            ? cacheParseData.contact_no.toString()
+            : null,
         },
         message:
           "OTP generated and user created, waiting to store new user in DB",
