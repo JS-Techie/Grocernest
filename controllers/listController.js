@@ -27,6 +27,7 @@ const getAllCategories = async (req, res, next) => {
             subName: currentSubcategory.sub_cat_name,
             id: currentSubcategory.id,
             image: currentSubcategory.image,
+            nodeId: currentSubcategory.sub_cat_cd,
           };
         }
       );
@@ -34,6 +35,7 @@ const getAllCategories = async (req, res, next) => {
       const subcategoryResponseArray = await Promise.all(subcategoryPromises);
 
       return {
+        nodeId: currentCategory.id,
         catName: currentCategory.group_name,
         categoryId: currentCategory.id,
         img: currentCategory.image,
