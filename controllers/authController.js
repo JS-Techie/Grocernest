@@ -609,14 +609,14 @@ const getOTP = async (req, res, next) => {
         cacheParseData.new_phone_number !== null
       ) {
         // sending OTP to whatsapp for now.
-        sendOTPToWhatsapp(
+        await sendOTPToWhatsapp(
           cacheParseData.new_phone_number.toString(),
           await CacheDetails.generated_otp
         );
         console.log(cacheParseData.new_phone_number.toString());
         console.log(cacheParseData.contact_no.toString());
       } else {
-        sendOTPToWhatsapp(
+        await sendOTPToWhatsapp(
           cacheParseData.contact_no.toString(),
           await CacheDetails.generated_otp
         );
@@ -648,7 +648,7 @@ const getOTP = async (req, res, next) => {
   }
 };
 
-const resendToken = async (req, res, next) => {};
+const resendToken = async (req, res, next) => { };
 
 module.exports = {
   login,
