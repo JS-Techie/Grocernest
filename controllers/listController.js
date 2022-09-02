@@ -123,8 +123,8 @@ const getAllBrands = async (req, res, next) => {
 
     let response = brands;
 
-    if (brands.length > 50) {
-      response = brands.slice(0, 50);
+    if (brands.length > 100) {
+      response = brands.slice(0, 100);
     }
 
     return res.status(200).send({
@@ -193,11 +193,16 @@ const getAllOffers = async (req, res, next) => {
     const resolved = await Promise.all(promises);
     console.log(resolved);
 
+    let response = resolved;
+    if(resolved.length > 10){
+      response = resolved.slice(0,10)
+    }
+
     return res.status(200).send({
       success: true,
       data: {
-        resolved,
-        number: resolved.length,
+        response,
+        number: response.length,
       },
       message: "Found all offers",
     });
