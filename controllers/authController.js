@@ -4,8 +4,8 @@ const referralCodeGenerator = require("referral-code-generator");
 const bcrypt = require("bcryptjs");
 const uniqid = require("uniqid");
 const axios = require("axios");
-const { optIn, optOut } = require('../services/whatsapp/optInOut');
-const { sendOTPToWhatsapp } = require('../services/whatsapp/whatsapp');
+const { optIn, optOut } = require("../services/whatsapp/optInOut");
+const { sendOTPToWhatsapp } = require("../services/whatsapp/whatsapp");
 const { sendRegistrationEmail } = require("../services/mail/mailService");
 const db = require("../models");
 
@@ -112,17 +112,17 @@ const register = async (req, res, next) => {
     }
 
     //verify captcha, if success, continue else return from here
-    const responseFromGoogle = await axios.post(
-      `https://www.google.com/recaptcha/api/siteverify?secret=6Lf2mZohAAAAAOv_tii4pRcP29HpX1HS8wCjumg6&response=${recaptchaEnteredByUser}`
-    );
+    // const responseFromGoogle = await axios.post(
+    //   `https://www.google.com/recaptcha/api/siteverify?secret=6Lf2mZohAAAAAOv_tii4pRcP29HpX1HS8wCjumg6&response=${recaptchaEnteredByUser}`
+    // );
 
-    if (responseFromGoogle.data.success == false) {
-      return res.status(400).send({
-        success: false,
-        data: responseFromGoogle.data,
-        message: "Please enter captcha",
-      });
-    }
+    // if (responseFromGoogle.data.success == false) {
+    //   return res.status(400).send({
+    //     success: false,
+    //     data: responseFromGoogle.data,
+    //     message: "Please enter captcha",
+    //   });
+    // }
 
     console.log(firstName, lastName, password, email, phoneNumber);
 
@@ -199,7 +199,9 @@ const register = async (req, res, next) => {
           console.log("New Customer");
 
           // opt in the user number for sending otp purpose
-          const response = await Promise.resolve(optIn("91" + phoneNumber.toString()));
+          const response = await Promise.resolve(
+            optIn("91" + phoneNumber.toString())
+          );
           if (response != 202)
             return res.status(400).send({
               success: false,
@@ -225,8 +227,6 @@ const register = async (req, res, next) => {
 
         const serverGeneratedOTP = generateOTP();
         // sendOTPToPhoneNumber(serverGeneratedOTP);
-
-
 
         try {
           const response = await Cache.create({
@@ -599,31 +599,31 @@ const getOTP = async (req, res, next) => {
     where: { cust_no },
   });
 
-
-
-
   console.log(CacheDetails);
   try {
     if (CacheDetails) {
-
       let cacheParseData = JSON.parse(CacheDetails.user_details);
 
       if (cacheParseData.new_phone_number) {
         // sending OTP to whatsapp for now.
-        sendOTPToWhatsapp(JSON.parse(CacheDetails.user_details).new_phone_number.toString(), await CacheDetails.generated_otp);
-
+        sendOTPToWhatsapp(
+          cacheParseData.new_phone_number.toString(),
+          await CacheDetails.generated_otp
+        );
+        console.log();
+      } else {
+        sendOTPToWhatsapp(
+          cacheParseData.contact_no.toString(),
+          await CacheDetails.generated_otp
+        );
       }
-      else {
-        sendOTPToWhatsapp(JSON.parse(CacheDetails.user_details).contact_no.toString(), await CacheDetails.generated_otp);
-      }
-
 
       return res.status(200).send({
         success: true,
         data: {
           // user: await JSON.parse(CacheDetails[0].user_details),
           otp: await CacheDetails.generated_otp,
-          user: JSON.parse(CacheDetails.user_details),
+          user: cacheParseData,
         },
         message:
           "OTP generated and user created, waiting to store new user in DB",
@@ -638,7 +638,7 @@ const getOTP = async (req, res, next) => {
   }
 };
 
-const resendToken = async (req, res, next) => { };
+const resendToken = async (req, res, next) => {};
 
 module.exports = {
   login,
