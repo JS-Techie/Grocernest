@@ -21,36 +21,36 @@ const getAllCategories = async (req, res, next) => {
       ],
     });
 
-    const [itemsInACategory, metadata] =
-      await sequelize.query(`select distinct t_item.id, t_item.name,t_item.brand_id,t_item.UOM ,t_item.category_id ,t_item.sub_category_id ,
-    t_item.image ,t_item.description ,t_item.available_for_ecomm ,t_batch.batch_no ,
-    t_batch.location_id ,t_batch.MRP ,t_batch.discount ,t_batch.cost_price ,t_batch.mfg_date ,t_batch.sale_price ,
-    t_batch.created_at,t_lkp_color.color_name, t_lkp_brand.brand_name, t_lkp_category.group_name, t_batch.mark_selected,t_batch.id as "batch_id"
-    from (((((t_item
-          inner join t_batch on t_batch.item_id = t_item.id )
-          inner join t_lkp_color on t_lkp_color.id = t_item.color_id)
-          inner join t_lkp_category on t_lkp_category.id = t_item.category_id)
-          inner join t_lkp_brand on t_lkp_brand.id = t_item.brand_id)
-          inner join t_inventory on t_inventory.item_id = t_item.id)
-           where t_lkp_category.id = ${category} and t_inventory.location_id = 4 and t_lkp_category.available_for_ecomm = 1 and t_item.available_for_ecomm = 1 and t_batch.mark_selected = 1;
-  `);
+    //   const [itemsInACategory, metadata] =
+    //     await sequelize.query(`select distinct t_item.id, t_item.name,t_item.brand_id,t_item.UOM ,t_item.category_id ,t_item.sub_category_id ,
+    //   t_item.image ,t_item.description ,t_item.available_for_ecomm ,t_batch.batch_no ,
+    //   t_batch.location_id ,t_batch.MRP ,t_batch.discount ,t_batch.cost_price ,t_batch.mfg_date ,t_batch.sale_price ,
+    //   t_batch.created_at,t_lkp_color.color_name, t_lkp_brand.brand_name, t_lkp_category.group_name, t_batch.mark_selected,t_batch.id as "batch_id"
+    //   from (((((t_item
+    //         inner join t_batch on t_batch.item_id = t_item.id )
+    //         inner join t_lkp_color on t_lkp_color.id = t_item.color_id)
+    //         inner join t_lkp_category on t_lkp_category.id = t_item.category_id)
+    //         inner join t_lkp_brand on t_lkp_brand.id = t_item.brand_id)
+    //         inner join t_inventory on t_inventory.item_id = t_item.id)
+    //          where t_lkp_category.id = ${category} and t_inventory.location_id = 4 and t_lkp_category.available_for_ecomm = 1 and t_item.available_for_ecomm = 1 and t_batch.mark_selected = 1;
+    // `);
 
-    let countOfItems = null;
-    let promises = null;
-    if (itemsInACategory.length !== 0) {
-      promises = itemsInACategory.map((current) => {
-        return {
-          itemID: current.id,
-        };
-      });
-    }
+    //   let countOfItems = null;
+    //   let promises = null;
+    //   if (itemsInACategory.length !== 0) {
+    //     promises = itemsInACategory.map((current) => {
+    //       return {
+    //         itemID: current.id,
+    //       };
+    //     });
+    //   }
 
-    const resolved = await Promise.resolve(promises);
-    const response = [
-      ...new Map(resolved.map((item) => [item["itemID"], item])).values(),
-    ];
+    //   const resolved = await Promise.resolve(promises);
+    //   const response = [
+    //     ...new Map(resolved.map((item) => [item["itemID"], item])).values(),
+    //   ];
 
-    countOfItems = response.length;
+    //   countOfItems = response.length;
 
     const categoryPromises = categories.map(async (currentCategory) => {
       const subcategoryPromises = currentCategory.t_lkp_sub_category_models.map(
@@ -79,10 +79,7 @@ const getAllCategories = async (req, res, next) => {
 
     return res.status(200).send({
       success: true,
-      data: {
-        countOfItems,
-        responseArray,
-      },
+      data: responseArray,
       message: "Found all categories",
     });
   } catch (error) {
