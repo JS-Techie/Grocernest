@@ -1,5 +1,6 @@
 const db = require("../models");
 const { Op } = require("sequelize");
+const { sequelize } = require("../models");
 
 const Category = db.LkpCategoryModel;
 const Subcategory = db.LkpSubCategoryModel;
@@ -20,6 +21,37 @@ const getAllCategories = async (req, res, next) => {
       ],
     });
 
+    //   const [itemsInACategory, metadata] =
+    //     await sequelize.query(`select distinct t_item.id, t_item.name,t_item.brand_id,t_item.UOM ,t_item.category_id ,t_item.sub_category_id ,
+    //   t_item.image ,t_item.description ,t_item.available_for_ecomm ,t_batch.batch_no ,
+    //   t_batch.location_id ,t_batch.MRP ,t_batch.discount ,t_batch.cost_price ,t_batch.mfg_date ,t_batch.sale_price ,
+    //   t_batch.created_at,t_lkp_color.color_name, t_lkp_brand.brand_name, t_lkp_category.group_name, t_batch.mark_selected,t_batch.id as "batch_id"
+    //   from (((((t_item
+    //         inner join t_batch on t_batch.item_id = t_item.id )
+    //         inner join t_lkp_color on t_lkp_color.id = t_item.color_id)
+    //         inner join t_lkp_category on t_lkp_category.id = t_item.category_id)
+    //         inner join t_lkp_brand on t_lkp_brand.id = t_item.brand_id)
+    //         inner join t_inventory on t_inventory.item_id = t_item.id)
+    //          where t_lkp_category.id = ${category} and t_inventory.location_id = 4 and t_lkp_category.available_for_ecomm = 1 and t_item.available_for_ecomm = 1 and t_batch.mark_selected = 1;
+    // `);
+
+    //   let countOfItems = null;
+    //   let promises = null;
+    //   if (itemsInACategory.length !== 0) {
+    //     promises = itemsInACategory.map((current) => {
+    //       return {
+    //         itemID: current.id,
+    //       };
+    //     });
+    //   }
+
+    //   const resolved = await Promise.resolve(promises);
+    //   const response = [
+    //     ...new Map(resolved.map((item) => [item["itemID"], item])).values(),
+    //   ];
+
+    //   countOfItems = response.length;
+
     const categoryPromises = categories.map(async (currentCategory) => {
       const subcategoryPromises = currentCategory.t_lkp_sub_category_models.map(
         (currentSubcategory) => {
@@ -27,6 +59,7 @@ const getAllCategories = async (req, res, next) => {
             subName: currentSubcategory.sub_cat_name,
             id: currentSubcategory.id,
             image: currentSubcategory.image,
+            nodeId: currentSubcategory.sub_cat_cd,
           };
         }
       );
@@ -34,6 +67,7 @@ const getAllCategories = async (req, res, next) => {
       const subcategoryResponseArray = await Promise.all(subcategoryPromises);
 
       return {
+        nodeId: currentCategory.id,
         catName: currentCategory.group_name,
         categoryId: currentCategory.id,
         img: currentCategory.image,
@@ -123,8 +157,8 @@ const getAllBrands = async (req, res, next) => {
 
     let response = brands;
 
-    if (brands.length > 50) {
-      response = brands.slice(0, 50);
+    if (brands.length > 100) {
+      response = brands.slice(0, 100);
     }
 
     return res.status(200).send({
@@ -147,6 +181,7 @@ const getAllBrands = async (req, res, next) => {
 const getAllOffers = async (req, res, next) => {
   try {
     const offers = await Offer.findAll({
+      where: { is_active: 1 },
       order: [["created_at", "DESC"]],
     });
 
@@ -158,10 +193,44 @@ const getAllOffers = async (req, res, next) => {
       });
     }
 
-    let response = offers;
+    const promises = offers.map(async (currentOffer) => {
+      if (currentOffer.item_id) {
+        const discountItem = await Item.findOne({
+          where: { id: currentOffer.item_id },
+        });
 
-    if (offers.length > 10) {
-      response = offers.slice(0, 10);
+        return {
+          type: "discount",
+          discountItem,
+          amountOfDiscount: currentOffer.amount_of_discount,
+          isPercentage: currentOffer.is_percentage,
+        };
+      } else {
+        const xItem = await Item.findOne({
+          where: { id: currentOffer.item_id_1 },
+        });
+        const yItem = await Item.findOne({
+          where: { id: currentOffer.item_id_2 },
+        });
+
+        return {
+          type: "offer",
+          xItem,
+          yItem,
+          xItemQuantity: currentOffer.item_1_quantity,
+          yItemQuantity: currentOffer.item_2_quantity,
+        };
+      }
+    });
+
+    console.log(promises);
+
+    const resolved = await Promise.all(promises);
+    console.log(resolved);
+
+    let response = resolved;
+    if (resolved.length > 10) {
+      response = resolved.slice(0, 10);
     }
 
     return res.status(200).send({

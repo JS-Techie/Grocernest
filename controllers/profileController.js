@@ -227,9 +227,13 @@ const editPhoneNumber = async (req, res, next) => {
       }
     );
 
+    const newCustomerDetails = await Customer.findOne({
+      where: { cust_no: currentUser },
+    });
+
     const responseFromCacheTable = await Cache.create({
       cust_no: currentUser,
-      user_details: JSON.stringify(customerExists),
+      user_details: JSON.stringify(newCustomerDetails),
       generated_otp: serverGeneratedOTP,
       created_by: 6,
     });
@@ -322,3 +326,5 @@ module.exports = {
   editPhoneNumber,
   changePhoneNumber,
 };
+
+
