@@ -188,7 +188,10 @@ const getAllOffers = async (req, res, next) => {
     if (offers.length === 0) {
       return res.status(200).send({
         success: true,
-        data: [],
+        data: {
+          response: [],
+          number: 0,
+        },
         message: "There are no offers",
       });
     }
