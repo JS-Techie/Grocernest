@@ -12,19 +12,6 @@ const getAllTasks = async (req, res, next) => {
       where: { user_id },
     });
 
-    const promises = tasks.map(async (currentTask) => {
-      const currentUser = await User.findOne({
-        where: { id: currentTask.user_id },
-      });
-
-      return {
-        currentTask,
-        currentUser,
-      };
-    });
-
-    const resolved = await Promise.all(promises);
-
     if (tasks.length == 0) {
       return res.status(200).send({
         success: true,
@@ -35,7 +22,7 @@ const getAllTasks = async (req, res, next) => {
 
     return res.status(200).send({
       success: true,
-      data: resolved,
+      data: tasks,
       message: "Found all tasks for current user",
     });
   } catch (error) {
@@ -77,10 +64,7 @@ const getTaskById = async (req, res, next) => {
     }
     return res.status(200).send({
       success: true,
-      data: {
-        task,
-        currentUser,
-      },
+      data: task,
       message: "Found requested task for current user",
     });
   } catch (error) {
