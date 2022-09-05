@@ -26,7 +26,7 @@ const getAllLeaves = async (req, res, next) => {
       };
     });
 
-    const resolvedArray = await Promise.resolve(promises);
+    const resolvedArray = await Promise.all(promises);
 
     console.log(resolvedArray);
 
@@ -60,9 +60,16 @@ const getLeaveById = async (req, res, next) => {
       });
     }
 
+    const currentUser = await User.findOne({
+      where: { id: leave.user_id },
+    });
+
     return res.status(200).send({
       success: true,
-      data: leave,
+      data: {
+        leave,
+        currentUser,
+      },
       message: "Found requested leave",
     });
   } catch (error) {
@@ -89,6 +96,21 @@ const getLeaveByStatus = async (req, res, next) => {
         message: `There are no ${status} leaves`,
       });
     }
+
+    const promises = leaves.map(async (currentLeave) => {
+      const currentUser = await User.findOne({
+        where: { id: currentLeave.user_id },
+      });
+
+      return {
+        currentLeave,
+        currentUser,
+      };
+    });
+
+    const resolvedArray = await Promise.all(promises);
+
+    console.log(resolvedArray);
 
     return res.status(200).send({
       success: true,
@@ -119,9 +141,16 @@ const getLeaveByUserId = async (req, res, next) => {
       });
     }
 
+    const currentUser = await User.findOne({
+      where: { id: user_id },
+    });
+
     return res.status(200).send({
       success: true,
-      data: leaves,
+      data: {
+        leaves,
+        currentUser,
+      },
       message: "Found all leaves for current user",
     });
   } catch (error) {

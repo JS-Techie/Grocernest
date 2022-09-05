@@ -1,6 +1,7 @@
 const db = require("../../models");
 
 const Task = db.TaskModel;
+const User = db.UserModel;
 
 const getAllTasks = async (req, res, next) => {
   try {
@@ -14,9 +15,24 @@ const getAllTasks = async (req, res, next) => {
       });
     }
 
+    const promises = tasks.map(async (current) => {
+      const currentUser = await User.findOne({
+        where: { id: currentUser.user_id },
+      });
+
+      return {
+        currentUser,
+        current,
+      };
+    });
+
+    const resolved = await Promise.all(promises);
+
+    console.log(promises);
+
     return res.status(200).send({
       success: true,
-      data: tasks,
+      data: resolved,
       message: "",
     });
   } catch (error) {
@@ -43,9 +59,16 @@ const getTaskById = async (req, res, next) => {
       });
     }
 
+    const currentUser = await User.findOne({
+      where: { id: task.user_id },
+    });
+
     return res.status(200).send({
       success: true,
-      data: task,
+      data: {
+        task,
+        currentUser,
+      },
       message: "Found requested task",
     });
   } catch (error) {
