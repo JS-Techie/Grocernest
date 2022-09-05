@@ -23,7 +23,7 @@ const getAllTasks = async (req, res, next) => {
       };
     });
 
-    const resolved = await Promise.resolve(promises);
+    const resolved = await Promise.all(promises);
 
     if (tasks.length == 0) {
       return res.status(200).send({
@@ -101,7 +101,7 @@ const getTasksByStatus = async (req, res, next) => {
       where: { user_id, status },
     });
 
-    if (tasks.length == 0) {
+    if (tasks.length === 0) {
       return res.status(200).send({
         success: true,
         data: [],
@@ -111,7 +111,7 @@ const getTasksByStatus = async (req, res, next) => {
     return res.status(200).send({
       success: true,
       data: tasks,
-      message: "Found all tasks for current user",
+      message: `Found all ${status} tasks for current user`,
     });
   } catch (error) {
     return res.status(400).send({

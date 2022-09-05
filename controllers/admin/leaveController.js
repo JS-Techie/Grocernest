@@ -82,7 +82,7 @@ const getLeaveById = async (req, res, next) => {
 };
 
 const getLeaveByStatus = async (req, res, next) => {
-  const status = req.params.status;
+  const {status} = req.params;
 
   try {
     const leaves = await Leave.findAll({
@@ -114,7 +114,7 @@ const getLeaveByStatus = async (req, res, next) => {
 
     return res.status(200).send({
       success: true,
-      data: leaves,
+      data: resolvedArray,
       message: `Found all ${status} leaves`,
     });
   } catch (error) {
