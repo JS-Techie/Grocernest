@@ -16,3 +16,4 @@ router.route("/view/status/:status").get(authenticate, getDeliveriesByStatus);
 router.route("/modify/:id").patch(authenticate, modifyDeliveryStatus);
 
 module.exports = router;
+[]

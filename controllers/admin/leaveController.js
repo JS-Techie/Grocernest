@@ -1,6 +1,7 @@
 const db = require("../../models");
 
 const Leave = db.LeaveModel;
+const User = db.UserModel;
 
 const getAllLeaves = async (req, res, next) => {
   try {
@@ -14,9 +15,24 @@ const getAllLeaves = async (req, res, next) => {
       });
     }
 
+    const promises = leaves.map(async (currentLeave) => {
+      const currentUser = await User.findOne({
+        where: { id: currentLeave.user_id },
+      });
+
+      return {
+        currentLeave,
+        currentUser,
+      };
+    });
+
+    const resolvedArray = await Promise.resolve(promises);
+
+    console.log(resolvedArray);
+
     return res.status(200).send({
       success: true,
-      data: leaves,
+      data: resolvedArray,
       message: "Found all leaves for current user",
     });
   } catch (error) {

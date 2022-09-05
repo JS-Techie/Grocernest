@@ -147,6 +147,8 @@ db.LeaveModel = require("./t_leave.js")(db.sequelize, Sequelize);
 
 db.TaskModel = require("./t_task")(db.sequelize, Sequelize);
 
+db.AttendanceModel = require("./t_attendance")(db.sequelize, Sequelize);
+
 // Relations between tables
 
 db.WalletModel.hasMany(db.WalletTransactionModel, { foreignKey: "wallet_id" }); //one to many mapping
