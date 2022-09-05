@@ -1912,7 +1912,7 @@
         }
       }
     },
-    "/attendance/attendance/login": {
+    "/attendance/login": {
       "post": {
         "description": "",
         "parameters": [
@@ -1935,7 +1935,7 @@
         }
       }
     },
-    "/attendance/attendance/logout": {
+    "/attendance/logout": {
       "post": {
         "description": "",
         "parameters": [

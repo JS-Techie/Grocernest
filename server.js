@@ -106,7 +106,7 @@ app.use("/whatsapp", whatsappRouter);
 app.use("/leave", leaveRouter);
 app.use("/task", taskRouter);
 app.use(posRouter);
-app.use("/attendance", attendanceRouter);
+app.use(attendanceRouter);
 
 // admin routes
 app.use("/admin/orders", adminOrderRouter);
