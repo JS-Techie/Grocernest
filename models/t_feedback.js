@@ -84,6 +84,15 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "item_id"
+    },
+    title: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "title"
     }
   };
   const options = {
