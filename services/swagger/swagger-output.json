@@ -2051,6 +2051,9 @@
                 },
                 "description": {
                   "example": "any"
+                },
+                "title": {
+                  "example": "any"
                 }
               }
             }
@@ -2094,6 +2097,9 @@
                   "example": "any"
                 },
                 "description": {
+                  "example": "any"
+                },
+                "title": {
                   "example": "any"
                 }
               }

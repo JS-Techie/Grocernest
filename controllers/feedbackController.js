@@ -107,14 +107,14 @@ const getFeedbackById = async (req, res, next) => {
 const createFeedback = async (req, res, next) => {
   const { item_id } = req.params;
   const { cust_no } = req;
-  const { stars, description,title } = req.body;
+  const { stars, description, title } = req.body;
 
   try {
     const currentOrders = await Order.findAll({
       where: { cust_no },
     });
 
-    let userOrderedThisItem = false;
+    console.log("Orders for this customer", currentOrders);
 
     if (currentOrders.length === 0) {
       return res.status(400).send({
@@ -125,21 +125,16 @@ const createFeedback = async (req, res, next) => {
       });
     }
 
-    currentOrders.map(async (currentOrder) => {
-      const OrderItems = await OrderItems.findAll({
-        where: { order_id: currentOrder.order_id },
-      });
+    // const promises = currentOrders.map(async (currentOrder) => {
 
-      if (OrderItems.length !== 0) {
-        OrderItems.map((currentItem) => {
-          if (currentItem.id === item_id) {
-            userOrderedThisItem = true;
-          }
-        });
-      }
-    });
+    // });
+
+
+    let userOrderedThisItem = false;
+    console.log(userOrderedThisItem);
 
     if (!userOrderedThisItem) {
+      console.log("In if");
       return res.status(400).send({
         success: false,
         data: [],
@@ -173,7 +168,7 @@ const createFeedback = async (req, res, next) => {
 
 const editFeedback = async (req, res, next) => {
   const { id, item_id } = req.params;
-  const { stars, description,title } = req.body;
+  const { stars, description, title } = req.body;
   const { cust_no } = req;
 
   try {
@@ -193,7 +188,7 @@ const editFeedback = async (req, res, next) => {
       {
         stars,
         description,
-        title
+        title,
       },
       {
         where: { id, cust_no },

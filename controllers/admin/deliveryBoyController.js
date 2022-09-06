@@ -29,7 +29,7 @@ const getAllDeliveryBoys = async (req, res, next) => {
       return currentUserDetails;
     });
 
-    const resolvedArray = await Promise.resolve(promises);
+    const resolvedArray = await Promise.all(promises);
 
     return res.status(200).send({
       success: true,
