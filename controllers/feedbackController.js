@@ -18,27 +18,15 @@ const getAllFeedbacks = async (req, res, next) => {
       });
     }
 
-    let numberOfRatings;
-    let numberOfReviews;
-    let totalRating;
-    let averageRating;
+    let numberOfRatings = 0;
+    let numberOfReviews = 0;
+    let totalRating = 0;
+    let averageRating = 0;
 
     const promises = feedbacks.map(async (current) => {
       const currentUser = await Customer.findOne({
         where: { cust_no: current.cust_no },
       });
-
-      feedbacks.map((current) => {
-        if (current.stars) {
-          numberOfRatings++;
-          totalRating += current.stars;
-        }
-        if (current.description) {
-          numberOfReviews++;
-        }
-      });
-
-      averageRating = totalRating / numberOfRatings;
 
       return {
         current,
@@ -47,6 +35,18 @@ const getAllFeedbacks = async (req, res, next) => {
     });
 
     const resolved = await Promise.all(promises);
+
+    resolved.map((currentFeedbackDetails) => {
+      if (currentFeedbackDetails.current.stars) {
+        numberOfRatings++;
+        totalRating += current.stars;
+      }
+      if (currentFeedbackDetails.current.description) {
+        numberOfReviews++;
+      }
+    });
+
+    averageRating = totalRating / numberOfRatings;
 
     return res.status(200).send({
       success: true,
