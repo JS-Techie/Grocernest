@@ -1,6 +1,7 @@
 const db = require("../../models");
 
 const Attendance = db.AttendanceModel;
+const User = db.UserModel;
 
 const getAttendanceDetails = async (req, res, next) => {
   try {
