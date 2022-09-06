@@ -1,5 +1,9 @@
 const db = require("../../models");
 
+const {
+  sendDeliveryBoyNotificationToWhatsapp
+} = require("../../services/whatsapp/whatsapp");
+
 const User = db.UserModel;
 const UserRole = db.UserRoleModel;
 
@@ -51,6 +55,9 @@ const sendMessageToDeliveryBoy = async (req, res, next) => {
     });
 
     //send whatsapp message to that deilvery boy
+
+    sendDeliveryBoyNotificationToWhatsapp(currentUser.full_name.toString(), orderId.toString(), currentUser.mobile_no.toString());
+
 
     return res.status(200).send({
       success: true,
