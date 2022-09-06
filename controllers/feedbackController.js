@@ -2,6 +2,8 @@ const db = require("../models");
 
 const Feedback = db.FeedbackModel;
 const Customer = db.CustomerModel;
+const Order = db.OrderModel;
+const OrderItems = db.OrderItemsModel;
 
 const getAllFeedbacks = async (req, res, next) => {
   const { item_id } = req.params;
@@ -21,6 +23,23 @@ const getAllFeedbacks = async (req, res, next) => {
         where: { cust_no: current.cust_no },
       });
 
+      let numberOfRatings;
+      let numberOfReviews;
+      let totalRating;
+      let averageRating;
+
+      feedbacks.map((current) => {
+        if (current.stars) {
+          numberOfRatings++;
+          totalRating += current.stars;
+        }
+        if (current.description) {
+          numberOfReviews++;
+        }
+      });
+
+      averageRating = totalRating / numberOfRatings;
+
       return {
         current,
         currentUser,
@@ -31,7 +50,12 @@ const getAllFeedbacks = async (req, res, next) => {
 
     return res.status(200).send({
       success: true,
-      data: resolved,
+      data: {
+        feedbacks: resolved,
+        numberOfRatings,
+        numberOfReviews,
+        averageRating,
+      },
       message: "Found all feedbacks for this current item",
     });
   } catch (error) {
@@ -86,10 +110,48 @@ const createFeedback = async (req, res, next) => {
   const { stars, description } = req.body;
 
   try {
+    const currentOrders = await Order.findAll({
+      where: { cust_no },
+    });
+
+    let userOrderedThisItem = false;
+
+    if (currentOrders.length === 0) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message:
+          "You have not placed any orders, hence you cant review an item",
+      });
+    }
+
+    currentOrders.map(async (currentOrder) => {
+      const OrderItems = await OrderItems.findAll({
+        where: { order_id: currentOrder.order_id },
+      });
+
+      if (OrderItems.length !== 0) {
+        OrderItems.map((currentItem) => {
+          if (currentItem.id === item_id) {
+            userOrderedThisItem = true;
+          }
+        });
+      }
+    });
+
+    if (!userOrderedThisItem) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message:
+          "You have not ordered this item, hence you cant place a review",
+      });
+    }
+
     const newFeedback = await Feedback.create({
       cust_no,
       item_id,
-      stars,
+      stars: parseInt(stars),
       description,
       created_by: 1,
     });
@@ -115,7 +177,7 @@ const editFeedback = async (req, res, next) => {
 
   try {
     const currentFeedback = await Feedback.findOne({
-      where: { id },
+      where: { id, cust_no },
     });
 
     if (!currentFeedback) {
@@ -132,12 +194,12 @@ const editFeedback = async (req, res, next) => {
         description,
       },
       {
-        where: { id },
+        where: { id, cust_no },
       }
     );
 
     const updatedFeedback = await Feedback.findOne({
-      where: { id },
+      where: { id, cust_no },
     });
 
     return res.status(200).send({
@@ -160,10 +222,11 @@ const editFeedback = async (req, res, next) => {
 
 const deleteFeedback = async (req, res, next) => {
   const { id } = req.params;
+  const { cust_no } = req;
 
   try {
     const currentFeedback = await Feedback.findOne({
-      where: { id },
+      where: { id, cust_no },
     });
 
     if (!currentFeedback) {
@@ -175,7 +238,7 @@ const deleteFeedback = async (req, res, next) => {
     }
 
     const deletedFeedback = await Feedback.destroy({
-      where: { id },
+      where: { id, cust_no },
     });
 
     return res.status(200).send({
