@@ -110,13 +110,13 @@ const createFeedback = async (req, res, next) => {
   const { stars, description, title } = req.body;
 
   try {
-    const currentOrders = await Order.findAll({
+    const ordersForCurrentUser = await Order.findAll({
       where: { cust_no },
     });
 
-    console.log("Orders for this customer", currentOrders);
+    console.log("Orders for this customer", ordersForCurrentUser);
 
-    if (currentOrders.length === 0) {
+    if (ordersForCurrentUser.length === 0) {
       return res.status(400).send({
         success: false,
         data: [],
@@ -125,13 +125,30 @@ const createFeedback = async (req, res, next) => {
       });
     }
 
-    // const promises = currentOrders.map(async (currentOrder) => {
-
-    // });
-
-
     let userOrderedThisItem = false;
-    console.log(userOrderedThisItem);
+
+    const promises = ordersForCurrentUser.map(async (currentOrder) => {
+      const itemsInCurrentOrder = await OrderItems.findAll({
+        where: { order_id: currentOrder.order_id },
+      });
+
+      return {
+        order_id: currentOrder.order_id,
+        itemsInCurrentOrder,
+      };
+    });
+
+    const resolved = await Promise.all(promises);
+
+    resolved.map(async (currentOrder) => {
+      currentOrder.itemsInCurrentOrder.map((currentItem) => {
+        console.log("Item for feedback", item_id);
+        console.log("Item in order", currentItem.item_id);
+        if (currentItem.item_id == item_id) {
+          userOrderedThisItem = true;
+        }
+      });
+    });
 
     if (!userOrderedThisItem) {
       console.log("In if");
