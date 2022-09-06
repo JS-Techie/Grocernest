@@ -160,6 +160,18 @@ const createFeedback = async (req, res, next) => {
       });
     }
 
+    const feedbackExists = await Feedback.findOne({
+      where: { item_id, cust_no },
+    });
+
+    if (feedbackExists) {
+      return res.status(400).send({
+        success: false,
+        data: feedbackExists,
+        message: "You have already added a review for this item",
+      });
+    }
+
     const newFeedback = await Feedback.create({
       title,
       cust_no,
