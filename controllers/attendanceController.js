@@ -44,16 +44,18 @@ const registerLogoutTime = async (req, res, next) => {
     }
 
     attendances.map(async (current) => {
-      await Attendance.update(
-        {
-          logout_time: new Date(),
-        },
-        {
-          where: {
-            id: current.id,
+      if (!current.logout_time) {
+        await Attendance.update(
+          {
+            logout_time: new Date(),
           },
-        }
-      );
+          {
+            where: {
+              id: current.id,
+            },
+          }
+        );
+      }
     });
 
     return res.status(200).send({

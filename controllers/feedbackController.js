@@ -107,7 +107,7 @@ const getFeedbackById = async (req, res, next) => {
 const createFeedback = async (req, res, next) => {
   const { item_id } = req.params;
   const { cust_no } = req;
-  const { stars, description } = req.body;
+  const { stars, description,title } = req.body;
 
   try {
     const currentOrders = await Order.findAll({
@@ -149,6 +149,7 @@ const createFeedback = async (req, res, next) => {
     }
 
     const newFeedback = await Feedback.create({
+      title,
       cust_no,
       item_id,
       stars: parseInt(stars),
@@ -172,7 +173,7 @@ const createFeedback = async (req, res, next) => {
 
 const editFeedback = async (req, res, next) => {
   const { id, item_id } = req.params;
-  const { stars, description } = req.body;
+  const { stars, description,title } = req.body;
   const { cust_no } = req;
 
   try {
@@ -192,6 +193,7 @@ const editFeedback = async (req, res, next) => {
       {
         stars,
         description,
+        title
       },
       {
         where: { id, cust_no },

@@ -462,6 +462,11 @@ const returnOrder = async (req, res, next) => {
         message: "Please enter the items you would like to return",
       });
     }
+
+    items.map((currentItem)=>{
+      
+    })
+
   } catch (error) {
     return res.status(400).send({
       success: false,
