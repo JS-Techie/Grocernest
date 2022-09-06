@@ -275,7 +275,12 @@ MODIFY
 ALTER TABLE
   ecomm.t_leave
 MODIFY
-  COLUMN leave_type ENUM("Annual/Casual", "Maternity", "Paternity", "Sick") DEFAULT NULL NULL;
+  COLUMN leave_type ENUM(
+    "Annual/Casual",
+    "Maternity",
+    "Paternity",
+    "Sick"
+  ) DEFAULT NULL NULL;
 
 ALTER TABLE
   ecomm.t_task
@@ -292,4 +297,16 @@ CREATE TABLE grocernest_pre_prod.t_attendance (
   `created_at` timestamp NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NULL DEFAULT NULL,
   CONSTRAINT NewTable_PK PRIMARY KEY (id)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
+
+CREATE TABLE grocernest_pre_prod.t_feedback (
+  id BIGINT(20) auto_increment NOT NULL,
+  cust_no varchar(20) NOT NULL,
+  stars bigint(10) NULL,
+  description varchar(5000) NULL,
+  `created_by` bigint(20) NOT NULL,
+  `updated_by` bigint(20) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT NULL,
+  CONSTRAINT t_feedback_PK PRIMARY KEY (id)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
