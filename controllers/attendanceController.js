@@ -3,7 +3,7 @@ const db = require("../models");
 const Attendance = db.AttendanceModel;
 
 const registerLoginTime = async (req, res, next) => {
-  const user_id = req.USERID;
+  const { user_id } = req;
 
   try {
     const newAttendance = await Attendance.create({
@@ -28,7 +28,7 @@ const registerLoginTime = async (req, res, next) => {
 };
 
 const registerLogoutTime = async (req, res, next) => {
-  const user_id = req.USERID;
+  const { user_id } = req;
 
   try {
     const attendances = await Attendance.findAll({
