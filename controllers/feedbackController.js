@@ -36,10 +36,12 @@ const getAllFeedbacks = async (req, res, next) => {
 
     const resolved = await Promise.all(promises);
 
+    console.log(resolved);
+
     resolved.map((currentFeedbackDetails) => {
       if (currentFeedbackDetails.current.stars) {
         numberOfRatings++;
-        totalRating += current.stars;
+        totalRating += currentFeedbackDetails.current.stars;
       }
       if (currentFeedbackDetails.current.description) {
         numberOfReviews++;
