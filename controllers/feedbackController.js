@@ -18,15 +18,15 @@ const getAllFeedbacks = async (req, res, next) => {
       });
     }
 
+    let numberOfRatings;
+    let numberOfReviews;
+    let totalRating;
+    let averageRating;
+
     const promises = feedbacks.map(async (current) => {
       const currentUser = await Customer.findOne({
         where: { cust_no: current.cust_no },
       });
-
-      let numberOfRatings;
-      let numberOfReviews;
-      let totalRating;
-      let averageRating;
 
       feedbacks.map((current) => {
         if (current.stars) {
