@@ -58,6 +58,7 @@ const leaveRouter = require("./routes/leaveRoutes");
 const taskRouter = require("./routes/taskRoutes");
 const posRouter = require("./routes/posRoutes");
 const attendanceRouter = require("./routes/attendanceRoutes");
+const feedbackRouter = require("./routes/feedbackRoutes");
 
 // admin routers import
 const adminOrderRouter = require("./routes/admin/orderRoutes");
@@ -107,6 +108,7 @@ app.use("/leave", leaveRouter);
 app.use("/task", taskRouter);
 app.use(posRouter);
 app.use(attendanceRouter);
+app.use("/feedback", feedbackRouter);
 
 // admin routes
 app.use("/admin/orders", adminOrderRouter);
