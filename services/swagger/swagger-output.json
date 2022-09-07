@@ -1976,10 +1976,26 @@
             "in": "path",
             "required": true,
             "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
           },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/feedback/view/{id}": {
+      "get": {
+        "description": "",
+        "parameters": [
           {
-            "name": "authorization",
-            "in": "header",
+            "name": "id",
+            "in": "path",
+            "required": true,
             "type": "string"
           }
         ],
@@ -1989,19 +2005,16 @@
           },
           "400": {
             "description": "Bad Request"
-          },
-          "404": {
-            "description": "Not Found"
           }
         }
       }
     },
-    "/feedback/view/{id}/": {
+    "/feedback/my/{item_id}": {
       "get": {
         "description": "",
         "parameters": [
           {
-            "name": "id",
+            "name": "item_id",
             "in": "path",
             "required": true,
             "type": "string"
@@ -2072,7 +2085,7 @@
         }
       }
     },
-    "/feedback/edit/{id}/": {
+    "/feedback/edit/{id}": {
       "patch": {
         "description": "",
         "parameters": [
@@ -2119,7 +2132,7 @@
         }
       }
     },
-    "/feedback/delete/{id}/": {
+    "/feedback/delete/{id}": {
       "delete": {
         "description": "",
         "parameters": [
