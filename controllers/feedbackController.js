@@ -106,6 +106,43 @@ const getFeedbackById = async (req, res, next) => {
   }
 };
 
+const getMyFeedback = async (req, res, next) => {
+  const { item_id } = req.params;
+  const { cust_no } = req;
+
+  // im getting item_id and cust_no
+
+  try {
+    const feedback = await Feedback.findOne({
+      where: {
+        cust_no,
+        item_id
+      },
+    });
+    if (!feedback) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "No feedback available for this current item",
+      });
+    }
+    return res.status(200).send({
+      success: true,
+      data: {
+        feedback
+      },
+      message: "Found requested feedback for current item",
+    });
+  }
+  catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "There is some error while fetching the review",
+    });
+  }
+}
+
 const createFeedback = async (req, res, next) => {
   const { item_id } = req.params;
   const { cust_no } = req;
@@ -292,4 +329,5 @@ module.exports = {
   createFeedback,
   editFeedback,
   deleteFeedback,
+  getMyFeedback
 };
