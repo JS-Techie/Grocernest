@@ -688,6 +688,7 @@ const InvoiceGen = async (cust_no, order_id, email, contact_no, opt_in) => {
           isGift: item.is_gift == 1 ? true : false,
           isOffer: item.is_offer == 1 ? true : false,
           offerPrice: item.is_offer == 1 ? offer_price : "",
+          salePrice: oldestBatch.sale_price
         };
       }
     });

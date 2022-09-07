@@ -18,30 +18,11 @@ const getWishlist = async (req, res, next) => {
   const currentUser = req.cust_no;
 
   try {
-    const [wishlist, metadata] = await sequelize.query(` select 
-      t_wishlist_items.item_id, 
-      t_item.name, 
-      t_item.image, 
-      t_item.category_id, 
-      t_item.sub_category_id, 
-      t_item.description, 
-      t_item.UOM, 
-      t_lkp_category.group_name, 
-      t_lkp_sub_category.sub_cat_name 
-    from 
-      (
-        (
-          (
-            t_wishlist_items 
-            inner join t_item on t_item.id = t_wishlist_items.item_id
-          ) 
-          inner join t_lkp_category on t_lkp_category.id = t_item.category_id
-        ) 
-        INNER join t_lkp_sub_category on t_lkp_sub_category.id = t_item.sub_category_id
-      ) 
-    where 
-      t_wishlist_items.cust_no = "${currentUser}"
-    `);
+    const [wishlist, metadata] =
+      await sequelize.query(`SELECT t_wishlist_items.item_id ,t_item.name ,t_item.category_id ,t_item.image ,t_item.description, t_lkp_category.group_name  from t_wishlist_items 
+    inner join t_item on t_item.id = t_wishlist_items.item_id 
+    inner join t_lkp_category on t_lkp_category.id = t_item.category_id 
+    where t_wishlist_items.cust_no = "${currentUser}"`);
 
     if (wishlist.length === 0) {
       return res.status(404).send({

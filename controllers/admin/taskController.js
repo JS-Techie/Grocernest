@@ -1,6 +1,7 @@
 const db = require("../../models");
 
 const Task = db.TaskModel;
+const User = db.UserModel;
 
 const getAllTasks = async (req, res, next) => {
   try {
@@ -14,9 +15,24 @@ const getAllTasks = async (req, res, next) => {
       });
     }
 
+    const promises = tasks.map(async (current) => {
+      const currentUser = await User.findOne({
+        where: { id: current.user_id },
+      });
+
+      return {
+        currentUser,
+        current,
+      };
+    });
+
+    const resolved = await Promise.all(promises);
+
+    console.log(promises);
+
     return res.status(200).send({
       success: true,
-      data: tasks,
+      data: resolved,
       message: "",
     });
   } catch (error) {
@@ -43,10 +59,59 @@ const getTaskById = async (req, res, next) => {
       });
     }
 
+    const currentUser = await User.findOne({
+      where: { id: task.user_id },
+    });
+
     return res.status(200).send({
       success: true,
-      data: task,
+      data: {
+        task,
+        currentUser,
+      },
       message: "Found requested task",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "Please check data field for more details",
+    });
+  }
+};
+
+const getTaskByStatus = async (req, res, next) => {
+  const { status } = req.params;
+  try {
+    const tasks = await Task.findAll({
+      where: { status },
+    });
+
+    if (tasks.length === 0) {
+      return res.status(200).send({
+        success: true,
+        data: [],
+        message: `There are no ${status} leaves`,
+      });
+    }
+
+    const promises = tasks.map(async (current) => {
+      const currentUser = await User.findOne({
+        where: { id: current.user_id },
+      });
+
+      return {
+        current,
+        currentUser,
+      };
+    });
+
+    const resolved = await Promise.all(promises);
+
+    return res.status(200).send({
+      success: true,
+      data: resolved,
+      message: `Found all ${status} tasks`,
     });
   } catch (error) {
     return res.status(400).send({
@@ -222,6 +287,7 @@ const deleteTask = async (req, res, next) => {
 module.exports = {
   getAllTasks,
   getTaskById,
+  getTaskByStatus,
   createTask,
   editTask,
   editTaskStatus,

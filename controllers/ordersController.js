@@ -85,23 +85,23 @@ const getAllOrders = async (req, res, next) => {
               currentOrderItem.is_offer === 1 ? (isEdit ? true : false) : "",
             offerDetails: currentOffer
               ? {
-                offerID: currentOffer.id,
-                offerType: currentOffer.type,
-                itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
-                quantityOfItemX: currentOffer.item_1_quantity
-                  ? currentOffer.item_1_quantity
-                  : "",
-                itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
-                quantityOfItemY: currentOffer.item_2_quantity
-                  ? currentOffer.item_2_quantity
-                  : "",
-                itemID: currentOffer.item_id ? currentOffer.item_id : "",
-                amountOfDiscount: currentOffer.amount_of_discount
-                  ? currentOffer.amount_of_discount
-                  : "",
-                isPercentage: currentOffer.is_percentage ? true : false,
-                isActive: currentOffer.is_active ? true : false,
-              }
+                  offerID: currentOffer.id,
+                  offerType: currentOffer.type,
+                  itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
+                  quantityOfItemX: currentOffer.item_1_quantity
+                    ? currentOffer.item_1_quantity
+                    : "",
+                  itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
+                  quantityOfItemY: currentOffer.item_2_quantity
+                    ? currentOffer.item_2_quantity
+                    : "",
+                  itemID: currentOffer.item_id ? currentOffer.item_id : "",
+                  amountOfDiscount: currentOffer.amount_of_discount
+                    ? currentOffer.amount_of_discount
+                    : "",
+                  isPercentage: currentOffer.is_percentage ? true : false,
+                  isActive: currentOffer.is_active ? true : false,
+                }
               : "",
           };
         }
@@ -224,23 +224,23 @@ const getOrderByOrderId = async (req, res, next) => {
             currentOrderItem.is_offer === 1 ? (isEdit ? true : false) : "",
           offerDetails: currentOffer
             ? {
-              offerID: currentOffer.id,
-              offerType: currentOffer.type,
-              itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
-              quantityOfItemX: currentOffer.item_1_quantity
-                ? currentOffer.item_1_quantity
-                : "",
-              itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
-              quantityOfItemY: currentOffer.item_2_quantity
-                ? currentOffer.item_2_quantity
-                : "",
-              itemID: currentOffer.item_id ? currentOffer.item_id : "",
-              amountOfDiscount: currentOffer.amount_of_discount
-                ? currentOffer.amount_of_discount
-                : "",
-              isPercentage: currentOffer.is_percentage ? true : false,
-              isActive: currentOffer.is_active ? true : false,
-            }
+                offerID: currentOffer.id,
+                offerType: currentOffer.type,
+                itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
+                quantityOfItemX: currentOffer.item_1_quantity
+                  ? currentOffer.item_1_quantity
+                  : "",
+                itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
+                quantityOfItemY: currentOffer.item_2_quantity
+                  ? currentOffer.item_2_quantity
+                  : "",
+                itemID: currentOffer.item_id ? currentOffer.item_id : "",
+                amountOfDiscount: currentOffer.amount_of_discount
+                  ? currentOffer.amount_of_discount
+                  : "",
+                isPercentage: currentOffer.is_percentage ? true : false,
+                isActive: currentOffer.is_active ? true : false,
+              }
             : "",
         };
       }
@@ -402,7 +402,11 @@ const cancelOrder = async (req, res, next) => {
     sendCancelledByUserStatusEmail(email.toString(), singleOrder.order_id);
 
     // send whatsapp
-    sendOrderStatusToWhatsapp(cust.contact_no, singleOrder.order_id, "Cancelled");
+    sendOrderStatusToWhatsapp(
+      cust.contact_no,
+      singleOrder.order_id,
+      "Cancelled"
+    );
 
     return res.status(200).send({
       success: true,
@@ -422,54 +426,52 @@ const cancelOrder = async (req, res, next) => {
 };
 
 const returnOrder = async (req, res, next) => {
-  //get currentUser from req.cust_no
-  const currentUser = req.cust_no;
-
-  //get orderId from req.body
-  const orderId = req.params.orderId;
+  const { cust_no } = req;
+  const order_id = req.params.orderId;
+  const { items } = req.body;
 
   try {
-    //check if that orderId belongs to that customer
-    const singleOrder = await Order.findOne({
-      where: {
-        cust_no: currentUser,
-        order_id: orderId,
-      },
+    const currentOrder = await Order.findOne({
+      where: { cust_no, order_id },
     });
 
-    if (!singleOrder) {
+    if (!currentOrder) {
       return res.status(400).send({
         success: false,
-        data: null,
-        message: "Could not fetch requested order for current user",
+        data: [],
+        message: "Requested order not found for current user",
       });
     }
 
-    let include_array = ["Placed", "Accepted", "Shipped", "Delivered"];
-    if (!include_array.includes(singleOrder.status)) {
+    if (
+      currentOrder.status !== "Delivered" ||
+      currentOrder.status === "Returned" ||
+      currentOrder.status === "Cancelled"
+    ) {
       return res.status(400).send({
         success: false,
-        data: singleOrder,
-        message: "This order cannot be returned",
+        data: currentOrder.status,
+        message: `This order cannot be returned because it is ${currentOrder.status}`,
       });
     }
 
-    const updatedOrderStatus = await singleOrder.update({
-      status: "Returned",
-      where: { order_id: singleOrder.order_id },
-    });
+    if (items.length === 0) {
+      return res.status(400).send({
+        success: false,
+        data: currentOrder,
+        message: "Please enter the items you would like to return",
+      });
+    }
 
-    return res.status(200).send({
-      success: true,
-      data: updatedOrderStatus,
-      message: "Requested order successfully Returned",
-    });
+    items.map((currentItem)=>{
+      
+    })
+
   } catch (error) {
     return res.status(400).send({
       success: false,
       data: error.message,
-      message:
-        "Error occured while trying to fetch requested order for current user",
+      message: "Please check data field for more details",
     });
   }
 };

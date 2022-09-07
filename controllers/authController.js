@@ -4,7 +4,8 @@ const referralCodeGenerator = require("referral-code-generator");
 const bcrypt = require("bcryptjs");
 const uniqid = require("uniqid");
 const axios = require("axios");
-// const { sendRegistrationWhatsapp } = require('../services/whatsapp/whatsapp');
+const { optIn, optOut } = require("../services/whatsapp/optInOut");
+const { sendOTPToWhatsapp } = require("../services/whatsapp/whatsapp");
 const { sendRegistrationEmail } = require("../services/mail/mailService");
 const db = require("../models");
 
@@ -111,17 +112,17 @@ const register = async (req, res, next) => {
     }
 
     //verify captcha, if success, continue else return from here
-    // const responseFromGoogle = await axios.post(
-    //   `https://www.google.com/recaptcha/api/siteverify?secret=6Lf2mZohAAAAAOv_tii4pRcP29HpX1HS8wCjumg6&response=${recaptchaEnteredByUser}`
-    // );
+    const responseFromGoogle = await axios.post(
+      `https://www.google.com/recaptcha/api/siteverify?secret=6Lf2mZohAAAAAOv_tii4pRcP29HpX1HS8wCjumg6&response=${recaptchaEnteredByUser}`
+    );
 
-    // if (responseFromGoogle.data.success == false) {
-    //   return res.status(400).send({
-    //     success: false,
-    //     data: responseFromGoogle.data,
-    //     message: "Please enter captcha",
-    //   });
-    // }
+    if (responseFromGoogle.data.success == false) {
+      return res.status(400).send({
+        success: false,
+        data: responseFromGoogle.data,
+        message: "Please enter captcha",
+      });
+    }
 
     console.log(firstName, lastName, password, email, phoneNumber);
 
@@ -196,6 +197,19 @@ const register = async (req, res, next) => {
           };
         } else {
           console.log("New Customer");
+
+          // opt in the user number for sending otp purpose
+          const response = await Promise.resolve(
+            optIn("91" + phoneNumber.toString())
+          );
+          if (response != 202)
+            return res.status(400).send({
+              success: false,
+              data: "",
+              message: "error occured while opt in whatsapp number",
+            });
+          // that's it
+
           newUser = {
             id: Math.floor(Math.random() * 10000 + 1),
             cust_no: uniqid(),
@@ -232,6 +246,9 @@ const register = async (req, res, next) => {
               "User created and OTP successfully sent, find the OTP from getOTP route",
           });
         } catch (error) {
+          await Cache.destroy({
+            where: { cust_no: newUser.cust_no },
+          });
           return res.status(400).send({
             success: false,
             data: error.message,
@@ -363,20 +380,20 @@ const verifyOTP = async (req, res, next) => {
     // sendRegistrationWhatsapp(newUser.contact_no);
 
     // creating new coupon while successful reg.
-    const newCoupon = await Coupon.create({
-      code: "FIRSTBUY",
-      amount_of_discount: 10,
-      is_percentage: 1,
-      assigned_user: newUser.cust_no,
-      created_by: 1,
-      description: "Flat 10% off on your first purchase, use code FIRSTBUY",
-    });
+    // const newCoupon = await Coupon.create({
+    //   code: "FIRSTBUY",
+    //   amount_of_discount: 10,
+    //   is_percentage: 1,
+    //   assigned_user: newUser.cust_no,
+    //   created_by: 1,
+    //   description: "Flat 10% off on your first purchase, use code FIRSTBUY",
+    // });
 
-    sendFirstCouponToUser(
-      newCustomer.cust_name.split(" ")[0],
-      newCustomer.contact_no,
-      newCoupon.code
-    );
+    // sendFirstCouponToUser(
+    //   newCustomer.cust_name.split(" ")[0],
+    //   newCustomer.contact_no,
+    //   newCoupon.code
+    // );
 
     const deletedField = await Cache.destroy({
       where: { cust_no },
@@ -386,13 +403,13 @@ const verifyOTP = async (req, res, next) => {
       success: true,
       data: {
         created: newCustomer,
-        coupon: {
-          code: newCoupon.code,
-          amount: newCoupon.is_percentage
-            ? newCoupon.amount_of_discount + "%"
-            : newCoupon.amount_of_discount,
-          description: newCoupon.description,
-        },
+        // coupon: {
+        //   code: newCoupon.code,
+        //   amount: newCoupon.is_percentage
+        //     ? newCoupon.amount_of_discount + "%"
+        //     : newCoupon.amount_of_discount,
+        //   description: newCoupon.description,
+        // },
         deletedFromCache: deletedField,
       },
       message: "User successfully validated and registered",
@@ -417,7 +434,7 @@ const forgotPassword = async (req, res, next) => {
   try {
     //Check if the phone number exists
     const customerExists = await Customer.findOne({
-      where: { contact_no: phoneNumber },
+      where: { contact_no: phoneNumber, registered_for_ecomm: 1 },
     });
 
     console.log(customerExists);
@@ -435,6 +452,7 @@ const forgotPassword = async (req, res, next) => {
     //sendOTPToPhoneNumber(serverGeneratedOTP)
 
     const response = await Cache.create({
+      cust_no: customerExists.cust_no,
       user_details: JSON.stringify(customerExists),
       generated_otp: serverGeneratedOTP,
       created_by: 6,
@@ -442,11 +460,23 @@ const forgotPassword = async (req, res, next) => {
 
     return res.status(200).send({
       success: true,
-      data: response,
+      data: {
+        response,
+        cust_no: customerExists.cust_no,
+      },
       message:
         "OTP successfully sent, validation required, get the otp from the /getToken route route",
     });
   } catch (error) {
+    const cacheExists = await Cache.findOne({
+      where: { cust_no },
+    });
+
+    if (cacheExists) {
+      await Cache.destroy({
+        where: { cust_no },
+      });
+    }
     return res.status(400).send({
       success: false,
       data: error.message,
@@ -459,10 +489,16 @@ const forgotPassword = async (req, res, next) => {
 const verifyToken = async (req, res, next) => {
   //get the user entered OTP
   const userEnteredOTP = req.body.otp;
+  const { cust_no } = req.body;
 
   try {
-    const CacheDetails = await Cache.findAll();
-    const serverGeneratedOTP = await CacheDetails[0].generated_otp;
+    const CacheDetails = await Cache.findOne({
+      where: { cust_no },
+    });
+    const serverGeneratedOTP = await CacheDetails.generated_otp;
+
+    console.log(CacheDetails.generated_otp);
+    console.log(userEnteredOTP);
 
     if (serverGeneratedOTP !== userEnteredOTP) {
       return res.status(400).send({
@@ -474,7 +510,7 @@ const verifyToken = async (req, res, next) => {
 
     return res.status(200).send({
       success: true,
-      data: JSON.parse(CacheDetails[0].user_details),
+      data: CacheDetails,
       message:
         "OTP successfully validated, user can proceed to change password",
     });
@@ -490,15 +526,16 @@ const verifyToken = async (req, res, next) => {
 
 const changePassword = async (req, res, next) => {
   //Get the customer number from the body
-  const { newPassword } = req.body;
-  const customer = await Cache.findAll();
-  const customerDetails = JSON.parse(customer[0].user_details);
+  const { newPassword, cust_no } = req.body;
 
-  const customerNumber = customerDetails.cust_no;
+  const customer = await Cache.findOne({
+    where: { cust_no },
+  });
+  const customerDetails = JSON.parse(customer.user_details);
 
   try {
     const currentUser = await Customer.findOne({
-      where: { cust_no: customerNumber },
+      where: { cust_no },
     });
 
     if (!currentUser) {
@@ -518,13 +555,13 @@ const changePassword = async (req, res, next) => {
       },
       {
         where: {
-          cust_no: customerNumber,
+          cust_no,
         },
       }
     );
 
     const deletedField = await Cache.destroy({
-      where: { generated_otp: customer[0].generated_otp },
+      where: { cust_no },
     });
 
     return res.status(200).send({
@@ -565,12 +602,34 @@ const getOTP = async (req, res, next) => {
   console.log(CacheDetails);
   try {
     if (CacheDetails) {
+      let cacheParseData = JSON.parse(CacheDetails.user_details);
+
+      console.log(cacheParseData);
+
+      console.log(cacheParseData.new_phone_number === "");
+      console.log(cacheParseData.new_phone_number);
+
+      if (cacheParseData.new_phone_number) {
+        console.log("In if");
+        // sending OTP to whatsapp for now.
+        await sendOTPToWhatsapp(
+          cacheParseData.new_phone_number.toString(),
+          await CacheDetails.generated_otp
+        );
+      } else {
+        console.log("In else");
+        await sendOTPToWhatsapp(
+          cacheParseData.contact_no.toString(),
+          await CacheDetails.generated_otp
+        );
+      }
+
       return res.status(200).send({
         success: true,
         data: {
           // user: await JSON.parse(CacheDetails[0].user_details),
           otp: await CacheDetails.generated_otp,
-          user: JSON.parse(CacheDetails.user_details),
+          user: cacheParseData,
         },
         message:
           "OTP generated and user created, waiting to store new user in DB",
