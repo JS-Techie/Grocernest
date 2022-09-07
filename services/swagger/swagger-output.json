@@ -3110,9 +3110,6 @@
                 },
                 "is_percentage": {
                   "example": "any"
-                },
-                "is_active": {
-                  "example": "any"
                 }
               }
             }

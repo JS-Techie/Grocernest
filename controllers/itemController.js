@@ -391,7 +391,7 @@ const getItemById = async (req, res, next) => {
     //Find all the details of the item pertaining to current item id
     const [itemResults, metadata] =
       await sequelize.query(`select distinct t_item.id, t_item.name,t_item.brand_id,t_item.UOM ,t_item.category_id, t_lkp_category.group_name,t_item.sub_category_id , t_lkp_sub_category.sub_cat_name 
-      ,t_item.image ,t_item.description ,t_item.available_for_ecomm ,t_batch.batch_no ,
+      ,t_item.image ,t_item.description ,t_item.available_for_ecomm ,t_batch.batch_no ,t_item.how_to_use,
       t_batch.location_id ,t_batch.MRP ,t_batch.discount ,t_batch.cost_price ,t_batch.mfg_date ,t_batch.sale_price ,
       t_batch.expiry_date,
       t_inventory.cashback, t_inventory.cashback_is_percentage,
@@ -530,6 +530,7 @@ const getItemById = async (req, res, next) => {
         isPercentage: offer ? (offer.is_percentage ? true : false) : "",
         createdBy: offer ? (offer.created_by ? offer.created_by : "") : "",
         coupon: couponForCurrentItem ? couponForCurrentItem : "",
+        howToUse : item.how_to_use ? item.how_to_use : ""
       },
       message: "Details for requested item found",
     });
