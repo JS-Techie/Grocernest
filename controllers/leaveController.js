@@ -153,6 +153,14 @@ const editLeave = async (req, res, next) => {
       });
     }
 
+    if (currentLeave.status !== "Pending") {
+      return res.status(400).send({
+        success: false,
+        data: currentLeave,
+        message: `This leave cannot be edited because it is ${currentLeave.status}`,
+      });
+    }
+
     const updateLeave = await Leave.update(
       {
         start_date,
