@@ -3,6 +3,7 @@ const { Op } = require("sequelize");
 const db = require("../../models");
 const Order = db.OrderModel;
 const OrderItems = db.OrderItemsModel;
+const User = db.UserModel
 const {
   sendOrderStatusEmail,
   sendCancelledStatusEmail,
@@ -131,6 +132,12 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
     }
 
     const promises = results.map(async (current) => {
+      const dboy_name = await User.findOne({
+        where: {
+          id: current.delivery_boy,
+          type_cd: "DELIVERY_BOY"
+        }
+      })
       return {
         cust_name: current.cust_name,
         contact_no: current.contact_no,
@@ -139,7 +146,7 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
         status: current.status,
         created_at: current.created_at,
         created_by: current.created_by,
-        transporter_name: current.transporter_name,
+        transporter_name: dboy_name ? dboy_name.full_name : "",
         cancellation_reason: current.cancellation_reason,
         total: current.total,
         applied_discount: current.applied_discount,
@@ -755,12 +762,12 @@ const acceptedOrders = async (req, res, next) => {
 
 const assignTransporter = async (req, res, next) => {
   let orderId = req.body.orderId;
-  let transporterName = req.body.transporterName;
+  let transporterName = req.body.delivery_boy;
 
   Order.update(
     {
       status: "Shipped",
-      transporter_name: transporterName,
+      delivery_boy: parseInt(transporterName),
     },
     { where: { order_id: orderId } }
   )
@@ -834,6 +841,13 @@ const getShippedOrders = async (req, res, next) => {
     }
 
     const promises = results.map(async (current) => {
+
+      const dboy_name = await User.findOne({
+        where: {
+          id: current.delivery_boy,
+          type_cd: "DELIVERY_BOY"
+        }
+      })
       return {
         cust_name: current.cust_name,
         contact_no: current.contact_no,
@@ -843,7 +857,7 @@ const getShippedOrders = async (req, res, next) => {
         created_at: current.created_at,
         created_by: current.created_by,
         total: current.total,
-        transporterName: current.transporter_name,
+        transporterName: dboy_name ? dboy_name.full_name : "",
       };
     });
 
@@ -880,6 +894,13 @@ const getDeliveredOrders = async (req, res, next) => {
     }
 
     const promises = results.map(async (current) => {
+      //Get delivery boy name and pass it in transportterName field
+      const dboy_name = await User.findOne({
+        where: {
+          id: current.delivery_boy,
+          type_cd: "DELIVERY_BOY"
+        }
+      })
       return {
         cust_name: current.cust_name,
         contact_no: current.contact_no,
@@ -889,7 +910,7 @@ const getDeliveredOrders = async (req, res, next) => {
         created_at: current.created_at,
         created_by: current.created_by,
         total: current.total,
-        transporterName: current.transporter_name,
+        transporterName: dboy_name ? dboy_name.full_name : "",
       };
     });
 
@@ -926,6 +947,15 @@ const getCanceledorders = async (req, res, next) => {
     }
 
     const promises = results.map(async (current) => {
+      //Find transporterName and pass it
+
+      const dboy_name = await User.findOne({
+        where: {
+          id: current.delivery_boy,
+          type_cd: "DELIVERY_BOY"
+        }
+      })
+
       return {
         cust_name: current.cust_name,
         contact_no: current.contact_no,
@@ -935,7 +965,7 @@ const getCanceledorders = async (req, res, next) => {
         created_at: current.created_at,
         created_by: current.created_by,
         total: current.total,
-        transporterName: current.transporter_name,
+        transporterName: dboy_name ? dboy_name.full_name : "",
         cancellation_reason: current.cancellation_reason,
       };
     });
