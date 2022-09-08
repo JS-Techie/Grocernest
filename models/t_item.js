@@ -210,6 +210,33 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "image_present"
+    },
+    how_to_use: {
+      type: DataTypes.STRING(5000),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "how_to_use"
+    },
+    country_of_origin: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "country_of_origin"
+    },
+    manufacturer_name: {
+      type: DataTypes.STRING(2000),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "manufacturer_name"
     }
   };
   const options = {
