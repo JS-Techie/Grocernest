@@ -165,6 +165,7 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "return_status"
+
     }
   };
   const options = {
