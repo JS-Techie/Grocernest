@@ -156,6 +156,16 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "delivery_boy"
+    },
+    return_status: {
+      type: DataTypes.ENUM('a', 'c', 'r', 'i'),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "return_status"
+
     }
   };
   const options = {

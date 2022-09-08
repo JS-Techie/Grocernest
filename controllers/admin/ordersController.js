@@ -17,6 +17,7 @@ const {
   sendAdminCancelledOrderStatusToWhatsapp,
 } = require("../../services/whatsapp/whatsapp");
 // const Customer = db.CustomerModel;
+
 const Batch = db.BatchModel;
 const Customer = db.CustomerModel;
 const OrderItem = db.OrderItemsModel;
@@ -986,6 +987,128 @@ const getCanceledorders = async (req, res, next) => {
   }
 };
 
+const assignDeliveryBoyForReturn = async (req, res, next) => {
+  const { order_id } = req.params;
+  const { delivery_boy } = req.body;
+
+  try {
+    const currentOrder = await Order.findOne({
+      where: { order_id },
+    });
+
+    if (!currentOrder) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "Could not find requested order",
+      });
+    }
+
+    await Order.update(
+      {
+        delivery_boy,
+      },
+      {
+        where: { order_id },
+      }
+    );
+
+    const updatedOrder = await Order.findOne({
+      where: { order_id },
+    });
+
+    return res.status(200).send({
+      success: true,
+      data: updatedOrder,
+      message: "Assigned requested delivery boy successfully",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "Please check data field for more details",
+    });
+  }
+};
+
+const rejectRequestedReturn = async (req, res, next) => {
+  const { order_id } = req.params;
+
+  try {
+    const currentOrder = await Order.findOne({
+      where: { order_id },
+    });
+
+    if (!currentOrder) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "Requested order not found",
+      });
+    }
+
+    await Order.update(
+      {
+        return_status: "c",
+      },
+      {
+        where: { order_id },
+      }
+    );
+
+    const updatedOrder = await Order.findOne({
+      where: { order_id },
+    });
+
+    //Notify customer about status of return
+
+    return res.status(400).send({
+      success: true,
+      data: updatedOrder,
+      message: "Successfully rejected requested return",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "Please check data field for more details",
+    });
+  }
+};
+
+const getRequestedReturns = async (req, res, next) => {
+  try {
+    const orders = await Order.findAll({
+      where: { return_status: "i" },
+      include: [
+        {
+          model: OrderItems,
+        },
+      ],
+    });
+
+    if (orders.length === 0) {
+      return res.status(200).send({
+        success: true,
+        data: [],
+        message: "There are no requested returns",
+      });
+    }
+
+    return res.status(200).send({
+      success: true,
+      data: orders,
+      message: "Found all requested returns",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "Please check data field for more details",
+    });
+  }
+};
+
 module.exports = {
   getAllPendingOrders,
   getOrderDetails,
@@ -996,4 +1119,7 @@ module.exports = {
   getDeliveredOrders,
   getCanceledorders,
   getAllOrderByPhoneNumber,
+  assignDeliveryBoyForReturn,
+  rejectRequestedReturn,
+  getRequestedReturns,
 };

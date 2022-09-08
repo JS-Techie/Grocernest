@@ -5,6 +5,7 @@ const WalletService = require("../services/walletService");
 const {
   sendCancelledByUserStatusEmail,
 } = require("../services/mail/mailService");
+
 const Order = db.OrderModel;
 const OrderItems = db.OrderItemsModel;
 const Item = db.ItemModel;
@@ -12,6 +13,7 @@ const Batch = db.BatchModel;
 const Offers = db.OffersModel;
 const Inventory = db.InventoryModel;
 const Customer = db.CustomerModel;
+const ReturnOrder = db.ReturnOrderModel;
 
 const { sendOrderStatusToWhatsapp } = require("../services/whatsapp/whatsapp");
 
@@ -445,13 +447,13 @@ const returnOrder = async (req, res, next) => {
 
     if (
       currentOrder.status !== "Delivered" ||
-      currentOrder.status === "Returned" ||
-      currentOrder.status === "Cancelled"
+      currentOrder.return_status !== "i" ||
+      currentOrder.return_status !== "r"
     ) {
       return res.status(400).send({
         success: false,
         data: currentOrder.status,
-        message: `This order cannot be returned because it is ${currentOrder.status}`,
+        message: `This order cannot be returned because it is ${currentOrder.status} and the return status is ${currentOrder.return_status}`,
       });
     }
 
@@ -463,10 +465,49 @@ const returnOrder = async (req, res, next) => {
       });
     }
 
-    items.map((currentItem)=>{
-      
-    })
+    items.map(async (currentItem) => {
+      const selectedBatch = await Batch.findOne({
+        where: { item_id: currentItem.id, mark_selected: 1 },
+      });
 
+      let item;
+      if (selectedBatch) {
+        item = await Inventory.findOne({
+          where: { batch_id: selectedBatch.id, item_id: currentItem.id },
+        });
+      }
+
+      await ReturnOrder.create({
+        order_id,
+        item_id: currentItem.item_id,
+        quantity: currentItem.quantity,
+        cashback_amount: item ? item.cashback : "",
+        is_percentage: item
+          ? item.cashback_is_percentage === 1
+            ? true
+            : false
+          : "",
+      });
+    });
+
+    await Order.update(
+      {
+        return_status: "i",
+      },
+      {
+        where: { order_id, cust_no },
+      }
+    );
+
+    const updatedOrder = await Order.findOne({
+      where: { order_id, cust_no },
+    });
+
+    return res.status(200).send({
+      success: true,
+      data: updatedOrder,
+      message: "Return initiated successfully",
+    });
   } catch (error) {
     return res.status(400).send({
       success: false,
