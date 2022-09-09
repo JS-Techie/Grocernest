@@ -13,7 +13,7 @@ const Batch = db.BatchModel;
 const Offers = db.OffersModel;
 const Inventory = db.InventoryModel;
 const Customer = db.CustomerModel;
-const ReturnOrder = db.ReturnOrderModel;
+const ReturnOrder = db.ReturnOrdersModel;
 
 const { sendOrderStatusToWhatsapp } = require("../services/whatsapp/whatsapp");
 
@@ -478,6 +478,7 @@ const returnOrder = async (req, res, next) => {
       }
 
       await ReturnOrder.create({
+        cust_no,
         order_id,
         item_id: currentItem.item_id,
         quantity: currentItem.quantity,
