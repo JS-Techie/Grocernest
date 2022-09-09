@@ -1,5 +1,7 @@
 const db = require("../models");
 
+const utcToIst = require("utc-to-indiantime");
+
 const Attendance = db.AttendanceModel;
 
 const registerLoginTime = async (req, res, next) => {
@@ -8,7 +10,7 @@ const registerLoginTime = async (req, res, next) => {
   try {
     const newAttendance = await Attendance.create({
       user_id,
-      login_time: new Date(),
+      login_time: utcToIst(new Date()),
       logout_time: null,
       created_by: 1,
     });
@@ -47,7 +49,7 @@ const registerLogoutTime = async (req, res, next) => {
       if (!current.logout_time) {
         await Attendance.update(
           {
-            logout_time: new Date(),
+            logout_time: utcToIst(new Date()),
           },
           {
             where: {

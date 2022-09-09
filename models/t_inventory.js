@@ -1,17 +1,15 @@
-const {
-  DataTypes
-} = require('sequelize');
+const { DataTypes, literal } = require("sequelize");
 
-module.exports = sequelize => {
+module.exports = (sequelize) => {
   const attributes = {
     id: {
       type: DataTypes.BIGINT,
       allowNull: false,
-      defaultValue: null,
+      defaultValue: literal("nextval(t_inventory_seq)"),
       primaryKey: true,
       autoIncrement: true,
       comment: null,
-      field: "id"
+      field: "id",
     },
     batch_id: {
       type: DataTypes.BIGINT,
@@ -23,8 +21,8 @@ module.exports = sequelize => {
       field: "batch_id",
       references: {
         key: "id",
-        model: "t_batch_model"
-      }
+        model: "t_batch_model",
+      },
     },
     location_id: {
       type: DataTypes.BIGINT,
@@ -36,8 +34,8 @@ module.exports = sequelize => {
       field: "location_id",
       references: {
         key: "id",
-        model: "t_lkp_location_model"
-      }
+        model: "t_lkp_location_model",
+      },
     },
     item_id: {
       type: DataTypes.BIGINT,
@@ -49,8 +47,8 @@ module.exports = sequelize => {
       field: "item_id",
       references: {
         key: "id",
-        model: "t_item_model"
-      }
+        model: "t_item_model",
+      },
     },
     quantity: {
       type: DataTypes.DECIMAL,
@@ -59,7 +57,7 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "quantity"
+      field: "quantity",
     },
     active_ind: {
       type: DataTypes.CHAR(1),
@@ -68,7 +66,7 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "active_ind"
+      field: "active_ind",
     },
     created_by: {
       type: DataTypes.BIGINT,
@@ -77,7 +75,7 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "created_by"
+      field: "created_by",
     },
     updated_by: {
       type: DataTypes.BIGINT,
@@ -86,16 +84,16 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "updated_by"
+      field: "updated_by",
     },
     created_at: {
       type: DataTypes.DATE,
       allowNull: false,
-      defaultValue: sequelize.fn('current_timestamp'),
+      defaultValue: sequelize.fn("current_timestamp"),
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "created_at"
+      field: "created_at",
     },
     updated_at: {
       type: DataTypes.DATE,
@@ -104,7 +102,7 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "updated_at"
+      field: "updated_at",
     },
     delivery_man: {
       type: DataTypes.STRING(250),
@@ -113,7 +111,7 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "delivery_man"
+      field: "delivery_man",
     },
     delivery_note: {
       type: DataTypes.STRING(250),
@@ -122,7 +120,7 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "delivery_note"
+      field: "delivery_note",
     },
     deluvery_contact_no: {
       type: DataTypes.STRING(45),
@@ -131,7 +129,7 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "deluvery_contact_no"
+      field: "deluvery_contact_no",
     },
     balance_type: {
       type: DataTypes.BIGINT,
@@ -143,8 +141,8 @@ module.exports = sequelize => {
       field: "balance_type",
       references: {
         key: "id",
-        model: "t_lkp_balance_type_model"
-      }
+        model: "t_lkp_balance_type_model",
+      },
     },
     cashback: {
       type: DataTypes.DECIMAL,
@@ -153,7 +151,7 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "cashback"
+      field: "cashback",
     },
     cashback_is_percentage: {
       type: DataTypes.INTEGER(1),
@@ -162,34 +160,43 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "cashback_is_percentage"
-    }
+      field: "cashback_is_percentage",
+    },
   };
   const options = {
     tableName: "t_inventory",
     comment: "",
-    indexes: [{
-      name: "batch_fkey",
-      unique: false,
-      type: "BTREE",
-      fields: ["batch_id"]
-    }, {
-      name: "item_id_fkey",
-      unique: false,
-      type: "BTREE",
-      fields: ["item_id"]
-    }, {
-      name: "location_fkey",
-      unique: false,
-      type: "BTREE",
-      fields: ["location_id"]
-    }, {
-      name: "balance_type_fkey_t_inventory_audit",
-      unique: false,
-      type: "BTREE",
-      fields: ["balance_type"]
-    }]
+    indexes: [
+      {
+        name: "batch_fkey",
+        unique: false,
+        type: "BTREE",
+        fields: ["batch_id"],
+      },
+      {
+        name: "item_id_fkey",
+        unique: false,
+        type: "BTREE",
+        fields: ["item_id"],
+      },
+      {
+        name: "location_fkey",
+        unique: false,
+        type: "BTREE",
+        fields: ["location_id"],
+      },
+      {
+        name: "balance_type_fkey_t_inventory_audit",
+        unique: false,
+        type: "BTREE",
+        fields: ["balance_type"],
+      },
+    ],
   };
-  const TInventoryModel = sequelize.define("t_inventory_model", attributes, options);
+  const TInventoryModel = sequelize.define(
+    "t_inventory_model",
+    attributes,
+    options
+  );
   return TInventoryModel;
 };
