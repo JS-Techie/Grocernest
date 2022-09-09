@@ -5,6 +5,7 @@ const WalletService = require("../services/walletService");
 const {
   sendCancelledByUserStatusEmail,
 } = require("../services/mail/mailService");
+const validator = require("email-validator");
 
 const Order = db.OrderModel;
 const OrderItems = db.OrderItemsModel;
@@ -401,7 +402,7 @@ const cancelOrder = async (req, res, next) => {
     });
     let email = cust.email;
     // send email
-    if (email) {
+    if (email !== null && validator.validate(email) == true) {
       sendCancelledByUserStatusEmail(email.toString(), singleOrder.order_id);
     }
 
