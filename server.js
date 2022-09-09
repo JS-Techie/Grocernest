@@ -75,6 +75,7 @@ const adminDeliveryRouter = require("./routes/admin/deliveryBoyRoutes");
 //delivery boy routes
 
 const deliveryBoyOrderRouter = require("./routes/deliveryBoy/ordersRoutes");
+const deliveryBoyMilkRouter = require("./routes/deliveryBoy/milkRoutes");
 
 // milk routes import (user)
 
@@ -135,7 +136,8 @@ app.use("/admin/milk/item", adminMilkItemsRouter);
 app.use("/admin/milk/subscription", adminMilkSubscriptionRouter);
 
 //delivery boy routes
-app.use("/deliveryboy/orders",deliveryBoyOrderRouter);
+app.use("/deliveryboy/orders", deliveryBoyOrderRouter);
+app.use("/deliveryboy/milk", deliveryBoyMilkRouter);
 
 //Start server and connect to DB
 const db = require("./services/dbSetupService.js");

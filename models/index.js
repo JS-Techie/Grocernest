@@ -151,7 +151,16 @@ db.AttendanceModel = require("./t_attendance")(db.sequelize, Sequelize);
 
 db.FeedbackModel = require("./t_feedback")(db.sequelize, Sequelize);
 
+db.ReturnOrdersModel = require("./t_return_orders")(db.sequelize, Sequelize);
+
+db.MilkDashboardModel = require("./t_milk_dashboard")(db.sequelize, Sequelize);
+
+
 // Relations between tables
+
+db.MilkDashboardModel.hasMany(db.SubscriptionItemsModel, {
+  foreignKey: "subscription_id",
+});
 
 db.WalletModel.hasMany(db.WalletTransactionModel, { foreignKey: "wallet_id" }); //one to many mapping
 
