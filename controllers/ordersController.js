@@ -401,7 +401,9 @@ const cancelOrder = async (req, res, next) => {
     });
     let email = cust.email;
     // send email
-    sendCancelledByUserStatusEmail(email.toString(), singleOrder.order_id);
+    if (email) {
+      sendCancelledByUserStatusEmail(email.toString(), singleOrder.order_id);
+    }
 
     // send whatsapp
     sendOrderStatusToWhatsapp(

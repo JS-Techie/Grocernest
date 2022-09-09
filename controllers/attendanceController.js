@@ -1,6 +1,5 @@
 const db = require("../models");
 
-const utcToIst = require("utc-to-indiantime");
 
 const Attendance = db.AttendanceModel;
 
