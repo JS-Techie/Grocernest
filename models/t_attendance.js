@@ -23,7 +23,7 @@ module.exports = sequelize => {
       field: "user_id"
     },
     login_time: {
-      type: DataTypes.DATE,
+      type: DataTypes.STRING(250),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
@@ -32,7 +32,7 @@ module.exports = sequelize => {
       field: "login_time"
     },
     logout_time: {
-      type: DataTypes.DATE,
+      type: DataTypes.STRING(250),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
