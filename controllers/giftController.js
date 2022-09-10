@@ -89,7 +89,6 @@ const getAllGifts = async (req, res, next) => {
           itemName: current.name,
           availableQuantity: currentItem.quantity,
           categoryID: current.category_id,
-          subcategoryID: current.sub_category_id,
           MRP: oldestBatch ? oldestBatch.MRP : "",
           discount: oldestBatch ? oldestBatch.discount : "",
           costPrice: oldestBatch ? oldestBatch.cost_price : "",
