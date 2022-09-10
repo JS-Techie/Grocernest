@@ -89,7 +89,6 @@ const getAllGifts = async (req, res, next) => {
       console.log("Current item=====>", currentItem);
 
       if (oldestBatch && currentItem) {
-        clg("In if");
         return {
           itemID: currentItem.id,
           itemName: current.name,
