@@ -63,7 +63,7 @@ const getAllGifts = async (req, res, next) => {
             where t_item.is_gift = 1 order by t_item.id 
   `);
 
-  console.log("GIFTS=====>", gifts);
+    console.log("GIFTS=====>", gifts);
 
     //Get all the gifts that exist
     let oldestBatch = null;
@@ -71,6 +71,8 @@ const getAllGifts = async (req, res, next) => {
       oldestBatch = await Batch.findOne({
         where: { item_id: current.id, mark_selected: 1 },
       });
+
+      console.log("Selected batch of item====>", oldestBatch);
 
       let currentItem;
       if (oldestBatch) {
@@ -83,9 +85,13 @@ const getAllGifts = async (req, res, next) => {
           },
         });
       }
+
+      console.log("Current item=====>", currentItem);
+
       if (oldestBatch && currentItem) {
+        clg("In if");
         return {
-          itemID: current.id,
+          itemID: currentItem.id,
           itemName: current.name,
           availableQuantity: currentItem.quantity,
           categoryID: current.category_id,
@@ -101,20 +107,21 @@ const getAllGifts = async (req, res, next) => {
     });
 
     const resolved = await Promise.all(promises);
+    console.log("GIfts array before removing undefined======>", resolved);
     const resolvedWithoutUndefined = resolved.filter((current) => {
       return current !== undefined;
     });
 
-    console.log(resolvedWithoutUndefined);
+    console.log("Resolved array=====>", resolvedWithoutUndefined);
 
     //returning only distinct items and not duplicates
     let giftsArray;
     if (resolvedWithoutUndefined.length !== 0) {
       giftsArray = [
-        ...new Map(resolved.map((item) => [item["itemID"], item])).values(),
+        ...new Map(resolvedWithoutUndefined.map((item) => [item["itemID"], item])).values(),
       ];
     }
-    console.log(giftsArray);
+    console.log("Gifts====>", giftsArray);
 
     //response array based on rule engine
     // let response;
