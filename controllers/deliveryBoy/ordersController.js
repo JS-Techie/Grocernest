@@ -2,6 +2,9 @@ const db = require("../../models");
 
 const Order = db.OrderModel;
 const OrderItems = db.OrderItemsModel;
+const ReturnOrder = db.ReturnOrdersModel;
+const Batch = db.BatchModel;
+const Inventory = db.InventoryModel;
 
 const getAllOrders = async (req, res, next) => {
   const { user_id } = req;
@@ -217,6 +220,53 @@ const changeStatusOfReturnOrder = async (req, res, next) => {
         } as it has already been cancelled by the admin`,
       });
     }
+
+    const returnedItems = await ReturnOrder.findAll({
+      where: { order_id },
+    });
+
+    if (returnedItems.length === 0) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "There are no return items for this order",
+      });
+    }
+
+    //Update inventory
+
+    returnedItems.map(async (current) => {
+      const oldestBatch = await Batch.findOne({
+        where: { item_id: current.item_id, mark_selected: 1 },
+      });
+      let inventory;
+      if (oldestBatch) {
+        inventory = await Inventory.findOne({
+          where: {
+            batch_id: oldestBatch.id,
+            item_id: current.item_id,
+            location_id: 4,
+            balance_type: 1,
+          },
+        });
+
+        if (inventory) {
+          await Inventory.update(
+            {
+              quantity: inventory.quantity + current.quantity,
+            },
+            {
+              where: {
+                batch_id: oldestBatch.id,
+                item_id: current.item_id,
+                location_id: 4,
+                balance_type: 1,
+              },
+            }
+          );
+        }
+      }
+    });
 
     await Order.update(
       {

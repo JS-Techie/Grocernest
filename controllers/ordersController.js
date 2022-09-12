@@ -433,9 +433,17 @@ const cancelOrder = async (req, res, next) => {
 const returnOrder = async (req, res, next) => {
   const { cust_no } = req;
   const order_id = req.params.orderId;
-  const { items } = req.body;
+  const { items, return_reason } = req.body;
 
   try {
+    if (!return_reason) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "Please enter a reason to return your order",
+      });
+    }
+
     const currentOrder = await Order.findOne({
       where: { cust_no, order_id },
     });
@@ -507,12 +515,14 @@ const returnOrder = async (req, res, next) => {
         order_id,
         item_id: currentItem.id,
         quantity: currentItem.quantity,
-        cashback_amount: item ? item.cashback : "",
+        cashback_amount: item ? item.cashback : null,
         is_percentage: item
           ? item.cashback_is_percentage === 1
-            ? true
-            : false
-          : "",
+            ? 1
+            : null
+          : null,
+        created_by: 1,
+        return_reason,
       });
     });
 
