@@ -1,0 +1,1 @@
+const getAllOrdersOfVendor = async (req, res, next) => {};
