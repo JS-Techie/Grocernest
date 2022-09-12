@@ -451,7 +451,8 @@ const returnOrder = async (req, res, next) => {
     if (
       currentOrder.status !== "Delivered" ||
       currentOrder.return_status !== "i" ||
-      currentOrder.return_status !== "r"
+      currentOrder.return_status !== "r" ||
+      !currentOrder.return_status
     ) {
       return res.status(400).send({
         success: false,
