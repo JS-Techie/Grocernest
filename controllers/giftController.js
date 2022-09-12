@@ -117,7 +117,9 @@ const getAllGifts = async (req, res, next) => {
     let giftsArray;
     if (resolvedWithoutUndefined.length !== 0) {
       giftsArray = [
-        ...new Map(resolvedWithoutUndefined.map((item) => [item["itemID"], item])).values(),
+        ...new Map(
+          resolvedWithoutUndefined.map((item) => [item["itemID"], item])
+        ).values(),
       ];
     }
     console.log("Gifts====>", giftsArray);

@@ -476,14 +476,19 @@ const returnOrder = async (req, res, next) => {
       let item;
       if (selectedBatch) {
         item = await Inventory.findOne({
-          where: { batch_id: selectedBatch.id, item_id: currentItem.id },
+          where: {
+            batch_id: selectedBatch.id,
+            item_id: currentItem.id,
+            location_id: 4,
+            balance_type: 1,
+          },
         });
       }
 
       await ReturnOrder.create({
         cust_no,
         order_id,
-        item_id: currentItem.item_id,
+        item_id: currentItem.id,
         quantity: currentItem.quantity,
         cashback_amount: item ? item.cashback : "",
         is_percentage: item
