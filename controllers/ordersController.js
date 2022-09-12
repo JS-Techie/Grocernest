@@ -448,11 +448,28 @@ const returnOrder = async (req, res, next) => {
       });
     }
 
+    // if (
+    //   currentOrder.status !== "Delivered" ||
+    //   currentOrder.return_status !== "i" ||
+    //   currentOrder.return_status !== "r" ||
+    //   currentOrder.return_status !== null
+    // ) {
+    //   return res.status(400).send({
+    //     success: false,
+    //     data: currentOrder.status,
+    //     message: `This order cannot be returned because it is ${currentOrder.status} and the return status is ${currentOrder.return_status}`,
+    //   });
+    // }
+
     if (
-      currentOrder.status !== "Delivered" ||
-      currentOrder.return_status !== "i" ||
-      currentOrder.return_status !== "r" ||
-      currentOrder.return_status !== null
+      currentOrder.status == "Placed" ||
+      currentOrder.status == "Accepted" ||
+      currentOrder.status == "Shipped" ||
+      currentOrder.status == "Returned" ||
+      currentOrder.status == "Cancelled" ||
+      currentOrder.return_status == "a" ||
+      currentOrder.return_status == "c" ||
+      currentOrder.return_status == "i"
     ) {
       return res.status(400).send({
         success: false,
@@ -460,7 +477,6 @@ const returnOrder = async (req, res, next) => {
         message: `This order cannot be returned because it is ${currentOrder.status} and the return status is ${currentOrder.return_status}`,
       });
     }
-
     if (items.length === 0) {
       return res.status(400).send({
         success: false,
