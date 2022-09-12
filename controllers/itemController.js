@@ -546,9 +546,39 @@ const getItemById = async (req, res, next) => {
   }
 };
 
+const getAvailableQty = async (req, res, next) => {
+  const { batch_id } = req.body;
+  try {
+    const batch = await Inventory.findOne({
+      where: { batch_id, location_id: 4, balance_type: 1 },
+    });
+
+    if (!batch) {
+      return res.status(404).send({
+        success: false,
+        data: [],
+        message: "Required batch details not found",
+      });
+    }
+
+    return res.status(200).send({
+      success: true,
+      data: batch.quantity,
+      message: "Found available quantity for required batch",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "Found available quantity of required item",
+    });
+  }
+};
+
 module.exports = {
   getItemsInCategory,
   getItemsInSubcategory,
   getItemsBySearchTerm,
   getItemById,
+  getAvailableQty,
 };
