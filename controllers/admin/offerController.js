@@ -220,7 +220,6 @@ const updateOffer = async (req, res, next) => {
     item_id,
     amount_of_discount,
     is_percentage,
-    is_active,
   } = req.body;
 
   try {
@@ -246,7 +245,6 @@ const updateOffer = async (req, res, next) => {
         item_id,
         amount_of_discount,
         is_percentage: is_percentage === true ? 1 : null,
-        is_active: is_active === true ? 1 : null,
       },
       {
         where: { id: offerID },

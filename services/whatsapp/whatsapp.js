@@ -172,8 +172,31 @@ const sendAdminCancelledOrderStatusToWhatsapp = (
     });
 };
 
+const sendDeliveryBoyNotificationToWhatsapp = (name, order_id, contact_no) => {
+  // Hi! Shyam, a new delivery with order id- 123212 is assigned to you.
+  client.message
+    .send({
+      channel: "whatsapp",
+      source: "919433804769",
+      destination: "91" + contact_no.toString(),
+      "src.name": "grocernest",
+      message: {
+        isHSM: "true",
+        type: "text",
+        text: "Hi! " + name + ", a new delivery with order id- " + order_id + " is assigned to you.",
+      },
+    })
+    .then((response) => {
+      console.log("Template message sent", response);
+    })
+    .catch((err) => {
+      console.log("Template message err:", err);
+    });
+}
+
 module.exports = {
   sendInvoiceToWhatsapp,
+  sendDeliveryBoyNotificationToWhatsapp,
   sendOTPToWhatsapp,
   sendOrderStatusToWhatsapp,
   sendOrderShippedToWhatsapp,

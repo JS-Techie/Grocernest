@@ -12,7 +12,7 @@ const {
 
 router.route("/view/all").get(authenticateUser, getAllTasks);
 router.route("/view/:id").get(authenticateUser, getTaskById);
-router.route("/view/:status").get(authenticateUser, getTasksByStatus);
+router.route("/view/status/:status").get(authenticateUser, getTasksByStatus);
 router.route("/:id/:status").patch(authenticateUser, editTaskStatus);
 
 module.exports = router;

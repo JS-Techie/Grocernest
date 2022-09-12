@@ -15,57 +15,30 @@ module.exports = sequelize => {
     },
     user_id: {
       type: DataTypes.BIGINT,
-      allowNull: true,
+      allowNull: false,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
       field: "user_id"
     },
-    start_date: {
-      type: DataTypes.DATE,
+    login_time: {
+      type: DataTypes.STRING(250),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "start_date"
+      field: "login_time"
     },
-    end_date: {
-      type: DataTypes.DATE,
+    logout_time: {
+      type: DataTypes.STRING(250),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "end_date"
-    },
-    no_of_days: {
-      type: DataTypes.BIGINT,
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "no_of_days"
-    },
-    status: {
-      type: DataTypes.ENUM('Pending', 'In Progress', 'Hold', 'Done'),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "status"
-    },
-    description: {
-      type: DataTypes.STRING(255),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "description"
+      field: "logout_time"
     },
     created_by: {
       type: DataTypes.BIGINT,
@@ -102,22 +75,13 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "updated_at"
-    },
-    on_hold_reason: {
-      type: DataTypes.STRING(100),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "on_hold_reason"
     }
   };
   const options = {
-    tableName: "t_task",
+    tableName: "t_attendance",
     comment: "",
     indexes: []
   };
-  const TTaskModel = sequelize.define("t_task_model", attributes, options);
-  return TTaskModel;
+  const TAttendanceModel = sequelize.define("t_attendance_model", attributes, options);
+  return TAttendanceModel;
 };

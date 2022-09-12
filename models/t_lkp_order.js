@@ -85,15 +85,6 @@ module.exports = sequelize => {
       comment: null,
       field: "address"
     },
-    transporter_name: {
-      type: DataTypes.STRING(200),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "transporter_name"
-    },
     cancellation_reason: {
       type: DataTypes.STRING(255),
       allowNull: true,
@@ -156,6 +147,24 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "coupon_id"
+    },
+    delivery_boy: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "delivery_boy"
+    },
+    return_status: {
+      type: DataTypes.ENUM('a', 'i', 'r', 'c'),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "return_status"
     }
   };
   const options = {

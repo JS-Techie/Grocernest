@@ -13,68 +13,50 @@ module.exports = sequelize => {
       comment: null,
       field: "id"
     },
-    user_id: {
-      type: DataTypes.BIGINT,
+    cust_no: {
+      type: DataTypes.STRING(20),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "user_id"
+      field: "cust_no"
     },
-    start_date: {
-      type: DataTypes.DATE,
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "start_date"
-    },
-    end_date: {
-      type: DataTypes.DATE,
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "end_date"
-    },
-    no_of_days: {
-      type: DataTypes.BIGINT,
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "no_of_days"
-    },
-    status: {
-      type: DataTypes.ENUM('Pending', 'In Progress', 'Hold', 'Done'),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "status"
-    },
-    description: {
+    subscription_id: {
       type: DataTypes.STRING(255),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "description"
+      field: "subscription_id"
     },
-    created_by: {
+    delivery_boy: {
       type: DataTypes.BIGINT,
-      allowNull: false,
+      allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "created_by"
+      field: "delivery_boy"
+    },
+    delivery_date: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "delivery_date"
+    },
+    status: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "status"
     },
     updated_by: {
       type: DataTypes.BIGINT,
@@ -103,21 +85,21 @@ module.exports = sequelize => {
       comment: null,
       field: "updated_at"
     },
-    on_hold_reason: {
-      type: DataTypes.STRING(100),
+    created_by: {
+      type: DataTypes.BIGINT,
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "on_hold_reason"
+      field: "created_by"
     }
   };
   const options = {
-    tableName: "t_task",
+    tableName: "t_milk_dashboard",
     comment: "",
     indexes: []
   };
-  const TTaskModel = sequelize.define("t_task_model", attributes, options);
-  return TTaskModel;
+  const TMilkDashboardModel = sequelize.define("t_milk_dashboard_model", attributes, options);
+  return TMilkDashboardModel;
 };

@@ -13,53 +13,26 @@ module.exports = sequelize => {
       comment: null,
       field: "id"
     },
-    user_id: {
+    cust_no: {
+      type: DataTypes.STRING(20),
+      allowNull: false,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "cust_no"
+    },
+    stars: {
       type: DataTypes.BIGINT,
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "user_id"
-    },
-    start_date: {
-      type: DataTypes.DATE,
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "start_date"
-    },
-    end_date: {
-      type: DataTypes.DATE,
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "end_date"
-    },
-    no_of_days: {
-      type: DataTypes.BIGINT,
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "no_of_days"
-    },
-    status: {
-      type: DataTypes.ENUM('Pending', 'In Progress', 'Hold', 'Done'),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "status"
+      field: "stars"
     },
     description: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.STRING(5000),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
@@ -103,21 +76,30 @@ module.exports = sequelize => {
       comment: null,
       field: "updated_at"
     },
-    on_hold_reason: {
+    item_id: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "item_id"
+    },
+    title: {
       type: DataTypes.STRING(100),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "on_hold_reason"
+      field: "title"
     }
   };
   const options = {
-    tableName: "t_task",
+    tableName: "t_feedback",
     comment: "",
     indexes: []
   };
-  const TTaskModel = sequelize.define("t_task_model", attributes, options);
-  return TTaskModel;
+  const TFeedbackModel = sequelize.define("t_feedback_model", attributes, options);
+  return TFeedbackModel;
 };

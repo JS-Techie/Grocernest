@@ -27,6 +27,7 @@ const authenticate = async (req, res, next) => {
     req.role = req.user.USERROLELIST[0].roleName;
     req.is_delivery_boy = true;
     req.delivery_boy = req.user.iss;
+    req.user_id = req.user.USERID;
     next();
   } catch (error) {
     return res.status(403).send({

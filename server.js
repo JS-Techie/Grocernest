@@ -57,6 +57,8 @@ const whatsappRouter = require("./routes/whatsappRoutes");
 const leaveRouter = require("./routes/leaveRoutes");
 const taskRouter = require("./routes/taskRoutes");
 const posRouter = require("./routes/posRoutes");
+const attendanceRouter = require("./routes/attendanceRoutes");
+const feedbackRouter = require("./routes/feedbackRoutes");
 
 // admin routers import
 const adminOrderRouter = require("./routes/admin/orderRoutes");
@@ -67,6 +69,13 @@ const adminCouponsRouter = require("./routes/admin/couponRoutes");
 const adminOffersRouter = require("./routes/admin/offerRoutes");
 const adminLeaveRouter = require("./routes/admin/leaveRoutes");
 const adminTaskRouter = require("./routes/admin/taskRoutes");
+const adminAttendanceRouter = require("./routes/admin/attendanceRoutes");
+const adminDeliveryRouter = require("./routes/admin/deliveryBoyRoutes");
+
+//delivery boy routes
+
+const deliveryBoyOrderRouter = require("./routes/deliveryBoy/ordersRoutes");
+const deliveryBoyMilkRouter = require("./routes/deliveryBoy/milkRoutes");
 
 // milk routes import (user)
 
@@ -103,6 +112,8 @@ app.use("/whatsapp", whatsappRouter);
 app.use("/leave", leaveRouter);
 app.use("/task", taskRouter);
 app.use(posRouter);
+app.use(attendanceRouter);
+app.use("/feedback", feedbackRouter);
 
 // admin routes
 app.use("/admin/orders", adminOrderRouter);
@@ -113,6 +124,8 @@ app.use("/admin/coupons", adminCouponsRouter);
 app.use("/admin/offers", adminOffersRouter);
 app.use("/admin/leave", adminLeaveRouter);
 app.use("/admin/task", adminTaskRouter);
+app.use("/admin/attendance", adminAttendanceRouter);
+app.use("/admin/delivery", adminDeliveryRouter);
 
 // milk (user)
 app.use("/subscription", SubscriptionRouter);
@@ -121,6 +134,10 @@ app.use("/delivery", deliveryRouter);
 // milk (admin)
 app.use("/admin/milk/item", adminMilkItemsRouter);
 app.use("/admin/milk/subscription", adminMilkSubscriptionRouter);
+
+//delivery boy routes
+app.use("/deliveryboy/orders", deliveryBoyOrderRouter);
+app.use("/deliveryboy/milk", deliveryBoyMilkRouter);
 
 //Start server and connect to DB
 const db = require("./services/dbSetupService.js");
