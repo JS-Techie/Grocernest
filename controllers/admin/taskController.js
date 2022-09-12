@@ -126,6 +126,14 @@ const createTask = async (req, res, next) => {
   const { start_date, end_date, description, user_id, no_of_days } = req.body;
 
   try {
+    if (!start_date || !end_date) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "Please enter correct dates",
+      });
+    }
+
     const newTask = await Task.create({
       start_date,
       end_date,
