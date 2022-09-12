@@ -261,6 +261,9 @@ const forgotPasswordForVendor = async (req, res, next) => {
       message: "OTP generated and sent successfully",
     });
   } catch (error) {
+    await Cache.destroy({
+      where: { id },
+    });
     return res.status(400).send({
       success: false,
       data: error.message,
@@ -395,6 +398,147 @@ const changeVendorPassword = async (req, res, next) => {
   }
 };
 
+const editPhoneNumber = async (req, res, next) => {
+  const { id } = req;
+  const { new_phone_number } = req.body;
+  try {
+    const vendor = await Vendor.findOne({
+      where: {
+        [Op.or]: [
+          { whatsapp_number: new_phone_number },
+          { phone_number: new_phone_number },
+        ],
+      },
+    });
+
+    if (vendor) {
+      return res.status(400).send({
+        success: false,
+        data: vendor,
+        message:
+          "A user with this phone number already exists, please use a different one",
+      });
+    }
+
+    const currentVendor = await Vendor.findOne({
+      where: { id },
+    });
+
+    if (!currentVendor) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "Requested user not found",
+      });
+    }
+
+    const update = await Vendor.update(
+      {
+        new_phone_number,
+      },
+      {
+        where: { id },
+      }
+    );
+
+    const updated = await Vendor.findOne({
+      where: { id },
+    });
+
+    const serverGeneratedOTP = generateOTP();
+
+    const cacheDetails = await Cache.create({
+      user_details: JSON.stringify(updated),
+      cust_no: id,
+      generated_otp: serverGeneratedOTP,
+      created_by: 1,
+    });
+
+    return res.status(200).send({
+      success: true,
+      data: cacheDetails,
+      message: "OTP successfully sent",
+    });
+  } catch (error) {
+    await Cache.destroy({
+      where: { id },
+    });
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "Something went wrong, please check data field for more details",
+    });
+  }
+};
+
+const changePhoneNumber = async (req, res, next) => {
+  const { otp } = req.body;
+  const { id } = req.params;
+
+  try {
+    const vendor = await Vendor.findOne({
+      where: { id },
+    });
+
+    if (!vendor) {
+      return res.status(404).send({
+        success: false,
+        data: [],
+        message: "Requested user not found",
+      });
+    }
+
+    const cacheDetails = await Cache.findOne({
+      where: { cust_no: id },
+    });
+
+    if (!cacheDetails) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "No details for current user found",
+      });
+    }
+
+    if (otp !== cacheDetails.generated_otp) {
+      return res.status(400).send({
+        success: false,
+        data: cacheDetails,
+        message: "Please enter correct OTP",
+      });
+    }
+
+    await Vendor.update(
+      {
+        whatsapp_number: new_phone_number,
+      },
+      {
+        where: { id },
+      }
+    );
+
+    await Cache.destroy({
+      where: { id },
+    });
+
+    const updated = await Vendor.findOne({
+      where: { id },
+    });
+
+    return res.status(200).send({
+      success: true,
+      data: updated,
+      message: "Successfully changed phone number of user",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "Something went wrong, please check data field for more details",
+    });
+  }
+};
+
 module.exports = {
   getVendorProfile,
   editVendorProfile,
@@ -402,4 +546,6 @@ module.exports = {
   forgotPasswordForVendor,
   changeVendorPassword,
   verifyOTPOfVendor,
+  editPhoneNumber,
+  changePhoneNumber,
 };
