@@ -735,7 +735,7 @@ const InvoiceGen = async (cust_no, order_id, email, contact_no, opt_in) => {
       }
       // send whatsapp
       if (contact_no != "") {
-        sendInvoiceToWhatsapp(contact_no, response.orderID, invoice_link);
+        await sendInvoiceToWhatsapp(contact_no, response.orderID, invoice_link);
       }
     });
   } catch (error) {

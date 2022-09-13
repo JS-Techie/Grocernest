@@ -2197,6 +2197,24 @@
         }
       }
     },
+    "/url/invoice/download/{id}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/admin/orders/pending": {
       "get": {
         "description": "",
