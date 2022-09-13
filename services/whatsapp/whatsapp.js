@@ -47,7 +47,8 @@ const sendInvoiceToWhatsapp = async (phno, order_id, link) => {
   console.log("Sending sms to whatsapp..");
 
   // sorten the link
-  let short_url = "http://ecomm-dev.grocernest.com/api/url/invoice/download/" + await getShortUrl(link);
+  let short_url = "http://ecomm-dev.grocernest.com/api/invoice/" + await getShortUrl(link);
+  // let short_url = "http://grocernest.com/api/url/invoice/download/" + await getShortUrl(link);
 
   client.message
     .send({
