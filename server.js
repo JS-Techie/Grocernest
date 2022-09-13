@@ -72,9 +72,6 @@ const adminTaskRouter = require("./routes/admin/taskRoutes");
 const adminAttendanceRouter = require("./routes/admin/attendanceRoutes");
 const adminDeliveryRouter = require("./routes/admin/deliveryBoyRoutes");
 
-// short url routes
-const urlShortenerRouter = require("./routes/urlShortenerRoutes");
-
 //delivery boy routes
 
 const deliveryBoyOrderRouter = require("./routes/deliveryBoy/ordersRoutes");
@@ -117,9 +114,6 @@ app.use("/task", taskRouter);
 app.use(posRouter);
 app.use(attendanceRouter);
 app.use("/feedback", feedbackRouter);
-
-// url shortner routes
-app.use("/url", urlShortenerRouter);
 
 // admin routes
 app.use("/admin/orders", adminOrderRouter);
