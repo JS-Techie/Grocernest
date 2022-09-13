@@ -45,20 +45,18 @@ const getAllOrders = async (req, res, next) => {
       const orderItemPromises = orderItems.map(async (currentOrderItem) => {
         let currentOffer = null;
         let isEdit = null;
-        if (currentOrderItem.is_offer === 1) {
-          currentOffer = await Offers.findOne({
-            where: {
-              is_active: 1,
-              [Op.or]: [
-                { item_id_1: currentOrderItem.item_id },
-                { item_id: currentOrderItem.item_id },
-              ],
-            },
-          });
-          if (currentOffer) {
-            if (currentOffer.amount_of_discount) {
-              isEdit = true;
-            }
+        currentOffer = await Offers.findOne({
+          where: {
+            is_active: 1,
+            [Op.or]: [
+              { item_id_1: currentOrderItem.item_id },
+              { item_id: currentOrderItem.item_id },
+            ],
+          },
+        });
+        if (currentOffer) {
+          if (currentOffer.amount_of_discount) {
+            isEdit = true;
           }
         }
 
@@ -178,26 +176,28 @@ const getOrderByOrderId = async (req, res, next) => {
       });
     }
 
-    console.log(singleOrder);
+    console.log("Current Order ----->", singleOrder);
 
     const promises = singleOrder.map(async (currentOrderItem) => {
       let currentOffer = null;
       let isEdit = null;
-      if (currentOrderItem.is_offer === 1) {
-        console.log("In if");
-        currentOffer = await Offers.findOne({
-          where: {
-            is_active: 1,
-            [Op.or]: [
-              { item_id_1: currentOrderItem.id },
-              { item_id: currentOrderItem.id },
-            ],
-          },
-        });
-        if (currentOffer) {
-          if (currentOffer.amount_of_discount) {
-            isEdit = true;
-          }
+
+      currentOffer = await Offers.findOne({
+        where: {
+          is_active: 1,
+          [Op.or]: [
+            { item_id_1: currentOrderItem.id },
+            { item_id: currentOrderItem.id },
+          ],
+        },
+      });
+
+      console.log("Current Item---->", currentOrderItem.id);
+      console.log("Offer for this item----->", currentOffer);
+
+      if (currentOffer) {
+        if (currentOffer.amount_of_discount) {
+          isEdit = true;
         }
       }
 
