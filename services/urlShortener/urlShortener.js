@@ -5,13 +5,12 @@ const Url = db.UrlModel;
 
 const getShortUrl = async (original_url) => {
 
-    let id = req.params.id.toString()
-
     const available_map = await Url.findOne({
         where: { original_url }
     })
 
     if (available_map !== null) {
+        // console.log("already there")
         return available_map.id;
     }
 
