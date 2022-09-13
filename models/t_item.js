@@ -237,6 +237,15 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "manufacturer_name"
+    },
+    ingredients: {
+      type: DataTypes.STRING(10000),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "ingredients"
     }
   };
   const options = {
