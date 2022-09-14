@@ -7,16 +7,22 @@ const Wallet = db.WalletModel
 const WalletTransaction = db.WalletTransactionModel;
 
 const checkWalletDetails = async (req, res, next) => {
-    let cust_no = req.params.cust_no
+
+    console.log("abcd");
+    let cust_no = req.params.cust_no;
 
     Wallet.findAll({
         include: [{
             model: WalletTransaction,
+            //order: [["created_at", "DESC"]],
         }],
         where: {
             cust_no: cust_no,
         },
-        order: [["created_at", "DESC"]],
+        order: [
+            [WalletTransaction, "created_at", "DESC"],
+        ]
+
     }).then((resData) => {
         return res.status(201).json({
             success: true,
