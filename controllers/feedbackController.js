@@ -116,7 +116,7 @@ const getMyFeedback = async (req, res, next) => {
     const feedback = await Feedback.findOne({
       where: {
         cust_no,
-        item_id
+        item_id,
       },
     });
     if (!feedback) {
@@ -129,19 +129,18 @@ const getMyFeedback = async (req, res, next) => {
     return res.status(200).send({
       success: true,
       data: {
-        feedback
+        feedback,
       },
       message: "Found requested feedback for current item",
     });
-  }
-  catch (error) {
+  } catch (error) {
     return res.status(400).send({
       success: false,
       data: error.message,
       message: "There is some error while fetching the review",
     });
   }
-}
+};
 
 const createFeedback = async (req, res, next) => {
   const { item_id } = req.params;
@@ -150,7 +149,7 @@ const createFeedback = async (req, res, next) => {
 
   try {
     const ordersForCurrentUser = await Order.findAll({
-      where: { cust_no },
+      where: { cust_no, status: "Delivered" },
     });
 
     console.log("Orders for this customer", ordersForCurrentUser);
@@ -160,7 +159,7 @@ const createFeedback = async (req, res, next) => {
         success: false,
         data: [],
         message:
-          "You have not placed any orders, hence you cant review an item",
+          "You cannot review this item as you have not ordered this item",
       });
     }
 
@@ -181,8 +180,6 @@ const createFeedback = async (req, res, next) => {
 
     resolved.map(async (currentOrder) => {
       currentOrder.itemsInCurrentOrder.map((currentItem) => {
-        console.log("Item for feedback", item_id);
-        console.log("Item in order", currentItem.item_id);
         if (currentItem.item_id == item_id) {
           userOrderedThisItem = true;
         }
@@ -190,7 +187,6 @@ const createFeedback = async (req, res, next) => {
     });
 
     if (!userOrderedThisItem) {
-      console.log("In if");
       return res.status(400).send({
         success: false,
         data: [],
@@ -329,5 +325,5 @@ module.exports = {
   createFeedback,
   editFeedback,
   deleteFeedback,
-  getMyFeedback
+  getMyFeedback,
 };

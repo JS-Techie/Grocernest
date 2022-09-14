@@ -1,8 +1,7 @@
 const { sequelize } = require("../../models");
 const { Op } = require("sequelize");
 const db = require("../../models");
-const Order = db.OrderModel;
-const OrderItems = db.OrderItemsModel;
+
 const {
   sendOrderStatusEmail,
   sendCancelledStatusEmail,
@@ -16,13 +15,17 @@ const {
   sendAdminCancelledOrderStatusToWhatsapp,
 } = require("../../services/whatsapp/whatsapp");
 // const Customer = db.CustomerModel;
+
 const Batch = db.BatchModel;
 const Customer = db.CustomerModel;
-const OrderItem = db.OrderItemsModel;
 const Item = db.ItemModel;
 const Inventory = db.InventoryModel;
 const Category = db.LkpCategoryModel;
 const Offers = db.OffersModel;
+const Order = db.OrderModel;
+const OrderItems = db.OrderItemsModel;
+const User = db.UserModel;
+const ReturnOrder = db.ReturnOrdersModel;
 
 const getAllPendingOrders = async (req, res, next) => {
   try {
@@ -108,7 +111,7 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
             tlo.created_at,
             tlo.created_by,
             tlo.total,
-            tlo.transporter_name,
+            delivery_boy,
             tlo.cancellation_reason,
             tlo.applied_discount,
             tlo.wallet_balance_used,
@@ -131,6 +134,12 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
     }
 
     const promises = results.map(async (current) => {
+      const dboy_name = await User.findOne({
+        where: {
+          id: current.delivery_boy,
+          type_cd: "DELIVERY_BOY",
+        },
+      });
       return {
         cust_name: current.cust_name,
         contact_no: current.contact_no,
@@ -139,7 +148,7 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
         status: current.status,
         created_at: current.created_at,
         created_by: current.created_by,
-        transporter_name: current.transporter_name,
+        transporter_name: dboy_name ? dboy_name.full_name : "",
         cancellation_reason: current.cancellation_reason,
         total: current.total,
         applied_discount: current.applied_discount,
@@ -755,12 +764,12 @@ const acceptedOrders = async (req, res, next) => {
 
 const assignTransporter = async (req, res, next) => {
   let orderId = req.body.orderId;
-  let transporterName = req.body.transporterName;
+  let transporterName = req.body.delivery_boy;
 
   Order.update(
     {
       status: "Shipped",
-      transporter_name: transporterName,
+      delivery_boy: parseInt(transporterName),
     },
     { where: { order_id: orderId } }
   )
@@ -820,7 +829,7 @@ const assignTransporter = async (req, res, next) => {
 const getShippedOrders = async (req, res, next) => {
   try {
     const [results, metadata] = await sequelize.query(`
-            select tlo.transporter_name, tc.cust_name, tlo.cust_no , tc.contact_no, tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total from t_lkp_order tlo inner join t_customer tc 
+            select delivery_boy, tc.cust_name, tlo.cust_no , tc.contact_no, tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total from t_lkp_order tlo inner join t_customer tc 
             where tc.cust_no = tlo.cust_no 
             AND tlo.status="Shipped"
           `);
@@ -834,6 +843,12 @@ const getShippedOrders = async (req, res, next) => {
     }
 
     const promises = results.map(async (current) => {
+      const dboy_name = await User.findOne({
+        where: {
+          id: current.delivery_boy,
+          type_cd: "DELIVERY_BOY",
+        },
+      });
       return {
         cust_name: current.cust_name,
         contact_no: current.contact_no,
@@ -843,7 +858,7 @@ const getShippedOrders = async (req, res, next) => {
         created_at: current.created_at,
         created_by: current.created_by,
         total: current.total,
-        transporterName: current.transporter_name,
+        transporterName: dboy_name ? dboy_name.full_name : "",
       };
     });
 
@@ -866,7 +881,7 @@ const getShippedOrders = async (req, res, next) => {
 const getDeliveredOrders = async (req, res, next) => {
   try {
     const [results, metadata] = await sequelize.query(`
-            select tc.cust_name, tlo.cust_no , tc.contact_no, tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total, tlo.transporter_name from t_lkp_order tlo inner join t_customer tc 
+            select tc.cust_name, tlo.cust_no , tc.contact_no, tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total, delivery_boy from t_lkp_order tlo inner join t_customer tc 
             where tc.cust_no = tlo.cust_no 
             AND tlo.status="Delivered"
           `);
@@ -880,6 +895,13 @@ const getDeliveredOrders = async (req, res, next) => {
     }
 
     const promises = results.map(async (current) => {
+      //Get delivery boy name and pass it in transportterName field
+      const dboy_name = await User.findOne({
+        where: {
+          id: current.delivery_boy,
+          type_cd: "DELIVERY_BOY",
+        },
+      });
       return {
         cust_name: current.cust_name,
         contact_no: current.contact_no,
@@ -889,7 +911,7 @@ const getDeliveredOrders = async (req, res, next) => {
         created_at: current.created_at,
         created_by: current.created_by,
         total: current.total,
-        transporterName: current.transporter_name,
+        transporterName: dboy_name ? dboy_name.full_name : "",
       };
     });
 
@@ -912,7 +934,7 @@ const getDeliveredOrders = async (req, res, next) => {
 const getCanceledorders = async (req, res, next) => {
   try {
     const [results, metadata] = await sequelize.query(`
-            select tc.cust_name, tlo.cust_no , tc.contact_no, tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total, tlo.transporter_name,tlo.cancellation_reason from t_lkp_order tlo inner join t_customer tc 
+            select tc.cust_name, tlo.cust_no , tc.contact_no, tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total, delivery_boy,tlo.cancellation_reason from t_lkp_order tlo inner join t_customer tc 
             where tc.cust_no = tlo.cust_no 
             AND tlo.status="Cancelled"
           `);
@@ -926,6 +948,15 @@ const getCanceledorders = async (req, res, next) => {
     }
 
     const promises = results.map(async (current) => {
+      //Find transporterName and pass it
+
+      const dboy_name = await User.findOne({
+        where: {
+          id: current.delivery_boy,
+          type_cd: "DELIVERY_BOY",
+        },
+      });
+
       return {
         cust_name: current.cust_name,
         contact_no: current.contact_no,
@@ -935,7 +966,7 @@ const getCanceledorders = async (req, res, next) => {
         created_at: current.created_at,
         created_by: current.created_by,
         total: current.total,
-        transporterName: current.transporter_name,
+        transporterName: dboy_name ? dboy_name.full_name : "",
         cancellation_reason: current.cancellation_reason,
       };
     });
@@ -956,6 +987,173 @@ const getCanceledorders = async (req, res, next) => {
   }
 };
 
+const assignDeliveryBoyForReturn = async (req, res, next) => {
+  const { order_id } = req.params;
+  const { delivery_boy } = req.body;
+
+  try {
+    const currentOrder = await Order.findOne({
+      where: { order_id },
+    });
+
+    if (!currentOrder) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "Could not find requested order",
+      });
+    }
+
+    await Order.update(
+      {
+        delivery_boy,
+      },
+      {
+        where: { order_id },
+      }
+    );
+
+    const updatedOrder = await Order.findOne({
+      where: { order_id },
+    });
+
+    return res.status(200).send({
+      success: true,
+      data: updatedOrder,
+      message: "Assigned requested delivery boy successfully",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "Please check data field for more details",
+    });
+  }
+};
+
+const rejectRequestedReturn = async (req, res, next) => {
+  const { order_id } = req.params;
+  const { reject_reason } = req.body;
+
+  try {
+    const currentOrder = await Order.findOne({
+      where: { order_id },
+    });
+
+    if (!currentOrder) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "Requested order not found",
+      });
+    }
+
+    await Order.update(
+      {
+        return_status: "c",
+      },
+      {
+        where: { order_id },
+      }
+    );
+
+    await ReturnOrder.update(
+      {
+        reject_reason,
+      },
+      {
+        where: { order_id },
+      }
+    );
+
+    const updatedOrder = await Order.findOne({
+      where: { order_id },
+    });
+
+    //Notify customer about status of return
+
+    return res.status(400).send({
+      success: true,
+      data: updatedOrder,
+      message: "Successfully rejected requested return",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "Please check data field for more details",
+    });
+  }
+};
+
+const getReturns = async (req, res, next) => {
+  const { return_status } = req.body;
+  try {
+    const allOrders = await Order.findAll({
+      where: { return_status },
+    });
+
+    const orderPromise = allOrders.map(async (currentOrder) => {
+      const orderItems = await OrderItems.findAll({
+        where: { order_id: currentOrder.order_id },
+      });
+
+      const currentCustomer = await Customer.findOne({
+        where: { cust_no: currentOrder.cust_no },
+      });
+
+      const innerOrderItemsPromises = await orderItems.map(
+        async (currentItem) => {
+          const oldestBatch = await Batch.findOne({
+            where: { item_id: currentItem.item_id, mark_selected: 1 },
+          });
+
+          let currentInventory;
+          if (oldestBatch) {
+            currentInventory = await Inventory.findOne({
+              where: { batch_id: oldestBatch.id, item_id: currentItem.item_id },
+            });
+          }
+          return {
+            batchDetails: oldestBatch,
+            inventoryDetails: currentInventory,
+          };
+        }
+      );
+
+      const itemDetails = await Promise.all(innerOrderItemsPromises);
+
+      return {
+        currentCustomer,
+        currentOrder,
+        itemDetails,
+      };
+    });
+
+    const orders = await Promise.all(orderPromise);
+
+    if (orders.length === 0) {
+      return res.status(200).send({
+        success: true,
+        data: [],
+        message: "There are no returns based on the return status",
+      });
+    }
+
+    return res.status(200).send({
+      success: true,
+      data: orders,
+      message: "Found all requested returns",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "Please check data field for more details",
+    });
+  }
+};
+
 module.exports = {
   getAllPendingOrders,
   getOrderDetails,
@@ -966,4 +1164,7 @@ module.exports = {
   getDeliveredOrders,
   getCanceledorders,
   getAllOrderByPhoneNumber,
+  assignDeliveryBoyForReturn,
+  rejectRequestedReturn,
+  getReturns,
 };

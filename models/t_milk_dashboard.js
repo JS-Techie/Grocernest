@@ -13,41 +13,50 @@ module.exports = sequelize => {
       comment: null,
       field: "id"
     },
-    user_id: {
-      type: DataTypes.BIGINT,
-      allowNull: false,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "user_id"
-    },
-    login_time: {
-      type: DataTypes.STRING(250),
+    cust_no: {
+      type: DataTypes.STRING(20),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "login_time"
+      field: "cust_no"
     },
-    logout_time: {
-      type: DataTypes.STRING(250),
+    subscription_id: {
+      type: DataTypes.STRING(255),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "logout_time"
+      field: "subscription_id"
     },
-    created_by: {
+    delivery_boy: {
       type: DataTypes.BIGINT,
-      allowNull: false,
+      allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "created_by"
+      field: "delivery_boy"
+    },
+    delivery_date: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "delivery_date"
+    },
+    status: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "status"
     },
     updated_by: {
       type: DataTypes.BIGINT,
@@ -75,13 +84,22 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "updated_at"
+    },
+    created_by: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "created_by"
     }
   };
   const options = {
-    tableName: "t_attendance",
+    tableName: "t_milk_dashboard",
     comment: "",
     indexes: []
   };
-  const TAttendanceModel = sequelize.define("t_attendance_model", attributes, options);
-  return TAttendanceModel;
+  const TMilkDashboardModel = sequelize.define("t_milk_dashboard_model", attributes, options);
+  return TMilkDashboardModel;
 };

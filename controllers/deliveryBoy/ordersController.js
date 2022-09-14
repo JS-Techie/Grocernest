@@ -1,0 +1,429 @@
+const db = require("../../models");
+
+const Order = db.OrderModel;
+const OrderItems = db.OrderItemsModel;
+const ReturnOrder = db.ReturnOrdersModel;
+const Batch = db.BatchModel;
+const Inventory = db.InventoryModel;
+const Item = db.ItemModel;
+const Customer = db.CustomerModel;
+
+const getAllOrders = async (req, res, next) => {
+  const { user_id } = req;
+  try {
+    const orders = await Order.findAll({
+      where: { delivery_boy: user_id },
+      include: [
+        {
+          model: OrderItems,
+        },
+      ],
+    });
+
+    if (orders.length === 0) {
+      return res.status(200).send({
+        success: true,
+        data: [],
+        message: "There are no orders for you",
+      });
+    }
+
+    return res.status(200).send({
+      success: true,
+      data: orders,
+      message: "Found all orders for current delivery boy",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "Please check data field for more details",
+    });
+  }
+};
+
+const getOrderById = async (req, res, next) => {
+  const { user_id } = req;
+  const { order_id } = req.params;
+
+  try {
+    const order = await Order.findOne({
+      where: { delivery_boy: user_id, order_id },
+      include: [
+        {
+          model: OrderItems,
+        },
+      ],
+    });
+
+    if (!order) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "Requested order not found for current delivery boy",
+      });
+    }
+
+    return res.status(200).send({
+      success: true,
+      data: order,
+      message: "Requested order found for current user",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "Please check data field for more details",
+    });
+  }
+};
+
+const getOrderByStatus = async (req, res, next) => {
+  const { user_id } = req;
+  const { status } = req.params;
+
+  try {
+    const orders = await Order.findAll({
+      where: { delivery_boy: user_id, status },
+      include: [
+        {
+          model: OrderItems,
+        },
+      ],
+    });
+
+    if (orders.length === 0) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "Requested order not found for current delivery boy",
+      });
+    }
+
+    return res.status(200).send({
+      success: true,
+      data: orders,
+      message: "Requested order found for current user",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "Please check data field for more details",
+    });
+  }
+};
+
+const changeStatusOfDeliveryOrder = async (req, res, next) => {
+  const { user_id } = req;
+  const { order_id } = req.params;
+  const { status } = req.body;
+
+  try {
+    console.log(user_id);
+    console.log(status);
+    console.log(order_id);
+
+    const orderExists = await Order.findOne({
+      where: { order_id, delivery_boy: user_id },
+      include: [{ model: OrderItems }],
+    });
+
+    if (!orderExists) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "Requested order does not exist for current delivery boy",
+      });
+    }
+    if (orderExists.status !== "Shipped") {
+      return res.status(400).send({
+        success: false,
+        data: orderExists,
+        message: `You cant change the status of the order as it is ${orderExists.status}`,
+      });
+    }
+
+    await Order.update(
+      { status },
+      {
+        where: { order_id, delivery_boy: user_id },
+      }
+    );
+
+    const updatedOrder = await Order.findOne({
+      where: { order_id, delivery_boy: user_id },
+      include: [{ model: OrderItems }],
+    });
+
+    return res.status(200).send({
+      success: true,
+      data: {
+        oldOrder: orderExists,
+        newOrder: updatedOrder,
+      },
+      message: "Successfully updated status of current order",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "Please check data field for more details",
+    });
+  }
+};
+
+const changeStatusOfReturnOrder = async (req, res, next) => {
+  const { user_id } = req;
+  const { order_id } = req.params;
+  const { return_status } = req.body;
+
+  try {
+    // console.log(return_status);
+
+    // console.log(return_status === "r");
+    // console.log(return_status !== "r");
+
+    if (return_status !== "a" && return_status !== "r" && !return_status) {
+      console.log("In if");
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "Please enter correct status",
+      });
+    }
+
+    const currentOrder = await Order.findOne({
+      where: { delivery_boy: user_id, order_id },
+    });
+
+    if (!currentOrder) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "Requested order not found",
+      });
+    }
+
+    if (!currentOrder.return_status) {
+      return res.status(400).send({
+        success: false,
+        data: currentOrder,
+        message: "The return for this order has not been initiated yet",
+      });
+    }
+
+    if (currentOrder.return_status === "c") {
+      return res.status(400).send({
+        success: false,
+        data: currentOrder.return_status,
+        message: `This return cannot be ${
+          return_status === "a" ? "Accepted" : "Rejected"
+        } as it has already been cancelled by the admin`,
+      });
+    }
+
+    const returnedItems = await ReturnOrder.findAll({
+      where: { order_id },
+    });
+
+    if (returnedItems.length === 0) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "There are no return items for this order",
+      });
+    }
+
+    //Update inventory
+
+    returnedItems.map(async (current) => {
+      const oldestBatch = await Batch.findOne({
+        where: { item_id: current.item_id, mark_selected: 1 },
+      });
+      let inventory;
+      if (oldestBatch) {
+        inventory = await Inventory.findOne({
+          where: {
+            batch_id: oldestBatch.id,
+            item_id: current.item_id,
+            location_id: 4,
+            balance_type: 1,
+          },
+        });
+
+        if (inventory) {
+          await Inventory.update(
+            {
+              quantity: inventory.quantity + current.quantity,
+            },
+            {
+              where: {
+                batch_id: oldestBatch.id,
+                item_id: current.item_id,
+                location_id: 4,
+                balance_type: 1,
+              },
+            }
+          );
+        }
+      }
+    });
+
+    await Order.update(
+      {
+        return_status,
+        status: "Returned",
+      },
+      {
+        where: { delivery_boy: user_id, order_id },
+      }
+    );
+
+    const updatedOrder = await Order.findOne({
+      where: { delivery_boy: user_id, order_id },
+    });
+
+    //Notify admin and user
+
+    return res.status(200).send({
+      success: true,
+      data: {
+        oldOrderDetails: currentOrder,
+        newOrderDetails: updatedOrder,
+      },
+      message: "Return for this order was accepted",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "Please check data field for more details",
+    });
+  }
+};
+
+const getAllDeliveryOrders = async (req, res, next) => {
+  const { user_id } = req;
+  try {
+    const allOrders = await Order.findAll({
+      where: { delivery_boy: user_id },
+    });
+
+    if (allOrders.length === 0) {
+      return res.status(200).send({
+        success: true,
+        data: [],
+        message: "There are no orders for you",
+      });
+    }
+
+    const orderPromises = await allOrders.map(async (currentOrder) => {
+      const orderItems = await OrderItems.findAll({
+        where: { order_id: currentOrder.order_id },
+      });
+
+      const orderItemsPromises = orderItems.map(async (currentItem) => {
+        const itemDetails = await Item.findOne({
+          where: { id: currentItem.item_id },
+        });
+
+        return itemDetails;
+      });
+
+      const itemDetails = await Promise.all(orderItemsPromises);
+
+      const currentCustomer = await Customer.findOne({
+        where: { cust_no: currentOrder.cust_no },
+      });
+
+      return {
+        currentCustomer,
+        currentOrder,
+        itemDetails,
+      };
+    });
+
+    const orders = await Promise.all(orderPromises);
+
+    return res.status(200).send({
+      success: true,
+      data: orders,
+      message: "Found all orders for current delivery boy",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "Please check data field for more details",
+    });
+  }
+};
+
+const getAllRequestedReturns = async (req, res, next) => {
+  const { user_id } = req;
+  const { return_status } = req.body;
+  try {
+    const allOrders = await Order.findAll({
+      where: { delivery_boy: user_id, return_status },
+    });
+
+    if (allOrders.length === 0) {
+      return res.status(200).send({
+        success: true,
+        data: [],
+        message: "There are no orders for you",
+      });
+    }
+
+    const orderPromises = await allOrders.map(async (currentOrder) => {
+      const orderItems = await OrderItems.findAll({
+        where: { order_id: currentOrder.order_id },
+      });
+
+      const innerPromise = orderItems.map(async (currentItem) => {
+        const itemDetails = await Item.findOne({
+          where: { id: currentItem.item_id },
+        });
+
+        return itemDetails;
+      });
+
+      const itemDetails = await Promise.all(innerPromise);
+
+      const currentCustomer = await Customer.findOne({
+        where: { cust_no: currentOrder.cust_no },
+      });
+
+      return {
+        currentOrder,
+        currentCustomer,
+        itemDetails,
+      };
+    });
+
+    const orders = await Promise.all(orderPromises);
+
+    return res.status(200).send({
+      success: true,
+      data: orders,
+      message: "Found all orders for current delivery boy",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "Please check data field for more details",
+    });
+  }
+};
+
+module.exports = {
+  getAllOrders,
+  getOrderById,
+  getOrderByStatus,
+  changeStatusOfDeliveryOrder,
+  changeStatusOfReturnOrder,
+  getAllRequestedReturns,
+  getAllDeliveryOrders,
+};

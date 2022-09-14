@@ -4,7 +4,7 @@ const sendInvoice = async (req, res, next) => {
   const { url, phoneNumber, orderId } = req.body;
 
   try {
-    sendInvoiceToWhatsapp(phoneNumber, orderId, url);
+    await sendInvoiceToWhatsapp(phoneNumber, orderId, url);
 
     return res.status(200).send({
       success: true,

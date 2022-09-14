@@ -36,7 +36,7 @@ const checkoutFromCart = async (req, res, next) => {
     final_payable_amount,
     wallet_balance_used,
     wallet_id,
-    cashback_amount
+    cashback_amount,
   } = req.body;
 
   if (!total) {
@@ -88,7 +88,7 @@ const checkoutFromCart = async (req, res, next) => {
       applied_discount: applied_discount,
       wallet_balance_used: wallet_balance_used,
       final_payable_amount: final_payable_amount,
-      cashback_amount: cashback_amount
+      cashback_amount: cashback_amount,
     });
 
     const user_wallet = await Wallet.findOne({
@@ -243,7 +243,7 @@ const checkoutFromCart = async (req, res, next) => {
       // if (currentInventory) {
       const updatedInventory = await Inventory.update(
         {
-          quantity: currentInventory.quantity - currentItem.quantity,  //error in this line
+          quantity: currentInventory.quantity - currentItem.quantity, //error in this line
         },
         {
           where: {
@@ -260,8 +260,6 @@ const checkoutFromCart = async (req, res, next) => {
         updatedInventory
       );
       // }
-
-
     });
 
     let email = "";
@@ -328,7 +326,7 @@ const buyNow = async (req, res, next) => {
     final_payable_amount,
     wallet_balance_used,
     wallet_id,
-    cashback_amount
+    cashback_amount,
   } = req.body;
 
   if (!total) {
@@ -349,15 +347,14 @@ const buyNow = async (req, res, next) => {
 
   try {
     const [currentItemDetails, metadata] =
-      await sequelize.query(`select distinct t_item.id, t_item.name,t_item.brand_id,t_item.UOM ,t_item.category_id, t_lkp_category.group_name,t_item.sub_category_id , t_lkp_sub_category.sub_cat_name 
+      await sequelize.query(`select distinct t_item.id, t_item.name,t_item.brand_id,t_item.UOM ,t_item.category_id, t_lkp_category.group_name,t_item.sub_category_id
       ,t_item.image ,t_item.description ,t_item.available_for_ecomm ,t_batch.batch_no ,
       t_batch.location_id ,t_batch.MRP ,t_batch.discount ,t_batch.cost_price ,t_batch.mfg_date ,t_batch.sale_price ,
       t_batch.created_at,t_lkp_color.color_name,t_batch.quantity, t_lkp_brand.brand_name
-      from ((((((t_item
+      from (((((t_item
             inner join t_batch on t_batch.item_id = t_item.id )
             inner join t_lkp_color on t_lkp_color.id = t_item.color_id)
             inner join t_lkp_category on t_lkp_category.id = t_item.category_id)
-            INNER join t_lkp_sub_category on t_lkp_sub_category.id = t_item.sub_category_id)
             inner join t_lkp_brand on t_lkp_brand.id = t_item.brand_id)
             inner join t_inventory on t_inventory.item_id = t_item.id)
              where t_item.id = ${itemID} and t_inventory.location_id = 4 and t_lkp_category.available_for_ecomm = 1 and t_item.available_for_ecomm = 1 `);
@@ -394,7 +391,7 @@ const buyNow = async (req, res, next) => {
       applied_discount: applied_discount,
       wallet_balance_used: wallet_balance_used,
       final_payable_amount: final_payable_amount,
-      cashback_amount: cashback_amount
+      cashback_amount: cashback_amount,
     });
 
     const user_wallet = await Wallet.findOne({
@@ -508,83 +505,89 @@ const buyNow = async (req, res, next) => {
         where: { item_id: currentItem.item_id, mark_selected: 1 },
       });
 
-      const currentInventory = await Inventory.findOne({
-        where: {
-          batch_id: oldestBatch.id,
-          item_id: currentItem.item_id,
-          location_id: 4,
-          balance_type: 1,
-        },
-      });
-
-      console.log("current inventory with balance type 1", currentInventory);
-
-      const currentInventoryToBeBlocked = await Inventory.findOne({
-        where: {
-          batch_id: oldestBatch.id,
-          item_id: currentItem.item_id,
-          location_id: 4,
-          balance_type: 7,
-        },
-      });
-
-      console.log(
-        "blocked inventory with balance type 1",
-        currentInventoryToBeBlocked
-      );
-
-      if (!currentInventoryToBeBlocked) {
-        const newInventory = await Inventory.create({
-          batch_id: oldestBatch.id,
-          item_id: currentItem.item_id,
-          location_id: 4,
-          quantity: currentItem.quantity,
-          balance_type: 7,
-          active_ind: "Y",
-          created_by: 1,
-        });
-
-        console.log(
-          "If there is no inventory to be blocked, make a new row",
-          newInventory
-        );
-      } else {
-        const updatedInventory = await Inventory.update(
-          {
-            quantity:
-              currentInventoryToBeBlocked.quantity + currentItem.quantity,
-          },
-          {
-            where: {
-              batch_id: oldestBatch.id,
-              item_id: currentItem.item_id,
-              location_id: 4,
-              balance_type: 7,
-            },
-          }
-        );
-
-        console.log(
-          "updated inventory row with balance type 7",
-          updatedInventory
-        );
-      }
-      // if (currentInventory) {
-      const updateInventory = await Inventory.update(
-        {
-          quantity: currentInventory.quantity - currentItem.quantity,
-        },
-        {
+      let currentInventory;
+      if (oldestBatch) {
+        currentInventory = await Inventory.findOne({
           where: {
             batch_id: oldestBatch.id,
             item_id: currentItem.item_id,
             location_id: 4,
             balance_type: 1,
           },
+        });
+
+        console.log("current inventory with balance type 1", currentInventory);
+
+        const currentInventoryToBeBlocked = await Inventory.findOne({
+          where: {
+            batch_id: oldestBatch.id,
+            item_id: currentItem.item_id,
+            location_id: 4,
+            balance_type: 7,
+          },
+        });
+
+        console.log(
+          "blocked inventory with balance type 1",
+          currentInventoryToBeBlocked
+        );
+
+        if (!currentInventoryToBeBlocked) {
+          const newInventory = await Inventory.create({
+            batch_id: oldestBatch.id,
+            item_id: currentItem.item_id,
+            location_id: 4,
+            quantity: currentItem.quantity,
+            balance_type: 7,
+            active_ind: "Y",
+            created_by: 1,
+          });
+
+          console.log(
+            "If there is no inventory to be blocked, make a new row",
+            newInventory
+          );
+        } else {
+          const updatedInventory = await Inventory.update(
+            {
+              quantity:
+                currentInventoryToBeBlocked.quantity + currentItem.quantity,
+            },
+            {
+              where: {
+                batch_id: oldestBatch.id,
+                item_id: currentItem.item_id,
+                location_id: 4,
+                balance_type: 7,
+              },
+            }
+          );
+
+          console.log(
+            "updated inventory row with balance type 7",
+            updatedInventory
+          );
         }
-      );
-      console.log("updated inventory row with balance type 1", updateInventory);
-      // }
+        // if (currentInventory) {
+        const updateInventory = await Inventory.update(
+          {
+            quantity: currentInventory.quantity - currentItem.quantity,
+          },
+          {
+            where: {
+              batch_id: oldestBatch.id,
+              item_id: currentItem.item_id,
+              location_id: 4,
+              balance_type: 1,
+            },
+          }
+        );
+        console.log(
+          "updated inventory row with balance type 1",
+          updateInventory
+        );
+        // }
+      }
     });
 
     const response = orderItems.map((current) => {
@@ -598,7 +601,7 @@ const buyNow = async (req, res, next) => {
 
     // await InvoiceGen(currentUser, newOrder.order_id);
 
-    console.log("jjjjjjjjjjjjjjjjjjjjjjjjjjjjjj")
+    console.log("jjjjjjjjjjjjjjjjjjjjjjjjjjjjjj");
     let email = "";
     let contact_no = "";
     Customer.findOne({
@@ -610,7 +613,7 @@ const buyNow = async (req, res, next) => {
       contact_no = cust.dataValues.contact_no;
       let opt_in = cust.dataValues.opt_in;
 
-      console.log("jjjjjjjjjjjjjjjjjjjjjjjjjjjjjj")
+      console.log("jjjjjjjjjjjjjjjjjjjjjjjjjjjjjj");
 
       await InvoiceGen(
         currentUser,
@@ -648,7 +651,7 @@ const buyNow = async (req, res, next) => {
 };
 
 const InvoiceGen = async (cust_no, order_id, email, contact_no, opt_in) => {
-  console.log("INVOICE GENNNN")
+  console.log("INVOICE GENNNN");
   const currentCustomer = cust_no;
   const orderID = order_id;
   try {
@@ -688,7 +691,7 @@ const InvoiceGen = async (cust_no, order_id, email, contact_no, opt_in) => {
           isGift: item.is_gift == 1 ? true : false,
           isOffer: item.is_offer == 1 ? true : false,
           offerPrice: item.is_offer == 1 ? offer_price : "",
-          salePrice: oldestBatch.sale_price
+          salePrice: oldestBatch.sale_price,
         };
       }
     });
@@ -732,10 +735,9 @@ const InvoiceGen = async (cust_no, order_id, email, contact_no, opt_in) => {
       }
       // send whatsapp
       if (contact_no != "") {
-        sendInvoiceToWhatsapp(contact_no, response.orderID, invoice_link);
+        await sendInvoiceToWhatsapp(contact_no, response.orderID, invoice_link);
       }
     });
-
   } catch (error) {
     console.log(error);
     return "error";

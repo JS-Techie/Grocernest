@@ -1,6 +1,6 @@
 const Gupshup = require("gupshup-whatsapp-api");
 const { optIn } = require("./optInOut");
-
+const { getShortUrl } = require("../../services/urlShortener/urlShortener");
 let client = new Gupshup({
   apiKey: "hm7797tb46hrtrgcsqksvxs69yj9zza4",
 });
@@ -43,8 +43,13 @@ const sendOTPToWhatsapp = async (phno, otp) => {
     });
 };
 
-const sendInvoiceToWhatsapp = (phno, order_id, link) => {
+const sendInvoiceToWhatsapp = async (phno, order_id, link) => {
   console.log("Sending sms to whatsapp..");
+
+  // sorten the link
+  let short_url = "http://ecomm-dev.grocernest.com/api/invoice/" + await getShortUrl(link);
+  // let short_url = "http://grocernest.com/api/url/invoice/download/" + await getShortUrl(link);
+
   client.message
     .send({
       channel: "whatsapp",
@@ -60,7 +65,7 @@ const sendInvoiceToWhatsapp = (phno, order_id, link) => {
           order_id +
           "*" +
           " is placed Successfully,  you can download your invoice by clicking this link " +
-          link,
+          short_url,
       },
     })
     .then((response) => {

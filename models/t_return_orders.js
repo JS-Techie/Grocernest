@@ -6,7 +6,7 @@ module.exports = sequelize => {
   const attributes = {
     cust_no: {
       type: DataTypes.STRING(20),
-      allowNull: false,
+      allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
@@ -15,39 +15,57 @@ module.exports = sequelize => {
     },
     order_id: {
       type: DataTypes.STRING(255),
-      allowNull: false,
+      allowNull: true,
       defaultValue: null,
-      primaryKey: true,
+      primaryKey: false,
       autoIncrement: false,
       comment: null,
       field: "order_id"
     },
     status: {
-      type: DataTypes.ENUM('Placed', 'Accepted', 'Shipped', 'Delivered', 'Cancelled', 'Returned'),
-      allowNull: false,
+      type: DataTypes.STRING(100),
+      allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
       field: "status"
     },
-    created_at: {
-      type: DataTypes.DATE,
-      allowNull: true,
-      defaultValue: sequelize.fn('current_timestamp'),
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "created_at"
-    },
-    updated_at: {
-      type: DataTypes.DATE,
+    item_id: {
+      type: DataTypes.BIGINT,
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "updated_at"
+      field: "item_id"
+    },
+    id: {
+      type: DataTypes.BIGINT,
+      allowNull: false,
+      defaultValue: null,
+      primaryKey: true,
+      autoIncrement: true,
+      comment: null,
+      field: "id"
+    },
+    delivery_boy: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "delivery_boy"
+    },
+    return_reason: {
+      type: DataTypes.STRING(500),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "return_reason"
     },
     created_by: {
       type: DataTypes.BIGINT,
@@ -67,71 +85,35 @@ module.exports = sequelize => {
       comment: null,
       field: "updated_by"
     },
-    total: {
-      type: DataTypes.FLOAT,
+    created_at: {
+      type: DataTypes.DATE,
       allowNull: true,
-      defaultValue: null,
+      defaultValue: sequelize.fn('current_timestamp'),
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "total"
+      field: "created_at"
     },
-    address: {
-      type: DataTypes.STRING(255),
+    updated_at: {
+      type: DataTypes.DATE,
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "address"
+      field: "updated_at"
     },
-    cancellation_reason: {
-      type: DataTypes.STRING(255),
+    quantity: {
+      type: DataTypes.BIGINT,
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "cancellation_reason"
-    },
-    wallet_balance_used: {
-      type: DataTypes.FLOAT,
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "wallet_balance_used"
-    },
-    applied_discount: {
-      type: DataTypes.FLOAT,
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "applied_discount"
-    },
-    final_payable_amount: {
-      type: DataTypes.FLOAT,
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "final_payable_amount"
-    },
-    cashback_processed: {
-      type: DataTypes.STRING(20),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "cashback_processed"
+      field: "quantity"
     },
     cashback_amount: {
-      type: DataTypes.FLOAT,
+      type: DataTypes.BIGINT,
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
@@ -139,39 +121,30 @@ module.exports = sequelize => {
       comment: null,
       field: "cashback_amount"
     },
-    coupon_id: {
-      type: DataTypes.BIGINT,
+    is_percentage: {
+      type: DataTypes.INTEGER(1),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "coupon_id"
+      field: "is_percentage"
     },
-    delivery_boy: {
-      type: DataTypes.BIGINT,
+    reject_reason: {
+      type: DataTypes.STRING(100),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "delivery_boy"
-    },
-    return_status: {
-      type: DataTypes.ENUM('a', 'i', 'r', 'c'),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "return_status"
+      field: "reject_reason"
     }
   };
   const options = {
-    tableName: "t_lkp_order",
+    tableName: "t_return_orders",
     comment: "",
     indexes: []
   };
-  const TLkpOrderModel = sequelize.define("t_lkp_order_model", attributes, options);
-  return TLkpOrderModel;
+  const TReturnOrdersModel = sequelize.define("t_return_orders_model", attributes, options);
+  return TReturnOrdersModel;
 };

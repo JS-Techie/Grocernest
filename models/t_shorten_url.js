@@ -5,40 +5,31 @@ const {
 module.exports = sequelize => {
   const attributes = {
     id: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.STRING(20),
       allowNull: false,
       defaultValue: null,
       primaryKey: true,
-      autoIncrement: true,
+      autoIncrement: false,
       comment: null,
       field: "id"
     },
-    user_id: {
-      type: DataTypes.BIGINT,
-      allowNull: false,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "user_id"
-    },
-    login_time: {
-      type: DataTypes.STRING(250),
+    original_url: {
+      type: DataTypes.STRING(500),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "login_time"
+      field: "original_url"
     },
-    logout_time: {
-      type: DataTypes.STRING(250),
+    short_url: {
+      type: DataTypes.STRING(300),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "logout_time"
+      field: "short_url"
     },
     created_by: {
       type: DataTypes.BIGINT,
@@ -60,7 +51,7 @@ module.exports = sequelize => {
     },
     created_at: {
       type: DataTypes.DATE,
-      allowNull: true,
+      allowNull: false,
       defaultValue: sequelize.fn('current_timestamp'),
       primaryKey: false,
       autoIncrement: false,
@@ -78,10 +69,10 @@ module.exports = sequelize => {
     }
   };
   const options = {
-    tableName: "t_attendance",
+    tableName: "t_shorten_url",
     comment: "",
     indexes: []
   };
-  const TAttendanceModel = sequelize.define("t_attendance_model", attributes, options);
-  return TAttendanceModel;
+  const TShortenUrlModel = sequelize.define("t_shorten_url_model", attributes, options);
+  return TShortenUrlModel;
 };
