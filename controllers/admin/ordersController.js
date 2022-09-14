@@ -1108,6 +1108,10 @@ const getReturns = async (req, res, next) => {
             where: { item_id: currentItem.item_id, mark_selected: 1 },
           });
 
+          const item = await Item.findOne({
+            where: { id: currentItem.item_id },
+          });
+
           let currentInventory;
           if (oldestBatch) {
             currentInventory = await Inventory.findOne({
@@ -1117,6 +1121,7 @@ const getReturns = async (req, res, next) => {
           return {
             batchDetails: oldestBatch,
             inventoryDetails: currentInventory,
+            item
           };
         }
       );
