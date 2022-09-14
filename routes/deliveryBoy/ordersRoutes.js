@@ -24,7 +24,7 @@ router
   .route("/deliver/:order_id")
   .post(authenticateDeliveryBoy, changeStatusOfDeliveryOrder);
 
-  router.route("/return/view/all").get(authenticateDeliveryBoy, getAllRequestedReturns);
+  router.route("/return/view/all").post(authenticateDeliveryBoy, getAllRequestedReturns);
   router.route("/deliver/view/all").get(authenticateDeliveryBoy, getAllDeliveryOrders);
 
 module.exports = router;

@@ -377,6 +377,24 @@
         }
       }
     },
+    "/invoice/{id}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/cart/save": {
       "post": {
         "description": "",
@@ -2197,24 +2215,6 @@
         }
       }
     },
-    "/url/invoice/download/{id}": {
-      "get": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
     "/admin/orders/pending": {
       "get": {
         "description": "",
@@ -2564,6 +2564,18 @@
             "name": "authorization",
             "in": "header",
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reject_reason": {
+                  "example": "any"
+                }
+              }
+            }
           }
         ],
         "responses": {
@@ -2577,13 +2589,25 @@
       }
     },
     "/admin/orders/view/returned": {
-      "get": {
+      "post": {
         "description": "",
         "parameters": [
           {
             "name": "authorization",
             "in": "header",
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "return_status": {
+                  "example": "any"
+                }
+              }
+            }
           }
         ],
         "responses": {
@@ -4981,13 +5005,25 @@
       }
     },
     "/deliveryboy/orders/return/view/all": {
-      "get": {
+      "post": {
         "description": "",
         "parameters": [
           {
             "name": "authorization",
             "in": "header",
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "return_status": {
+                  "example": "any"
+                }
+              }
+            }
           }
         ],
         "responses": {

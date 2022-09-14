@@ -15,7 +15,7 @@ const {
   getAllOrderByPhoneNumber,
   assignDeliveryBoyForReturn,
   rejectRequestedReturn,
-  getRequestedReturns,
+  getReturns,
 } = require("../../controllers/admin/ordersController.js");
 
 router.route("/pending").get(authenticateAdmin, getAllPendingOrders);
@@ -46,6 +46,6 @@ router
   .route("/reject/return/:order_id")
   .post(authenticateAdmin, rejectRequestedReturn);
 
-router.route("/view/returned").get(authenticateAdmin, getRequestedReturns);
+router.route("/view/returned").post(authenticateAdmin, getReturns);
 
 module.exports = router;

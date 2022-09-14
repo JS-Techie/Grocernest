@@ -1,9 +1,7 @@
 const { sequelize } = require("../../models");
 const { Op } = require("sequelize");
 const db = require("../../models");
-const Order = db.OrderModel;
-const OrderItems = db.OrderItemsModel;
-const User = db.UserModel
+
 const {
   sendOrderStatusEmail,
   sendCancelledStatusEmail,
@@ -20,11 +18,14 @@ const {
 
 const Batch = db.BatchModel;
 const Customer = db.CustomerModel;
-const OrderItem = db.OrderItemsModel;
 const Item = db.ItemModel;
 const Inventory = db.InventoryModel;
 const Category = db.LkpCategoryModel;
 const Offers = db.OffersModel;
+const Order = db.OrderModel;
+const OrderItems = db.OrderItemsModel;
+const User = db.UserModel;
+const ReturnOrder = db.ReturnOrdersModel;
 
 const getAllPendingOrders = async (req, res, next) => {
   try {
@@ -84,15 +85,15 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
       : " AND tc.contact_no LIKE '%" + phno + "%'";
   const dateQuery =
     startDate == undefined ||
-      startDate == "" ||
-      endDate == undefined ||
-      endDate == ""
+    startDate == "" ||
+    endDate == undefined ||
+    endDate == ""
       ? ""
       : " AND tlo.created_at BETWEEN '" +
-      startDate +
-      "' AND (SELECT DATE_ADD('" +
-      endDate +
-      "', INTERVAL 1 DAY))";
+        startDate +
+        "' AND (SELECT DATE_ADD('" +
+        endDate +
+        "', INTERVAL 1 DAY))";
   const orderId =
     orderid == undefined || orderid == ""
       ? ""
@@ -136,9 +137,9 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
       const dboy_name = await User.findOne({
         where: {
           id: current.delivery_boy,
-          type_cd: "DELIVERY_BOY"
-        }
-      })
+          type_cd: "DELIVERY_BOY",
+        },
+      });
       return {
         cust_name: current.cust_name,
         contact_no: current.contact_no,
@@ -272,23 +273,23 @@ const getOrderDetails = async (req, res, next) => {
             currentOrderItem.is_offer === 1 ? (isEdit ? true : false) : "",
           offerDetails: currentOffer
             ? {
-              offerID: currentOffer.id,
-              offerType: currentOffer.type,
-              itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
-              quantityOfItemX: currentOffer.item_1_quantity
-                ? currentOffer.item_1_quantity
-                : "",
-              itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
-              quantityOfItemY: currentOffer.item_2_quantity
-                ? currentOffer.item_2_quantity
-                : "",
-              itemID: currentOffer.item_id ? currentOffer.item_id : "",
-              amountOfDiscount: currentOffer.amount_of_discount
-                ? currentOffer.amount_of_discount
-                : "",
-              isPercentage: currentOffer.is_percentage ? true : false,
-              isActive: currentOffer.is_active ? true : false,
-            }
+                offerID: currentOffer.id,
+                offerType: currentOffer.type,
+                itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
+                quantityOfItemX: currentOffer.item_1_quantity
+                  ? currentOffer.item_1_quantity
+                  : "",
+                itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
+                quantityOfItemY: currentOffer.item_2_quantity
+                  ? currentOffer.item_2_quantity
+                  : "",
+                itemID: currentOffer.item_id ? currentOffer.item_id : "",
+                amountOfDiscount: currentOffer.amount_of_discount
+                  ? currentOffer.amount_of_discount
+                  : "",
+                isPercentage: currentOffer.is_percentage ? true : false,
+                isActive: currentOffer.is_active ? true : false,
+              }
             : "",
         };
       }
@@ -535,8 +536,8 @@ const changeOrderStatus = async (req, res, next) => {
                   res.dataValues.wallet_balance_used,
                   res.dataValues.cust_no,
                   "cancelled order ID-" +
-                  req.body.orderId +
-                  " wallet balance refunded."
+                    req.body.orderId +
+                    " wallet balance refunded."
                 );
               }
             }
@@ -687,9 +688,9 @@ const changeOrderStatus = async (req, res, next) => {
                 email.toString(),
                 req.body.orderId,
                 "Your order " +
-                req.body.orderId +
-                " has been " +
-                req.body.status
+                  req.body.orderId +
+                  " has been " +
+                  req.body.status
               );
               // whatsapp for cancelled by user
               sendOrderStatusToWhatsapp(
@@ -791,9 +792,9 @@ const assignTransporter = async (req, res, next) => {
               email.toString(),
               req.body.orderId,
               "Your order " +
-              req.body.orderId +
-              " has been Shipped. Your order will be delivered by " +
-              transporterName
+                req.body.orderId +
+                " has been Shipped. Your order will be delivered by " +
+                transporterName
             );
 
           // send whatsapp
@@ -842,13 +843,12 @@ const getShippedOrders = async (req, res, next) => {
     }
 
     const promises = results.map(async (current) => {
-
       const dboy_name = await User.findOne({
         where: {
           id: current.delivery_boy,
-          type_cd: "DELIVERY_BOY"
-        }
-      })
+          type_cd: "DELIVERY_BOY",
+        },
+      });
       return {
         cust_name: current.cust_name,
         contact_no: current.contact_no,
@@ -899,9 +899,9 @@ const getDeliveredOrders = async (req, res, next) => {
       const dboy_name = await User.findOne({
         where: {
           id: current.delivery_boy,
-          type_cd: "DELIVERY_BOY"
-        }
-      })
+          type_cd: "DELIVERY_BOY",
+        },
+      });
       return {
         cust_name: current.cust_name,
         contact_no: current.contact_no,
@@ -953,9 +953,9 @@ const getCanceledorders = async (req, res, next) => {
       const dboy_name = await User.findOne({
         where: {
           id: current.delivery_boy,
-          type_cd: "DELIVERY_BOY"
-        }
-      })
+          type_cd: "DELIVERY_BOY",
+        },
+      });
 
       return {
         cust_name: current.cust_name,
@@ -1033,6 +1033,7 @@ const assignDeliveryBoyForReturn = async (req, res, next) => {
 
 const rejectRequestedReturn = async (req, res, next) => {
   const { order_id } = req.params;
+  const { reject_reason } = req.body;
 
   try {
     const currentOrder = await Order.findOne({
@@ -1050,6 +1051,15 @@ const rejectRequestedReturn = async (req, res, next) => {
     await Order.update(
       {
         return_status: "c",
+      },
+      {
+        where: { order_id },
+      }
+    );
+
+    await ReturnOrder.update(
+      {
+        reject_reason,
       },
       {
         where: { order_id },
@@ -1076,22 +1086,57 @@ const rejectRequestedReturn = async (req, res, next) => {
   }
 };
 
-const getRequestedReturns = async (req, res, next) => {
+const getReturns = async (req, res, next) => {
+  const { return_status } = req.body;
   try {
-    const orders = await Order.findAll({
-      where: { return_status: "i" },
-      include: [
-        {
-          model: OrderItems,
-        },
-      ],
+    const allOrders = await Order.findAll({
+      where: { return_status },
     });
+
+    const orderPromise = allOrders.map(async (currentOrder) => {
+      const orderItems = await OrderItems.findAll({
+        where: { order_id: currentOrder.order_id },
+      });
+
+      const currentCustomer = await Customer.findOne({
+        where: { cust_no: currentOrder.cust_no },
+      });
+
+      const innerOrderItemsPromises = await orderItems.map(
+        async (currentItem) => {
+          const oldestBatch = await Batch.findOne({
+            where: { item_id: currentItem.item_id, mark_selected: 1 },
+          });
+
+          let currentInventory;
+          if (oldestBatch) {
+            currentInventory = await Inventory.findOne({
+              where: { batch_id: oldestBatch.id, item_id: currentItem.item_id },
+            });
+          }
+          return {
+            batchDetails: oldestBatch,
+            inventoryDetails: currentInventory,
+          };
+        }
+      );
+
+      const itemDetails = await Promise.all(innerOrderItemsPromises);
+
+      return {
+        currentCustomer,
+        currentOrder,
+        itemDetails,
+      };
+    });
+
+    const orders = await Promise.all(orderPromise);
 
     if (orders.length === 0) {
       return res.status(200).send({
         success: true,
         data: [],
-        message: "There are no requested returns",
+        message: "There are no returns based on the return status",
       });
     }
 
@@ -1121,5 +1166,5 @@ module.exports = {
   getAllOrderByPhoneNumber,
   assignDeliveryBoyForReturn,
   rejectRequestedReturn,
-  getRequestedReturns,
+  getReturns,
 };

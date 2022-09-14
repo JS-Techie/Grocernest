@@ -5,6 +5,8 @@ const OrderItems = db.OrderItemsModel;
 const ReturnOrder = db.ReturnOrdersModel;
 const Batch = db.BatchModel;
 const Inventory = db.InventoryModel;
+const Item = db.ItemModel;
+const Customer = db.CustomerModel;
 
 const getAllOrders = async (req, res, next) => {
   const { user_id } = req;
@@ -304,22 +306,45 @@ const changeStatusOfReturnOrder = async (req, res, next) => {
 const getAllDeliveryOrders = async (req, res, next) => {
   const { user_id } = req;
   try {
-    const orders = await Order.findAll({
-      where: { delivery_boy: user_id, return_status: null },
-      include: [
-        {
-          model: OrderItems,
-        },
-      ],
+    const allOrders = await Order.findAll({
+      where: { delivery_boy: user_id },
     });
 
-    if (orders.length === 0) {
+    if (allOrders.length === 0) {
       return res.status(200).send({
         success: true,
         data: [],
         message: "There are no orders for you",
       });
     }
+
+    const orderPromises = await allOrders.map(async (currentOrder) => {
+      const orderItems = await OrderItems.findAll({
+        where: { order_id: currentOrder.order_id },
+      });
+
+      const orderItemsPromises = orderItems.map(async (currentItem) => {
+        const itemDetails = await Item.findOne({
+          where: { id: currentItem.item_id },
+        });
+
+        return itemDetails;
+      });
+
+      const itemDetails = await Promise.all(orderItemsPromises);
+
+      const currentCustomer = await Customer.findOne({
+        where: { cust_no: currentOrder.cust_no },
+      });
+
+      return {
+        currentCustomer,
+        currentOrder,
+        itemDetails,
+      };
+    });
+
+    const orders = await Promise.all(orderPromises);
 
     return res.status(200).send({
       success: true,
@@ -337,23 +362,47 @@ const getAllDeliveryOrders = async (req, res, next) => {
 
 const getAllRequestedReturns = async (req, res, next) => {
   const { user_id } = req;
+  const { return_status } = req.body;
   try {
-    const orders = await Order.findAll({
-      where: { delivery_boy: user_id, return_status: "i" },
-      include: [
-        {
-          model: OrderItems,
-        },
-      ],
+    const allOrders = await Order.findAll({
+      where: { delivery_boy: user_id, return_status },
     });
 
-    if (orders.length === 0) {
+    if (allOrders.length === 0) {
       return res.status(200).send({
         success: true,
         data: [],
         message: "There are no orders for you",
       });
     }
+
+    const orderPromises = await allOrders.map(async (currentOrder) => {
+      const orderItems = await OrderItems.findAll({
+        where: { order_id: currentOrder.order_id },
+      });
+
+      const innerPromise = orderItems.map(async (currentItem) => {
+        const itemDetails = await Item.findOne({
+          where: { id: currentItem.item_id },
+        });
+
+        return itemDetails;
+      });
+
+      const itemDetails = await Promise.all(innerPromise);
+
+      const currentCustomer = await Customer.findOne({
+        where: { cust_no: currentOrder.cust_no },
+      });
+
+      return {
+        currentOrder,
+        currentCustomer,
+        itemDetails,
+      };
+    });
+
+    const orders = await Promise.all(orderPromises);
 
     return res.status(200).send({
       success: true,
