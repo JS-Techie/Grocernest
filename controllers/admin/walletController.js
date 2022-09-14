@@ -84,7 +84,7 @@ const debitAmountFromWallet = async (req, res, next) => {
                 `);
             return res.status(200).send({
                 success: true,
-                data: results3,
+                data: results3[0],
                 message: "Amount successfully debited from the wallet",
             });
         }
