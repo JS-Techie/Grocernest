@@ -15,8 +15,8 @@ const checkWalletDetails = async (req, res, next) => {
         }],
         where: {
             cust_no: cust_no,
-            order: [["created_at", "DESC"]],
-        }
+        },
+        order: [["created_at", "DESC"]],
     }).then((resData) => {
         return res.status(201).json({
             success: true,
