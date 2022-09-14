@@ -26,7 +26,7 @@ const checkWalletDetails = async (req, res, next) => {
     }).catch((err) => {
         return res.status(400).json({
             success: false,
-            data: error.message,
+            data: err.message,
             message: "Error while fetching wallet and transaction from database",
         });
     })
