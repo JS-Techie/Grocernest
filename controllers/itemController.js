@@ -449,21 +449,29 @@ const getItemById = async (req, res, next) => {
       });
     }
 
-    const coupons = await Coupons.findAll({
-      where: {
-        [Op.or]: [
-          { item_id: item.id },
-          { brand_id: item.brand_id },
-          { cat_id: item.category_id },
-          { sub_cat_id: item.sub_category_id },
-        ],
-      },
-    });
+    // const coupons = await Coupons.findAll({
+    //   where: {
+    //     [Op.or]: [
+    //       { item_id: item.id },
+    //       { brand_id: item.brand_id },
+    //       { cat_id: item.category_id },
+    //       { sub_cat_id: item.sub_category_id },
+    //     ],
+    //   },
+    // });
+
+    const [coupons, metadata2] =
+      await sequelize.query(`select *
+    from t_coupons
+    where t_coupons.item_id = ${item.id} OR t_coupons.cat_id = ${item.category_id} OR t_coupons.sub_cat_id = ${item.sub_category_id} or t_coupons.brand_id = ${item.brand_id} 
+    or t_coupons.assigned_user = "${currentUser}" `);
 
     // const [couponForCurrentItem, metadataForCoupons] = await sequelize.query(
     //   `select t_coupons.code, t_coupons.amount_of_discount ,t_coupons.is_percentage ,t_coupons.description, t_coupons.expiry_date, t_coupons.created_at
     //   from ecomm.t_coupons where t_coupons.item_id = ${item.id} OR t_coupons.cat_id = ${item.category_id} OR t_coupons.sub_cat_id = ${item.sub_category_id} or t_coupons.brand_id = ${item.brand_id}`
     // );
+
+    //t_coupons.code, t_coupons.amount_of_discount ,t_coupons.is_percentage ,t_coupons.description,t_coupons.expiry_date
     let promises = [];
     if (coupons.length != 0) {
       promises = coupons.map((current) => {
