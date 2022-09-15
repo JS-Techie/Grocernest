@@ -1076,7 +1076,7 @@ const rejectRequestedReturn = async (req, res, next) => {
 
     //Notify customer about status of return
 
-    return res.status(400).send({
+    return res.status(200).send({
       success: true,
       data: updatedOrder,
       message: "Successfully rejected requested return",
