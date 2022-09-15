@@ -197,14 +197,14 @@ module.exports = sequelize => {
       comment: null,
       field: "registered_for_ecomm"
     },
-    calling_no: {
+    calling_number: {
       type: DataTypes.STRING(20),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "calling_no"
+      field: "calling_number"
     }
   };
   const options = {
