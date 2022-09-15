@@ -26,6 +26,7 @@ const Order = db.OrderModel;
 const OrderItems = db.OrderItemsModel;
 const User = db.UserModel;
 const ReturnOrder = db.ReturnOrdersModel;
+const Coupon = db.CouponsModel;
 
 const getAllPendingOrders = async (req, res, next) => {
   try {
@@ -992,11 +993,11 @@ const assignDeliveryBoyForReturn = async (req, res, next) => {
   const { delivery_boy } = req.body;
 
   try {
-    const currentOrder = await Order.findOne({
+    const currentOrder = await ReturnOrder.findAll({
       where: { order_id },
     });
 
-    if (!currentOrder) {
+    if (currentOrder.length !== 0) {
       return res.status(400).send({
         success: false,
         data: [],
@@ -1004,7 +1005,7 @@ const assignDeliveryBoyForReturn = async (req, res, next) => {
       });
     }
 
-    await Order.update(
+    await ReturnOrder.update(
       {
         delivery_boy,
       },
@@ -1013,7 +1014,7 @@ const assignDeliveryBoyForReturn = async (req, res, next) => {
       }
     );
 
-    const updatedOrder = await Order.findOne({
+    const updatedOrder = await ReturnOrder.findAll({
       where: { order_id },
     });
 
@@ -1051,20 +1052,18 @@ const rejectRequestedReturn = async (req, res, next) => {
     await Order.update(
       {
         return_status: "c",
-      },
-      {
-        where: { order_id },
-      }
-    );
-
-    await ReturnOrder.update(
-      {
         reject_reason,
       },
       {
         where: { order_id },
       }
     );
+
+    //Delete all records from return orders table which has order id
+
+    await ReturnOrder.destroy({
+      where: { order_id },
+    });
 
     const updatedOrder = await Order.findOne({
       where: { order_id },
@@ -1093,57 +1092,111 @@ const getReturns = async (req, res, next) => {
       where: { return_status },
     });
 
-    const orderPromise = allOrders.map(async (currentOrder) => {
-      const orderItems = await OrderItems.findAll({
-        where: { order_id: currentOrder.order_id },
-      });
-
-      const currentCustomer = await Customer.findOne({
-        where: { cust_no: currentOrder.cust_no },
-      });
-
-      const innerOrderItemsPromises = await orderItems.map(
-        async (currentItem) => {
-          const oldestBatch = await Batch.findOne({
-            where: { item_id: currentItem.item_id, mark_selected: 1 },
-          });
-
-          const item = await Item.findOne({
-            where: { id: currentItem.item_id },
-          });
-
-          let currentInventory;
-          if (oldestBatch) {
-            currentInventory = await Inventory.findOne({
-              where: { batch_id: oldestBatch.id, item_id: currentItem.item_id },
-            });
-          }
-          return {
-            batchDetails: oldestBatch,
-            inventoryDetails: currentInventory,
-            item
-          };
-        }
-      );
-
-      const itemDetails = await Promise.all(innerOrderItemsPromises);
-
-      return {
-        currentCustomer,
-        currentOrder,
-        itemDetails,
-      };
-    });
-
-    const orders = await Promise.all(orderPromise);
-
-    if (orders.length === 0) {
+    if (allOrders.length === 0) {
       return res.status(200).send({
         success: true,
         data: [],
         message: "There are no returns based on the return status",
       });
     }
+
+    const outerPromises = await allOrders.map(async (currentOrder) => {
+      const returnedItems = await ReturnOrder.findAll({
+        where: { order_id: currentOrder.order_id },
+      });
+
+      console.log("Returned items for this order", returnedItems);
+
+      let coupon;
+      if (currentOrder.coupon_id) {
+        coupon = await Coupon.findOne({
+          where: { id: currentOrder.coupon_id },
+        });
+      }
+
+      let currentCustomer;
+      let returnedItemsWithoutUndefined = [];
+      let promises = [];
+
+      if (returnedItems.length !== 0) {
+        returnedItemsWithoutUndefined = await returnedItems.filter(
+          (current) => {
+            return current !== undefined;
+          }
+        );
+
+        promises = await returnedItemsWithoutUndefined.map(
+          async (currentReturnedItem) => {
+            const item = await Item.findOne({
+              where: { id: currentReturnedItem.item_id },
+            });
+
+            const selectedBatch = await Batch.findOne({
+              where: { item_id: currentReturnedItem.item_id, mark_selected: 1 },
+            });
+
+            let inventory;
+            if (selectedBatch) {
+              inventory = await Inventory.findOne({
+                where: {
+                  batch_id: selectedBatch.id,
+                  item_id: currentReturnedItem.item_id,
+                  location_id: 4,
+                  balance_type: 1,
+                },
+              });
+            }
+
+            currentCustomer = await Customer.findOne({
+              where: { cust_no: currentOrder.cust_no },
+            });
+
+            return {
+              itemId: currentReturnedItem.item_id,
+              returnedQuantity: currentReturnedItem.quantity,
+              itemName: item.name,
+              image: item.image,
+              MRP: selectedBatch ? selectedBatch.MRP : "",
+              salePrice: selectedBatch ? selectedBatch.sale_price : "",
+              expiryDate: selectedBatch ? selectedBatch.expiry_date : "",
+              discount: selectedBatch ? selectedBatch.discount : "",
+              costPrice: selectedBatch ? selectedBatch.cost_price : "",
+              cashback: inventory ? inventory.cashback : "",
+              cashbackIsPercentage: inventory
+                ? inventory.cashback_is_percentage
+                : "",
+            };
+          }
+        );
+
+        const itemDetails = await Promise.all(promises);
+
+        return {
+          orderId: currentOrder.order_id,
+          date: currentOrder.created_at,
+          customerAddress: currentOrder.address,
+          total: currentOrder.total,
+          payableAmount: currentOrder.final_payable_amount,
+          customerName: currentCustomer ? currentCustomer.cust_name : "",
+          customerPhoneNumber: currentCustomer
+            ? currentCustomer.contact_no
+            : "",
+          customerEmail: currentCustomer ? currentCustomer.email : "",
+          status: currentOrder.status,
+          returnStatus: currentOrder.return_status,
+          paidByWallet: currentOrder.wallet_balance_used,
+          couponUsed: coupon ? coupon.code : "",
+          couponDiscount: coupon ? coupon.amount_of_discount : "",
+          couponIsPercentage: coupon ? coupon.is_percentage : "",
+          itemDetails,
+        };
+      }
+    });
+
+    const resolved = await Promise.all(outerPromises);
+    const orders = await resolved.filter((current) => {
+      return current != undefined;
+    });
 
     return res.status(200).send({
       success: true,

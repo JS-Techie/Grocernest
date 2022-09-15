@@ -7,6 +7,7 @@ const Batch = db.BatchModel;
 const Inventory = db.InventoryModel;
 const Item = db.ItemModel;
 const Customer = db.CustomerModel;
+const Coupon = db.CouponsModel;
 
 const getAllOrders = async (req, res, next) => {
   const { user_id } = req;
@@ -176,7 +177,7 @@ const changeStatusOfDeliveryOrder = async (req, res, next) => {
 const changeStatusOfReturnOrder = async (req, res, next) => {
   const { user_id } = req;
   const { order_id } = req.params;
-  const { return_status } = req.body;
+  const { return_status, reject_reason } = req.body;
 
   try {
     // console.log(return_status);
@@ -190,6 +191,14 @@ const changeStatusOfReturnOrder = async (req, res, next) => {
         success: false,
         data: [],
         message: "Please enter correct status",
+      });
+    }
+
+    if (return_status === "r" && !reject_reason) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "Please enter a rejection reason for rejecting this return",
       });
     }
 
@@ -274,6 +283,7 @@ const changeStatusOfReturnOrder = async (req, res, next) => {
       {
         return_status,
         status: "Returned",
+        reject_reason,
       },
       {
         where: { delivery_boy: user_id, order_id },
@@ -283,6 +293,12 @@ const changeStatusOfReturnOrder = async (req, res, next) => {
     const updatedOrder = await Order.findOne({
       where: { delivery_boy: user_id, order_id },
     });
+
+    if (return_status === "r") {
+      await ReturnOrder.destroy({
+        where: { order_id },
+      });
+    }
 
     //Notify admin and user
 
@@ -318,33 +334,85 @@ const getAllDeliveryOrders = async (req, res, next) => {
       });
     }
 
-    const orderPromises = await allOrders.map(async (currentOrder) => {
-      const orderItems = await OrderItems.findAll({
-        where: { order_id: currentOrder.order_id },
-      });
-
-      const orderItemsPromises = orderItems.map(async (currentItem) => {
-        const itemDetails = await Item.findOne({
-          where: { id: currentItem.item_id },
-        });
-
-        return itemDetails;
-      });
-
-      const itemDetails = await Promise.all(orderItemsPromises);
-
+    const outerPromises = await allOrders.map(async (currentOrder) => {
       const currentCustomer = await Customer.findOne({
         where: { cust_no: currentOrder.cust_no },
       });
 
+      const orderItems = await OrderItems.findAll({
+        where: { order_id: currentOrder.order_id },
+      });
+
+      let coupon;
+      if (currentOrder.coupon_id) {
+        coupon = await Coupon.findOne({
+          where: { id: currentOrder.coupon_id },
+        });
+      }
+
+      const promises = await orderItems.map(async (currentReturnedItem) => {
+        const item = await Item.findOne({
+          where: { id: currentReturnedItem.item_id },
+        });
+
+        const selectedBatch = await Batch.findOne({
+          where: { item_id: currentReturnedItem.item_id, mark_selected: 1 },
+        });
+
+        let inventory;
+        if (selectedBatch) {
+          inventory = await Inventory.findOne({
+            where: {
+              batch_id: selectedBatch.id,
+              item_id: currentReturnedItem.item_id,
+              location_id: 4,
+              balance_type: 1,
+            },
+          });
+        }
+
+        return {
+          itemId: currentReturnedItem.item_id,
+          quantity: currentReturnedItem.quantity,
+          itemName: item.name,
+          image: item.image,
+          MRP: selectedBatch ? selectedBatch.MRP : "",
+          salePrice: selectedBatch ? selectedBatch.sale_price : "",
+          expiryDate: selectedBatch ? selectedBatch.expiry_date : "",
+          discount: selectedBatch ? selectedBatch.discount : "",
+          costPrice: selectedBatch ? selectedBatch.cost_price : "",
+          cashback: inventory ? inventory.cashback : "",
+          cashbackIsPercentage: inventory
+            ? inventory.cashback_is_percentage
+            : "",
+        };
+      });
+
+      const itemDetails = await Promise.all(promises);
+
       return {
-        currentCustomer,
-        currentOrder,
+        orderId: currentOrder.order_id,
+        date: currentOrder.created_at,
+        customerAddress: currentOrder.address,
+        total: currentOrder.total,
+        payableAmount: currentOrder.final_payable_amount,
+        customerName: currentCustomer ? currentCustomer.cust_name : "",
+        customerPhoneNumber: currentCustomer ? currentCustomer.contact_no : "",
+        customerEmail: currentCustomer ? currentCustomer.email : "",
+        status: currentOrder.status,
+        returnStatus: currentOrder.return_status,
+        paidByWallet: currentOrder.wallet_balance_used,
+        couponUsed: coupon ? coupon.code : "",
+        couponDiscount: coupon ? coupon.amount_of_discount : "",
+        couponIsPercentage: coupon ? coupon.is_percentage : "",
         itemDetails,
       };
     });
 
-    const orders = await Promise.all(orderPromises);
+    const resolved = await Promise.all(outerPromises);
+    const orders = await resolved.filter((current) => {
+      return current != undefined;
+    });
 
     return res.status(200).send({
       success: true,
@@ -376,33 +444,103 @@ const getAllRequestedReturns = async (req, res, next) => {
       });
     }
 
-    const orderPromises = await allOrders.map(async (currentOrder) => {
-      const orderItems = await OrderItems.findAll({
+    const outerPromises = await allOrders.map(async (currentOrder) => {
+      const returnedItems = await ReturnOrder.findAll({
         where: { order_id: currentOrder.order_id },
       });
 
-      const innerPromise = orderItems.map(async (currentItem) => {
-        const itemDetails = await Item.findOne({
-          where: { id: currentItem.item_id },
+      console.log("Returned items for this order", returnedItems);
+
+      let coupon;
+      if (currentOrder.coupon_id) {
+        coupon = await Coupon.findOne({
+          where: { id: currentOrder.coupon_id },
         });
+      }
 
-        return itemDetails;
-      });
+      let currentCustomer;
+      let returnedItemsWithoutUndefined = [];
+      let promises = [];
 
-      const itemDetails = await Promise.all(innerPromise);
+      if (returnedItems.length !== 0) {
+        returnedItemsWithoutUndefined = await returnedItems.filter(
+          (current) => {
+            return current !== undefined;
+          }
+        );
 
-      const currentCustomer = await Customer.findOne({
-        where: { cust_no: currentOrder.cust_no },
-      });
+        promises = await returnedItemsWithoutUndefined.map(
+          async (currentReturnedItem) => {
+            const item = await Item.findOne({
+              where: { id: currentReturnedItem.item_id },
+            });
 
-      return {
-        currentOrder,
-        currentCustomer,
-        itemDetails,
-      };
+            const selectedBatch = await Batch.findOne({
+              where: { item_id: currentReturnedItem.item_id, mark_selected: 1 },
+            });
+
+            let inventory;
+            if (selectedBatch) {
+              inventory = await Inventory.findOne({
+                where: {
+                  batch_id: selectedBatch.id,
+                  item_id: currentReturnedItem.item_id,
+                  location_id: 4,
+                  balance_type: 1,
+                },
+              });
+            }
+
+            currentCustomer = await Customer.findOne({
+              where: { cust_no: currentOrder.cust_no },
+            });
+
+            return {
+              itemId: currentReturnedItem.item_id,
+              returnedQuantity: currentReturnedItem.quantity,
+              itemName: item.name,
+              image: item.image,
+              MRP: selectedBatch ? selectedBatch.MRP : "",
+              salePrice: selectedBatch ? selectedBatch.sale_price : "",
+              expiryDate: selectedBatch ? selectedBatch.expiry_date : "",
+              discount: selectedBatch ? selectedBatch.discount : "",
+              costPrice: selectedBatch ? selectedBatch.cost_price : "",
+              cashback: inventory ? inventory.cashback : "",
+              cashbackIsPercentage: inventory
+                ? inventory.cashback_is_percentage
+                : "",
+            };
+          }
+        );
+
+        const itemDetails = await Promise.all(promises);
+
+        return {
+          orderId: currentOrder.order_id,
+          date: currentOrder.created_at,
+          customerAddress: currentOrder.address,
+          total: currentOrder.total,
+          payableAmount: currentOrder.final_payable_amount,
+          customerName: currentCustomer ? currentCustomer.cust_name : "",
+          customerPhoneNumber: currentCustomer
+            ? currentCustomer.contact_no
+            : "",
+          customerEmail: currentCustomer ? currentCustomer.email : "",
+          status: currentOrder.status,
+          returnStatus: currentOrder.return_status,
+          paidByWallet: currentOrder.wallet_balance_used,
+          couponUsed: coupon ? coupon.code : "",
+          couponDiscount: coupon ? coupon.amount_of_discount : "",
+          couponIsPercentage: coupon ? coupon.is_percentage : "",
+          itemDetails,
+        };
+      }
     });
 
-    const orders = await Promise.all(orderPromises);
+    const resolved = await Promise.all(outerPromises);
+    const orders = await resolved.filter((current) => {
+      return current != undefined;
+    });
 
     return res.status(200).send({
       success: true,
