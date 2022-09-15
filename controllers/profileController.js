@@ -39,9 +39,9 @@ const getProfile = async (req, res, next) => {
         customerName: currentUserProfile.cust_name,
         firstName: currentUserProfile.cust_name.split(" ")[0],
         lastName: currentUserProfile.cust_name.split(" ")[1],
-        emailID: currentUserProfile.email,
+        emailID: currentUserProfile.email ? currentUserProfile.email : "",
         contactNumber: currentUserProfile.contact_no,
-        callingNumber: currentUserProfile.calling_number,
+        callingNumber: currentUserProfile.calling_number ? currentUserProfile.calling_number : "",
         profileImage: currentUserProfile.image
           ? currentUserProfile.image
           : generator.generateRandomAvatar(),
