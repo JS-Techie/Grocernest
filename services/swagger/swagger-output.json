@@ -52,6 +52,9 @@
                 "phoneNumber": {
                   "example": "any"
                 },
+                "callingNumber": {
+                  "example": "any"
+                },
                 "email": {
                   "example": "any"
                 },
@@ -4938,6 +4941,9 @@
               "type": "object",
               "properties": {
                 "return_status": {
+                  "example": "any"
+                },
+                "reject_reason": {
                   "example": "any"
                 }
               }

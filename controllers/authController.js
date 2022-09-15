@@ -95,6 +95,7 @@ const register = async (req, res, next) => {
       firstName,
       lastName,
       phoneNumber,
+      callingNumber,
       email,
       password,
       referral_code,
@@ -189,6 +190,7 @@ const register = async (req, res, next) => {
             cust_name: firstName + " " + lastName,
             email: email ? email.toLowerCase() : null,
             contact_no: phoneNumber.toString(),
+            calling_number: callingNumber ? callingNumber.toString() : null,
             password: encryptedPassword,
             created_by: 13,
             referral_code: ref_code,
@@ -217,6 +219,7 @@ const register = async (req, res, next) => {
             cust_name: firstName + " " + lastName,
             email: email ? email.toLowerCase() : null,
             contact_no: phoneNumber.toString(),
+            calling_number: callingNumber ? callingNumber.toString() : null,
             password: encryptedPassword,
             created_by: 13,
             referral_code: ref_code,
@@ -331,6 +334,7 @@ const verifyOTP = async (req, res, next) => {
           cust_name: newUser.cust_name,
           email: newUser.email,
           contact_no: newUser.contact_no,
+          calling_number: newUser.calling_number,
           password: newUser.password,
           created_by: newUser.created_by,
           referral_code: newUser.referral_code,
@@ -355,6 +359,7 @@ const verifyOTP = async (req, res, next) => {
         cust_name: newUser.cust_name,
         email: newUser.email,
         contact_no: newUser.contact_no,
+        calling_number: newUser.calling_number,
         password: newUser.password,
         created_by: newUser.created_by,
         referral_code: newUser.referral_code,
@@ -644,7 +649,7 @@ const getOTP = async (req, res, next) => {
   }
 };
 
-const resendToken = async (req, res, next) => {};
+const resendToken = async (req, res, next) => { };
 
 module.exports = {
   login,
