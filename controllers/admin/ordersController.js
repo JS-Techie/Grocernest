@@ -1002,7 +1002,7 @@ const assignDeliveryBoyForReturn = async (req, res, next) => {
       where: { order_id },
     });
 
-    if (currentOrder.length !== 0) {
+    if (currentOrder.length === 0) {
       return res.status(400).send({
         success: false,
         data: [],
