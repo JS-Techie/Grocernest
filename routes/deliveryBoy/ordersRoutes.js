@@ -11,7 +11,7 @@ const {
 
 
 router
-  .route("/deliver/view/all/")
+  .route("/deliver/view/all")
   .post(authenticateDeliveryBoy, getAllDeliveryOrders);
 router
   .route("/return/:order_id")
