@@ -114,6 +114,7 @@ const editProfile = async (req, res, next) => {
   const enteredFirstName = req.body.firstName;
   const enteredLastName = req.body.lastName;
   const email = req.body.email;
+  const callingNumber = req.body.callingNumber;
   const { base64 } = req.body;
 
   let url = null;
@@ -158,6 +159,7 @@ const editProfile = async (req, res, next) => {
       {
         cust_name: enteredFirstName + " " + enteredLastName,
         email: email ? email : "",
+        calling_number: callingNumber ? callingNumber : "",
         image: base64
           ? url
           : currentUserProfile.image
