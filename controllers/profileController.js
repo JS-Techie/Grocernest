@@ -41,6 +41,7 @@ const getProfile = async (req, res, next) => {
         lastName: currentUserProfile.cust_name.split(" ")[1],
         emailID: currentUserProfile.email,
         contactNumber: currentUserProfile.contact_no,
+        callingNumber: currentUserProfile.calling_number,
         profileImage: currentUserProfile.image
           ? currentUserProfile.image
           : generator.generateRandomAvatar(),
@@ -160,8 +161,8 @@ const editProfile = async (req, res, next) => {
         image: base64
           ? url
           : currentUserProfile.image
-          ? currentUserProfile.image
-          : null,
+            ? currentUserProfile.image
+            : null,
       },
       { where: { cust_no: currentUser } }
     );
