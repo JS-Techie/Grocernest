@@ -52,6 +52,9 @@
                 "phoneNumber": {
                   "example": "any"
                 },
+                "callingNumber": {
+                  "example": "any"
+                },
                 "email": {
                   "example": "any"
                 },

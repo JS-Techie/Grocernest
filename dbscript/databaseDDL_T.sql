@@ -142,3 +142,5 @@ CREATE TABLE `t_shorten_url` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+ALTER TABLE grocernest_pre_prod.t_customer ADD calling_number varchar(20) NULL;​

@@ -165,6 +165,15 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "return_status"
+    },
+    reject_reason: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "reject_reason"
     }
   };
   const options = {
