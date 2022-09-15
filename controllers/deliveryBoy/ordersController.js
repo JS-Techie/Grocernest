@@ -9,19 +9,15 @@ const Item = db.ItemModel;
 const Customer = db.CustomerModel;
 const Coupon = db.CouponsModel;
 
-const getAllOrders = async (req, res, next) => {
+const getAllDeliveryOrders = async (req, res, next) => {
   const { user_id } = req;
+  const { status } = req.body;
   try {
-    const orders = await Order.findAll({
-      where: { delivery_boy: user_id },
-      include: [
-        {
-          model: OrderItems,
-        },
-      ],
+    const allOrders = await Order.findAll({
+      where: { delivery_boy: user_id, status },
     });
 
-    if (orders.length === 0) {
+    if (allOrders.length === 0) {
       return res.status(200).send({
         success: true,
         data: [],
@@ -29,82 +25,90 @@ const getAllOrders = async (req, res, next) => {
       });
     }
 
+    const outerPromises = await allOrders.map(async (currentOrder) => {
+      const currentCustomer = await Customer.findOne({
+        where: { cust_no: currentOrder.cust_no },
+      });
+
+      const orderItems = await OrderItems.findAll({
+        where: { order_id: currentOrder.order_id },
+      });
+
+      let coupon;
+      if (currentOrder.coupon_id) {
+        coupon = await Coupon.findOne({
+          where: { id: currentOrder.coupon_id },
+        });
+      }
+
+      const promises = await orderItems.map(async (currentReturnedItem) => {
+        const item = await Item.findOne({
+          where: { id: currentReturnedItem.item_id },
+        });
+
+        const selectedBatch = await Batch.findOne({
+          where: { item_id: currentReturnedItem.item_id, mark_selected: 1 },
+        });
+
+        let inventory;
+        if (selectedBatch) {
+          inventory = await Inventory.findOne({
+            where: {
+              batch_id: selectedBatch.id,
+              item_id: currentReturnedItem.item_id,
+              location_id: 4,
+              balance_type: 1,
+            },
+          });
+        }
+
+        return {
+          itemId: currentReturnedItem.item_id,
+          quantity: currentReturnedItem.quantity,
+          itemName: item.name,
+          image: item.image,
+          MRP: selectedBatch ? selectedBatch.MRP : "",
+          salePrice: selectedBatch ? selectedBatch.sale_price : "",
+          expiryDate: selectedBatch ? selectedBatch.expiry_date : "",
+          discount: selectedBatch ? selectedBatch.discount : "",
+          costPrice: selectedBatch ? selectedBatch.cost_price : "",
+          cashback: inventory ? inventory.cashback : "",
+          cashbackIsPercentage: inventory
+            ? inventory.cashback_is_percentage
+            : "",
+        };
+      });
+
+      const itemDetails = await Promise.all(promises);
+
+      return {
+        orderId: currentOrder.order_id,
+        date: currentOrder.created_at,
+        customerAddress: currentOrder.address,
+        total: currentOrder.total,
+        payableAmount: currentOrder.final_payable_amount,
+        customerName: currentCustomer ? currentCustomer.cust_name : "",
+        customerPhoneNumber: currentCustomer ? currentCustomer.contact_no : "",
+        customerEmail: currentCustomer ? currentCustomer.email : "",
+        status: currentOrder.status,
+        returnStatus: currentOrder.return_status,
+        paidByWallet: currentOrder.wallet_balance_used,
+        couponUsed: coupon ? coupon.code : "",
+        couponDiscount: coupon ? coupon.amount_of_discount : "",
+        couponIsPercentage: coupon ? coupon.is_percentage : "",
+        itemDetails,
+      };
+    });
+
+    const resolved = await Promise.all(outerPromises);
+    const orders = await resolved.filter((current) => {
+      return current != undefined;
+    });
+
     return res.status(200).send({
       success: true,
       data: orders,
       message: "Found all orders for current delivery boy",
-    });
-  } catch (error) {
-    return res.status(400).send({
-      success: false,
-      data: error.message,
-      message: "Please check data field for more details",
-    });
-  }
-};
-
-const getOrderById = async (req, res, next) => {
-  const { user_id } = req;
-  const { order_id } = req.params;
-
-  try {
-    const order = await Order.findOne({
-      where: { delivery_boy: user_id, order_id },
-      include: [
-        {
-          model: OrderItems,
-        },
-      ],
-    });
-
-    if (!order) {
-      return res.status(400).send({
-        success: false,
-        data: [],
-        message: "Requested order not found for current delivery boy",
-      });
-    }
-
-    return res.status(200).send({
-      success: true,
-      data: order,
-      message: "Requested order found for current user",
-    });
-  } catch (error) {
-    return res.status(400).send({
-      success: false,
-      data: error.message,
-      message: "Please check data field for more details",
-    });
-  }
-};
-
-const getOrderByStatus = async (req, res, next) => {
-  const { user_id } = req;
-  const { status } = req.params;
-
-  try {
-    const orders = await Order.findAll({
-      where: { delivery_boy: user_id, status },
-      include: [
-        {
-          model: OrderItems,
-        },
-      ],
-    });
-
-    if (orders.length === 0) {
-      return res.status(400).send({
-        success: false,
-        data: [],
-        message: "Requested order not found for current delivery boy",
-      });
-    }
-
-    return res.status(200).send({
-      success: true,
-      data: orders,
-      message: "Requested order found for current user",
     });
   } catch (error) {
     return res.status(400).send({
@@ -246,38 +250,46 @@ const changeStatusOfReturnOrder = async (req, res, next) => {
 
     //Update inventory
 
-    returnedItems.map(async (current) => {
-      const oldestBatch = await Batch.findOne({
-        where: { item_id: current.item_id, mark_selected: 1 },
+    if (return_status === "r") {
+      await ReturnOrder.destroy({
+        where: { order_id },
       });
-      let inventory;
-      if (oldestBatch) {
-        inventory = await Inventory.findOne({
-          where: {
-            batch_id: oldestBatch.id,
-            item_id: current.item_id,
-            location_id: 4,
-            balance_type: 1,
-          },
-        });
+    }
 
-        if (inventory) {
-          await Inventory.update(
-            {
-              quantity: inventory.quantity + current.quantity,
+    if (return_status === "a") {
+      returnedItems.map(async (current) => {
+        const oldestBatch = await Batch.findOne({
+          where: { item_id: current.item_id, mark_selected: 1 },
+        });
+        let inventory;
+        if (oldestBatch) {
+          inventory = await Inventory.findOne({
+            where: {
+              batch_id: oldestBatch.id,
+              item_id: current.item_id,
+              location_id: 4,
+              balance_type: 1,
             },
-            {
-              where: {
-                batch_id: oldestBatch.id,
-                item_id: current.item_id,
-                location_id: 4,
-                balance_type: 1,
+          });
+
+          if (inventory) {
+            await Inventory.update(
+              {
+                quantity: inventory.quantity + current.quantity,
               },
-            }
-          );
+              {
+                where: {
+                  batch_id: oldestBatch.id,
+                  item_id: current.item_id,
+                  location_id: 4,
+                  balance_type: 1,
+                },
+              }
+            );
+          }
         }
-      }
-    });
+      });
+    }
 
     await Order.update(
       {
@@ -294,12 +306,6 @@ const changeStatusOfReturnOrder = async (req, res, next) => {
       where: { delivery_boy: user_id, order_id },
     });
 
-    if (return_status === "r") {
-      await ReturnOrder.destroy({
-        where: { order_id },
-      });
-    }
-
     //Notify admin and user
 
     return res.status(200).send({
@@ -309,115 +315,6 @@ const changeStatusOfReturnOrder = async (req, res, next) => {
         newOrderDetails: updatedOrder,
       },
       message: "Return for this order was accepted",
-    });
-  } catch (error) {
-    return res.status(400).send({
-      success: false,
-      data: error.message,
-      message: "Please check data field for more details",
-    });
-  }
-};
-
-const getAllDeliveryOrders = async (req, res, next) => {
-  const { user_id } = req;
-  try {
-    const allOrders = await Order.findAll({
-      where: { delivery_boy: user_id },
-    });
-
-    if (allOrders.length === 0) {
-      return res.status(200).send({
-        success: true,
-        data: [],
-        message: "There are no orders for you",
-      });
-    }
-
-    const outerPromises = await allOrders.map(async (currentOrder) => {
-      const currentCustomer = await Customer.findOne({
-        where: { cust_no: currentOrder.cust_no },
-      });
-
-      const orderItems = await OrderItems.findAll({
-        where: { order_id: currentOrder.order_id },
-      });
-
-      let coupon;
-      if (currentOrder.coupon_id) {
-        coupon = await Coupon.findOne({
-          where: { id: currentOrder.coupon_id },
-        });
-      }
-
-      const promises = await orderItems.map(async (currentReturnedItem) => {
-        const item = await Item.findOne({
-          where: { id: currentReturnedItem.item_id },
-        });
-
-        const selectedBatch = await Batch.findOne({
-          where: { item_id: currentReturnedItem.item_id, mark_selected: 1 },
-        });
-
-        let inventory;
-        if (selectedBatch) {
-          inventory = await Inventory.findOne({
-            where: {
-              batch_id: selectedBatch.id,
-              item_id: currentReturnedItem.item_id,
-              location_id: 4,
-              balance_type: 1,
-            },
-          });
-        }
-
-        return {
-          itemId: currentReturnedItem.item_id,
-          quantity: currentReturnedItem.quantity,
-          itemName: item.name,
-          image: item.image,
-          MRP: selectedBatch ? selectedBatch.MRP : "",
-          salePrice: selectedBatch ? selectedBatch.sale_price : "",
-          expiryDate: selectedBatch ? selectedBatch.expiry_date : "",
-          discount: selectedBatch ? selectedBatch.discount : "",
-          costPrice: selectedBatch ? selectedBatch.cost_price : "",
-          cashback: inventory ? inventory.cashback : "",
-          cashbackIsPercentage: inventory
-            ? inventory.cashback_is_percentage
-            : "",
-        };
-      });
-
-      const itemDetails = await Promise.all(promises);
-
-      return {
-        orderId: currentOrder.order_id,
-        date: currentOrder.created_at,
-        customerAddress: currentOrder.address,
-        total: currentOrder.total,
-        payableAmount: currentOrder.final_payable_amount,
-        customerName: currentCustomer ? currentCustomer.cust_name : "",
-        customerPhoneNumber: currentCustomer ? currentCustomer.contact_no : "",
-        customerEmail: currentCustomer ? currentCustomer.email : "",
-        status: currentOrder.status,
-        returnStatus: currentOrder.return_status,
-        paidByWallet: currentOrder.wallet_balance_used,
-        couponUsed: coupon ? coupon.code : "",
-        couponDiscount: coupon ? coupon.amount_of_discount : "",
-        couponIsPercentage: coupon ? coupon.is_percentage : "",
-        itemDetails,
-      };
-    });
-
-    const resolved = await Promise.all(outerPromises);
-    const orders = await resolved.filter((current) => {
-      return current != undefined;
-    });
-
-    return res.status(200).send({
-      success: true,
-      data: orders,
-      message: "Found all orders for current delivery boy",
     });
   } catch (error) {
     return res.status(400).send({
@@ -557,9 +454,6 @@ const getAllRequestedReturns = async (req, res, next) => {
 };
 
 module.exports = {
-  getAllOrders,
-  getOrderById,
-  getOrderByStatus,
   changeStatusOfDeliveryOrder,
   changeStatusOfReturnOrder,
   getAllRequestedReturns,
