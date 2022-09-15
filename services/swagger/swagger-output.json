@@ -4829,7 +4829,7 @@
         }
       }
     },
-    "/deliveryboy/orders/deliver/view/all/": {
+    "/deliveryboy/orders/deliver/view/all": {
       "post": {
         "description": "",
         "parameters": [
@@ -4893,6 +4893,9 @@
                 },
                 "reject_reason": {
                   "example": "any"
+                },
+                "date": {
+                  "example": "any"
                 }
               }
             }
@@ -4936,6 +4939,9 @@
               "type": "object",
               "properties": {
                 "status": {
+                  "example": "any"
+                },
+                "date": {
                   "example": "any"
                 }
               }
