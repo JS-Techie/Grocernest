@@ -122,7 +122,7 @@ const getAllDeliveryOrders = async (req, res, next) => {
 const changeStatusOfDeliveryOrder = async (req, res, next) => {
   const { user_id } = req;
   const { order_id } = req.params;
-  const { status } = req.body;
+  const { status, date } = req.body;
 
   try {
     console.log(user_id);
@@ -150,7 +150,7 @@ const changeStatusOfDeliveryOrder = async (req, res, next) => {
     }
 
     await Order.update(
-      { status },
+      { status, delivery_date: date },
       {
         where: { order_id, delivery_boy: user_id },
       }
@@ -181,7 +181,7 @@ const changeStatusOfDeliveryOrder = async (req, res, next) => {
 const changeStatusOfReturnOrder = async (req, res, next) => {
   const { user_id } = req;
   const { order_id } = req.params;
-  const { return_status, reject_reason } = req.body;
+  const { return_status, reject_reason, date } = req.body;
 
   try {
     // console.log(return_status);
@@ -296,6 +296,7 @@ const changeStatusOfReturnOrder = async (req, res, next) => {
         return_status,
         status: "Returned",
         reject_reason,
+        pickup_date: date,
       },
       {
         where: { delivery_boy: user_id, order_id },

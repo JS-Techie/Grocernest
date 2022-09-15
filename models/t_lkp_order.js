@@ -174,6 +174,24 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "reject_reason"
+    },
+    delivery_date: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "delivery_date"
+    },
+    pickup_date: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "pickup_date"
     }
   };
   const options = {
