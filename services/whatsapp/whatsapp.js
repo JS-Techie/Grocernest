@@ -43,12 +43,12 @@ const sendOTPToWhatsapp = async (phno, otp) => {
     });
 };
 
-const sendInvoiceToWhatsapp = async (phno, order_id, link) => {
+const sendInvoiceToWhatsapp = async (phno, order_id, link, base_url) => {
   console.log("Sending sms to whatsapp..");
 
   // sorten the link
   // let short_url = "http://ecomm-dev.grocernest.com/api/invoice/" + await getShortUrl(link);
-  let short_url = req.protocol + '://' + req.get('host') + "/api/invoice/" + await getShortUrl(link);
+  let short_url = base_url + "/api/invoice/" + await getShortUrl(link);
   // let short_url = "http://grocernest.com/api/url/invoice/download/" + await getShortUrl(link);
 
   client.message
