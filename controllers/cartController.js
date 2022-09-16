@@ -42,6 +42,7 @@ const addItemToCart = async (req, res, next) => {
       where: {
         item_id: itemId,
         cust_no: currentUser,
+        is_offer : 1
       },
     });
 
