@@ -1,6 +1,7 @@
 const db = require("../models");
 const S3 = require("aws-sdk/clients/s3");
 const s3Config = require("../config/s3Config");
+const uniqid = require("uniqid");
 
 const Task = db.TaskModel;
 const User = db.UserModel;
@@ -113,7 +114,7 @@ const getTasksByStatus = async (req, res, next) => {
 const editTaskStatus = async (req, res, next) => {
   const { user_id } = req;
   const { status, id } = req.params;
-  const { on_hold_reason, base64 } = req.body;
+  const { on_hold_reason, base64, extension } = req.body;
 
   try {
     const task = await Task.findOne({
@@ -146,10 +147,10 @@ const editTaskStatus = async (req, res, next) => {
       //const type = base64.split(";")[0].split("/")[1];
       const params = {
         Bucket: process.env.AWS_BUCKET_NAME,
-        Key: `profile/images/${currentUser}-${uniqid()}.jpeg`,
+        Key: `task/document/${user_id}.${extension}`,
         Body: base64Data,
         ContentEncoding: "base64",
-        ContentType: `image/jpeg`,
+        //ContentType: `image/jpeg`,
       };
 
       const s3UploadResponse = await s3.upload(params).promise();

@@ -107,6 +107,7 @@ const createLeave = async (req, res, next) => {
     half_day,
     hours,
     base64,
+    extension
   } = req.body;
 
   if (leave_type === "Emergency" && !hours) {
@@ -173,10 +174,10 @@ const createLeave = async (req, res, next) => {
       //const type = base64.split(";")[0].split("/")[1];
       const params = {
         Bucket: process.env.AWS_BUCKET_NAME,
-        Key: `leave/medical-records/${user_id}.jpeg`,
+        Key: `leave/medical-records/${user_id}.${extension}`,
         Body: base64Data,
         ContentEncoding: "base64",
-        ContentType: `image/jpeg`,
+        //ContentType: `image/jpeg`,
       };
 
       const s3UploadResponse = await s3.upload(params).promise();
