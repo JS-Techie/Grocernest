@@ -268,7 +268,7 @@ const changeStatusOfReturnOrder = async (req, res, next) => {
               batch_id: oldestBatch.id,
               item_id: current.item_id,
               location_id: 4,
-              balance_type: 1,
+              balance_type: 8,
             },
           });
 
@@ -282,10 +282,20 @@ const changeStatusOfReturnOrder = async (req, res, next) => {
                   batch_id: oldestBatch.id,
                   item_id: current.item_id,
                   location_id: 4,
-                  balance_type: 1,
+                  balance_type: 8,
                 },
               }
             );
+          } else {
+            await Inventory.create({
+              quantity: current.quantity,
+              batch_id: oldestBatch.id,
+              item_id: current.item_id,
+              location_id: 4,
+              balance_type: 8,
+              created_by: 1,
+              active_ind: "Y",
+            });
           }
         }
       });

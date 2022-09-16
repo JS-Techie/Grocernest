@@ -966,6 +966,9 @@
                 "email": {
                   "example": "any"
                 },
+                "callingNumber": {
+                  "example": "any"
+                },
                 "base64": {
                   "example": "any"
                 }
@@ -2582,6 +2585,9 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "OK"
+          },
           "400": {
             "description": "Bad Request"
           },
