@@ -161,6 +161,8 @@ const changeStatusOfDeliveryOrder = async (req, res, next) => {
       include: [{ model: OrderItems }],
     });
 
+    //Notify customer and admin about order
+
     return res.status(200).send({
       success: true,
       data: {
