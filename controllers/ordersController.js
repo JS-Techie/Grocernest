@@ -68,6 +68,20 @@ const getAllOrders = async (req, res, next) => {
           where: { item_id: currentOrderItem.item_id, mark_selected: 1 },
         });
 
+        let canReturn = true;
+
+        const offers = await Offers.findAll({});
+        if (offers.length !== 0) {
+          offers.map((current) => {
+            if (
+              currentOrderItem.item_id === current.item_id_1 ||
+              currentOrderItem.item_id === current.item_id_2
+            ) {
+              canReturn = false;
+            }
+          });
+        }
+
         if (oldestBatch) {
           return {
             itemName: currentItem.name,
@@ -84,6 +98,7 @@ const getAllOrders = async (req, res, next) => {
             isOffer: currentOrderItem.is_offer === 1 ? true : false,
             canEdit:
               currentOrderItem.is_offer === 1 ? (isEdit ? true : false) : "",
+            canReturn,
             offerDetails: currentOffer
               ? {
                   offerID: currentOffer.id,
