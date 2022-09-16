@@ -1,6 +1,5 @@
 const db = require("../models");
 
-
 const Attendance = db.AttendanceModel;
 
 const registerLoginTime = async (req, res, next) => {
@@ -47,20 +46,18 @@ const registerLogoutTime = async (req, res, next) => {
     }
 
     attendances.map(async (current) => {
-      if (!current.logout_time) {
-        await Attendance.update(
-          {
-            logout_time: new Date().toLocaleString("en-US", {
-              timeZone: "Asia/Kolkata",
-            }),
+      await Attendance.update(
+        {
+          logout_time: new Date().toLocaleString("en-US", {
+            timeZone: "Asia/Kolkata",
+          }),
+        },
+        {
+          where: {
+            id: current.id,
           },
-          {
-            where: {
-              id: current.id,
-            },
-          }
-        );
-      }
+        }
+      );
     });
 
     return res.status(200).send({

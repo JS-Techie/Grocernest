@@ -1,6 +1,11 @@
+const { sequelize } = require("../models");
 const db = require("../models");
+const S3 = require("aws-sdk/clients/s3");
+const s3Config = require("../config/s3Config");
 
 const Leave = db.LeaveModel;
+
+const s3 = new S3(s3Config);
 
 const getAllLeaves = async (req, res, next) => {
   const user_id = req.user_id;
@@ -100,8 +105,83 @@ const createLeave = async (req, res, next) => {
     leave_reason,
     leave_type,
     half_day,
+    hours,
+    base64,
   } = req.body;
+
+  if (leave_type === "Emergency" && !hours) {
+    return res.status(400).send({
+      success: false,
+      data: [],
+      message:
+        "You have chosen to take emergency leave, please enter the number of hours you want to take leave for",
+    });
+  }
+
+  if (leave_type === "Annual/Casual" && no_of_days > 2) {
+    return res.status(400).send({
+      success: false,
+      data: [],
+      message: "You cannot apply for Annual/Casual leaves for more than 2 days",
+    });
+  }
+
+  if (leave_type === "Prolonged Sick" && !base64) {
+    return res.status(400).send({
+      success: false,
+      data: [],
+      message:
+        "Please upload your medical records to apply for prolonged sick leave",
+    });
+  }
+
+  let isValid = true;
+  let numberOfLeaves = 0;
+  let medical_record = null;
+
+  const leaves = await Leave.findAll();
+  leaves.map((currentLeave) => {
+    if (
+      (start_date >= currentLeave.start_date &&
+        end_date <= currentLeave.end_date) ||
+      (start_date <= currentLeave.start_date &&
+        start_date <= currentLeave.end_date) ||
+      (start_date >= currentLeave.start_date &&
+        start_date <= currentLeave.end_date) ||
+      (end_date >= currentLeave.start_date && end_date <= currentLeave.end_date)
+    ) {
+      numberOfLeaves++;
+    }
+  });
+
+  if (numberOfLeaves >= 2) isValid = false;
+  if (!isValid) {
+    return res.status(400).send({
+      success: false,
+      data: [],
+      message:
+        "Two employees have already requested for leaves in this range, please choose another date range",
+    });
+  }
+
   try {
+    if (base64) {
+      const base64Data = new Buffer.from(
+        base64.replace(/^data:image\/\w+;base64,/, ""),
+        "base64"
+      );
+      //const type = base64.split(";")[0].split("/")[1];
+      const params = {
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: `leave/medical-records/${user_id}.jpeg`,
+        Body: base64Data,
+        ContentEncoding: "base64",
+        ContentType: `image/jpeg`,
+      };
+
+      const s3UploadResponse = await s3.upload(params).promise();
+      medical_record = s3UploadResponse.Location;
+    }
     const newLeave = await Leave.create({
       user_id,
       start_date,
@@ -113,6 +193,8 @@ const createLeave = async (req, res, next) => {
       updated_by: 1,
       half_day: half_day == true ? 1 : null,
       leave_type,
+      hours,
+      medical_record,
     });
 
     return res.status(201).send({
@@ -138,6 +220,8 @@ const editLeave = async (req, res, next) => {
     leave_reason,
     leave_type,
     half_day,
+    hours,
+    base64,
   } = req.body;
   const id = req.params.id;
   try {
@@ -161,6 +245,63 @@ const editLeave = async (req, res, next) => {
       });
     }
 
+    if (leave_type === "Emergency" && !hours) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message:
+          "You have chosen to take emergency leave, please enter the number of hours you want to take leave for",
+      });
+    }
+
+    if (leave_type === "Annual/Casual" && no_of_days > 2) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message:
+          "You cannot apply for Annual/Casual leaves for more than 2 days",
+      });
+    }
+
+    if (leave_type === "Prolonged Sick" && !base64) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message:
+          "Please upload your medical records to apply for prolonged sick leave",
+      });
+    }
+
+    let isValid = true;
+    let numberOfLeaves = 0;
+    let medical_record = null;
+
+    const leaves = await Leave.findAll();
+    leaves.map((currentLeave) => {
+      if (
+        (start_date >= currentLeave.start_date &&
+          end_date <= currentLeave.end_date) ||
+        (start_date <= currentLeave.start_date &&
+          start_date <= currentLeave.end_date) ||
+        (start_date >= currentLeave.start_date &&
+          start_date <= currentLeave.end_date) ||
+        (end_date >= currentLeave.start_date &&
+          end_date <= currentLeave.end_date)
+      ) {
+        numberOfLeaves++;
+      }
+    });
+
+    if (numberOfLeaves >= 2) isValid = false;
+    if (!isValid) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message:
+          "Two employees have already requested for leaves in this range, please choose another date range",
+      });
+    }
+
     const updateLeave = await Leave.update(
       {
         start_date,
@@ -169,6 +310,8 @@ const editLeave = async (req, res, next) => {
         leave_reason,
         half_day: half_day == true ? 1 : null,
         leave_type,
+        hours,
+        medical_record
       },
       {
         where: { id, user_id },

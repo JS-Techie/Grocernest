@@ -1,7 +1,11 @@
 const db = require("../models");
+const S3 = require("aws-sdk/clients/s3");
+const s3Config = require("../config/s3Config");
 
 const Task = db.TaskModel;
 const User = db.UserModel;
+
+const s3 = new S3(s3Config);
 
 const getAllTasks = async (req, res, next) => {
   //Get current user from jWt
@@ -109,7 +113,7 @@ const getTasksByStatus = async (req, res, next) => {
 const editTaskStatus = async (req, res, next) => {
   const { user_id } = req;
   const { status, id } = req.params;
-  const { on_hold_reason } = req.body;
+  const { on_hold_reason, base64 } = req.body;
 
   try {
     const task = await Task.findOne({
@@ -132,10 +136,31 @@ const editTaskStatus = async (req, res, next) => {
       });
     }
 
+    let document = null;
+
+    if (base64) {
+      const base64Data = new Buffer.from(
+        base64.replace(/^data:image\/\w+;base64,/, ""),
+        "base64"
+      );
+      //const type = base64.split(";")[0].split("/")[1];
+      const params = {
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: `profile/images/${currentUser}-${uniqid()}.jpeg`,
+        Body: base64Data,
+        ContentEncoding: "base64",
+        ContentType: `image/jpeg`,
+      };
+
+      const s3UploadResponse = await s3.upload(params).promise();
+      document = s3UploadResponse.Location;
+    }
+
     const updateTaskStatus = await Task.update(
       {
         status,
         on_hold_reason,
+        document,
       },
       {
         where: {
