@@ -262,6 +262,7 @@ const checkoutFromCart = async (req, res, next) => {
       // }
     });
 
+    let base_url = req.protocol + '://' + req.get('host');
     let email = "";
     let contact_no = "";
     Customer.findOne({
@@ -278,7 +279,8 @@ const checkoutFromCart = async (req, res, next) => {
         newOrder.order_id,
         email,
         contact_no,
-        opt_in
+        opt_in,
+        base_url
       );
     });
 
