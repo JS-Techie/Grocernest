@@ -378,6 +378,7 @@ const changeVendorPassword = async (req, res, next) => {
     const update = await Vendor.update(
       {
         password: encryptedPassword,
+        login_attempt: vendor.login_attempt ? vendor.login_attempt + 1 : 1,
       },
       {
         where: { id },
