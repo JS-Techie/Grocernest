@@ -84,6 +84,7 @@ const adminMilkItemsRouter = require("./routes/admin/milkItemsRoutes");
 const SubscriptionRouter = require("./routes/subscriptionRoutes");
 const deliveryRouter = require("./routes/deliveryRoutes");
 const adminMilkSubscriptionRouter = require("./routes/admin/milkSubscriptionRoutes");
+const adminVendorRouter = require("./routes/admin/vendorRoutes");
 
 //Vendor routes import
 
@@ -130,6 +131,7 @@ app.use("/admin/leave", adminLeaveRouter);
 app.use("/admin/task", adminTaskRouter);
 app.use("/admin/attendance", adminAttendanceRouter);
 app.use("/admin/delivery", adminDeliveryRouter);
+app.use("/admin/vendor", adminVendorRouter);
 
 // milk (user)
 app.use("/subscription", SubscriptionRouter);
