@@ -122,13 +122,31 @@ module.exports = sequelize => {
       field: "half_day"
     },
     leave_type: {
-      type: DataTypes.ENUM('Annual/Casual', 'Maternity', 'Paternity', 'Sick'),
+      type: DataTypes.ENUM('Annual/Casual', 'Maternity', 'Paternity', 'Sick', 'Emergency', 'Prolonged Sick'),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
       field: "leave_type"
+    },
+    hours: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "hours"
+    },
+    medical_record: {
+      type: DataTypes.STRING(500),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "medical_record"
     }
   };
   const options = {
