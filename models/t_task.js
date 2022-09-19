@@ -111,6 +111,15 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "on_hold_reason"
+    },
+    document: {
+      type: DataTypes.STRING(500),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "document"
     }
   };
   const options = {

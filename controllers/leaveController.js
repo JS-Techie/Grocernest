@@ -107,7 +107,7 @@ const createLeave = async (req, res, next) => {
     half_day,
     hours,
     base64,
-    extension
+    extension,
   } = req.body;
 
   if (leave_type === "Emergency" && !hours) {
@@ -149,6 +149,8 @@ const createLeave = async (req, res, next) => {
         start_date <= currentLeave.end_date) ||
       (start_date >= currentLeave.start_date &&
         start_date <= currentLeave.end_date) ||
+      (end_date >= currentLeave.start_date &&
+        end_date <= currentLeave.end_date) ||
       (end_date >= currentLeave.start_date && end_date <= currentLeave.end_date)
     ) {
       numberOfLeaves++;
@@ -312,7 +314,7 @@ const editLeave = async (req, res, next) => {
         half_day: half_day == true ? 1 : null,
         leave_type,
         hours,
-        medical_record
+        medical_record,
       },
       {
         where: { id, user_id },
