@@ -157,6 +157,7 @@ db.ReturnOrdersModel = require("./t_return_orders")(db.sequelize, Sequelize);
 
 db.MilkDashboardModel = require("./t_milk_dashboard")(db.sequelize, Sequelize);
 
+db.VendorModel = require("./t_vendor")(db.sequelize, Sequelize);
 
 // Relations between tables
 
