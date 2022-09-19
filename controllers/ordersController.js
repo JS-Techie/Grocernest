@@ -609,10 +609,55 @@ const trackOrder = async (req, res, next) => {
   }
 };
 
+const getAllReturns = async (req, res, next) => {
+  const { cust_no } = req;
+  const { order_id } = req.body;
+  try {
+    const returnedItems = await ReturnOrder.findAll({
+      where: { order_id, cust_no },
+    });
+
+    if (returnedItems.length === 0) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "There are no returned items for this order",
+      });
+    }
+
+    const promises = returnedItems.map(async (current) => {
+      const currentItem = await Item.findAll({
+        where: { id: current.item_id },
+      });
+
+      return {
+        itemID: currentItem.id,
+        itemName: currentItem.name,
+        quantity: current.quantity,
+      };
+    });
+
+    const response = await Promise.all(promises);
+
+    return res.status(200).send({
+      success: true,
+      data: response,
+      message: "Successfully fetched returned items and their quantity",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "Please check data field for more details",
+    });
+  }
+};
+
 module.exports = {
   getAllOrders,
   getOrderByOrderId,
   cancelOrder,
   returnOrder,
   trackOrder,
+  getAllReturns,
 };
