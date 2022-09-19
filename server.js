@@ -85,6 +85,10 @@ const SubscriptionRouter = require("./routes/subscriptionRoutes");
 const deliveryRouter = require("./routes/deliveryRoutes");
 const adminMilkSubscriptionRouter = require("./routes/admin/milkSubscriptionRoutes");
 
+//Vendor routes import
+
+const vendorRouter = require("./routes/vendor/profileRoutes");
+
 //routes
 app.get("/responses", (req, res) => {
   res.send(endPoint);
@@ -138,6 +142,10 @@ app.use("/admin/milk/subscription", adminMilkSubscriptionRouter);
 //delivery boy routes
 app.use("/deliveryboy/orders", deliveryBoyOrderRouter);
 app.use("/deliveryboy/milk", deliveryBoyMilkRouter);
+
+//vendor routes
+
+app.use("/vendor", vendorRouter);
 
 //Start server and connect to DB
 const db = require("./services/dbSetupService.js");
