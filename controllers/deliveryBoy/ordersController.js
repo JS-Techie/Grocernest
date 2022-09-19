@@ -65,8 +65,8 @@ const getAllDeliveryOrders = async (req, res, next) => {
         return {
           itemId: currentReturnedItem.item_id,
           quantity: currentReturnedItem.quantity,
-          itemName: item.name,
-          image: item.image,
+          itemName: item ? item.name : "",
+          image: item ? item.image : "",
           MRP: selectedBatch ? selectedBatch.MRP : "",
           salePrice: selectedBatch ? selectedBatch.sale_price : "",
           expiryDate: selectedBatch ? selectedBatch.expiry_date : "",
