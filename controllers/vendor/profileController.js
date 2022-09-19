@@ -57,10 +57,13 @@ const loginVendor = async (req, res, next) => {
       });
     }
 
+    const userType = "VENDOR";
+
     const { id } = vendor;
     const token = jwt.sign(
       {
         id,
+        userType,
       },
       "VendorPassword123#",
       {
