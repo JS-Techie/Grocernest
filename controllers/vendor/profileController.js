@@ -88,6 +88,7 @@ const loginVendor = async (req, res, next) => {
         vendor,
         token,
         first_login: false,
+        userType,
       },
       message: "Successfully logged in",
     });
