@@ -609,11 +609,6 @@ const getOTP = async (req, res, next) => {
     if (CacheDetails) {
       let cacheParseData = JSON.parse(CacheDetails.user_details);
 
-      console.log(cacheParseData);
-
-      console.log(cacheParseData.new_phone_number === "");
-      console.log(cacheParseData.new_phone_number);
-
       if (cacheParseData.new_phone_number) {
         console.log("In if");
         // sending OTP to whatsapp for now.
@@ -621,8 +616,12 @@ const getOTP = async (req, res, next) => {
           cacheParseData.new_phone_number.toString(),
           await CacheDetails.generated_otp
         );
+      } else if (cacheParseData.whatsapp_number) {
+        await sendOTPToWhatsapp(
+          cacheParseData.whatsapp_number.toString(),
+          await CacheDetails.generated_otp
+        );
       } else {
-        console.log("In else");
         await sendOTPToWhatsapp(
           cacheParseData.contact_no.toString(),
           await CacheDetails.generated_otp
@@ -649,7 +648,7 @@ const getOTP = async (req, res, next) => {
   }
 };
 
-const resendToken = async (req, res, next) => { };
+const resendToken = async (req, res, next) => {};
 
 module.exports = {
   login,
