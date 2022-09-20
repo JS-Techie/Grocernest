@@ -183,6 +183,15 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "login_attempt"
+    },
+    new_phone_number: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "new_phone_number"
     }
   };
   const options = {
