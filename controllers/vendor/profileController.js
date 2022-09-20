@@ -373,7 +373,7 @@ const changeVendorPassword = async (req, res, next) => {
     }
 
     let salt = bcrypt.genSaltSync(10);
-    let encryptedPassword = bcrypt.hashSync(password, salt);
+    let encryptedPassword = bcrypt.hashSync(new_password, salt);
 
     const update = await Vendor.update(
       {
