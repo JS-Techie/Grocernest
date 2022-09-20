@@ -35,6 +35,13 @@ const loginVendor = async (req, res, next) => {
         message: "This phone number does not exist, please register",
       });
     }
+    if (!bcrypt.compareSync(password, vendor.password)) {
+      return res.status(401).send({
+        success: false,
+        data: null,
+        message: "Please enter correct password for phone number entered",
+      });
+    }
 
     if (!vendor.login_attempt) {
       return res.status(200).send({
@@ -46,14 +53,6 @@ const loginVendor = async (req, res, next) => {
         },
         message:
           "Since this is your first login, you have to change your password",
-      });
-    }
-
-    if (!bcrypt.compareSync(password, vendor.password)) {
-      return res.status(401).send({
-        success: false,
-        data: null,
-        message: "Please enter correct password for phone number entered",
       });
     }
 
