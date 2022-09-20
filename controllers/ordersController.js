@@ -626,13 +626,13 @@ const getAllReturns = async (req, res, next) => {
     }
 
     const promises = returnedItems.map(async (current) => {
-      const currentItem = await Item.findAll({
+      const currentItem = await Item.findOne({
         where: { id: current.item_id },
       });
 
       return {
-        itemID: currentItem.id,
-        itemName: currentItem.name,
+        itemID: currentItem ? currentItem.id : "",
+        itemName: currentItem ? currentItem.name : "",
         quantity: current.quantity,
       };
     });
