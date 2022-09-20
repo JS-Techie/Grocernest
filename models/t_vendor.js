@@ -174,6 +174,15 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "updated_at"
+    },
+    login_attempt: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "login_attempt"
     }
   };
   const options = {
