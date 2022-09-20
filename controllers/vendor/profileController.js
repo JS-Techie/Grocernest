@@ -257,7 +257,7 @@ const forgotPasswordForVendor = async (req, res, next) => {
     return res.status(200).send({
       success: true,
       data: {
-        cacheDetails,
+        //cacheDetails,
         serverGeneratedOTP,
         id: vendor.id,
       },
