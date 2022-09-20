@@ -388,7 +388,7 @@ const changeVendorPassword = async (req, res, next) => {
       where: { id },
     });
 
-    return res.status(400).send({
+    return res.status(200).send({
       success: true,
       data: updated,
       message: "Succesfully changed password, you can proceed to login",
