@@ -162,12 +162,15 @@ const editVendorProfile = async (req, res, next) => {
     }
 
     let vendorWithSamePhoneNumber;
+
     if (phone_number) {
-      vendorWithSamePhoneNumber = await Vendor.findOne({
-        where: {
-          [Op.or]: [{ phone_number }, { whatsapp_number: phone_number }],
-        },
-      });
+      if (phone_number !== vendor.phone_number) {
+        vendorWithSamePhoneNumber = await Vendor.findOne({
+          where: {
+            [Op.or]: [{ phone_number }, { whatsapp_number: phone_number }],
+          },
+        });
+      }
     }
 
     if (vendorWithSamePhoneNumber) {
