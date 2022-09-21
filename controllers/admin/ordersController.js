@@ -1108,8 +1108,6 @@ const getReturns = async (req, res, next) => {
       where: { return_status },
     });
 
-    let returnDate = null;
-
     if (allOrders.length === 0) {
       return res.status(200).send({
         success: true,
@@ -1120,6 +1118,7 @@ const getReturns = async (req, res, next) => {
 
     const outerPromises = await allOrders.map(async (currentOrder) => {
       let dbDetails = null;
+      let returnDate = null;
 
       const returnedItems = await ReturnOrder.findAll({
         where: { order_id: currentOrder.order_id },
@@ -1148,7 +1147,7 @@ const getReturns = async (req, res, next) => {
         promises = await returnedItemsWithoutUndefined.map(
           async (currentReturnedItem) => {
             returnDate = currentReturnedItem.created_at;
-            console.log("Assigned", currentReturnedItem.delivery_boy);
+
             dbDetails = await User.findOne({
               where: { id: currentReturnedItem.delivery_boy },
             });
