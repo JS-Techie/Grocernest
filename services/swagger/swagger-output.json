@@ -5500,6 +5500,9 @@
                 },
                 "phone_number": {
                   "example": "any"
+                },
+                "business_name": {
+                  "example": "any"
                 }
               }
             }

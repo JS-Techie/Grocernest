@@ -153,7 +153,9 @@ const createLeave = async (req, res, next) => {
         end_date <= currentLeave.end_date) ||
       (end_date >= currentLeave.start_date && end_date <= currentLeave.end_date)
     ) {
-      numberOfLeaves+=1;
+      console.log("Inside If");
+      console.log(currentLeave);
+      numberOfLeaves += 1;
     }
   });
 

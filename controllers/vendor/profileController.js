@@ -145,6 +145,7 @@ const editVendorProfile = async (req, res, next) => {
     first_name,
     last_name,
     phone_number,
+    business_name,
   } = req.body;
 
   try {
@@ -219,10 +220,12 @@ const editVendorProfile = async (req, res, next) => {
         current_address,
         pan,
         cin,
-        image: base64 ? url : vendor.image,
+        image: base64 ? url : vendor.image ? vendor.image : null,
         email,
         first_name,
         last_name,
+        business_name,
+        phone_number,
       },
       {
         where: { id },
