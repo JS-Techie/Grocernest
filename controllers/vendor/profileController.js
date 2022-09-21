@@ -1,4 +1,5 @@
 const db = require("../../models");
+const { Op } = require("sequelize");
 
 const S3 = require("aws-sdk/clients/s3");
 const s3Config = require("../../config/s3Config");
@@ -142,6 +143,7 @@ const editVendorProfile = async (req, res, next) => {
     email,
     first_name,
     last_name,
+    phone_number,
   } = req.body;
 
   try {
@@ -154,6 +156,24 @@ const editVendorProfile = async (req, res, next) => {
         success: false,
         data: [],
         message: "Required vendor details not found",
+      });
+    }
+
+    let vendorWithSamePhoneNumber;
+    if (phone_number) {
+      vendorWithSamePhoneNumber = await Vendor.findOne({
+        where: {
+          [Op.or]: [{ phone_number }, { whatsapp_number: phone_number }, ,],
+        },
+      });
+    }
+
+    if (vendorWithSamePhoneNumber) {
+      return res.status(400).send({
+        success: false,
+        data: vendor,
+        message:
+          "Vendor with the phone number or whatsapp number already exists, please enter a different  number",
       });
     }
 

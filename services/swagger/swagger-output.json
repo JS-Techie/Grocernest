@@ -5462,6 +5462,9 @@
                 },
                 "last_name": {
                   "example": "any"
+                },
+                "phone_number": {
+                  "example": "any"
                 }
               }
             }
