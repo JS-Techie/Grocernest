@@ -140,7 +140,7 @@ const createLeave = async (req, res, next) => {
   let numberOfLeaves = 0;
   let medical_record = null;
 
-  const leaves = await Leave.findAll();
+  const leaves = await Leave.findAll({});
   leaves.map((currentLeave) => {
     if (
       (start_date >= currentLeave.start_date &&
