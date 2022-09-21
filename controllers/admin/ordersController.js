@@ -1119,6 +1119,8 @@ const getReturns = async (req, res, next) => {
     }
 
     const outerPromises = await allOrders.map(async (currentOrder) => {
+      let dbDetails = null;
+
       const returnedItems = await ReturnOrder.findAll({
         where: { order_id: currentOrder.order_id },
       });
@@ -1146,6 +1148,10 @@ const getReturns = async (req, res, next) => {
         promises = await returnedItemsWithoutUndefined.map(
           async (currentReturnedItem) => {
             returnDate = currentReturnedItem.created_at;
+
+            dbDetails = await User.findOne({
+              where: { id: currentReturnedItem.delivery_boy },
+            });
 
             const item = await Item.findOne({
               where: { id: currentReturnedItem.item_id },
@@ -1195,6 +1201,7 @@ const getReturns = async (req, res, next) => {
           orderId: currentOrder.order_id,
           orderedDate: currentOrder.created_at,
           returnDate,
+          deliveryBoy: dbDetails ? dbDetails.full_name : "",
           customerAddress: currentOrder.address,
           total: currentOrder.total,
           payableAmount: currentOrder.final_payable_amount,
