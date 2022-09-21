@@ -1,5 +1,6 @@
 const db = require("../../models");
 const { Op } = require("sequelize");
+const uniqid = require("uniqid");
 
 const S3 = require("aws-sdk/clients/s3");
 const s3Config = require("../../config/s3Config");
@@ -200,7 +201,7 @@ const editVendorProfile = async (req, res, next) => {
       );
       const params = {
         Bucket: process.env.AWS_BUCKET_NAME,
-        Key: `vendor/profile/images/${id}.jpeg`,
+        Key: `vendor/profile/images/${id}-${uniqid()}.jpeg`,
         Body: base64Data,
         ContentEncoding: "base64",
         ContentType: `image/jpeg`,
