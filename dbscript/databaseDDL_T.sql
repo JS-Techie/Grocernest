@@ -144,3 +144,6 @@ CREATE TABLE `t_shorten_url` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 ALTER TABLE grocernest_pre_prod.t_customer ADD calling_number varchar(20) NULL;​
+
+ALTER TABLE grocernest_pre_prod.t_vendor ADD business_name varchar(200) NULL;
+
