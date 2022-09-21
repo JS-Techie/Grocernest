@@ -42,7 +42,6 @@ const addItemToCart = async (req, res, next) => {
       where: {
         item_id: itemId,
         cust_no: currentUser,
-  
       },
     });
 
@@ -123,9 +122,11 @@ const addItemToCart = async (req, res, next) => {
         return res.status(402).send({
           success: false,
           data: currentInventory,
-          message: `Could not add item to cart as available quantity is ${currentInventory.quantity
-            } and your requested quantity is ${enteredQuantity + itemAlreadyExists.quantity
-            } `,
+          message: `Could not add item to cart as available quantity is ${
+            currentInventory.quantity
+          } and your requested quantity is ${
+            enteredQuantity + itemAlreadyExists.quantity
+          } `,
         });
       }
 
@@ -178,7 +179,7 @@ const subtractItemFromCart = async (req, res, next) => {
     }
 
     const offerExists = await Offers.findOne({
-      where: { is_active: 1, [Op.or]: [{ item_id_1: itemID }] },
+      where: { is_active: 1, item_id_1: itemID },
     });
 
     let offerItemToBeRemoved = null;

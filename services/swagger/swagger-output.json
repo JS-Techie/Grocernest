@@ -1823,6 +1823,9 @@
                 },
                 "base64": {
                   "example": "any"
+                },
+                "extension": {
+                  "example": "any"
                 }
               }
             }
@@ -4197,6 +4200,9 @@
                 },
                 "password": {
                   "example": "any"
+                },
+                "business_name": {
+                  "example": "any"
                 }
               }
             }
@@ -4255,6 +4261,9 @@
                   "example": "any"
                 },
                 "password": {
+                  "example": "any"
+                },
+                "business_name": {
                   "example": "any"
                 }
               }

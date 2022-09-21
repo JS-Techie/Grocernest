@@ -2,9 +2,18 @@ const db = require("../../models");
 const uniq = require("uniqid");
 
 const Vendor = db.VendorModel;
-const VendorOrders = db.VendorOrdersModel;
+//const VendorOrders = db.VendorOrdersModel;
 
-const getAllVendorOrders = async (req, res, next) => {};
+const getAllVendorOrders = async (req, res, next) => {
+  try {
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "Please check data field for more details",
+    });
+  }
+};
 
 const getVendorOrderById = async (req, res, next) => {};
 
@@ -20,6 +29,12 @@ const editVendorOrder = async (req, res, next) => {};
 
 const deleteVendorOrder = async (req, res, next) => {};
 
+const getAllInvoices = async (req, res, next) => {};
+
+const getInvoiceByOrderId = async (req, res, next) => {};
+
+const updatePaymentStatus = async (req, res, next) => {};
+
 module.exports = {
   getAllVendorOrders,
   getVendorOrderById,
@@ -29,4 +44,7 @@ module.exports = {
   editStatusOfVendorOrder,
   editVendorOrder,
   deleteVendorOrder,
+  getAllInvoices,
+  getInvoiceByOrderId,
+  updatePaymentStatus,
 };

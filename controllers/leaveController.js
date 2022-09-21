@@ -225,9 +225,31 @@ const editLeave = async (req, res, next) => {
     half_day,
     hours,
     base64,
+    extension,
   } = req.body;
   const id = req.params.id;
+
   try {
+    let medical_record = null;
+
+    if (base64) {
+      const base64Data = new Buffer.from(
+        base64.replace(/^data:image\/\w+;base64,/, ""),
+        "base64"
+      );
+      //const type = base64.split(";")[0].split("/")[1];
+      const params = {
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: `leave/medical-records/${user_id}.${extension}`,
+        Body: base64Data,
+        ContentEncoding: "base64",
+        //ContentType: `image/jpeg`,
+      };
+
+      const s3UploadResponse = await s3.upload(params).promise();
+      medical_record = s3UploadResponse.Location;
+    }
+
     const currentLeave = await Leave.findOne({
       where: { id, user_id },
     });
@@ -277,7 +299,6 @@ const editLeave = async (req, res, next) => {
 
     let isValid = true;
     let numberOfLeaves = 0;
-    let medical_record = null;
 
     const leaves = await Leave.findAll();
     leaves.map((currentLeave) => {
@@ -314,7 +335,7 @@ const editLeave = async (req, res, next) => {
         half_day: half_day == true ? 1 : null,
         leave_type,
         hours,
-        medical_record,
+        medical_record: base64 ? medical_record : currentLeave.medical_record,
       },
       {
         where: { id, user_id },

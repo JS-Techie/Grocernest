@@ -69,6 +69,7 @@ const createVendor = async (req, res, next) => {
     phone_number,
     whatsapp_number,
     password,
+    business_name,
   } = req.body;
   try {
     if (!first_name || !last_name || type || whatsapp_number || password) {
@@ -120,6 +121,7 @@ const createVendor = async (req, res, next) => {
       phone_number,
       whatsapp_number,
       password: encryptedPassword,
+      business_name,
       created_by: 1,
     });
 
@@ -147,6 +149,7 @@ const editVendor = async (req, res, next) => {
     phone_number,
     whatsapp_number,
     password,
+    business_name,
   } = req.body;
   try {
     const vendor = await Vendor.findOne({
@@ -206,6 +209,7 @@ const editVendor = async (req, res, next) => {
         phone_number,
         whatsapp_number,
         password: encryptedPassword,
+        business_name,
       },
       {
         where: { id },
