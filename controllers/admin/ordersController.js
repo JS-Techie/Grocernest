@@ -87,15 +87,15 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
       : " AND tc.contact_no LIKE '%" + phno + "%'";
   const dateQuery =
     startDate == undefined ||
-      startDate == "" ||
-      endDate == undefined ||
-      endDate == ""
+    startDate == "" ||
+    endDate == undefined ||
+    endDate == ""
       ? ""
       : " AND tlo.created_at BETWEEN '" +
-      startDate +
-      "' AND (SELECT DATE_ADD('" +
-      endDate +
-      "', INTERVAL 1 DAY))";
+        startDate +
+        "' AND (SELECT DATE_ADD('" +
+        endDate +
+        "', INTERVAL 1 DAY))";
   const orderId =
     orderid == undefined || orderid == ""
       ? ""
@@ -275,23 +275,23 @@ const getOrderDetails = async (req, res, next) => {
             currentOrderItem.is_offer === 1 ? (isEdit ? true : false) : "",
           offerDetails: currentOffer
             ? {
-              offerID: currentOffer.id,
-              offerType: currentOffer.type,
-              itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
-              quantityOfItemX: currentOffer.item_1_quantity
-                ? currentOffer.item_1_quantity
-                : "",
-              itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
-              quantityOfItemY: currentOffer.item_2_quantity
-                ? currentOffer.item_2_quantity
-                : "",
-              itemID: currentOffer.item_id ? currentOffer.item_id : "",
-              amountOfDiscount: currentOffer.amount_of_discount
-                ? currentOffer.amount_of_discount
-                : "",
-              isPercentage: currentOffer.is_percentage ? true : false,
-              isActive: currentOffer.is_active ? true : false,
-            }
+                offerID: currentOffer.id,
+                offerType: currentOffer.type,
+                itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
+                quantityOfItemX: currentOffer.item_1_quantity
+                  ? currentOffer.item_1_quantity
+                  : "",
+                itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
+                quantityOfItemY: currentOffer.item_2_quantity
+                  ? currentOffer.item_2_quantity
+                  : "",
+                itemID: currentOffer.item_id ? currentOffer.item_id : "",
+                amountOfDiscount: currentOffer.amount_of_discount
+                  ? currentOffer.amount_of_discount
+                  : "",
+                isPercentage: currentOffer.is_percentage ? true : false,
+                isActive: currentOffer.is_active ? true : false,
+              }
             : "",
         };
       }
@@ -538,8 +538,8 @@ const changeOrderStatus = async (req, res, next) => {
                   res.dataValues.wallet_balance_used,
                   res.dataValues.cust_no,
                   "cancelled order ID-" +
-                  req.body.orderId +
-                  " wallet balance refunded."
+                    req.body.orderId +
+                    " wallet balance refunded."
                 );
               }
             }
@@ -690,9 +690,9 @@ const changeOrderStatus = async (req, res, next) => {
                 email.toString(),
                 req.body.orderId,
                 "Your order " +
-                req.body.orderId +
-                " has been " +
-                req.body.status
+                  req.body.orderId +
+                  " has been " +
+                  req.body.status
               );
               // whatsapp for cancelled by user
               sendOrderStatusToWhatsapp(
@@ -799,9 +799,9 @@ const assignTransporter = async (req, res, next) => {
               email.toString(),
               req.body.orderId,
               "Your order " +
-              req.body.orderId +
-              " has been Shipped. Your order will be delivered by " +
-              deliveryBoy.full_name.toString()
+                req.body.orderId +
+                " has been Shipped. Your order will be delivered by " +
+                deliveryBoy.full_name.toString()
             );
 
           // send whatsapp
@@ -1148,12 +1148,12 @@ const getReturns = async (req, res, next) => {
         promises = await returnedItemsWithoutUndefined.map(
           async (currentReturnedItem) => {
             returnDate = currentReturnedItem.created_at;
-            console.log("Assigned", currentReturnedItem.delivery_boy)
+            console.log("Assigned", currentReturnedItem.delivery_boy);
             dbDetails = await User.findOne({
               where: { id: currentReturnedItem.delivery_boy },
             });
 
-            console.log("Delivery Boy details=======>", dbDetails)
+            console.log("Delivery Boy details=======>", dbDetails);
 
             const item = await Item.findOne({
               where: { id: currentReturnedItem.item_id },
@@ -1242,6 +1242,61 @@ const getReturns = async (req, res, next) => {
   }
 };
 
+const getReturnedItems = async (req, res, next) => {
+  const { order_id } = req.body;
+  try {
+    const order = await Order.findOne({
+      where: { order_id },
+    });
+
+    if (!order) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "Requested order not found",
+      });
+    }
+
+    const returnItems = await ReturnOrder.findAll({
+      where: { order_id },
+    });
+
+    if (returnItems.length === 0) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "There are no returned items for this order",
+      });
+    }
+
+    const promises = returnItems.map(async (current) => {
+      const currentItem = await Item.findOne({
+        where: { id: currentItem.item_id },
+      });
+
+      return {
+        itemName: currentItem ? currentItem.name : "",
+        returnedQuantity: current.quantity,
+        itemId: current.item_id,
+      };
+    });
+
+    const response = await Promise.all(promises);
+
+    return res.status(200).send({
+      success: true,
+      data: response,
+      message: "Found all returned items for requested order",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "Please check data field for more details",
+    });
+  }
+};
+
 module.exports = {
   getAllPendingOrders,
   getOrderDetails,
@@ -1255,4 +1310,5 @@ module.exports = {
   assignDeliveryBoyForReturn,
   rejectRequestedReturn,
   getReturns,
+  getReturnedItems,
 };

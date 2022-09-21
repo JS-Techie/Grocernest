@@ -234,7 +234,7 @@ const editVendorProfile = async (req, res, next) => {
 
     //send email if changed email
     return res.status(200).send({
-      success: false,
+      success: true,
       data: updated,
       message: "Updated vendor details successfully",
     });
