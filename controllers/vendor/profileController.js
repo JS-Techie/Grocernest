@@ -146,6 +146,7 @@ const editVendorProfile = async (req, res, next) => {
     last_name,
     phone_number,
     business_name,
+    image_status,
   } = req.body;
 
   try {
@@ -223,7 +224,7 @@ const editVendorProfile = async (req, res, next) => {
         current_address,
         pan,
         cin,
-        image: base64 ? url : vendor.image ? vendor.image : null,
+        image: base64 ? url : image_status === "e" ? vendor.image : null,
         email,
         first_name,
         last_name,
