@@ -1270,13 +1270,19 @@ const getReturnedItems = async (req, res, next) => {
 
     const promises = returnItems.map(async (current) => {
       const currentItem = await Item.findOne({
-        where: { id: currentItem.item_id },
+        where: { id: current.item_id },
+      });
+
+      const selectedBatch = await Batch.findOne({
+        where: { item_id: current.item_id, mark_selected: 1 },
       });
 
       return {
         itemName: currentItem ? currentItem.name : "",
         returnedQuantity: current.quantity,
         itemId: current.item_id,
+        MRP: selectedBatch ? selectedBatch.MRP : "",
+        salePrice: selectedBatch ? selectedBatch.sale_price : "",
       };
     });
 
