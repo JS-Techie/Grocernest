@@ -345,7 +345,7 @@ const getAllRequestedReturns = async (req, res, next) => {
   const { return_status } = req.body;
   try {
     const allOrders = await Order.findAll({
-      where: { delivery_boy: user_id, return_status },
+      where: { return_status },
     });
 
     if (allOrders.length === 0) {
@@ -356,9 +356,11 @@ const getAllRequestedReturns = async (req, res, next) => {
       });
     }
 
+    console.log(allOrders);
+
     const outerPromises = await allOrders.map(async (currentOrder) => {
       const returnedItems = await ReturnOrder.findAll({
-        where: { order_id: currentOrder.order_id },
+        where: { order_id: currentOrder.order_id, delivery_boy : user_id },
       });
 
       console.log("Returned items for this order", returnedItems);
@@ -383,6 +385,7 @@ const getAllRequestedReturns = async (req, res, next) => {
 
         promises = await returnedItemsWithoutUndefined.map(
           async (currentReturnedItem) => {
+            console.log("Inside Map");
             const item = await Item.findOne({
               where: { id: currentReturnedItem.item_id },
             });

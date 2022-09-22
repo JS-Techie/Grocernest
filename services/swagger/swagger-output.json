@@ -5503,6 +5503,9 @@
                 },
                 "business_name": {
                   "example": "any"
+                },
+                "image_status": {
+                  "example": "any"
                 }
               }
             }
