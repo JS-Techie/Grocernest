@@ -5,7 +5,9 @@ const User = db.UserModel;
 
 const getAttendanceDetails = async (req, res, next) => {
   try {
-    const attendanceDetails = await Attendance.findAll({});
+    const attendanceDetails = await Attendance.findAll({
+      order: [["date", "DESC"]],
+    });
 
     if (attendanceDetails.length === 0) {
       return res.status(200).send({
