@@ -493,7 +493,7 @@ const returnOrder = async (req, res, next) => {
       currentOrder.status == "Returned" ||
       currentOrder.status == "Cancelled" ||
       currentOrder.return_status == "a" ||
-      currentOrder.return_status == "c" ||
+      currentOrder.return_status == "r" ||
       currentOrder.return_status == "i"
     ) {
       return res.status(400).send({
