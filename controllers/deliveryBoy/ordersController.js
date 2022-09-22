@@ -252,11 +252,11 @@ const changeStatusOfReturnOrder = async (req, res, next) => {
 
     //Update inventory
 
-    if (return_status === "r") {
-      await ReturnOrder.destroy({
-        where: { order_id },
-      });
-    }
+    // if (return_status === "r") {
+    //   await ReturnOrder.destroy({
+    //     where: { order_id },
+    //   });
+    // }
 
     if (return_status === "a") {
       returnedItems.map(async (current) => {
