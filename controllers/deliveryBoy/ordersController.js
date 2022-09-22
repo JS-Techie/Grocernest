@@ -327,7 +327,7 @@ const changeStatusOfReturnOrder = async (req, res, next) => {
         oldOrderDetails: currentOrder,
         newOrderDetails: updatedOrder,
       },
-      message: `Return for this order was accepted ${
+      message: `Return for this order was ${
         return_status === "r" ? "Rejected" : "Accepted"
       }`,
     });
