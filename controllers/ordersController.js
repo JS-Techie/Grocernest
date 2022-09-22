@@ -630,10 +630,16 @@ const getAllReturns = async (req, res, next) => {
         where: { id: current.item_id },
       });
 
+      const selectedBatch = await Batch.findOne({
+        where: { item_id: currentItem.id, mark_selected: 1 },
+      });
+
       return {
         itemID: currentItem ? currentItem.id : "",
         itemName: currentItem ? currentItem.name : "",
         quantity: current.quantity,
+        salePrice: selectedBatch ? selectedBatch.sale_price : "",
+        MRP: selectedBatch ? selectedBatch.MRP : "",
       };
     });
 
