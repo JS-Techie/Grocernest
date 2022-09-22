@@ -209,7 +209,7 @@ const changeStatusOfReturnOrder = async (req, res, next) => {
     }
 
     const currentOrder = await Order.findOne({
-      where: { delivery_boy: user_id, order_id },
+      where: { order_id },
     });
 
     if (!currentOrder) {
@@ -239,7 +239,7 @@ const changeStatusOfReturnOrder = async (req, res, next) => {
     }
 
     const returnedItems = await ReturnOrder.findAll({
-      where: { order_id },
+      where: { delivery_boy: user_id, order_id },
     });
 
     if (returnedItems.length === 0) {
@@ -311,12 +311,12 @@ const changeStatusOfReturnOrder = async (req, res, next) => {
         pickup_date: date,
       },
       {
-        where: { delivery_boy: user_id, order_id },
+        where: { order_id },
       }
     );
 
     const updatedOrder = await Order.findOne({
-      where: { delivery_boy: user_id, order_id },
+      where: { order_id },
     });
 
     //Notify admin and user
@@ -360,7 +360,7 @@ const getAllRequestedReturns = async (req, res, next) => {
 
     const outerPromises = await allOrders.map(async (currentOrder) => {
       const returnedItems = await ReturnOrder.findAll({
-        where: { order_id: currentOrder.order_id, delivery_boy : user_id },
+        where: { order_id: currentOrder.order_id, delivery_boy: user_id },
       });
 
       console.log("Returned items for this order", returnedItems);
