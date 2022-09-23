@@ -630,11 +630,11 @@ const getAllItemsMappedToVendor = async (req, res, next) => {
           isLow = true;
         }
       }
-      item["isLow"] = isLow
+      Object.assign(item, { isLow: isLow });
 
       return {
         item,
-        // isLow,
+        isLow,
       };
     });
 
