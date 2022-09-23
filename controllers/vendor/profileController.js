@@ -12,6 +12,9 @@ const { generateOTP } = require("../../services/otpService");
 const Vendor = db.VendorModel;
 const Cache = db.CacheModel;
 const Item = db.ItemModel;
+const LowStock = db.LowStockConfigModel;
+const Batch = db.BatchModel;
+const Inventory = db.InventoryModel;
 
 const s3 = new S3(s3Config);
 
@@ -594,8 +597,40 @@ const getAllItemsMappedToVendor = async (req, res, next) => {
         where: { id: current.item_id },
       });
 
+      const lowStock = await LowStock.findOne({
+        where: { item_id: current.item_id },
+      });
+
+      let availableQuantity = 0;
+      let isLow = false;
+      const batches = await Batch.findAll({
+        where: { item_id: current.item_id },
+      });
+
+      if (batches.length > 0) {
+        batches.map(async (currentBatch) => {
+          const currentInventory = await Inventory.findOne({
+            where: {
+              item_id: current.item_id,
+              batch_id: currentBatch.id,
+              location_id: 4,
+              balance_type: 1,
+            },
+          });
+
+          if (currentInventory) {
+            availableQuantity += currentInventory.quantity;
+          }
+        });
+      }
+
+      if (availableQuantity <= lowStock) {
+        isLow = true;
+      }
+
       return {
         item,
+        isLow,
       };
     });
 
