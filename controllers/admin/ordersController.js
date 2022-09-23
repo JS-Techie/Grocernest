@@ -1,9 +1,7 @@
 const { sequelize } = require("../../models");
 const { Op } = require("sequelize");
 const db = require("../../models");
-const Order = db.OrderModel;
-const OrderItems = db.OrderItemsModel;
-const User = db.UserModel
+
 const {
   sendOrderStatusEmail,
   sendCancelledStatusEmail,
@@ -15,16 +13,21 @@ const {
   sendOrderStatusToWhatsapp,
   sendOrderShippedToWhatsapp,
   sendAdminCancelledOrderStatusToWhatsapp,
+  sendPickupBoyNotificationToWhatsapp,
 } = require("../../services/whatsapp/whatsapp");
 // const Customer = db.CustomerModel;
 
 const Batch = db.BatchModel;
 const Customer = db.CustomerModel;
-const OrderItem = db.OrderItemsModel;
 const Item = db.ItemModel;
 const Inventory = db.InventoryModel;
 const Category = db.LkpCategoryModel;
 const Offers = db.OffersModel;
+const Order = db.OrderModel;
+const OrderItems = db.OrderItemsModel;
+const User = db.UserModel;
+const ReturnOrder = db.ReturnOrdersModel;
+const Coupon = db.CouponsModel;
 
 const getAllPendingOrders = async (req, res, next) => {
   try {
@@ -84,15 +87,15 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
       : " AND tc.contact_no LIKE '%" + phno + "%'";
   const dateQuery =
     startDate == undefined ||
-      startDate == "" ||
-      endDate == undefined ||
-      endDate == ""
+    startDate == "" ||
+    endDate == undefined ||
+    endDate == ""
       ? ""
       : " AND tlo.created_at BETWEEN '" +
-      startDate +
-      "' AND (SELECT DATE_ADD('" +
-      endDate +
-      "', INTERVAL 1 DAY))";
+        startDate +
+        "' AND (SELECT DATE_ADD('" +
+        endDate +
+        "', INTERVAL 1 DAY))";
   const orderId =
     orderid == undefined || orderid == ""
       ? ""
@@ -136,9 +139,9 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
       const dboy_name = await User.findOne({
         where: {
           id: current.delivery_boy,
-          type_cd: "DELIVERY_BOY"
-        }
-      })
+          type_cd: "DELIVERY_BOY",
+        },
+      });
       return {
         cust_name: current.cust_name,
         contact_no: current.contact_no,
@@ -272,23 +275,23 @@ const getOrderDetails = async (req, res, next) => {
             currentOrderItem.is_offer === 1 ? (isEdit ? true : false) : "",
           offerDetails: currentOffer
             ? {
-              offerID: currentOffer.id,
-              offerType: currentOffer.type,
-              itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
-              quantityOfItemX: currentOffer.item_1_quantity
-                ? currentOffer.item_1_quantity
-                : "",
-              itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
-              quantityOfItemY: currentOffer.item_2_quantity
-                ? currentOffer.item_2_quantity
-                : "",
-              itemID: currentOffer.item_id ? currentOffer.item_id : "",
-              amountOfDiscount: currentOffer.amount_of_discount
-                ? currentOffer.amount_of_discount
-                : "",
-              isPercentage: currentOffer.is_percentage ? true : false,
-              isActive: currentOffer.is_active ? true : false,
-            }
+                offerID: currentOffer.id,
+                offerType: currentOffer.type,
+                itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
+                quantityOfItemX: currentOffer.item_1_quantity
+                  ? currentOffer.item_1_quantity
+                  : "",
+                itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
+                quantityOfItemY: currentOffer.item_2_quantity
+                  ? currentOffer.item_2_quantity
+                  : "",
+                itemID: currentOffer.item_id ? currentOffer.item_id : "",
+                amountOfDiscount: currentOffer.amount_of_discount
+                  ? currentOffer.amount_of_discount
+                  : "",
+                isPercentage: currentOffer.is_percentage ? true : false,
+                isActive: currentOffer.is_active ? true : false,
+              }
             : "",
         };
       }
@@ -521,7 +524,7 @@ const changeOrderStatus = async (req, res, next) => {
           req.body.status === "Delivered" ||
           req.body.status === "Cancelled"
         ) {
-          OrderItem.findAll({
+          OrderItems.findAll({
             where: {
               order_id: res.dataValues.order_id,
             },
@@ -535,8 +538,8 @@ const changeOrderStatus = async (req, res, next) => {
                   res.dataValues.wallet_balance_used,
                   res.dataValues.cust_no,
                   "cancelled order ID-" +
-                  req.body.orderId +
-                  " wallet balance refunded."
+                    req.body.orderId +
+                    " wallet balance refunded."
                 );
               }
             }
@@ -687,9 +690,9 @@ const changeOrderStatus = async (req, res, next) => {
                 email.toString(),
                 req.body.orderId,
                 "Your order " +
-                req.body.orderId +
-                " has been " +
-                req.body.status
+                  req.body.orderId +
+                  " has been " +
+                  req.body.status
               );
               // whatsapp for cancelled by user
               sendOrderStatusToWhatsapp(
@@ -765,6 +768,11 @@ const assignTransporter = async (req, res, next) => {
   let orderId = req.body.orderId;
   let transporterName = req.body.delivery_boy;
 
+  const deliveryBoy = await User.findOne({
+    where: {
+      id: transporterName,
+    },
+  });
   Order.update(
     {
       status: "Shipped",
@@ -791,9 +799,9 @@ const assignTransporter = async (req, res, next) => {
               email.toString(),
               req.body.orderId,
               "Your order " +
-              req.body.orderId +
-              " has been Shipped. Your order will be delivered by " +
-              transporterName
+                req.body.orderId +
+                " has been Shipped. Your order will be delivered by " +
+                deliveryBoy.full_name.toString()
             );
 
           // send whatsapp
@@ -804,7 +812,7 @@ const assignTransporter = async (req, res, next) => {
           sendOrderShippedToWhatsapp(
             contact_no,
             req.body.orderId,
-            transporterName
+            deliveryBoy.full_name.toString()
           );
           // }
         });
@@ -842,13 +850,12 @@ const getShippedOrders = async (req, res, next) => {
     }
 
     const promises = results.map(async (current) => {
-
       const dboy_name = await User.findOne({
         where: {
           id: current.delivery_boy,
-          type_cd: "DELIVERY_BOY"
-        }
-      })
+          type_cd: "DELIVERY_BOY",
+        },
+      });
       return {
         cust_name: current.cust_name,
         contact_no: current.contact_no,
@@ -899,9 +906,9 @@ const getDeliveredOrders = async (req, res, next) => {
       const dboy_name = await User.findOne({
         where: {
           id: current.delivery_boy,
-          type_cd: "DELIVERY_BOY"
-        }
-      })
+          type_cd: "DELIVERY_BOY",
+        },
+      });
       return {
         cust_name: current.cust_name,
         contact_no: current.contact_no,
@@ -953,9 +960,9 @@ const getCanceledorders = async (req, res, next) => {
       const dboy_name = await User.findOne({
         where: {
           id: current.delivery_boy,
-          type_cd: "DELIVERY_BOY"
-        }
-      })
+          type_cd: "DELIVERY_BOY",
+        },
+      });
 
       return {
         cust_name: current.cust_name,
@@ -992,11 +999,11 @@ const assignDeliveryBoyForReturn = async (req, res, next) => {
   const { delivery_boy } = req.body;
 
   try {
-    const currentOrder = await Order.findOne({
+    const currentOrder = await ReturnOrder.findAll({
       where: { order_id },
     });
 
-    if (!currentOrder) {
+    if (currentOrder.length === 0) {
       return res.status(400).send({
         success: false,
         data: [],
@@ -1004,7 +1011,7 @@ const assignDeliveryBoyForReturn = async (req, res, next) => {
       });
     }
 
-    await Order.update(
+    await ReturnOrder.update(
       {
         delivery_boy,
       },
@@ -1013,7 +1020,17 @@ const assignDeliveryBoyForReturn = async (req, res, next) => {
       }
     );
 
-    const updatedOrder = await Order.findOne({
+    const currentDeliveryBoy = await User.findOne({
+      where: { id: delivery_boy },
+    });
+
+    sendPickupBoyNotificationToWhatsapp(
+      currentDeliveryBoy.full_name.toString(),
+      order_id.toString(),
+      currentDeliveryBoy.mobile_no.toString()
+    );
+
+    const updatedOrder = await ReturnOrder.findAll({
       where: { order_id },
     });
 
@@ -1033,6 +1050,7 @@ const assignDeliveryBoyForReturn = async (req, res, next) => {
 
 const rejectRequestedReturn = async (req, res, next) => {
   const { order_id } = req.params;
+  const { reject_reason } = req.body;
 
   try {
     const currentOrder = await Order.findOne({
@@ -1050,19 +1068,26 @@ const rejectRequestedReturn = async (req, res, next) => {
     await Order.update(
       {
         return_status: "c",
+        reject_reason,
       },
       {
         where: { order_id },
       }
     );
 
+    //Delete all records from return orders table which has order id
+
+    await ReturnOrder.destroy({
+      where: { order_id },
+    });
+
     const updatedOrder = await Order.findOne({
       where: { order_id },
     });
 
-    //Notify customer about status of return
+    //Notify customer about status of return reject
 
-    return res.status(400).send({
+    return res.status(200).send({
       success: true,
       data: updatedOrder,
       message: "Successfully rejected requested return",
@@ -1076,29 +1101,197 @@ const rejectRequestedReturn = async (req, res, next) => {
   }
 };
 
-const getRequestedReturns = async (req, res, next) => {
+const getReturns = async (req, res, next) => {
+  const { return_status } = req.body;
   try {
-    const orders = await Order.findAll({
-      where: { return_status: "i" },
-      include: [
-        {
-          model: OrderItems,
-        },
-      ],
+    const allOrders = await Order.findAll({
+      where: { return_status },
     });
 
-    if (orders.length === 0) {
+    if (allOrders.length === 0) {
       return res.status(200).send({
         success: true,
         data: [],
-        message: "There are no requested returns",
+        message: "There are no returns based on the return status",
       });
     }
+
+    const outerPromises = await allOrders.map(async (currentOrder) => {
+      let dbDetails = null;
+      let returnDate = null;
+
+      const returnedItems = await ReturnOrder.findAll({
+        where: { order_id: currentOrder.order_id },
+      });
+
+      console.log("Returned items for this order", returnedItems);
+
+      let coupon;
+      if (currentOrder.coupon_id) {
+        coupon = await Coupon.findOne({
+          where: { id: currentOrder.coupon_id },
+        });
+      }
+
+      let currentCustomer;
+      let returnedItemsWithoutUndefined = [];
+      let promises = [];
+
+      if (returnedItems.length !== 0) {
+        returnedItemsWithoutUndefined = await returnedItems.filter(
+          (current) => {
+            return current !== undefined;
+          }
+        );
+
+        promises = await returnedItemsWithoutUndefined.map(
+          async (currentReturnedItem) => {
+            returnDate = currentReturnedItem.created_at;
+
+            dbDetails = await User.findOne({
+              where: { id: currentReturnedItem.delivery_boy },
+            });
+
+            console.log("Delivery Boy details=======>", dbDetails);
+
+            const item = await Item.findOne({
+              where: { id: currentReturnedItem.item_id },
+            });
+
+            const selectedBatch = await Batch.findOne({
+              where: { item_id: currentReturnedItem.item_id, mark_selected: 1 },
+            });
+
+            let inventory;
+            if (selectedBatch) {
+              inventory = await Inventory.findOne({
+                where: {
+                  batch_id: selectedBatch.id,
+                  item_id: currentReturnedItem.item_id,
+                  location_id: 4,
+                  balance_type: 1,
+                },
+              });
+            }
+
+            currentCustomer = await Customer.findOne({
+              where: { cust_no: currentOrder.cust_no },
+            });
+
+            return {
+              itemId: currentReturnedItem.item_id,
+              returnedQuantity: currentReturnedItem.quantity,
+              itemName: item.name,
+              image: item.image,
+              MRP: selectedBatch ? selectedBatch.MRP : "",
+              salePrice: selectedBatch ? selectedBatch.sale_price : "",
+              expiryDate: selectedBatch ? selectedBatch.expiry_date : "",
+              discount: selectedBatch ? selectedBatch.discount : "",
+              costPrice: selectedBatch ? selectedBatch.cost_price : "",
+              cashback: inventory ? inventory.cashback : "",
+              cashbackIsPercentage: inventory
+                ? inventory.cashback_is_percentage
+                : "",
+            };
+          }
+        );
+
+        const itemDetails = await Promise.all(promises);
+
+        return {
+          orderId: currentOrder.order_id,
+          orderedDate: currentOrder.created_at,
+          returnDate,
+          deliveryBoy: dbDetails ? dbDetails.full_name : "",
+          customerAddress: currentOrder.address,
+          total: currentOrder.total,
+          payableAmount: currentOrder.final_payable_amount,
+          customerName: currentCustomer ? currentCustomer.cust_name : "",
+          customerPhoneNumber: currentCustomer
+            ? currentCustomer.contact_no
+            : "",
+          customerEmail: currentCustomer ? currentCustomer.email : "",
+          status: currentOrder.status,
+          returnStatus: currentOrder.return_status,
+          paidByWallet: currentOrder.wallet_balance_used,
+          couponUsed: coupon ? coupon.code : "",
+          couponDiscount: coupon ? coupon.amount_of_discount : "",
+          couponIsPercentage: coupon ? coupon.is_percentage : "",
+          itemDetails,
+        };
+      }
+    });
+
+    const resolved = await Promise.all(outerPromises);
+    const orders = await resolved.filter((current) => {
+      return current != undefined;
+    });
 
     return res.status(200).send({
       success: true,
       data: orders,
       message: "Found all requested returns",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "Please check data field for more details",
+    });
+  }
+};
+
+const getReturnedItems = async (req, res, next) => {
+  const { order_id } = req.body;
+  try {
+    const order = await Order.findOne({
+      where: { order_id },
+    });
+
+    if (!order) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "Requested order not found",
+      });
+    }
+
+    const returnItems = await ReturnOrder.findAll({
+      where: { order_id },
+    });
+
+    if (returnItems.length === 0) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "There are no returned items for this order",
+      });
+    }
+
+    const promises = returnItems.map(async (current) => {
+      const currentItem = await Item.findOne({
+        where: { id: current.item_id },
+      });
+
+      const selectedBatch = await Batch.findOne({
+        where: { item_id: current.item_id, mark_selected: 1 },
+      });
+
+      return {
+        itemName: currentItem ? currentItem.name : "",
+        returnedQuantity: current.quantity,
+        itemId: current.item_id,
+        MRP: selectedBatch ? selectedBatch.MRP : "",
+        salePrice: selectedBatch ? selectedBatch.sale_price : "",
+      };
+    });
+
+    const response = await Promise.all(promises);
+
+    return res.status(200).send({
+      success: true,
+      data: response,
+      message: "Found all returned items for requested order",
     });
   } catch (error) {
     return res.status(400).send({
@@ -1121,5 +1314,6 @@ module.exports = {
   getAllOrderByPhoneNumber,
   assignDeliveryBoyForReturn,
   rejectRequestedReturn,
-  getRequestedReturns,
+  getReturns,
+  getReturnedItems,
 };

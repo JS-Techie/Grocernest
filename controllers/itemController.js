@@ -391,7 +391,7 @@ const getItemById = async (req, res, next) => {
     //Find all the details of the item pertaining to current item id
     const [itemResults, metadata] =
       await sequelize.query(`select distinct t_item.id, t_item.name,t_item.brand_id,t_item.UOM ,t_item.category_id, t_lkp_category.group_name,t_item.sub_category_id , t_lkp_sub_category.sub_cat_name 
-      ,t_item.image ,t_item.description ,t_item.available_for_ecomm ,t_batch.batch_no ,t_item.how_to_use, t_item.country_of_origin,t_item.manufacturer_name,
+      ,t_item.image ,t_item.description ,t_item.available_for_ecomm ,t_batch.batch_no ,t_item.how_to_use, t_item.ingredients, t_item.country_of_origin,t_item.manufacturer_name,
       t_batch.location_id ,t_batch.MRP ,t_batch.discount ,t_batch.cost_price ,t_batch.mfg_date ,t_batch.sale_price ,
       t_batch.expiry_date,
       t_inventory.cashback, t_inventory.cashback_is_percentage,
@@ -449,21 +449,29 @@ const getItemById = async (req, res, next) => {
       });
     }
 
-    const coupons = await Coupons.findAll({
-      where: {
-        [Op.or]: [
-          { item_id: item.id },
-          { brand_id: item.brand_id },
-          { cat_id: item.category_id },
-          { sub_cat_id: item.sub_category_id },
-        ],
-      },
-    });
+    // const coupons = await Coupons.findAll({
+    //   where: {
+    //     [Op.or]: [
+    //       { item_id: item.id },
+    //       { brand_id: item.brand_id },
+    //       { cat_id: item.category_id },
+    //       { sub_cat_id: item.sub_category_id },
+    //     ],
+    //   },
+    // });
+
+    const [coupons, metadata2] =
+      await sequelize.query(`select *
+    from t_coupons
+    where t_coupons.item_id = ${item.id} OR t_coupons.cat_id = ${item.category_id} OR t_coupons.sub_cat_id = ${item.sub_category_id} or t_coupons.brand_id = ${item.brand_id} 
+    or t_coupons.assigned_user = "${currentUser}" `);
 
     // const [couponForCurrentItem, metadataForCoupons] = await sequelize.query(
     //   `select t_coupons.code, t_coupons.amount_of_discount ,t_coupons.is_percentage ,t_coupons.description, t_coupons.expiry_date, t_coupons.created_at
     //   from ecomm.t_coupons where t_coupons.item_id = ${item.id} OR t_coupons.cat_id = ${item.category_id} OR t_coupons.sub_cat_id = ${item.sub_category_id} or t_coupons.brand_id = ${item.brand_id}`
     // );
+
+    //t_coupons.code, t_coupons.amount_of_discount ,t_coupons.is_percentage ,t_coupons.description,t_coupons.expiry_date
     let promises = [];
     if (coupons.length != 0) {
       promises = coupons.map((current) => {
@@ -531,6 +539,7 @@ const getItemById = async (req, res, next) => {
         createdBy: offer ? (offer.created_by ? offer.created_by : "") : "",
         coupon: couponForCurrentItem ? couponForCurrentItem : "",
         howToUse: item.how_to_use ? item.how_to_use : "",
+        ingredients: item.ingredients ? item.ingredients : "",
         manufacturerName: item.manufacturer_name ? item.manufacturer_name : "",
         countryOfOrigin: item.country_of_origin ? item.country_of_origin : "",
       },
@@ -546,9 +555,39 @@ const getItemById = async (req, res, next) => {
   }
 };
 
+const getAvailableQty = async (req, res, next) => {
+  const { batch_id } = req.body;
+  try {
+    const batch = await Inventory.findOne({
+      where: { batch_id, location_id: 4, balance_type: 1 },
+    });
+
+    if (!batch) {
+      return res.status(404).send({
+        success: false,
+        data: [],
+        message: "Required batch details not found",
+      });
+    }
+
+    return res.status(200).send({
+      success: true,
+      data: batch.quantity,
+      message: "Found available quantity for required batch",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "Found available quantity of required item",
+    });
+  }
+};
+
 module.exports = {
   getItemsInCategory,
   getItemsInSubcategory,
   getItemsBySearchTerm,
   getItemById,
+  getAvailableQty,
 };

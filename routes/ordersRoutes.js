@@ -9,15 +9,17 @@ const {
   cancelOrder,
   returnOrder,
   trackOrder,
+  getAllReturns
 } = require("../controllers/ordersController");
 
 
-//Add authenticate middleware to all controllers
+//Add authenticate middleware to all controllers 
 
 router.route("/all").get(authenticate, getAllOrders);
 router.route("/:orderId").get(authenticate, getOrderByOrderId);
 router.route("/cancel/:orderId").post(authenticate, cancelOrder);
 router.route("/return/:orderId").post(authenticate, returnOrder);
 router.route("/:orderId/tracking").get(authenticate, trackOrder);
+router.route("/return/view/all").post(authenticate, getAllReturns);
 
 module.exports = router;

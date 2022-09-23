@@ -127,3 +127,23 @@ CREATE TABLE `t_gateway_transaction` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`transaction_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+
+CREATE TABLE `t_shorten_url` (
+  `id` varchar(20) NOT NULL,
+  
+  `original_url` varchar(500) NULL,
+  `short_url` varchar(300) NULL,
+
+  `created_by` bigint(20) NOT NULL,
+  `updated_by` bigint(20) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+ALTER TABLE grocernest_pre_prod.t_customer ADD calling_number varchar(20) NULL;​
+
+ALTER TABLE grocernest_pre_prod.t_vendor ADD business_name varchar(200) NULL;
+

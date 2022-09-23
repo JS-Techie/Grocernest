@@ -82,7 +82,7 @@ const getLeaveById = async (req, res, next) => {
 };
 
 const getLeaveByStatus = async (req, res, next) => {
-  const {status} = req.params;
+  const { status } = req.params;
 
   try {
     const leaves = await Leave.findAll({
@@ -181,6 +181,7 @@ const approveLeave = async (req, res, next) => {
     const approve = await Leave.update(
       {
         status: "Approved",
+        reject_reason: null,
       },
       {
         where: { id },

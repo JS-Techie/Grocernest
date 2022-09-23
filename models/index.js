@@ -145,6 +145,8 @@ db.GatewayTransactionModel = require("./t_gateway_transaction")(
 
 db.LeaveModel = require("./t_leave.js")(db.sequelize, Sequelize);
 
+db.UrlModel = require("./t_shorten_url.js")(db.sequelize, Sequelize);
+
 db.TaskModel = require("./t_task")(db.sequelize, Sequelize);
 
 db.AttendanceModel = require("./t_attendance")(db.sequelize, Sequelize);
@@ -155,6 +157,7 @@ db.ReturnOrdersModel = require("./t_return_orders")(db.sequelize, Sequelize);
 
 db.MilkDashboardModel = require("./t_milk_dashboard")(db.sequelize, Sequelize);
 
+db.VendorModel = require("./t_vendor")(db.sequelize, Sequelize);
 
 // Relations between tables
 

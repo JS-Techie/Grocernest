@@ -179,7 +179,7 @@ const subtractItemFromCart = async (req, res, next) => {
     }
 
     const offerExists = await Offers.findOne({
-      where: { is_active: 1, [Op.or]: [{ item_id_1: itemID }] },
+      where: { is_active: 1, item_id_1: itemID },
     });
 
     let offerItemToBeRemoved = null;
@@ -425,7 +425,7 @@ const getItemCount = async (req, res, next) => {
 
 const getCart = async (req, res, next) => {
   // console.log("===========whatsapp testing==============");
-  // sendInvoiceToWhatsapp("8910443583", "123456774", "https://ecomm-dev.s3.ap-south-1.amazonaws.com/pdfs/invoices/invoice-9619381.pdf");
+  // sendInvoiceToWhatsapp("8910443583", "123456774", "https://ecomm-dev.s3.ap-south-1.amazonaws.com/pdfs/invoices/invoice-307172.pdf");
   //sendOrderStatusToWhatsapp("7980996735", "123456774", "Shipped");
   // sendOrderShippedToWhatsapp("9163540343", "123456", "Shipped", "Tanmoy");
   // sendAdminCancelledOrderStatusToWhatsapp("9163540343", "12345", "no items");

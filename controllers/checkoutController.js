@@ -262,6 +262,7 @@ const checkoutFromCart = async (req, res, next) => {
       // }
     });
 
+    let base_url = req.protocol + '://' + req.get('host');
     let email = "";
     let contact_no = "";
     Customer.findOne({
@@ -278,7 +279,8 @@ const checkoutFromCart = async (req, res, next) => {
         newOrder.order_id,
         email,
         contact_no,
-        opt_in
+        opt_in,
+        base_url
       );
     });
 
@@ -505,83 +507,89 @@ const buyNow = async (req, res, next) => {
         where: { item_id: currentItem.item_id, mark_selected: 1 },
       });
 
-      const currentInventory = await Inventory.findOne({
-        where: {
-          batch_id: oldestBatch.id,
-          item_id: currentItem.item_id,
-          location_id: 4,
-          balance_type: 1,
-        },
-      });
-
-      console.log("current inventory with balance type 1", currentInventory);
-
-      const currentInventoryToBeBlocked = await Inventory.findOne({
-        where: {
-          batch_id: oldestBatch.id,
-          item_id: currentItem.item_id,
-          location_id: 4,
-          balance_type: 7,
-        },
-      });
-
-      console.log(
-        "blocked inventory with balance type 1",
-        currentInventoryToBeBlocked
-      );
-
-      if (!currentInventoryToBeBlocked) {
-        const newInventory = await Inventory.create({
-          batch_id: oldestBatch.id,
-          item_id: currentItem.item_id,
-          location_id: 4,
-          quantity: currentItem.quantity,
-          balance_type: 7,
-          active_ind: "Y",
-          created_by: 1,
-        });
-
-        console.log(
-          "If there is no inventory to be blocked, make a new row",
-          newInventory
-        );
-      } else {
-        const updatedInventory = await Inventory.update(
-          {
-            quantity:
-              currentInventoryToBeBlocked.quantity + currentItem.quantity,
-          },
-          {
-            where: {
-              batch_id: oldestBatch.id,
-              item_id: currentItem.item_id,
-              location_id: 4,
-              balance_type: 7,
-            },
-          }
-        );
-
-        console.log(
-          "updated inventory row with balance type 7",
-          updatedInventory
-        );
-      }
-      // if (currentInventory) {
-      const updateInventory = await Inventory.update(
-        {
-          quantity: currentInventory.quantity - currentItem.quantity,
-        },
-        {
+      let currentInventory;
+      if (oldestBatch) {
+        currentInventory = await Inventory.findOne({
           where: {
             batch_id: oldestBatch.id,
             item_id: currentItem.item_id,
             location_id: 4,
             balance_type: 1,
           },
+        });
+
+        console.log("current inventory with balance type 1", currentInventory);
+
+        const currentInventoryToBeBlocked = await Inventory.findOne({
+          where: {
+            batch_id: oldestBatch.id,
+            item_id: currentItem.item_id,
+            location_id: 4,
+            balance_type: 7,
+          },
+        });
+
+        console.log(
+          "blocked inventory with balance type 1",
+          currentInventoryToBeBlocked
+        );
+
+        if (!currentInventoryToBeBlocked) {
+          const newInventory = await Inventory.create({
+            batch_id: oldestBatch.id,
+            item_id: currentItem.item_id,
+            location_id: 4,
+            quantity: currentItem.quantity,
+            balance_type: 7,
+            active_ind: "Y",
+            created_by: 1,
+          });
+
+          console.log(
+            "If there is no inventory to be blocked, make a new row",
+            newInventory
+          );
+        } else {
+          const updatedInventory = await Inventory.update(
+            {
+              quantity:
+                currentInventoryToBeBlocked.quantity + currentItem.quantity,
+            },
+            {
+              where: {
+                batch_id: oldestBatch.id,
+                item_id: currentItem.item_id,
+                location_id: 4,
+                balance_type: 7,
+              },
+            }
+          );
+
+          console.log(
+            "updated inventory row with balance type 7",
+            updatedInventory
+          );
         }
-      );
-      console.log("updated inventory row with balance type 1", updateInventory);
-      // }
+        // if (currentInventory) {
+        const updateInventory = await Inventory.update(
+          {
+            quantity: currentInventory.quantity - currentItem.quantity,
+          },
+          {
+            where: {
+              batch_id: oldestBatch.id,
+              item_id: currentItem.item_id,
+              location_id: 4,
+              balance_type: 1,
+            },
+          }
+        );
+        console.log(
+          "updated inventory row with balance type 1",
+          updateInventory
+        );
+        // }
+      }
     });
 
     const response = orderItems.map((current) => {
@@ -609,12 +617,14 @@ const buyNow = async (req, res, next) => {
 
       console.log("jjjjjjjjjjjjjjjjjjjjjjjjjjjjjj");
 
+      let base_url = req.protocol + '://' + req.get('host');
       await InvoiceGen(
         currentUser,
         newOrder.order_id,
         email,
         contact_no,
-        opt_in
+        opt_in,
+        base_url
       );
     });
 
@@ -644,7 +654,7 @@ const buyNow = async (req, res, next) => {
   }
 };
 
-const InvoiceGen = async (cust_no, order_id, email, contact_no, opt_in) => {
+const InvoiceGen = async (cust_no, order_id, email, contact_no, opt_in, base_url) => {
   console.log("INVOICE GENNNN");
   const currentCustomer = cust_no;
   const orderID = order_id;
@@ -729,7 +739,7 @@ const InvoiceGen = async (cust_no, order_id, email, contact_no, opt_in) => {
       }
       // send whatsapp
       if (contact_no != "") {
-        sendInvoiceToWhatsapp(contact_no, response.orderID, invoice_link);
+        await sendInvoiceToWhatsapp(contact_no, response.orderID, invoice_link, base_url);
       }
     });
   } catch (error) {

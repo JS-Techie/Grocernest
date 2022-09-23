@@ -7,15 +7,22 @@ const Wallet = db.WalletModel
 const WalletTransaction = db.WalletTransactionModel;
 
 const checkWalletDetails = async (req, res, next) => {
-    let cust_no = req.params.cust_no
+
+    console.log("abcd");
+    let cust_no = req.params.cust_no;
 
     Wallet.findAll({
         include: [{
             model: WalletTransaction,
+            //order: [["created_at", "DESC"]],
         }],
         where: {
             cust_no: cust_no,
-        }
+        },
+        order: [
+            [WalletTransaction, "created_at", "DESC"],
+        ]
+
     }).then((resData) => {
         return res.status(201).json({
             success: true,
@@ -25,7 +32,7 @@ const checkWalletDetails = async (req, res, next) => {
     }).catch((err) => {
         return res.status(400).json({
             success: false,
-            data: error.message,
+            data: err.message,
             message: "Error while fetching wallet and transaction from database",
         });
     })
@@ -67,7 +74,7 @@ const debitAmountFromWallet = async (req, res, next) => {
                 UPDATE t_wallet
                 SET balance = (select balance from t_wallet where cust_no="${cust_no}")-${amount}
                 WHERE cust_no = "${cust_no}"
-          `);
+                `);
 
             const [results2, metadata2] =
                 await sequelize.query(`
@@ -76,18 +83,19 @@ const debitAmountFromWallet = async (req, res, next) => {
                 VALUES((
                 select wallet_id from t_wallet where cust_no="${cust_no}"
                 ), "${transaction_id}", "D", ${amount}, "${details}", current_timestamp(), 2, NULL, current_timestamp(), current_timestamp()); 
-      `);
+                `);
 
             const [results3, metadata3] =
                 await sequelize.query(`
                 select balance from t_wallet where cust_no="${cust_no}"
-          `);
+                `);
+            return res.status(200).send({
+                success: true,
+                data: results3[0],
+                message: "Amount successfully debited from the wallet",
+            });
         }
-        return res.status(200).send({
-            success: true,
-            data: results3[0],
-            message: "Amount successfully debited from the wallet",
-        });
+
     } catch (error) {
         return res.status(400).send({
             success: false,
