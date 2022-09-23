@@ -580,7 +580,7 @@ const changePhoneNumber = async (req, res, next) => {
 const getAllItemsMappedToVendor = async (req, res, next) => {
   const { id } = req;
   try {
-    const vendorItems = await Vendor.findAll({
+    const vendorItems = await VendorItem.findAll({
       where: { vendor_id: id },
     });
 
@@ -624,8 +624,10 @@ const getAllItemsMappedToVendor = async (req, res, next) => {
         });
       }
 
-      if (availableQuantity <= lowStock) {
-        isLow = true;
+      if (lowStock) {
+        if (availableQuantity <= lowStock) {
+          isLow = true;
+        }
       }
 
       return {
