@@ -506,7 +506,7 @@ const editPhoneNumber = async (req, res, next) => {
 
 const changePhoneNumber = async (req, res, next) => {
   const { otp } = req.body;
-  const { id } = req.params;
+  const { id } = req;
 
   try {
     const vendor = await Vendor.findOne({
