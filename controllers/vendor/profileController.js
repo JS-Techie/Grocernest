@@ -494,7 +494,7 @@ const editPhoneNumber = async (req, res, next) => {
     });
   } catch (error) {
     await Cache.destroy({
-      where: { id },
+      where: { cust_no: id },
     });
     return res.status(400).send({
       success: false,
@@ -553,7 +553,7 @@ const changePhoneNumber = async (req, res, next) => {
     );
 
     await Cache.destroy({
-      where: { id },
+      where: { cust_no: id },
     });
 
     const updated = await Vendor.findOne({
