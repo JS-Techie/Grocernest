@@ -630,11 +630,12 @@ const getAllItemsMappedToVendor = async (req, res, next) => {
           isLow = true;
         }
       }
-      Object.assign(item, { isLow: isLow });
+
+      let single_item = { ...item.dataValues, "isLow": isLow };
 
       return {
-        item,
-        isLow,
+        single_item,
+        isLow
       };
     });
 
