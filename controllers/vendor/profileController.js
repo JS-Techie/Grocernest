@@ -630,6 +630,7 @@ const getAllItemsMappedToVendor = async (req, res, next) => {
           isLow = true;
         }
       }
+      item.isLow = isLow
 
       return {
         item,
