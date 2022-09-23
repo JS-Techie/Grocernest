@@ -85,6 +85,7 @@ const SubscriptionRouter = require("./routes/subscriptionRoutes");
 const deliveryRouter = require("./routes/deliveryRoutes");
 const adminMilkSubscriptionRouter = require("./routes/admin/milkSubscriptionRoutes");
 const adminVendorRouter = require("./routes/admin/vendorRoutes");
+const adminVendorItemRouter = require("./routes/admin/vendorItemRoutes");
 
 //Vendor routes import
 
@@ -132,6 +133,7 @@ app.use("/admin/task", adminTaskRouter);
 app.use("/admin/attendance", adminAttendanceRouter);
 app.use("/admin/delivery", adminDeliveryRouter);
 app.use("/admin/vendor", adminVendorRouter);
+app.use("/admin/vendor/items", adminVendorItemRouter);
 
 // milk (user)
 app.use("/subscription", SubscriptionRouter);
@@ -154,8 +156,8 @@ const db = require("./services/dbSetupService.js");
 const PORT = process.env.PORT || 8080;
 const start = async () => {
   try {
-    console.log(`Database connected`);
     app.listen(PORT, () => {
+      console.log(`Database connected`);
       console.log(`Server started on port ${PORT}`);
     });
   } catch (error) {

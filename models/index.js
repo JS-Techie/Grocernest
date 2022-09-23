@@ -159,6 +159,8 @@ db.MilkDashboardModel = require("./t_milk_dashboard")(db.sequelize, Sequelize);
 
 db.VendorModel = require("./t_vendor")(db.sequelize, Sequelize);
 
+db.VendorItemModel = require("./t_vendor_item")(db.sequelize, Sequelize);
+
 // Relations between tables
 
 db.MilkDashboardModel.hasMany(db.SubscriptionItemsModel, {

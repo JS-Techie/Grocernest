@@ -310,3 +310,16 @@ CREATE TABLE grocernest_pre_prod.t_feedback (
   `updated_at` timestamp NULL DEFAULT NULL,
   CONSTRAINT t_feedback_PK PRIMARY KEY (id)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
+
+-- grocernest_pre_prod.t_vendor_item definition
+
+CREATE TABLE `t_vendor_item` (
+  `vendor_id` varchar(100) DEFAULT NULL,
+  `item_id` bigint(20) DEFAULT NULL,
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `created_by` bigint(20) NOT NULL,
+  `updated_by` bigint(20) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
