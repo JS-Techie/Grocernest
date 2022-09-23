@@ -11,6 +11,7 @@ const { generateOTP } = require("../../services/otpService");
 
 const Vendor = db.VendorModel;
 const Cache = db.CacheModel;
+const VendorItem = db.VendorItemModel;
 const Item = db.ItemModel;
 const LowStock = db.LowStockConfigModel;
 const Batch = db.BatchModel;
