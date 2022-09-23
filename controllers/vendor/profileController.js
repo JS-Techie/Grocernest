@@ -541,9 +541,11 @@ const changePhoneNumber = async (req, res, next) => {
       });
     }
 
+    const vendorDetails = JSON.parse(cacheDetails.user_details);
+
     await Vendor.update(
       {
-        whatsapp_number: new_phone_number,
+        whatsapp_number: vendorDetails.new_phone_number,
       },
       {
         where: { id },
@@ -612,6 +614,7 @@ const getAllItemsMappedToVendor = async (req, res, next) => {
     });
   }
 };
+
 module.exports = {
   getVendorProfile,
   editVendorProfile,
