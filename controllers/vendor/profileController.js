@@ -11,6 +11,7 @@ const { generateOTP } = require("../../services/otpService");
 
 const Vendor = db.VendorModel;
 const Cache = db.CacheModel;
+const Item = db.ItemModel;
 
 const s3 = new S3(s3Config);
 
@@ -571,6 +572,46 @@ const changePhoneNumber = async (req, res, next) => {
   }
 };
 
+const getAllItemsMappedToVendor = async (req, res, next) => {
+  const { id } = req;
+  try {
+    const vendorItems = await Vendor.findAll({
+      where: { vendor_id: id },
+    });
+
+    if (vendorItems.length === 0) {
+      return res.status(200).send({
+        success: true,
+        data: [],
+        message: "There are no items mapped to current vendor",
+      });
+    }
+
+    const promises = vendorItems.map(async (current) => {
+      const item = await Item.findOne({
+        where: { id: current.item_id },
+      });
+
+      return {
+        item,
+      };
+    });
+
+    const response = await Promise.all(promises);
+
+    return res.status(200).send({
+      success: true,
+      data: response,
+      message: "Found all items mapped to current vendor",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "Something went wrong, please check data field for more details",
+    });
+  }
+};
 module.exports = {
   getVendorProfile,
   editVendorProfile,
@@ -580,4 +621,5 @@ module.exports = {
   verifyOTPOfVendor,
   editPhoneNumber,
   changePhoneNumber,
+  getAllItemsMappedToVendor,
 };
