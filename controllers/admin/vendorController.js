@@ -85,9 +85,7 @@ const createVendor = async (req, res, next) => {
         [Op.or]: [
           { phone_number },
           { whatsapp_number },
-          ,
           { whatsapp_number: phone_number },
-          ,
           { phone_number: whatsapp_number },
         ],
       },
@@ -169,9 +167,9 @@ const editVendor = async (req, res, next) => {
         [Op.or]: [
           { phone_number },
           { whatsapp_number },
-          ,
+
           { whatsapp_number: phone_number },
-          ,
+
           { phone_number: whatsapp_number },
         ],
       },
