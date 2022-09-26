@@ -146,13 +146,13 @@ const createAnItemMappingToVendor = async (req, res, next) => {
 
     items.map(async (current) => {
       const vendorItem = await VendorItem.findOne({
-        where: { vendor_id, item_id: current.item_id },
+        where: { vendor_id, item_id: current },
       });
 
       if (!vendorItem) {
         await VendorItem.create({
           vendor_id,
-          item_id: current.item_id,
+          item_id: current,
           created_by: 1,
         });
       }
