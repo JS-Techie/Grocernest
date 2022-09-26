@@ -195,10 +195,10 @@ module.exports = sequelize => {
     }
   };
   const options = {
-    tableName: "t_lkp_order",
+    tableName: "t_order",
     comment: "",
     indexes: []
   };
-  const TLkpOrderModel = sequelize.define("t_lkp_order_model", attributes, options);
+  const TLkpOrderModel = sequelize.define("t_order_model", attributes, options);
   return TLkpOrderModel;
 };

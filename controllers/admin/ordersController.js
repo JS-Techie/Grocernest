@@ -32,7 +32,7 @@ const Coupon = db.CouponsModel;
 const getAllPendingOrders = async (req, res, next) => {
   try {
     const [results, metadata] = await sequelize.query(`
-            select tc.cust_name, tlo.cust_no , tc.contact_no, tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total from t_lkp_order tlo inner join t_customer tc 
+            select tc.cust_name, tlo.cust_no , tc.contact_no, tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total from t_order tlo inner join t_customer tc 
             where tc.cust_no = tlo.cust_no 
             AND tlo.status="Placed"
           `);
@@ -87,15 +87,15 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
       : " AND tc.contact_no LIKE '%" + phno + "%'";
   const dateQuery =
     startDate == undefined ||
-    startDate == "" ||
-    endDate == undefined ||
-    endDate == ""
+      startDate == "" ||
+      endDate == undefined ||
+      endDate == ""
       ? ""
       : " AND tlo.created_at BETWEEN '" +
-        startDate +
-        "' AND (SELECT DATE_ADD('" +
-        endDate +
-        "', INTERVAL 1 DAY))";
+      startDate +
+      "' AND (SELECT DATE_ADD('" +
+      endDate +
+      "', INTERVAL 1 DAY))";
   const orderId =
     orderid == undefined || orderid == ""
       ? ""
@@ -118,7 +118,7 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
             tlo.applied_discount,
             tlo.wallet_balance_used,
             tlo.final_payable_amount
-            from t_lkp_order tlo inner join t_customer tc 
+            from t_order tlo inner join t_customer tc 
             where tc.cust_no = tlo.cust_no 
             AND tlo.status="${orderType}"
             ${phoneNoQuery}
@@ -196,7 +196,7 @@ const getOrderDetails = async (req, res, next) => {
             tc.email ,
             tc.contact_no ,
             tc.comments 
-            from t_customer tc inner join t_lkp_order tlo 
+            from t_customer tc inner join t_order tlo 
             where
             tc.cust_no = tlo.cust_no and
             tlo.order_id = "${orderId}"
@@ -204,12 +204,12 @@ const getOrderDetails = async (req, res, next) => {
     );
 
     const [singleOrder, metadata] = await sequelize.query(`
-      select t_lkp_order.order_id, t_lkp_order.created_at, t_lkp_order.status, t_item.id, t_item.name, t_order_items.quantity, t_item.image,
-      t_order_items.is_offer, t_order_items.is_gift, t_order_items.offer_price,t_lkp_order.cashback_amount
-    from ((t_lkp_order
-    inner join t_order_items on t_order_items.order_id = t_lkp_order.order_id)
+      select t_order.order_id, t_order.created_at, t_order.status, t_item.id, t_item.name, t_order_items.quantity, t_item.image,
+      t_order_items.is_offer, t_order_items.is_gift, t_order_items.offer_price,t_order.cashback_amount
+    from ((t_order
+    inner join t_order_items on t_order_items.order_id = t_order.order_id)
     inner join t_item on t_item.id = t_order_items.item_id)
-    where t_lkp_order.order_id = ${orderId}`);
+    where t_order.order_id = ${orderId}`);
 
     if (singleOrder.length === 0) {
       return res.status(404).send({
@@ -275,23 +275,23 @@ const getOrderDetails = async (req, res, next) => {
             currentOrderItem.is_offer === 1 ? (isEdit ? true : false) : "",
           offerDetails: currentOffer
             ? {
-                offerID: currentOffer.id,
-                offerType: currentOffer.type,
-                itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
-                quantityOfItemX: currentOffer.item_1_quantity
-                  ? currentOffer.item_1_quantity
-                  : "",
-                itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
-                quantityOfItemY: currentOffer.item_2_quantity
-                  ? currentOffer.item_2_quantity
-                  : "",
-                itemID: currentOffer.item_id ? currentOffer.item_id : "",
-                amountOfDiscount: currentOffer.amount_of_discount
-                  ? currentOffer.amount_of_discount
-                  : "",
-                isPercentage: currentOffer.is_percentage ? true : false,
-                isActive: currentOffer.is_active ? true : false,
-              }
+              offerID: currentOffer.id,
+              offerType: currentOffer.type,
+              itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
+              quantityOfItemX: currentOffer.item_1_quantity
+                ? currentOffer.item_1_quantity
+                : "",
+              itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
+              quantityOfItemY: currentOffer.item_2_quantity
+                ? currentOffer.item_2_quantity
+                : "",
+              itemID: currentOffer.item_id ? currentOffer.item_id : "",
+              amountOfDiscount: currentOffer.amount_of_discount
+                ? currentOffer.amount_of_discount
+                : "",
+              isPercentage: currentOffer.is_percentage ? true : false,
+              isActive: currentOffer.is_active ? true : false,
+            }
             : "",
         };
       }
@@ -392,7 +392,7 @@ const getOrderDetails_unused = async (req, res, next) => {
             tc.email ,
             tc.contact_no ,
             tc.comments 
-            from t_customer tc inner join t_lkp_order tlo 
+            from t_customer tc inner join t_order tlo 
             where
             tc.cust_no = tlo.cust_no and
             tlo.order_id = "${orderId}"
@@ -538,8 +538,8 @@ const changeOrderStatus = async (req, res, next) => {
                   res.dataValues.wallet_balance_used,
                   res.dataValues.cust_no,
                   "cancelled order ID-" +
-                    req.body.orderId +
-                    " wallet balance refunded."
+                  req.body.orderId +
+                  " wallet balance refunded."
                 );
               }
             }
@@ -690,9 +690,9 @@ const changeOrderStatus = async (req, res, next) => {
                 email.toString(),
                 req.body.orderId,
                 "Your order " +
-                  req.body.orderId +
-                  " has been " +
-                  req.body.status
+                req.body.orderId +
+                " has been " +
+                req.body.status
               );
               // whatsapp for cancelled by user
               sendOrderStatusToWhatsapp(
@@ -722,7 +722,7 @@ const changeOrderStatus = async (req, res, next) => {
 const acceptedOrders = async (req, res, next) => {
   try {
     const [results, metadata] = await sequelize.query(`
-            select tc.cust_name, tlo.cust_no , tc.contact_no, tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total from t_lkp_order tlo inner join t_customer tc 
+            select tc.cust_name, tlo.cust_no , tc.contact_no, tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total from t_order tlo inner join t_customer tc 
             where tc.cust_no = tlo.cust_no 
             AND tlo.status="Accepted"
           `);
@@ -799,9 +799,9 @@ const assignTransporter = async (req, res, next) => {
               email.toString(),
               req.body.orderId,
               "Your order " +
-                req.body.orderId +
-                " has been Shipped. Your order will be delivered by " +
-                deliveryBoy.full_name.toString()
+              req.body.orderId +
+              " has been Shipped. Your order will be delivered by " +
+              deliveryBoy.full_name.toString()
             );
 
           // send whatsapp
@@ -836,7 +836,7 @@ const assignTransporter = async (req, res, next) => {
 const getShippedOrders = async (req, res, next) => {
   try {
     const [results, metadata] = await sequelize.query(`
-            select delivery_boy, tc.cust_name, tlo.cust_no , tc.contact_no, tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total from t_lkp_order tlo inner join t_customer tc 
+            select delivery_boy, tc.cust_name, tlo.cust_no , tc.contact_no, tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total from t_order tlo inner join t_customer tc 
             where tc.cust_no = tlo.cust_no 
             AND tlo.status="Shipped"
           `);
@@ -888,7 +888,7 @@ const getShippedOrders = async (req, res, next) => {
 const getDeliveredOrders = async (req, res, next) => {
   try {
     const [results, metadata] = await sequelize.query(`
-            select tc.cust_name, tlo.cust_no , tc.contact_no, tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total, delivery_boy from t_lkp_order tlo inner join t_customer tc 
+            select tc.cust_name, tlo.cust_no , tc.contact_no, tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total, delivery_boy from t_order tlo inner join t_customer tc 
             where tc.cust_no = tlo.cust_no 
             AND tlo.status="Delivered"
           `);
@@ -941,7 +941,7 @@ const getDeliveredOrders = async (req, res, next) => {
 const getCanceledorders = async (req, res, next) => {
   try {
     const [results, metadata] = await sequelize.query(`
-            select tc.cust_name, tlo.cust_no , tc.contact_no, tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total, delivery_boy,tlo.cancellation_reason from t_lkp_order tlo inner join t_customer tc 
+            select tc.cust_name, tlo.cust_no , tc.contact_no, tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total, delivery_boy,tlo.cancellation_reason from t_order tlo inner join t_customer tc 
             where tc.cust_no = tlo.cust_no 
             AND tlo.status="Cancelled"
           `);
@@ -1086,6 +1086,7 @@ const rejectRequestedReturn = async (req, res, next) => {
     });
 
     //Notify customer about status of return reject
+
 
     return res.status(200).send({
       success: true,
