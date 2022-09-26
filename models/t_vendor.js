@@ -78,7 +78,7 @@ module.exports = sequelize => {
     },
     gst: {
       type: DataTypes.STRING(100),
-      allowNull: false,
+      allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
@@ -87,7 +87,7 @@ module.exports = sequelize => {
     },
     aadhar: {
       type: DataTypes.STRING(100),
-      allowNull: false,
+      allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
