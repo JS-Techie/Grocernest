@@ -626,16 +626,16 @@ const getAllItemsMappedToVendor = async (req, res, next) => {
       }
 
       if (lowStock) {
-        if (availableQuantity <= lowStock) {
+        if (availableQuantity <= lowStock.low_stock_qnty) {
           isLow = true;
         }
       }
 
-      let single_item = { ...item.dataValues, "isLow": isLow };
+      let single_item = { ...item.dataValues, isLow: isLow };
 
       return {
         single_item,
-        isLow
+        isLow,
       };
     });
 
