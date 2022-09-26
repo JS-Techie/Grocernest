@@ -232,9 +232,8 @@ const changeStatusOfReturnOrder = async (req, res, next) => {
       return res.status(400).send({
         success: false,
         data: currentOrder.return_status,
-        message: `This return cannot be ${
-          return_status === "a" ? "Accepted" : "Rejected"
-        } as it has already been cancelled by the admin`,
+        message: `This return cannot be ${return_status === "a" ? "Accepted" : "Rejected"
+          } as it has already been cancelled by the admin`,
       });
     }
 
@@ -327,9 +326,8 @@ const changeStatusOfReturnOrder = async (req, res, next) => {
         oldOrderDetails: currentOrder,
         newOrderDetails: updatedOrder,
       },
-      message: `Return for this order was ${
-        return_status === "r" ? "Rejected" : "Accepted"
-      }`,
+      message: `Return for this order was ${return_status === "r" ? "Rejected" : "Accepted"
+        }`,
     });
   } catch (error) {
     return res.status(400).send({
