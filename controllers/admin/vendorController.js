@@ -72,7 +72,14 @@ const createVendor = async (req, res, next) => {
     business_name,
   } = req.body;
   try {
-    if (!first_name || !last_name || !type || !whatsapp_number || !password) {
+    if (
+      !first_name ||
+      !last_name ||
+      !type ||
+      !whatsapp_number ||
+      !password ||
+      !business_name
+    ) {
       return res.status(400).send({
         success: false,
         data: [],

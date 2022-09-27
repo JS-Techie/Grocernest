@@ -33,6 +33,7 @@ const getAllVendorAndMappedItems = async (req, res, next) => {
             itemId: currentItem ? currentItem.id : "",
             itemName: currentItem ? currentItem.name : "",
             image: currentItem ? currentItem.image : "",
+            id: current ? current.id : "",
           };
         });
 
@@ -99,6 +100,7 @@ const getAllItemsMappedToVendorById = async (req, res, next) => {
       });
 
       return {
+        id: current.id,
         currentItem,
         currentVendor,
       };
