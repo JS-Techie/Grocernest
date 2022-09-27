@@ -2,6 +2,8 @@ const db = require("../../models");
 
 const {
   sendOrderStatusToWhatsapp,
+  sendReturnOrderStatusToWhatsapp,
+  sendReturnOrderRejectStatusToWhatsapp
 } = require("../../services/whatsapp/whatsapp");
 
 const Order = db.OrderModel;
@@ -335,6 +337,27 @@ const changeStatusOfReturnOrder = async (req, res, next) => {
     });
 
     //Notify admin and user
+
+    // getting data for sending notification in whatsapp
+    let cust_no = updatedOrder.dataValues.cust_no;
+    const currentCustomer = await Customer.findOne({
+      where: { cust_no: cust_no },
+    });
+    let ph_no = currentCustomer.contact_no;
+    let return_status_full_name = return_status === "r" ? "Rejected" : "Accepted";
+    console.log("========", ph_no, order_id, return_status_full_name);
+
+    //Send notification in whatsapp about order status
+    if (return_status === "a") {
+      if (ph_no && order_id && return_status_full_name)
+        sendReturnOrderStatusToWhatsapp(ph_no, order_id, return_status_full_name);
+    }
+
+    if (return_status === "r") {
+      if (ph_no && order_id && return_status_full_name && reject_reason)
+        sendReturnOrderRejectStatusToWhatsapp(ph_no, order_id, return_status_full_name, reject_reason);
+    }
+
 
     return res.status(200).send({
       success: true,
