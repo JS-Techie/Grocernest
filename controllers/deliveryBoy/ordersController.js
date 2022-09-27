@@ -1,5 +1,9 @@
 const db = require("../../models");
 
+const {
+  sendOrderStatusToWhatsapp,
+} = require("../../services/whatsapp/whatsapp");
+
 const Order = db.OrderModel;
 const OrderItems = db.OrderItemsModel;
 const ReturnOrder = db.ReturnOrdersModel;
@@ -161,7 +165,19 @@ const changeStatusOfDeliveryOrder = async (req, res, next) => {
       include: [{ model: OrderItems }],
     });
 
-    //Notify customer and admin about order
+    // getting data for sending notification in whatsapp
+    let cust_no = updatedOrder.dataValues.cust_no;
+    let order_status = updatedOrder.dataValues.status;
+    const currentCustomer = await Customer.findOne({
+      where: { cust_no: cust_no },
+    });
+    let ph_no = currentCustomer.contact_no;
+
+
+    //Send notification in whatsapp about order status
+    if (ph_no && order_id && order_status)
+      sendOrderStatusToWhatsapp(ph_no, order_id, order_status);
+
 
     return res.status(200).send({
       success: true,
