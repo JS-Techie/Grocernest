@@ -22,8 +22,8 @@ CREATE TABLE `t_wishlist_items` (
   PRIMARY KEY (`item_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = latin1;
 
--- grocernest.t_lkp_order definition
-CREATE TABLE `t_lkp_order` (
+-- grocernest.t_order definition
+CREATE TABLE `t_order` (
   `cust_no` varchar(20) NOT NULL,
   `order_id` varchar(255) NOT NULL,
   `status` enum(
@@ -87,9 +87,9 @@ ALTER TABLE
 ADD
   is_gift BOOL NULL;
 
---adding order_total field in t_lkp_order table
+--adding order_total field in t_order table
 ALTER TABLE
-  ecomm.t_lkp_order
+  ecomm.t_order
 ADD
   total BIGINT(40) NULL;
 

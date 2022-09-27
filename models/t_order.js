@@ -199,6 +199,6 @@ module.exports = sequelize => {
     comment: "",
     indexes: []
   };
-  const TLkpOrderModel = sequelize.define("t_order_model", attributes, options);
-  return TLkpOrderModel;
+  const TOrderModel = sequelize.define("t_order_model", attributes, options);
+  return TOrderModel;
 };
