@@ -114,7 +114,7 @@ const getTasksByStatus = async (req, res, next) => {
 const editTaskStatus = async (req, res, next) => {
   const { user_id } = req;
   const { status, id } = req.params;
-  const { on_hold_reason, base64, extension } = req.body;
+  const { on_hold_reason, base64, extension, done_reason } = req.body;
 
   try {
     const task = await Task.findOne({
@@ -162,6 +162,7 @@ const editTaskStatus = async (req, res, next) => {
         status,
         on_hold_reason,
         document,
+        done_reason,
       },
       {
         where: {

@@ -167,7 +167,7 @@ const createAnItemMappingToVendor = async (req, res, next) => {
     return res.status(201).send({
       success: true,
       data: vendorItems,
-      message: "Mapped Items to vendor successfully",
+      message: "Mapped Item to vendor successfully",
     });
   } catch (error) {
     return res.status(400).send({
