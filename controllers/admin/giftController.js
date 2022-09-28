@@ -225,6 +225,13 @@ const updateStrategy = async (req, res, next) => {
   const { min_purchase, max_purchase, no_of_gifts } = req.body;
 
   try {
+    if (parseInt(max_purchase) <= parseInt(min_purchase)) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "Minimum Purchase cannot be more than Maximum purchase",
+      });
+    }
     const exists = await Strategy.findOne({
       where: { id: strategyID },
     });
