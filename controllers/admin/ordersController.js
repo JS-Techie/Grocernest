@@ -135,6 +135,9 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
       });
     }
 
+    let orders_total = 0;
+
+
     const promises = results.map(async (current) => {
       const dboy_name = await User.findOne({
         where: {
@@ -142,6 +145,8 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
           type_cd: "DELIVERY_BOY",
         },
       });
+
+      orders_total += current.final_payable_amount;
       return {
         cust_name: current.cust_name,
         contact_no: current.contact_no,
@@ -161,9 +166,16 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
 
     const responseArray = await Promise.all(promises);
 
+    // responseArray.push({
+    //   order_total: orders_total
+    // });
+
     return res.status(200).send({
       success: true,
-      data: responseArray,
+      data: {
+        orders: responseArray,
+        order_total: orders_total
+      },
       message: "Successfully fetched all pending orders",
     });
   } catch (error) {
@@ -773,6 +785,7 @@ const assignTransporter = async (req, res, next) => {
       id: transporterName,
     },
   });
+
   Order.update(
     {
       status: "Shipped",
