@@ -158,7 +158,7 @@ const createStrategy = async (req, res, next) => {
     });
   }
 
-  if (max_purchase <= min_purchase) {
+  if (parseInt(max_purchase) <= parseInt(min_purchase)) {
     return res.status(400).send({
       success: false,
       data: [],
