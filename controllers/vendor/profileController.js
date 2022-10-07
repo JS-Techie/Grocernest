@@ -16,6 +16,8 @@ const Item = db.ItemModel;
 const LowStock = db.LowStockConfigModel;
 const Batch = db.BatchModel;
 const Inventory = db.InventoryModel;
+const Brand = db.LkpBrandModel;
+const Category = db.LkpCategoryModel;
 
 const s3 = new S3(s3Config);
 
@@ -598,6 +600,14 @@ const getAllItemsMappedToVendor = async (req, res, next) => {
         where: { id: current.item_id },
       });
 
+      const brand = await Brand.findOne({
+        where: { id: item.brand_id },
+      });
+
+      const category = await Category.findOne({
+        where: { id: item.category_id }
+      })
+
       const lowStock = await LowStock.findOne({
         where: { item_id: current.item_id },
       });
@@ -631,7 +641,7 @@ const getAllItemsMappedToVendor = async (req, res, next) => {
         }
       }
 
-      let single_item = { ...item.dataValues, isLow: isLow };
+      let single_item = { ...item.dataValues, isLow: isLow, brandName: brand.brand_name, categoryName: category.group_name };
 
       return {
         single_item,
