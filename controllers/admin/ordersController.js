@@ -1120,6 +1120,7 @@ const getReturns = async (req, res, next) => {
   try {
     const allOrders = await Order.findAll({
       where: { return_status },
+      order: [['created_at', 'DESC']],
     });
 
     if (allOrders.length === 0) {
