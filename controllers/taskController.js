@@ -147,7 +147,7 @@ const editTaskStatus = async (req, res, next) => {
       //const type = base64.split(";")[0].split("/")[1];
       const params = {
         Bucket: process.env.AWS_BUCKET_NAME,
-        Key: `task/document/${user_id}.${extension}`,
+        Key: `tasks/documents/${user_id}-${id}.${extension}`,
         Body: base64Data,
         ContentEncoding: "base64",
         //ContentType: `image/jpeg`,
