@@ -168,11 +168,11 @@ const editVendor = async (req, res, next) => {
       });
     }
 
-    let samePhoneNumberVendor = false;
+    let samePhoneNumberVendor = null;
 
     if (
       vendor.phone_number !== phone_number ||
-      vendor.phone_number !== whatsapp_number
+      vendor.whatsapp_number !== whatsapp_number
     ) {
       samePhoneNumberVendor = await Vendor.findOne({
         where: {
