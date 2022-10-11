@@ -5,7 +5,7 @@ const {
 module.exports = sequelize => {
   const attributes = {
     vendor_id: {
-      type: DataTypes.STRING(100),
+      type: DataTypes.BIGINT,
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
