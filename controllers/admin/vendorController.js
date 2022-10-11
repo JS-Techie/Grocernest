@@ -168,18 +168,25 @@ const editVendor = async (req, res, next) => {
       });
     }
 
-    const samePhoneNumberVendor = await Vendor.findOne({
-      where: {
-        [Op.or]: [
-          { phone_number },
-          { whatsapp_number },
+    let samePhoneNumberVendor = false;
 
-          { whatsapp_number: phone_number },
+    if (
+      vendor.phone_number !== phone_number ||
+      vendor.phone_number !== whatsapp_number
+    ) {
+      samePhoneNumberVendor = await Vendor.findOne({
+        where: {
+          [Op.or]: [
+            { phone_number },
+            { whatsapp_number },
 
-          { phone_number: whatsapp_number },
-        ],
-      },
-    });
+            { whatsapp_number: phone_number },
+
+            { phone_number: whatsapp_number },
+          ],
+        },
+      });
+    }
 
     if (samePhoneNumberVendor) {
       return res.status(400).send({
