@@ -118,7 +118,6 @@ const createVendor = async (req, res, next) => {
     let encryptedPassword = bcrypt.hashSync(password, salt);
 
     const newVendor = await Vendor.create({
-      id: uniq(),
       email,
       first_name,
       last_name,
