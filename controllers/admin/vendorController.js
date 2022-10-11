@@ -238,6 +238,7 @@ const editVendor = async (req, res, next) => {
         noOfRowsUpdated: update,
         newVendor: updatedVendor,
       },
+      message: "Successfully edited details of requested vendor",
     });
   } catch (error) {
     return res.status(400).send({
