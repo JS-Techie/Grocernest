@@ -1,6 +1,6 @@
 const db = require("../../models");
 
-const Vendor = db.VendorModel;
+const Vendor = db.SupplierModel;
 
 const getAllOrdersOfVendor = async (req, res, next) => {};
 

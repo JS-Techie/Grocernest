@@ -9,7 +9,7 @@ const bcrypt = require("bcryptjs");
 
 const { generateOTP } = require("../../services/otpService");
 
-const Vendor = db.VendorModel;
+const Vendor = db.SupplierModel;
 const Cache = db.CacheModel;
 const VendorItem = db.VendorItemModel;
 const Item = db.ItemModel;
@@ -605,8 +605,8 @@ const getAllItemsMappedToVendor = async (req, res, next) => {
       });
 
       const category = await Category.findOne({
-        where: { id: item.category_id }
-      })
+        where: { id: item.category_id },
+      });
 
       const lowStock = await LowStock.findOne({
         where: { item_id: current.item_id },
@@ -641,7 +641,12 @@ const getAllItemsMappedToVendor = async (req, res, next) => {
         }
       }
 
-      let single_item = { ...item.dataValues, isLow: isLow, brandName: brand.brand_name, categoryName: category.group_name };
+      let single_item = {
+        ...item.dataValues,
+        isLow: isLow,
+        brandName: brand.brand_name,
+        categoryName: category.group_name,
+      };
 
       return {
         single_item,

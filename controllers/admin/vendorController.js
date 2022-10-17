@@ -4,7 +4,8 @@ const bcrypt = require("bcryptjs");
 
 const db = require("../../models");
 
-const Vendor = db.VendorModel;
+const Vendor = db.SupplierModel;
+
 
 const getAllVendors = async (req, res, next) => {
   try {

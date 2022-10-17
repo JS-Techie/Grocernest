@@ -13,50 +13,14 @@ module.exports = sequelize => {
       comment: null,
       field: "id"
     },
-    supplier_name: {
+    first_name: {
       type: DataTypes.STRING(250),
       allowNull: false,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "supplier_name"
-    },
-    address: {
-      type: DataTypes.STRING(500),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "address"
-    },
-    contact_no: {
-      type: DataTypes.STRING(20),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "contact_no"
-    },
-    contact_email: {
-      type: DataTypes.STRING(50),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "contact_email"
-    },
-    active_ind: {
-      type: DataTypes.CHAR(1),
-      allowNull: false,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "active_ind"
+      field: "first_name"
     },
     created_by: {
       type: DataTypes.BIGINT,
@@ -102,6 +66,150 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "supplier_code"
+    },
+    last_name: {
+      type: DataTypes.STRING(250),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "last_name"
+    },
+    whatsapp_number: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "whatsapp_number"
+    },
+    phone_number: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "phone_number"
+    },
+    password: {
+      type: DataTypes.STRING(500),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "password"
+    },
+    email: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "email"
+    },
+    type: {
+      type: DataTypes.ENUM('g', 'c', 'b'),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "type"
+    },
+    gst: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "gst"
+    },
+    aadhar: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "aadhar"
+    },
+    billing_address: {
+      type: DataTypes.STRING(500),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "billing_address"
+    },
+    current_address: {
+      type: DataTypes.STRING(500),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "current_address"
+    },
+    pan: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "pan"
+    },
+    image: {
+      type: DataTypes.STRING(500),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "image"
+    },
+    cin: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "cin"
+    },
+    login_attempt: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "login_attempt"
+    },
+    new_phone_number: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "new_phone_number"
+    },
+    business_name: {
+      type: DataTypes.STRING(200),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "business_name"
     }
   };
   const options = {
