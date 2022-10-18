@@ -1,5 +1,5 @@
 const {
-  DataTypes
+  DataTypes, literal
 } = require('sequelize');
 
 module.exports = sequelize => {
@@ -7,7 +7,7 @@ module.exports = sequelize => {
     id: {
       type: DataTypes.BIGINT,
       allowNull: false,
-      defaultValue: null,
+      defaultValue: literal("nextval(supplier_seq)"),
       primaryKey: true,
       autoIncrement: false,
       comment: null,
@@ -15,7 +15,7 @@ module.exports = sequelize => {
     },
     first_name: {
       type: DataTypes.STRING(250),
-      allowNull: false,
+      allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
@@ -210,6 +210,15 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "business_name"
+    },
+    active_ind: {
+      type: DataTypes.CHAR(1),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "active_ind"
     }
   };
   const options = {
