@@ -147,7 +147,7 @@ const createVendor = async (req, res, next) => {
     const newUserRole = await UserRole.create({
       user_id: newUser.id,
       role_id: 5,
-      active_ind: 1,
+      active_ind: 'Y',
       created_by: 1,
     });
 
