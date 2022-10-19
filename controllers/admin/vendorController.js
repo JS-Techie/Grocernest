@@ -134,15 +134,12 @@ const createVendor = async (req, res, next) => {
 
     let randomPassword = bcrypt.hashSync(uniq(), salt);
 
-    const newUserRole = await UserRole.create({
-      user_id: newVendor.id,
-      role_id: 5,
-      active_ind: "Y",
-      created_by: 1,
+    const currentVendor = await Vendor.findOne({
+      where: { whatsapp_number },
     });
 
     const newUser = await User.create({
-      id: newVendor.id,
+      id: currentVendor.id,
       full_name: first_name + " " + last_name,
       email: uniq(),
       password: randomPassword,
@@ -151,9 +148,20 @@ const createVendor = async (req, res, next) => {
       created_by: 1,
     });
 
+    const newUserRole = await UserRole.create({
+      user_id: currentVendor.id,
+      role_id: 5,
+      active_ind: "Y",
+      created_by: 1,
+    });
+
     return res.status(201).send({
       success: true,
-      data: newVendor,
+      data: {
+        newVendor,
+        newUser,
+        newUserRole,
+      },
       message: "New vendor created successfully",
     });
   } catch (error) {
