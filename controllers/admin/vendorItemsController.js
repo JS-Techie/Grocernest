@@ -1,6 +1,6 @@
 const db = require("../../models");
 
-const Vendor = db.VendorModel;
+const Vendor = db.SupplierModel;
 const VendorItem = db.VendorItemModel;
 const Item = db.ItemModel;
 
