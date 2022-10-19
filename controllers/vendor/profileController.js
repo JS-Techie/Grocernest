@@ -73,7 +73,7 @@ const loginVendor = async (req, res, next) => {
         id,
         userType,
       },
-      "VendorPassword123#",
+      "cosmetixkey",
       {
         expiresIn: "300d", //Subject to change
       }
