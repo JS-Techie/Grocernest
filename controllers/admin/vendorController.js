@@ -134,6 +134,13 @@ const createVendor = async (req, res, next) => {
 
     let randomPassword = bcrypt.hashSync(uniq(), salt);
 
+    const newUserRole = await UserRole.create({
+      user_id: newUser.id,
+      role_id: 5,
+      active_ind: "Y",
+      created_by: 1,
+    });
+
     const newUser = await User.create({
       id: newVendor.id,
       full_name: first_name + " " + last_name,
@@ -141,13 +148,6 @@ const createVendor = async (req, res, next) => {
       password: randomPassword,
       type_cd: "VENDOR",
       active_ind: "Y",
-      created_by: 1,
-    });
-
-    const newUserRole = await UserRole.create({
-      user_id: newUser.id,
-      role_id: 5,
-      active_ind: 'Y',
       created_by: 1,
     });
 
