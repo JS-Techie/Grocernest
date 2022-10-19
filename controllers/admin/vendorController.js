@@ -5,7 +5,9 @@ const bcrypt = require("bcryptjs");
 const db = require("../../models");
 
 const Vendor = db.SupplierModel;
-
+const User = db.UserModel;
+const UserRole = db.UserRoleModel;
+const Role = db.RoleModel;
 
 const getAllVendors = async (req, res, next) => {
   try {
@@ -127,6 +129,25 @@ const createVendor = async (req, res, next) => {
       whatsapp_number,
       password: encryptedPassword,
       business_name,
+      created_by: 1,
+    });
+
+    let randomPassword = bcrypt.hashSync(uniq(), salt);
+
+    const newUser = await User.create({
+      id: newVendor.id,
+      full_name: first_name + " " + last_name,
+      email: uniq(),
+      password: randomPassword,
+      type_cd: "VENDOR",
+      active_ind: "Y",
+      created_by: 1,
+    });
+
+    const newUserRole = await UserRole.create({
+      user_id: newUser.id,
+      role_id: 5,
+      active_ind: 1,
       created_by: 1,
     });
 
