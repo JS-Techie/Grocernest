@@ -76,7 +76,7 @@ const loginVendor = async (req, res, next) => {
         sub: whatsapp_number,
         CURRENTLOCALE: null,
         USERTYPEID: null,
-        iss: "Admin",
+        iss: "VENDOR",
         USERROLELIST: [{ roleName: "VENDOR", roleDesc: "VENDOR", roleId: 5 }],
         USERMODULELIST: [
           {
