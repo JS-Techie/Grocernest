@@ -70,8 +70,20 @@ const loginVendor = async (req, res, next) => {
     const { id } = vendor;
     const token = jwt.sign(
       {
-        userId : id,
+        USERID: id,
         userType,
+        sub: whatsapp_number,
+        CURRENTLOCALE: null,
+        USERTYPEID: null,
+        iss: "Admin",
+        USERROLELIST: [{ roleName: "VENDOR", roleDesc: "VENDOR", roleId: 5 }],
+        USERMODULELIST: [
+          {
+            moduleName: "VENDOR",
+            moduleDesc: "VENDOR",
+          },
+        ],
+        jti: 5,
       },
       "cosmetixkey",
       {
