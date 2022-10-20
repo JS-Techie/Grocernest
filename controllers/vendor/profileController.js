@@ -71,6 +71,7 @@ const loginVendor = async (req, res, next) => {
     const token = jwt.sign(
       {
         USERID: id,
+        aud : 4,
         userType,
         sub: whatsapp_number,
         CURRENTLOCALE: null,

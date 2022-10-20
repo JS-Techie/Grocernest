@@ -15,7 +15,7 @@ const authenticate = async (req, res, next) => {
   try {
     //Verify the token
     const vendor = jwt.verify(token, "VendorPassword123#");
-    req.id = vendor.userId;
+    req.id = vendor.USERID;
     next();
   } catch (error) {
     return res.status(400).send({
