@@ -70,7 +70,7 @@ const loginVendor = async (req, res, next) => {
     const { id } = vendor;
     const token = jwt.sign(
       {
-        id,
+        userId : id,
         userType,
       },
       "cosmetixkey",
