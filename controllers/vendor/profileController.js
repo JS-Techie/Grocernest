@@ -70,10 +70,10 @@ const loginVendor = async (req, res, next) => {
     const { id } = vendor;
     const token = jwt.sign(
       {
-        USERID: `"${id}"`,
+        USERID: id.toString(),
         aud: "4",
         userType,
-        sub: `"${whatsapp_number}"`,
+        sub: whatsapp_number.toString(),
         CURRENTLOCALE: null,
         USERTYPEID: null,
         iss: "VENDOR",
