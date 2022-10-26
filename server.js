@@ -1,5 +1,6 @@
 require("dotenv").config();
 const refferal_job = require("./utils/CRON_REF_1");
+const pos_refferal_job = require("./utils/CRON_REF_3");
 // Swagger UI Setup
 const swaggerUI = require("swagger-ui-express");
 const endPoint = require("./services/swagger/swagger-output.json");
@@ -167,3 +168,4 @@ const start = async () => {
 
 start();
 refferal_job();
+pos_refferal_job();
