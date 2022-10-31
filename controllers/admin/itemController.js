@@ -46,7 +46,7 @@ const uploadMultipleImages = async (req, res, next) => {
       const url = s3UploadResponse.Location;
 
       return {
-        imageName: currentImage.fileName,
+        imageName: currentImage.name,
         url,
         serialNumber: currentImage.serialNumber,
       };
