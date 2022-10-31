@@ -134,6 +134,7 @@ const createVendor = async (req, res, next) => {
       password: encryptedPassword,
       business_name,
       created_by: 1,
+      active_ind: "Y"
     });
 
     let randomPassword = bcrypt.hashSync(uniq(), salt);
@@ -202,7 +203,7 @@ const editVendor = async (req, res, next) => {
       });
     }
 
-   // let samePhoneNumberVendor = null;
+    // let samePhoneNumberVendor = null;
 
     // if (
     //   vendor.phone_number !== phone_number ||
