@@ -6,7 +6,7 @@ const Item = db.ItemModel;
 const s3 = new S3(s3Config);
 
 const uploadMultipleImages = async (req, res, next) => {
-  const { id, uploadedImages } = req.params;
+  const { id, uploadedImages } = req.body;
   try {
     const currentItem = await Item.findOne({
       where: { id },
