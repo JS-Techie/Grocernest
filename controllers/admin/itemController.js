@@ -104,7 +104,7 @@ const editUploadedImages = async (req, res, next) => {
     const promises = uploadedImages.map(async (currentImage) => {
       let currentImageUrl = "";
 
-      if (current.edit) {
+      if (currentImage.edit) {
         const base64Data = new Buffer.from(
           currentImage.base64.replace(/^data:image\/\w+;base64,/, ""),
           "base64"
