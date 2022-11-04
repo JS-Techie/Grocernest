@@ -1,6 +1,7 @@
 const db = require("../../models");
 const S3 = require("aws-sdk/clients/s3");
 const s3Config = require("../../config/s3Config");
+const uniq = require("uniqid");
 
 const Item = db.ItemModel;
 const s3 = new S3(s3Config);
@@ -36,7 +37,9 @@ const uploadMultipleImages = async (req, res, next) => {
       //const type = base64.split(";")[0].split("/")[1];
       const params = {
         Bucket: process.env.AWS_BUCKET_NAME,
-        Key: `item/images/${id}-${currentImage.serialNumber}.${currentImage.extension}`,
+        Key: `item/images/${uniq()}-${id}-${currentImage.serialNumber}.${
+          currentImage.extension
+        }`,
         Body: base64Data,
         ContentEncoding: "base64",
         ContentType: `image/jpeg`,
@@ -93,11 +96,28 @@ const editUploadedImages = async (req, res, next) => {
       });
     }
 
+    // if (!uploadedImages) {
+    //   return res.status(404).send({
+    //     success: false,
+    //     data: [],
+    //     message: "Please upload the images",
+    //   });
+    // }
+
     if (uploadedImages.length === 0) {
-      return res.status(404).send({
-        success: false,
+      await Item.update(
+        {
+          image: JSON.stringify([]),
+        },
+        {
+          where: { id },
+        }
+      );
+
+      return res.status(200).send({
+        success: true,
         data: [],
-        message: "Please upload the images",
+        message: "Successfully deleted the images",
       });
     }
 
@@ -112,7 +132,9 @@ const editUploadedImages = async (req, res, next) => {
 
         const params = {
           Bucket: process.env.AWS_BUCKET_NAME,
-          Key: `item/images/${id}-${currentImage.serialNumber}.${currentImage.extension}`,
+          Key: `item/images/${uniq()}-${id}-${currentImage.serialNumber}.${
+            currentImage.extension
+          }`,
           Body: base64Data,
           ContentEncoding: "base64",
           ContentType: `image/jpeg`,
@@ -192,7 +214,9 @@ const deleteImage = async (req, res, next) => {
 
     const params = {
       Bucket: process.env.AWS_BUCKET_NAME,
-      Key: `item/images/${id}-${image.serialNumber}.${image.extension}`,
+      Key: `item/images/${uniq()}-${id}-${image.serialNumber}.${
+        image.extension
+      }`,
     };
 
     let deleteSuccess = true;
