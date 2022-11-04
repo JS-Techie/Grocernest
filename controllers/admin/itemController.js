@@ -22,10 +22,18 @@ const uploadMultipleImages = async (req, res, next) => {
     }
 
     if (uploadedImages.length === 0) {
-      return res.status(400).send({
-        success: false,
+      await Item.update(
+        {
+          image: JSON.stringify([]),
+        },
+        {
+          where: { id },
+        }
+      );
+      return res.status(200).send({
+        success: true,
         data: [],
-        message: "Please upload the images for this item",
+        message: "Item has been uploaded without any images",
       });
     }
 
