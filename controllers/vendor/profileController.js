@@ -9,8 +9,15 @@ const bcrypt = require("bcryptjs");
 
 const { generateOTP } = require("../../services/otpService");
 
-const Vendor = db.VendorModel;
+const Vendor = db.SupplierModel;
 const Cache = db.CacheModel;
+const VendorItem = db.VendorItemModel;
+const Item = db.ItemModel;
+const LowStock = db.LowStockConfigModel;
+const Batch = db.BatchModel;
+const Inventory = db.InventoryModel;
+const Brand = db.LkpBrandModel;
+const Category = db.LkpCategoryModel;
 
 const s3 = new S3(s3Config);
 
@@ -63,10 +70,23 @@ const loginVendor = async (req, res, next) => {
     const { id } = vendor;
     const token = jwt.sign(
       {
-        id,
+        USERID: id.toString(),
+        aud: "4",
         userType,
+        sub: whatsapp_number.toString(),
+        CURRENTLOCALE: null,
+        USERTYPEID: null,
+        iss: "VENDOR",
+        USERROLELIST: [{ roleName: "VENDOR", roleDesc: "VENDOR", roleId: 5 }],
+        USERMODULELIST: [
+          {
+            moduleName: "VENDOR",
+            moduleDesc: "VENDOR",
+          },
+        ],
+        jti: 5,
       },
-      "VendorPassword123#",
+      "cosmetixkey",
       {
         expiresIn: "300d", //Subject to change
       }
@@ -493,7 +513,7 @@ const editPhoneNumber = async (req, res, next) => {
     });
   } catch (error) {
     await Cache.destroy({
-      where: { id },
+      where: { cust_no: id },
     });
     return res.status(400).send({
       success: false,
@@ -505,7 +525,7 @@ const editPhoneNumber = async (req, res, next) => {
 
 const changePhoneNumber = async (req, res, next) => {
   const { otp } = req.body;
-  const { id } = req.params;
+  const { id } = req;
 
   try {
     const vendor = await Vendor.findOne({
@@ -540,9 +560,11 @@ const changePhoneNumber = async (req, res, next) => {
       });
     }
 
+    const vendorDetails = JSON.parse(cacheDetails.user_details);
+
     await Vendor.update(
       {
-        whatsapp_number: new_phone_number,
+        whatsapp_number: vendorDetails.new_phone_number,
       },
       {
         where: { id },
@@ -550,7 +572,7 @@ const changePhoneNumber = async (req, res, next) => {
     );
 
     await Cache.destroy({
-      where: { id },
+      where: { cust_no: id },
     });
 
     const updated = await Vendor.findOne({
@@ -571,6 +593,96 @@ const changePhoneNumber = async (req, res, next) => {
   }
 };
 
+const getAllItemsMappedToVendor = async (req, res, next) => {
+  const { id } = req;
+  try {
+    const vendorItems = await VendorItem.findAll({
+      where: { vendor_id: id },
+    });
+
+    if (vendorItems.length === 0) {
+      return res.status(200).send({
+        success: true,
+        data: [],
+        message: "There are no items mapped to current vendor",
+      });
+    }
+
+    const promises = vendorItems.map(async (current) => {
+      const item = await Item.findOne({
+        where: { id: current.item_id },
+      });
+
+      const brand = await Brand.findOne({
+        where: { id: item.brand_id },
+      });
+
+      const category = await Category.findOne({
+        where: { id: item.category_id },
+      });
+
+      const lowStock = await LowStock.findOne({
+        where: { item_id: current.item_id },
+      });
+
+      let availableQuantity = 0;
+      let isLow = false;
+      const batches = await Batch.findAll({
+        where: { item_id: current.item_id },
+      });
+
+      if (batches.length > 0) {
+        batches.map(async (currentBatch) => {
+          const currentInventory = await Inventory.findOne({
+            where: {
+              item_id: current.item_id,
+              batch_id: currentBatch.id,
+              location_id: 4,
+              balance_type: 1,
+            },
+          });
+
+          if (currentInventory) {
+            availableQuantity += currentInventory.quantity;
+          }
+        });
+      }
+
+      if (lowStock) {
+        if (availableQuantity <= lowStock.low_stock_qnty) {
+          isLow = true;
+        }
+      }
+
+      let single_item = {
+        ...item.dataValues,
+        isLow: isLow,
+        brandName: brand.brand_name,
+        categoryName: category.group_name,
+      };
+
+      return {
+        single_item,
+        isLow,
+      };
+    });
+
+    const response = await Promise.all(promises);
+
+    return res.status(200).send({
+      success: true,
+      data: response,
+      message: "Found all items mapped to current vendor",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "Something went wrong, please check data field for more details",
+    });
+  }
+};
+
 module.exports = {
   getVendorProfile,
   editVendorProfile,
@@ -580,4 +692,5 @@ module.exports = {
   verifyOTPOfVendor,
   editPhoneNumber,
   changePhoneNumber,
+  getAllItemsMappedToVendor,
 };

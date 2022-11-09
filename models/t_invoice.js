@@ -205,6 +205,24 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "total_discount"
+    },
+    cashback_processed: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "cashback_processed"
+    },
+    cashback_amount: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "cashback_amount"
     }
   };
   const options = {

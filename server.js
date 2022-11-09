@@ -1,5 +1,6 @@
 require("dotenv").config();
 const refferal_job = require("./utils/CRON_REF_1");
+const pos_refferal_job = require("./utils/CRON_REF_3");
 // Swagger UI Setup
 const swaggerUI = require("swagger-ui-express");
 const endPoint = require("./services/swagger/swagger-output.json");
@@ -71,6 +72,7 @@ const adminLeaveRouter = require("./routes/admin/leaveRoutes");
 const adminTaskRouter = require("./routes/admin/taskRoutes");
 const adminAttendanceRouter = require("./routes/admin/attendanceRoutes");
 const adminDeliveryRouter = require("./routes/admin/deliveryBoyRoutes");
+const adminItemsRouter = require("./routes/admin/itemRoutes");
 
 //delivery boy routes
 
@@ -85,6 +87,7 @@ const SubscriptionRouter = require("./routes/subscriptionRoutes");
 const deliveryRouter = require("./routes/deliveryRoutes");
 const adminMilkSubscriptionRouter = require("./routes/admin/milkSubscriptionRoutes");
 const adminVendorRouter = require("./routes/admin/vendorRoutes");
+const adminVendorItemRouter = require("./routes/admin/vendorItemRoutes");
 
 //Vendor routes import
 
@@ -132,6 +135,8 @@ app.use("/admin/task", adminTaskRouter);
 app.use("/admin/attendance", adminAttendanceRouter);
 app.use("/admin/delivery", adminDeliveryRouter);
 app.use("/admin/vendor", adminVendorRouter);
+app.use("/admin/vendor/items", adminVendorItemRouter);
+app.use("/admin/items", adminItemsRouter);
 
 // milk (user)
 app.use("/subscription", SubscriptionRouter);
@@ -154,8 +159,8 @@ const db = require("./services/dbSetupService.js");
 const PORT = process.env.PORT || 8080;
 const start = async () => {
   try {
-    console.log(`Database connected`);
     app.listen(PORT, () => {
+      console.log(`Database connected`);
       console.log(`Server started on port ${PORT}`);
     });
   } catch (error) {
@@ -165,3 +170,4 @@ const start = async () => {
 
 start();
 refferal_job();
+pos_refferal_job();

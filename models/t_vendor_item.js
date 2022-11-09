@@ -1,52 +1,35 @@
 const {
-  DataTypes, literal
+  DataTypes
 } = require('sequelize');
 
 module.exports = sequelize => {
   const attributes = {
+    vendor_id: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "vendor_id"
+    },
+    item_id: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "item_id"
+    },
     id: {
       type: DataTypes.BIGINT,
       allowNull: false,
-      defaultValue: literal("nextval(t_user_role_seq)"),
+      defaultValue: null,
       primaryKey: true,
-      autoIncrement: false,
+      autoIncrement: true,
       comment: null,
       field: "id"
-    },
-    user_id: {
-      type: DataTypes.BIGINT,
-      allowNull: false,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "user_id",
-      references: {
-        key: "id",
-        model: "t_user_model"
-      }
-    },
-    role_id: {
-      type: DataTypes.BIGINT,
-      allowNull: false,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "role_id",
-      references: {
-        key: "id",
-        model: "t_role_model"
-      }
-    },
-    active_ind: {
-      type: DataTypes.CHAR(1),
-      allowNull: false,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "active_ind"
     },
     created_by: {
       type: DataTypes.BIGINT,
@@ -68,7 +51,7 @@ module.exports = sequelize => {
     },
     created_at: {
       type: DataTypes.DATE,
-      allowNull: false,
+      allowNull: true,
       defaultValue: sequelize.fn('current_timestamp'),
       primaryKey: false,
       autoIncrement: false,
@@ -86,20 +69,10 @@ module.exports = sequelize => {
     }
   };
   const options = {
-    tableName: "t_user_role",
+    tableName: "t_vendor_item",
     comment: "",
-    indexes: [{
-      name: "roleid_fkey",
-      unique: false,
-      type: "BTREE",
-      fields: ["role_id"]
-    }, {
-      name: "userid_fkey",
-      unique: false,
-      type: "BTREE",
-      fields: ["user_id"]
-    }]
+    indexes: []
   };
-  const TUserRoleModel = sequelize.define("t_user_role_model", attributes, options);
-  return TUserRoleModel;
+  const TVendorItemModel = sequelize.define("t_vendor_item_model", attributes, options);
+  return TVendorItemModel;
 };

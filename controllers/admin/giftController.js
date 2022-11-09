@@ -158,11 +158,19 @@ const createStrategy = async (req, res, next) => {
     });
   }
 
-  if (max_purchase <= min_purchase) {
+  if (parseInt(max_purchase) <= parseInt(min_purchase)) {
     return res.status(400).send({
       success: false,
       data: [],
       message: "Minimum Purchase cannot be more than Maximum purchase",
+    });
+  }
+
+  if (parseInt(no_of_gifts) === 0) {
+    return res.status(400).send({
+      success: false,
+      data: [],
+      message: "Number of gifts applicable has to be more than zero",
     });
   }
 
@@ -225,6 +233,22 @@ const updateStrategy = async (req, res, next) => {
   const { min_purchase, max_purchase, no_of_gifts } = req.body;
 
   try {
+    if (parseInt(max_purchase) <= parseInt(min_purchase)) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "Minimum Purchase cannot be more than Maximum purchase",
+      });
+    }
+
+    if (parseInt(no_of_gifts) === 0) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "Number of gifts applicable has to be more than zero",
+      });
+    }
+
     const exists = await Strategy.findOne({
       where: { id: strategyID },
     });

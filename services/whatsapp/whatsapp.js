@@ -198,6 +198,50 @@ const sendDeliveryBoyNotificationToWhatsapp = (name, order_id, contact_no) => {
     .catch((err) => {
       console.log("Template message err:", err);
     });
+};
+
+const sendReturnOrderStatusToWhatsapp = (contact_no, order_id, return_status) => {
+  // Hi, Your order return for order id [1234] is [Accepted].
+  client.message
+    .send({
+      channel: "whatsapp",
+      source: "919433804769",
+      destination: "91" + contact_no.toString(),
+      "src.name": "grocernest",
+      message: {
+        isHSM: "true",
+        type: "text",
+        text: "Hi, Your order return for order id " + "*" + order_id + "*" + " is " + return_status + ".",
+      },
+    })
+    .then((response) => {
+      console.log("Template message sent", response);
+    })
+    .catch((err) => {
+      console.log("Template message err:", err);
+    });
+}
+
+const sendReturnOrderRejectStatusToWhatsapp = (contact_no, order_id, return_status, reject_reason) => {
+  // Hi, Your order return for order id [1234] is [Accepted].
+  client.message
+    .send({
+      channel: "whatsapp",
+      source: "919433804769",
+      destination: "91" + contact_no.toString(),
+      "src.name": "grocernest",
+      message: {
+        isHSM: "true",
+        type: "text",
+        text: "Hi, Your order return for order id " + "*" + order_id + "*" + " is " + return_status + ". Due to this reason: " + "*" + reject_reason + "*" + "."
+      },
+    })
+    .then((response) => {
+      console.log("Template message sent", response);
+    })
+    .catch((err) => {
+      console.log("Template message err:", err);
+    });
 }
 
 
@@ -230,5 +274,7 @@ module.exports = {
   sendOrderStatusToWhatsapp,
   sendOrderShippedToWhatsapp,
   sendAdminCancelledOrderStatusToWhatsapp,
-  sendPickupBoyNotificationToWhatsapp
+  sendPickupBoyNotificationToWhatsapp,
+  sendReturnOrderStatusToWhatsapp,
+  sendReturnOrderRejectStatusToWhatsapp
 };

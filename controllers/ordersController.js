@@ -143,6 +143,7 @@ const getAllOrders = async (req, res, next) => {
         cashback_amount: currentOrder.cashback_amount,
         itemDetails: responseWithoutUndefined,
         return_status: currentOrder.return_status,
+        reject_reason: currentOrder.reject_reason,
       };
     });
 
@@ -174,14 +175,14 @@ const getOrderByOrderId = async (req, res, next) => {
     //Get that order according to its id
 
     const [singleOrder, metadata] =
-      await sequelize.query(`select t_lkp_order.order_id, t_lkp_order.created_at, t_lkp_order.status, t_lkp_order.return_status,t_item.id, t_item.name, t_order_items.quantity, t_item.image,
+      await sequelize.query(`select t_order.order_id, t_order.created_at, t_order.status, t_order.return_status,t_item.id, t_item.name, t_order_items.quantity, t_item.image,
       t_order_items.is_offer, t_order_items.is_gift, t_order_items.offer_price
-    from ((t_lkp_order
-    inner join t_order_items on t_order_items.order_id = t_lkp_order.order_id)
+    from ((t_order
+    inner join t_order_items on t_order_items.order_id = t_order.order_id)
     inner join t_item on t_item.id = t_order_items.item_id)
-    where t_lkp_order.cust_no = "${currentUser}"
+    where t_order.cust_no = "${currentUser}"
     AND 
-    t_lkp_order.order_id = ${orderId}`);
+    t_order.order_id = ${orderId}`);
 
     if (singleOrder.length === 0) {
       return res.status(404).send({

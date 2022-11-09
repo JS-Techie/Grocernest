@@ -4,7 +4,10 @@ const bcrypt = require("bcryptjs");
 
 const db = require("../../models");
 
-const Vendor = db.VendorModel;
+const Vendor = db.SupplierModel;
+const User = db.UserModel;
+const UserRole = db.UserRoleModel;
+const Role = db.RoleModel;
 
 const getAllVendors = async (req, res, next) => {
   try {
@@ -72,7 +75,14 @@ const createVendor = async (req, res, next) => {
     business_name,
   } = req.body;
   try {
-    if (!first_name || !last_name || type || whatsapp_number || password) {
+    if (
+      !first_name ||
+      !last_name ||
+      !type ||
+      !whatsapp_number ||
+      !password ||
+      !business_name
+    ) {
       return res.status(400).send({
         success: false,
         data: [],
@@ -82,18 +92,20 @@ const createVendor = async (req, res, next) => {
 
     const vendor = await Vendor.findOne({
       where: {
-        [Op.or]: [
-          { phone_number },
-          { whatsapp_number },
-          ,
-          { whatsapp_number: phone_number },
-          ,
-          { phone_number: whatsapp_number },
-        ],
+        [Op.or]: [{ whatsapp_number }, { whatsapp_number: phone_number }],
       },
     });
 
-    if (vendor) {
+    let vendorExists;
+    if (phone_number || phone_number !== "") {
+      vendorExists = await Vendor.findOne({
+        where: {
+          [Op.or]: [{ phone_number }, { phone_number: whatsapp_number }],
+        },
+      });
+    }
+
+    if (vendor || vendorExists) {
       return res.status(400).send({
         success: false,
         data: vendor,
@@ -113,7 +125,6 @@ const createVendor = async (req, res, next) => {
     let encryptedPassword = bcrypt.hashSync(password, salt);
 
     const newVendor = await Vendor.create({
-      id: uniq(),
       email,
       first_name,
       last_name,
@@ -123,11 +134,39 @@ const createVendor = async (req, res, next) => {
       password: encryptedPassword,
       business_name,
       created_by: 1,
+      active_ind: "Y"
+    });
+
+    let randomPassword = bcrypt.hashSync(uniq(), salt);
+
+    const currentVendor = await Vendor.findOne({
+      where: { whatsapp_number },
+    });
+
+    const newUser = await User.create({
+      id: currentVendor.id,
+      full_name: first_name + " " + last_name,
+      email: uniq(),
+      password: randomPassword,
+      type_cd: "VENDOR",
+      active_ind: "Y",
+      created_by: 1,
+    });
+
+    const newUserRole = await UserRole.create({
+      user_id: currentVendor.id,
+      role_id: 5,
+      active_ind: "Y",
+      created_by: 1,
     });
 
     return res.status(201).send({
       success: true,
-      data: newVendor,
+      data: {
+        newVendor,
+        newUser,
+        newUserRole,
+      },
       message: "New vendor created successfully",
     });
   } catch (error) {
@@ -164,27 +203,64 @@ const editVendor = async (req, res, next) => {
       });
     }
 
-    const samePhoneNumberVendor = await Vendor.findOne({
-      where: {
-        [Op.or]: [
-          { phone_number },
-          { whatsapp_number },
-          ,
-          { whatsapp_number: phone_number },
-          ,
-          { phone_number: whatsapp_number },
-        ],
-      },
-    });
+    // let samePhoneNumberVendor = null;
 
-    if (samePhoneNumberVendor) {
+    // if (
+    //   vendor.phone_number !== phone_number ||
+    //   vendor.whatsapp_number !== whatsapp_number
+    // ) {
+    //   samePhoneNumberVendor = await Vendor.findOne({
+    //     where: {
+    //       [Op.or]: [
+    //         { phone_number },
+    //         { whatsapp_number },
+
+    //         { whatsapp_number: phone_number },
+
+    //         { phone_number: whatsapp_number },
+    //       ],
+    //     },
+    //   });
+    // }
+    let vendorExistsWithSamePhoneNumber;
+    let vendorExistsWithSameWhatsappNumber;
+
+    if (
+      vendor.phone_number !== phone_number ||
+      vendor.whatsapp_number !== whatsapp_number
+    ) {
+      vendorExistsWithSameWhatsappNumber = await Vendor.findOne({
+        where: {
+          [Op.or]: [{ whatsapp_number }, { whatsapp_number: phone_number }],
+        },
+      });
+
+      if (phone_number || phone_number !== "") {
+        vendorExists = await Vendor.findOne({
+          where: {
+            [Op.or]: [{ phone_number }, { phone_number: whatsapp_number }],
+          },
+        });
+      }
+    }
+
+    if (vendorExistsWithSameWhatsappNumber || vendorExistsWithSamePhoneNumber) {
       return res.status(400).send({
         success: false,
         data: vendor,
         message:
-          "Vendor with the phone number or whatsapp number already exists, please enter a different number",
+          "Vendor with the phone number or whatsapp number already exists, please enter a different  number",
       });
     }
+
+    // if (samePhoneNumberVendor) {
+    //   return res.status(400).send({
+    //     success: false,
+    //     data: vendor,
+    //     message:
+    //       "Vendor with the phone number or whatsapp number already exists, please enter a different number",
+    //   });
+    // }
 
     let salt;
     let encryptedPassword;
@@ -227,6 +303,7 @@ const editVendor = async (req, res, next) => {
         noOfRowsUpdated: update,
         newVendor: updatedVendor,
       },
+      message: "Successfully edited details of requested vendor",
     });
   } catch (error) {
     return res.status(400).send({

@@ -114,7 +114,7 @@ const getTasksByStatus = async (req, res, next) => {
 const editTaskStatus = async (req, res, next) => {
   const { user_id } = req;
   const { status, id } = req.params;
-  const { on_hold_reason, base64, extension } = req.body;
+  const { on_hold_reason, base64, extension, done_reason } = req.body;
 
   try {
     const task = await Task.findOne({
@@ -147,7 +147,7 @@ const editTaskStatus = async (req, res, next) => {
       //const type = base64.split(";")[0].split("/")[1];
       const params = {
         Bucket: process.env.AWS_BUCKET_NAME,
-        Key: `task/document/${user_id}.${extension}`,
+        Key: `tasks/documents/${user_id}-${id}.${extension}`,
         Body: base64Data,
         ContentEncoding: "base64",
         //ContentType: `image/jpeg`,
@@ -162,6 +162,7 @@ const editTaskStatus = async (req, res, next) => {
         status,
         on_hold_reason,
         document,
+        done_reason,
       },
       {
         where: {

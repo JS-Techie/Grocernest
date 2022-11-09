@@ -1,26 +1,53 @@
 const {
-  DataTypes, literal
+  DataTypes
 } = require('sequelize');
 
 module.exports = sequelize => {
   const attributes = {
-    id: {
-      type: DataTypes.BIGINT,
+    cust_no: {
+      type: DataTypes.STRING(20),
       allowNull: false,
-      defaultValue: literal("nextval(supplier_seq)"),
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "cust_no"
+    },
+    order_id: {
+      type: DataTypes.STRING(255),
+      allowNull: false,
+      defaultValue: null,
       primaryKey: true,
       autoIncrement: false,
       comment: null,
-      field: "id"
+      field: "order_id"
     },
-    first_name: {
-      type: DataTypes.STRING(250),
+    status: {
+      type: DataTypes.ENUM('Placed', 'Accepted', 'Shipped', 'Delivered', 'Cancelled', 'Returned'),
+      allowNull: false,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "status"
+    },
+    created_at: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      defaultValue: sequelize.fn('current_timestamp'),
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "created_at"
+    },
+    updated_at: {
+      type: DataTypes.DATE,
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "first_name"
+      field: "updated_at"
     },
     created_by: {
       type: DataTypes.BIGINT,
@@ -40,192 +67,138 @@ module.exports = sequelize => {
       comment: null,
       field: "updated_by"
     },
-    created_at: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: sequelize.fn('current_timestamp'),
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "created_at"
-    },
-    updated_at: {
-      type: DataTypes.DATE,
+    total: {
+      type: DataTypes.FLOAT,
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "updated_at"
+      field: "total"
     },
-    supplier_code: {
-      type: DataTypes.STRING(50),
+    address: {
+      type: DataTypes.STRING(255),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "supplier_code"
+      field: "address"
     },
-    last_name: {
-      type: DataTypes.STRING(250),
+    cancellation_reason: {
+      type: DataTypes.STRING(255),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "last_name"
+      field: "cancellation_reason"
     },
-    whatsapp_number: {
-      type: DataTypes.STRING(100),
+    wallet_balance_used: {
+      type: DataTypes.FLOAT,
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "whatsapp_number"
+      field: "wallet_balance_used"
     },
-    phone_number: {
-      type: DataTypes.STRING(100),
+    applied_discount: {
+      type: DataTypes.FLOAT,
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "phone_number"
+      field: "applied_discount"
     },
-    password: {
-      type: DataTypes.STRING(500),
+    final_payable_amount: {
+      type: DataTypes.FLOAT,
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "password"
+      field: "final_payable_amount"
     },
-    email: {
-      type: DataTypes.STRING(100),
+    cashback_processed: {
+      type: DataTypes.STRING(20),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "email"
+      field: "cashback_processed"
     },
-    type: {
-      type: DataTypes.ENUM('g', 'c', 'b'),
+    cashback_amount: {
+      type: DataTypes.FLOAT,
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "type"
+      field: "cashback_amount"
     },
-    gst: {
-      type: DataTypes.STRING(100),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "gst"
-    },
-    aadhar: {
-      type: DataTypes.STRING(100),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "aadhar"
-    },
-    billing_address: {
-      type: DataTypes.STRING(500),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "billing_address"
-    },
-    current_address: {
-      type: DataTypes.STRING(500),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "current_address"
-    },
-    pan: {
-      type: DataTypes.STRING(100),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "pan"
-    },
-    image: {
-      type: DataTypes.STRING(500),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "image"
-    },
-    cin: {
-      type: DataTypes.STRING(100),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "cin"
-    },
-    login_attempt: {
+    coupon_id: {
       type: DataTypes.BIGINT,
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "login_attempt"
+      field: "coupon_id"
     },
-    new_phone_number: {
+    delivery_boy: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "delivery_boy"
+    },
+    return_status: {
+      type: DataTypes.ENUM('a', 'i', 'r', 'c'),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "return_status"
+    },
+    reject_reason: {
       type: DataTypes.STRING(100),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "new_phone_number"
+      field: "reject_reason"
     },
-    business_name: {
-      type: DataTypes.STRING(200),
+    delivery_date: {
+      type: DataTypes.DATE,
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "business_name"
+      field: "delivery_date"
     },
-    active_ind: {
-      type: DataTypes.CHAR(1),
+    pickup_date: {
+      type: DataTypes.DATE,
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "active_ind"
+      field: "pickup_date"
     }
   };
   const options = {
-    tableName: "t_supplier",
+    tableName: "t_order",
     comment: "",
     indexes: []
   };
-  const TSupplierModel = sequelize.define("t_supplier_model", attributes, options);
-  return TSupplierModel;
+  const TOrderModel = sequelize.define("t_order_model", attributes, options);
+  return TOrderModel;
 };

@@ -109,7 +109,7 @@ db.AddressModel = require("./t_address")(db.sequelize, Sequelize);
 
 db.WishlistItemsModel = require("./t_wishlist_items")(db.sequelize, Sequelize);
 
-db.OrderModel = require("./t_lkp_order")(db.sequelize, Sequelize);
+db.OrderModel = require("./t_order")(db.sequelize, Sequelize);
 
 db.OrderItemsModel = require("./t_order_items")(db.sequelize, Sequelize);
 
@@ -158,6 +158,8 @@ db.ReturnOrdersModel = require("./t_return_orders")(db.sequelize, Sequelize);
 db.MilkDashboardModel = require("./t_milk_dashboard")(db.sequelize, Sequelize);
 
 db.VendorModel = require("./t_vendor")(db.sequelize, Sequelize);
+
+db.VendorItemModel = require("./t_vendor_item")(db.sequelize, Sequelize);
 
 // Relations between tables
 
