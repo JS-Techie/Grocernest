@@ -297,7 +297,7 @@ const deleteTask = async (req, res, next) => {
 };
 
 const deleteDocument = async (req, res, next) => {
-  const { id } = req.params.id;
+  const id = parseInt(req.params.id);
   const { extension } = req.body;
   try {
     const currentTask = await Task.findOne({
@@ -342,7 +342,7 @@ const deleteDocument = async (req, res, next) => {
         where: { id },
       }
     );
-    
+
     const updatedTask = await Task.findOne({
       where: { id },
     });

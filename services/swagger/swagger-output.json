@@ -4039,7 +4039,7 @@
       }
     },
     "/admin/task/delete/document/{id}": {
-      "delete": {
+      "put": {
         "description": "",
         "parameters": [
           {
