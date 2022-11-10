@@ -304,6 +304,14 @@ const deleteDocument = async (req, res, next) => {
       where: { id },
     });
 
+    if (!extension || extension === "") {
+      return res.status(404).send({
+        success: false,
+        data: [],
+        message: "File Extension not found",
+      });
+    }
+
     if (!currentTask) {
       return res.status(404).send({
         success: false,
