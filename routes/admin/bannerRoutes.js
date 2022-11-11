@@ -11,7 +11,7 @@ const {
 
 router.route("/view/all").get(authenticateAdmin, getAllBanners);
 router.route("/view/:id").get(authenticateAdmin, getBannerById);
-router.route("/create").get(authenticateAdmin, createBanner);
-router.route("/delete/:id").get(authenticateAdmin, deleteBanner);
+router.route("/create").post(authenticateAdmin, createBanner);
+router.route("/delete/:id").delete(authenticateAdmin, deleteBanner);
 
 module.exports = router;
