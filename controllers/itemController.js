@@ -611,7 +611,7 @@ const getBestSellers = async (req, res, next) => {
 
     if (bestsellers.length === 0) {
       return res.status(200).send({
-        success: false,
+        success: true,
         data: [],
         message: "There are no bestsellers to show right now",
       });
