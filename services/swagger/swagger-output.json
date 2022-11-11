@@ -654,6 +654,20 @@
         }
       }
     },
+    "/items/bestsellers": {
+      "get": {
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
     "/wallet/view/balance": {
       "get": {
         "description": "",

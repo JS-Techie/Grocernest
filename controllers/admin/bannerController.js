@@ -185,3 +185,8 @@ module.exports = {
   createBanner,
   deleteBanner,
 };
+
+//bestseller
+//homepage - create - inage,brand_id,text1,text2
+//view all
+//items based on brands - brand id
