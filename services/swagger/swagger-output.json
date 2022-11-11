@@ -654,7 +654,7 @@
         }
       }
     },
-    "/items/bestsellers": {
+    "/items/view/bestsellers": {
       "get": {
         "description": "",
         "parameters": [],
