@@ -73,6 +73,7 @@ const adminTaskRouter = require("./routes/admin/taskRoutes");
 const adminAttendanceRouter = require("./routes/admin/attendanceRoutes");
 const adminDeliveryRouter = require("./routes/admin/deliveryBoyRoutes");
 const adminItemsRouter = require("./routes/admin/itemRoutes");
+const adminBannerRouter = require("./routes/admin/bannerRoutes");
 
 //delivery boy routes
 
@@ -137,6 +138,7 @@ app.use("/admin/delivery", adminDeliveryRouter);
 app.use("/admin/vendor", adminVendorRouter);
 app.use("/admin/vendor/items", adminVendorItemRouter);
 app.use("/admin/items", adminItemsRouter);
+app.use("/admin/banners", adminBannerRouter);
 
 // milk (user)
 app.use("/subscription", SubscriptionRouter);
