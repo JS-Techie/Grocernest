@@ -4706,13 +4706,34 @@
       }
     },
     "/admin/banners/create": {
-      "get": {
+      "post": {
         "description": "",
         "parameters": [
           {
             "name": "authorization",
             "in": "header",
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "example": "any"
+                },
+                "base64": {
+                  "example": "any"
+                },
+                "size": {
+                  "example": "any"
+                },
+                "extension": {
+                  "example": "any"
+                }
+              }
+            }
           }
         ],
         "responses": {
@@ -4729,7 +4750,7 @@
       }
     },
     "/admin/banners/delete/{id}": {
-      "get": {
+      "delete": {
         "description": "",
         "parameters": [
           {
