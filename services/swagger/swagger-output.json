@@ -4995,7 +4995,7 @@
         }
       }
     },
-    "/admin/homedelete/featured/{id}": {
+    "/admin/home/delete/featured/{id}": {
       "delete": {
         "description": "",
         "parameters": [
