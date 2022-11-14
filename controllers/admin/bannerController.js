@@ -138,7 +138,7 @@ const deleteBanner = async (req, res, next) => {
     }
     const params = {
       Bucket: process.env.AWS_BUCKET_NAME,
-      Key: `Banners/Images/${id}-${name}-${size}.${extension}`,
+      Key: `Banners/Images/${id}-${current.name}-${current.size}.${current.extension}`,
     };
 
     let deleteSuccess = true;
