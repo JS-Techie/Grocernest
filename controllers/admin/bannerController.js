@@ -71,7 +71,7 @@ const createBanner = async (req, res, next) => {
   try {
     const id = uniq();
 
-    if (size !== "s" || size !== "b") {
+    if (size !== "s" && size !== "b") {
       return res.status(400).send({
         success: false,
         data: [],

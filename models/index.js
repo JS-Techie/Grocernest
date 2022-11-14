@@ -161,6 +161,13 @@ db.VendorModel = require("./t_vendor")(db.sequelize, Sequelize);
 
 db.VendorItemModel = require("./t_vendor_item")(db.sequelize, Sequelize);
 
+db.BannerModel = require("./t_banner")(db.sequelize, Sequelize);
+
+db.FeaturedBrandsModel = require("./t_featured_brands")(
+  db.sequelize,
+  Sequelize
+);
+
 // Relations between tables
 
 db.MilkDashboardModel.hasMany(db.SubscriptionItemsModel, {

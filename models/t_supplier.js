@@ -1,6 +1,8 @@
-const { DataTypes, literal } = require("sequelize");
+const {
+  DataTypes, literal
+} = require('sequelize');
 
-module.exports = (sequelize) => {
+module.exports = sequelize => {
   const attributes = {
     id: {
       type: DataTypes.BIGINT,
@@ -9,7 +11,7 @@ module.exports = (sequelize) => {
       primaryKey: true,
       autoIncrement: false,
       comment: null,
-      field: "id",
+      field: "id"
     },
     first_name: {
       type: DataTypes.STRING(250),
@@ -18,7 +20,7 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "first_name",
+      field: "first_name"
     },
     created_by: {
       type: DataTypes.BIGINT,
@@ -27,7 +29,7 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "created_by",
+      field: "created_by"
     },
     updated_by: {
       type: DataTypes.BIGINT,
@@ -36,16 +38,16 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "updated_by",
+      field: "updated_by"
     },
     created_at: {
       type: DataTypes.DATE,
       allowNull: false,
-      defaultValue: sequelize.fn("current_timestamp"),
+      defaultValue: sequelize.fn('current_timestamp'),
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "created_at",
+      field: "created_at"
     },
     updated_at: {
       type: DataTypes.DATE,
@@ -54,7 +56,7 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "updated_at",
+      field: "updated_at"
     },
     supplier_code: {
       type: DataTypes.STRING(50),
@@ -63,7 +65,7 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "supplier_code",
+      field: "supplier_code"
     },
     last_name: {
       type: DataTypes.STRING(250),
@@ -72,7 +74,7 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "last_name",
+      field: "last_name"
     },
     whatsapp_number: {
       type: DataTypes.STRING(100),
@@ -81,7 +83,7 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "whatsapp_number",
+      field: "whatsapp_number"
     },
     phone_number: {
       type: DataTypes.STRING(100),
@@ -90,7 +92,7 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "phone_number",
+      field: "phone_number"
     },
     password: {
       type: DataTypes.STRING(500),
@@ -99,7 +101,7 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "password",
+      field: "password"
     },
     email: {
       type: DataTypes.STRING(100),
@@ -108,16 +110,16 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "email",
+      field: "email"
     },
     type: {
-      type: DataTypes.ENUM("g", "c", "b"),
+      type: DataTypes.ENUM('g', 'c', 'b'),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "type",
+      field: "type"
     },
     gst: {
       type: DataTypes.STRING(100),
@@ -126,7 +128,7 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "gst",
+      field: "gst"
     },
     aadhar: {
       type: DataTypes.STRING(100),
@@ -135,7 +137,7 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "aadhar",
+      field: "aadhar"
     },
     billing_address: {
       type: DataTypes.STRING(500),
@@ -144,7 +146,7 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "billing_address",
+      field: "billing_address"
     },
     current_address: {
       type: DataTypes.STRING(500),
@@ -153,7 +155,7 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "current_address",
+      field: "current_address"
     },
     pan: {
       type: DataTypes.STRING(100),
@@ -162,7 +164,7 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "pan",
+      field: "pan"
     },
     image: {
       type: DataTypes.STRING(500),
@@ -171,7 +173,7 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "image",
+      field: "image"
     },
     cin: {
       type: DataTypes.STRING(100),
@@ -180,7 +182,7 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "cin",
+      field: "cin"
     },
     login_attempt: {
       type: DataTypes.BIGINT,
@@ -189,7 +191,7 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "login_attempt",
+      field: "login_attempt"
     },
     new_phone_number: {
       type: DataTypes.STRING(100),
@@ -198,7 +200,7 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "new_phone_number",
+      field: "new_phone_number"
     },
     business_name: {
       type: DataTypes.STRING(200),
@@ -207,7 +209,7 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "business_name",
+      field: "business_name"
     },
     active_ind: {
       type: DataTypes.CHAR(1),
@@ -216,18 +218,14 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "active_ind",
-    },
+      field: "active_ind"
+    }
   };
   const options = {
     tableName: "t_supplier",
     comment: "",
-    indexes: [],
+    indexes: []
   };
-  const TSupplierModel = sequelize.define(
-    "t_supplier_model",
-    attributes,
-    options
-  );
+  const TSupplierModel = sequelize.define("t_supplier_model", attributes, options);
   return TSupplierModel;
 };
