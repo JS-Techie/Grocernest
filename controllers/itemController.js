@@ -27,7 +27,7 @@ const getItemsInCategory = async (req, res, next) => {
   const category = req.params.categoryId;
   try {
     const [itemsInACategory, metadata] =
-      await sequelize.query(`select distinct t_item.id, t_item.name,t_item.brand_id,t_item.UOM ,t_item.category_id ,t_item.sub_category_id ,
+      await sequelize.query(`select distinct t_item.id, t_item.name, t_item.show_discount, t_item.brand_id,t_item.UOM, t_item.category_id ,t_item.sub_category_id ,
       t_item.image ,t_item.description ,t_item.available_for_ecomm ,t_batch.batch_no ,
       t_batch.location_id ,t_batch.MRP ,t_batch.discount ,t_batch.cost_price ,t_batch.mfg_date ,t_batch.sale_price ,
       t_batch.created_at,t_lkp_color.color_name, t_lkp_brand.brand_name, t_lkp_category.group_name, t_batch.mark_selected,t_batch.id as "batch_id"
@@ -78,6 +78,7 @@ const getItemsInCategory = async (req, res, next) => {
 
       return {
         itemName: current.name,
+        showDiscount: current.show_discount,
         itemID: current.id,
         UOM: current.UOM,
         categoryName: current.group_name,
@@ -149,7 +150,7 @@ const getItemsInSubcategory = async (req, res, next) => {
 
   try {
     const [ItemsInASubcategory, metadata] =
-      await sequelize.query(`select distinct t_item.id, t_item.name,t_item.brand_id,t_item.UOM ,t_item.category_id ,t_item.sub_category_id ,
+      await sequelize.query(`select distinct t_item.id, t_item.show_discount, t_item.name,t_item.brand_id,t_item.UOM ,t_item.category_id ,t_item.sub_category_id ,
     t_item.image ,t_item.description ,t_item.available_for_ecomm ,t_batch.batch_no ,
     t_batch.location_id ,t_batch.MRP ,t_batch.discount ,t_batch.cost_price ,t_batch.mfg_date ,t_batch.sale_price ,
     t_batch.created_at,t_lkp_color.color_name, t_lkp_brand.brand_name ,t_lkp_sub_category.sub_cat_name, t_lkp_category.group_name,t_batch.mark_selected,t_batch.id as "batch_id"
@@ -199,6 +200,7 @@ const getItemsInSubcategory = async (req, res, next) => {
       }
       return {
         itemName: current.name,
+        showDiscount: current.show_discount,
         itemID: current.id,
         categoryID: current.category_id,
         categoryName: current.group_name,
@@ -270,7 +272,7 @@ const getItemsBySearchTerm = async (req, res, next) => {
 
   try {
     const [results, metadata] =
-      await sequelize.query(`select distinct t_item.id, t_item.name,t_item.brand_id,t_item.UOM ,t_item.category_id, t_lkp_category.group_name,t_item.sub_category_id , t_lkp_sub_category.sub_cat_name 
+      await sequelize.query(`select distinct t_item.id, t_item.name, t_item.show_discount, t_item.brand_id,t_item.UOM ,t_item.category_id, t_lkp_category.group_name,t_item.sub_category_id , t_lkp_sub_category.sub_cat_name 
     ,t_item.image ,t_item.description ,t_item.available_for_ecomm ,t_batch.batch_no ,
     t_batch.location_id ,t_batch.MRP ,t_batch.discount ,t_batch.cost_price ,t_batch.mfg_date ,t_batch.sale_price ,
     t_batch.created_at,t_lkp_color.color_name,t_batch.quantity, t_lkp_brand.brand_name,t_batch.mark_selected,t_batch.id as "batch_id"
@@ -320,6 +322,7 @@ const getItemsBySearchTerm = async (req, res, next) => {
       }
       return {
         itemName: current.name,
+        showDiscount: current.show_discount,
         itemID: current.id,
         categoryID: current.category_id,
         categoryName: current.group_name,
@@ -393,7 +396,7 @@ const getItemById = async (req, res, next) => {
   try {
     //Find all the details of the item pertaining to current item id
     const [itemResults, metadata] =
-      await sequelize.query(`select distinct t_item.id, t_item.name,t_item.brand_id,t_item.UOM ,t_item.category_id, t_lkp_category.group_name,t_item.sub_category_id , t_lkp_sub_category.sub_cat_name 
+      await sequelize.query(`select distinct t_item.id, t_item.name,t_item.show_discount ,t_item.brand_id,t_item.UOM ,t_item.category_id, t_lkp_category.group_name,t_item.sub_category_id , t_lkp_sub_category.sub_cat_name 
       ,t_item.image ,t_item.description ,t_item.available_for_ecomm ,t_batch.batch_no ,t_item.how_to_use, t_item.ingredients, t_item.country_of_origin,t_item.manufacturer_name,
       t_batch.location_id ,t_batch.MRP ,t_batch.discount ,t_batch.cost_price ,t_batch.mfg_date ,t_batch.sale_price ,
       t_batch.expiry_date,
@@ -497,6 +500,7 @@ const getItemById = async (req, res, next) => {
       success: true,
       data: {
         itemName: item.name,
+        showDiscount: item.show_discount,
         itemID: item.id,
         quantity: currentItem.quantity,
         UOM: item.UOM,
