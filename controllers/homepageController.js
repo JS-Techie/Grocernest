@@ -5,7 +5,9 @@ const FeaturedBrands = db.FeaturedBrandsModel;
 const WishlistItems = db.WishlistItemsModel;
 const Offers = db.OffersModel;
 const Item = db.ItemModel;
+
 const { sequelize } = require("../models");
+const { Op } = require("sequelize");
 
 const { findCustomerNumber } = require("../middleware/customerNumber");
 
