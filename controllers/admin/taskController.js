@@ -297,12 +297,20 @@ const deleteTask = async (req, res, next) => {
 };
 
 const deleteDocument = async (req, res, next) => {
-  const { id } = req.params.id;
+  const id = parseInt(req.params.id);
   const { extension } = req.body;
   try {
     const currentTask = await Task.findOne({
       where: { id },
     });
+
+    if (!extension || extension === "") {
+      return res.status(404).send({
+        success: false,
+        data: [],
+        message: "File Extension not found",
+      });
+    }
 
     if (!currentTask) {
       return res.status(404).send({
@@ -342,7 +350,7 @@ const deleteDocument = async (req, res, next) => {
         where: { id },
       }
     );
-    
+
     const updatedTask = await Task.findOne({
       where: { id },
     });

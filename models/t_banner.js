@@ -5,7 +5,7 @@ const {
 module.exports = sequelize => {
   const attributes = {
     id: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.STRING(100),
       allowNull: false,
       defaultValue: null,
       primaryKey: true,
@@ -13,35 +13,45 @@ module.exports = sequelize => {
       comment: null,
       field: "id"
     },
-    user_id: {
-      type: DataTypes.BIGINT,
-      allowNull: false,
+    name: {
+      type: DataTypes.STRING(500),
+      allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "user_id",
-      references: {
-        key: "id",
-        model: "t_user_model"
-      }
+      field: "name"
     },
-    role_id: {
-      type: DataTypes.BIGINT,
-      allowNull: false,
+    size: {
+      type: DataTypes.ENUM('s', 'b'),
+      allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "role_id",
-      references: {
-        key: "id",
-        model: "t_role_model"
-      }
+      field: "size"
+    },
+    extension: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "extension"
+    },
+    url: {
+      type: DataTypes.STRING(500),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "url"
     },
     active_ind: {
-      type: DataTypes.CHAR(1),
-      allowNull: false,
+      type: DataTypes.ENUM('Y', 'N'),
+      allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
@@ -68,7 +78,7 @@ module.exports = sequelize => {
     },
     created_at: {
       type: DataTypes.DATE,
-      allowNull: false,
+      allowNull: true,
       defaultValue: sequelize.fn('current_timestamp'),
       primaryKey: false,
       autoIncrement: false,
@@ -86,20 +96,10 @@ module.exports = sequelize => {
     }
   };
   const options = {
-    tableName: "t_user_role",
+    tableName: "t_banner",
     comment: "",
-    indexes: [{
-      name: "roleid_fkey",
-      unique: false,
-      type: "BTREE",
-      fields: ["role_id"]
-    }, {
-      name: "userid_fkey",
-      unique: false,
-      type: "BTREE",
-      fields: ["user_id"]
-    }]
+    indexes: []
   };
-  const TUserRoleModel = sequelize.define("t_user_role_model", attributes, options);
-  return TUserRoleModel;
+  const TBannerModel = sequelize.define("t_banner_model", attributes, options);
+  return TBannerModel;
 };

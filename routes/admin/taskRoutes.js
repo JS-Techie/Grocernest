@@ -21,6 +21,6 @@ router.route("/edit/:id").patch(authenticateAdmin, editTask);
 router.route("/edit/:id/:status").patch(authenticateAdmin, editTaskStatus);
 router.route("/delete/:id").delete(authenticateAdmin, deleteTask);
 router.route("/view/status/:status").get(authenticateAdmin, getTaskByStatus)
-router.route("/delete/document/:id").delete(authenticateAdmin, deleteDocument)
+router.route("/delete/document/:id").put(authenticateAdmin, deleteDocument)
 
 module.exports = router;

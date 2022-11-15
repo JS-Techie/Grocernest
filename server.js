@@ -60,6 +60,7 @@ const taskRouter = require("./routes/taskRoutes");
 const posRouter = require("./routes/posRoutes");
 const attendanceRouter = require("./routes/attendanceRoutes");
 const feedbackRouter = require("./routes/feedbackRoutes");
+const homePageRouter = require("./routes/homepageRoutes");
 
 // admin routers import
 const adminOrderRouter = require("./routes/admin/orderRoutes");
@@ -73,7 +74,8 @@ const adminTaskRouter = require("./routes/admin/taskRoutes");
 const adminAttendanceRouter = require("./routes/admin/attendanceRoutes");
 const adminDeliveryRouter = require("./routes/admin/deliveryBoyRoutes");
 const adminItemsRouter = require("./routes/admin/itemRoutes");
-
+const adminBannerRouter = require("./routes/admin/bannerRoutes");
+const adminHomeRouter = require("./routes/admin/homeRoutes");
 //delivery boy routes
 
 const deliveryBoyOrderRouter = require("./routes/deliveryBoy/ordersRoutes");
@@ -122,6 +124,7 @@ app.use("/task", taskRouter);
 app.use(posRouter);
 app.use(attendanceRouter);
 app.use("/feedback", feedbackRouter);
+app.use("/home", homePageRouter);
 
 // admin routes
 app.use("/admin/orders", adminOrderRouter);
@@ -137,6 +140,8 @@ app.use("/admin/delivery", adminDeliveryRouter);
 app.use("/admin/vendor", adminVendorRouter);
 app.use("/admin/vendor/items", adminVendorItemRouter);
 app.use("/admin/items", adminItemsRouter);
+app.use("/admin/banners", adminBannerRouter);
+app.use("/admin/home", adminHomeRouter);
 
 // milk (user)
 app.use("/subscription", SubscriptionRouter);

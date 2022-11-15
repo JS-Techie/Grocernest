@@ -323,3 +323,39 @@ CREATE TABLE `t_vendor_item` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+-- grocernest_pre_prod.t_banner definition
+
+CREATE TABLE `t_banner` (
+  `id` varchar(100) NOT NULL,
+  `name` varchar(500) DEFAULT NULL,
+  `size` enum('s','b') DEFAULT NULL,
+  `extension` varchar(100) DEFAULT NULL,
+  `url` varchar(500) DEFAULT NULL,
+  `active_ind` enum('Y','N') DEFAULT NULL,
+  `created_by` bigint(20) NOT NULL,
+  `updated_by` bigint(20) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+-- grocernest_pre_prod.t_featured_brands definition
+
+CREATE TABLE `t_featured_brands` (
+  `id` varchar(100) NOT NULL,
+  `heading` varchar(500) DEFAULT NULL,
+  `desc` varchar(500) DEFAULT NULL,
+  `brand_id` bigint(20) DEFAULT NULL,
+  `extension` varchar(100) DEFAULT NULL,
+  `name` varchar(100) DEFAULT NULL,
+  `active_ind` varchar(1) DEFAULT NULL,
+  `url` varchar(500) DEFAULT NULL,
+  `created_by` bigint(20) NOT NULL,
+  `updated_by` bigint(20) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

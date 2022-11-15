@@ -158,7 +158,7 @@ module.exports = sequelize => {
       field: "updated_at"
     },
     image: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.STRING(10000),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,

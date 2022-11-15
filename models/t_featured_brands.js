@@ -5,7 +5,7 @@ const {
 module.exports = sequelize => {
   const attributes = {
     id: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.STRING(100),
       allowNull: false,
       defaultValue: null,
       primaryKey: true,
@@ -13,40 +13,68 @@ module.exports = sequelize => {
       comment: null,
       field: "id"
     },
-    user_id: {
-      type: DataTypes.BIGINT,
-      allowNull: false,
+    heading: {
+      type: DataTypes.STRING(500),
+      allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "user_id",
-      references: {
-        key: "id",
-        model: "t_user_model"
-      }
+      field: "heading"
     },
-    role_id: {
-      type: DataTypes.BIGINT,
-      allowNull: false,
+    desc: {
+      type: DataTypes.STRING(500),
+      allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "role_id",
-      references: {
-        key: "id",
-        model: "t_role_model"
-      }
+      field: "desc"
+    },
+    brand_id: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "brand_id"
+    },
+    extension: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "extension"
+    },
+    name: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "name"
     },
     active_ind: {
-      type: DataTypes.CHAR(1),
-      allowNull: false,
+      type: DataTypes.STRING(1),
+      allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
       field: "active_ind"
+    },
+    url: {
+      type: DataTypes.STRING(500),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "url"
     },
     created_by: {
       type: DataTypes.BIGINT,
@@ -68,7 +96,7 @@ module.exports = sequelize => {
     },
     created_at: {
       type: DataTypes.DATE,
-      allowNull: false,
+      allowNull: true,
       defaultValue: sequelize.fn('current_timestamp'),
       primaryKey: false,
       autoIncrement: false,
@@ -86,20 +114,10 @@ module.exports = sequelize => {
     }
   };
   const options = {
-    tableName: "t_user_role",
+    tableName: "t_featured_brands",
     comment: "",
-    indexes: [{
-      name: "roleid_fkey",
-      unique: false,
-      type: "BTREE",
-      fields: ["role_id"]
-    }, {
-      name: "userid_fkey",
-      unique: false,
-      type: "BTREE",
-      fields: ["user_id"]
-    }]
+    indexes: []
   };
-  const TUserRoleModel = sequelize.define("t_user_role_model", attributes, options);
-  return TUserRoleModel;
+  const TFeaturedBrandsModel = sequelize.define("t_featured_brands_model", attributes, options);
+  return TFeaturedBrandsModel;
 };
