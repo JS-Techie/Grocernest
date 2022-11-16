@@ -165,13 +165,40 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "return_status"
+    },
+    reject_reason: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "reject_reason"
+    },
+    delivery_date: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "delivery_date"
+    },
+    pickup_date: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "pickup_date"
     }
   };
   const options = {
-    tableName: "t_lkp_order",
+    tableName: "t_order",
     comment: "",
     indexes: []
   };
-  const TLkpOrderModel = sequelize.define("t_lkp_order_model", attributes, options);
+  const TLkpOrderModel = sequelize.define("t_order_model", attributes, options);
   return TLkpOrderModel;
 };

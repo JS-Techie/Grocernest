@@ -145,11 +145,11 @@ const createOffer = async (req, res, next) => {
 
   if (item_id) {
     offer = await Offers.findOne({
-      where: { item_id: item_id },
+      where: { [Op.or]: [{ item_id_1: item_id }, { item_id }] },
     });
   } else {
     offer = await Offers.findOne({
-      where: { item_id_1: item_id_1 },
+      where: { [Op.or]: [{ item_id_1 }, { item_id_1: item_id }] },
     });
   }
 
@@ -232,6 +232,26 @@ const updateOffer = async (req, res, next) => {
         success: false,
         data: [],
         message: "Requested offer not found",
+      });
+    }
+
+    let offer = null;
+
+    if (item_id) {
+      offer = await Offers.findOne({
+        where: { [Op.or]: [{ item_id_1: item_id }, { item_id }] },
+      });
+    } else {
+      offer = await Offers.findOne({
+        where: { [Op.or]: [{ item_id: item_id_1 }, { item_id_1 }] },
+      });
+    }
+
+    if (offer) {
+      return res.status(400).send({
+        success: false,
+        data: offer,
+        message: "Offer already exists for this item",
       });
     }
 

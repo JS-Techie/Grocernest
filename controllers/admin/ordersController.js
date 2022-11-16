@@ -13,6 +13,7 @@ const {
   sendOrderStatusToWhatsapp,
   sendOrderShippedToWhatsapp,
   sendAdminCancelledOrderStatusToWhatsapp,
+  sendPickupBoyNotificationToWhatsapp,
 } = require("../../services/whatsapp/whatsapp");
 // const Customer = db.CustomerModel;
 
@@ -26,11 +27,12 @@ const Order = db.OrderModel;
 const OrderItems = db.OrderItemsModel;
 const User = db.UserModel;
 const ReturnOrder = db.ReturnOrdersModel;
+const Coupon = db.CouponsModel;
 
 const getAllPendingOrders = async (req, res, next) => {
   try {
     const [results, metadata] = await sequelize.query(`
-            select tc.cust_name, tlo.cust_no , tc.contact_no, tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total from t_lkp_order tlo inner join t_customer tc 
+            select tc.cust_name, tlo.cust_no , tc.contact_no, tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total from t_order tlo inner join t_customer tc 
             where tc.cust_no = tlo.cust_no 
             AND tlo.status="Placed"
           `);
@@ -85,15 +87,15 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
       : " AND tc.contact_no LIKE '%" + phno + "%'";
   const dateQuery =
     startDate == undefined ||
-    startDate == "" ||
-    endDate == undefined ||
-    endDate == ""
+      startDate == "" ||
+      endDate == undefined ||
+      endDate == ""
       ? ""
       : " AND tlo.created_at BETWEEN '" +
-        startDate +
-        "' AND (SELECT DATE_ADD('" +
-        endDate +
-        "', INTERVAL 1 DAY))";
+      startDate +
+      "' AND (SELECT DATE_ADD('" +
+      endDate +
+      "', INTERVAL 1 DAY))";
   const orderId =
     orderid == undefined || orderid == ""
       ? ""
@@ -116,7 +118,7 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
             tlo.applied_discount,
             tlo.wallet_balance_used,
             tlo.final_payable_amount
-            from t_lkp_order tlo inner join t_customer tc 
+            from t_order tlo inner join t_customer tc 
             where tc.cust_no = tlo.cust_no 
             AND tlo.status="${orderType}"
             ${phoneNoQuery}
@@ -133,6 +135,9 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
       });
     }
 
+    let orders_total = 0;
+
+
     const promises = results.map(async (current) => {
       const dboy_name = await User.findOne({
         where: {
@@ -140,6 +145,8 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
           type_cd: "DELIVERY_BOY",
         },
       });
+
+      orders_total += current.final_payable_amount;
       return {
         cust_name: current.cust_name,
         contact_no: current.contact_no,
@@ -159,9 +166,16 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
 
     const responseArray = await Promise.all(promises);
 
+    // responseArray.push({
+    //   order_total: orders_total
+    // });
+
     return res.status(200).send({
       success: true,
-      data: responseArray,
+      data: {
+        orders: responseArray,
+        order_total: orders_total
+      },
       message: "Successfully fetched all pending orders",
     });
   } catch (error) {
@@ -194,7 +208,7 @@ const getOrderDetails = async (req, res, next) => {
             tc.email ,
             tc.contact_no ,
             tc.comments 
-            from t_customer tc inner join t_lkp_order tlo 
+            from t_customer tc inner join t_order tlo 
             where
             tc.cust_no = tlo.cust_no and
             tlo.order_id = "${orderId}"
@@ -202,12 +216,12 @@ const getOrderDetails = async (req, res, next) => {
     );
 
     const [singleOrder, metadata] = await sequelize.query(`
-      select t_lkp_order.order_id, t_lkp_order.created_at, t_lkp_order.status, t_item.id, t_item.name, t_order_items.quantity, t_item.image,
-      t_order_items.is_offer, t_order_items.is_gift, t_order_items.offer_price,t_lkp_order.cashback_amount
-    from ((t_lkp_order
-    inner join t_order_items on t_order_items.order_id = t_lkp_order.order_id)
+      select t_order.order_id, t_order.created_at, t_order.status, t_item.id, t_item.name, t_order_items.quantity, t_item.image,
+      t_order_items.is_offer, t_order_items.is_gift, t_order_items.offer_price,t_order.cashback_amount
+    from ((t_order
+    inner join t_order_items on t_order_items.order_id = t_order.order_id)
     inner join t_item on t_item.id = t_order_items.item_id)
-    where t_lkp_order.order_id = ${orderId}`);
+    where t_order.order_id = ${orderId}`);
 
     if (singleOrder.length === 0) {
       return res.status(404).send({
@@ -273,23 +287,23 @@ const getOrderDetails = async (req, res, next) => {
             currentOrderItem.is_offer === 1 ? (isEdit ? true : false) : "",
           offerDetails: currentOffer
             ? {
-                offerID: currentOffer.id,
-                offerType: currentOffer.type,
-                itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
-                quantityOfItemX: currentOffer.item_1_quantity
-                  ? currentOffer.item_1_quantity
-                  : "",
-                itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
-                quantityOfItemY: currentOffer.item_2_quantity
-                  ? currentOffer.item_2_quantity
-                  : "",
-                itemID: currentOffer.item_id ? currentOffer.item_id : "",
-                amountOfDiscount: currentOffer.amount_of_discount
-                  ? currentOffer.amount_of_discount
-                  : "",
-                isPercentage: currentOffer.is_percentage ? true : false,
-                isActive: currentOffer.is_active ? true : false,
-              }
+              offerID: currentOffer.id,
+              offerType: currentOffer.type,
+              itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
+              quantityOfItemX: currentOffer.item_1_quantity
+                ? currentOffer.item_1_quantity
+                : "",
+              itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
+              quantityOfItemY: currentOffer.item_2_quantity
+                ? currentOffer.item_2_quantity
+                : "",
+              itemID: currentOffer.item_id ? currentOffer.item_id : "",
+              amountOfDiscount: currentOffer.amount_of_discount
+                ? currentOffer.amount_of_discount
+                : "",
+              isPercentage: currentOffer.is_percentage ? true : false,
+              isActive: currentOffer.is_active ? true : false,
+            }
             : "",
         };
       }
@@ -390,7 +404,7 @@ const getOrderDetails_unused = async (req, res, next) => {
             tc.email ,
             tc.contact_no ,
             tc.comments 
-            from t_customer tc inner join t_lkp_order tlo 
+            from t_customer tc inner join t_order tlo 
             where
             tc.cust_no = tlo.cust_no and
             tlo.order_id = "${orderId}"
@@ -522,7 +536,7 @@ const changeOrderStatus = async (req, res, next) => {
           req.body.status === "Delivered" ||
           req.body.status === "Cancelled"
         ) {
-          OrderItem.findAll({
+          OrderItems.findAll({
             where: {
               order_id: res.dataValues.order_id,
             },
@@ -536,8 +550,8 @@ const changeOrderStatus = async (req, res, next) => {
                   res.dataValues.wallet_balance_used,
                   res.dataValues.cust_no,
                   "cancelled order ID-" +
-                    req.body.orderId +
-                    " wallet balance refunded."
+                  req.body.orderId +
+                  " wallet balance refunded."
                 );
               }
             }
@@ -688,9 +702,9 @@ const changeOrderStatus = async (req, res, next) => {
                 email.toString(),
                 req.body.orderId,
                 "Your order " +
-                  req.body.orderId +
-                  " has been " +
-                  req.body.status
+                req.body.orderId +
+                " has been " +
+                req.body.status
               );
               // whatsapp for cancelled by user
               sendOrderStatusToWhatsapp(
@@ -720,7 +734,7 @@ const changeOrderStatus = async (req, res, next) => {
 const acceptedOrders = async (req, res, next) => {
   try {
     const [results, metadata] = await sequelize.query(`
-            select tc.cust_name, tlo.cust_no , tc.contact_no, tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total from t_lkp_order tlo inner join t_customer tc 
+            select tc.cust_name, tlo.cust_no , tc.contact_no, tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total from t_order tlo inner join t_customer tc 
             where tc.cust_no = tlo.cust_no 
             AND tlo.status="Accepted"
           `);
@@ -766,6 +780,12 @@ const assignTransporter = async (req, res, next) => {
   let orderId = req.body.orderId;
   let transporterName = req.body.delivery_boy;
 
+  const deliveryBoy = await User.findOne({
+    where: {
+      id: transporterName,
+    },
+  });
+
   Order.update(
     {
       status: "Shipped",
@@ -792,9 +812,9 @@ const assignTransporter = async (req, res, next) => {
               email.toString(),
               req.body.orderId,
               "Your order " +
-                req.body.orderId +
-                " has been Shipped. Your order will be delivered by " +
-                transporterName
+              req.body.orderId +
+              " has been Shipped. Your order will be delivered by " +
+              deliveryBoy.full_name.toString()
             );
 
           // send whatsapp
@@ -805,7 +825,7 @@ const assignTransporter = async (req, res, next) => {
           sendOrderShippedToWhatsapp(
             contact_no,
             req.body.orderId,
-            transporterName
+            deliveryBoy.full_name.toString()
           );
           // }
         });
@@ -829,7 +849,7 @@ const assignTransporter = async (req, res, next) => {
 const getShippedOrders = async (req, res, next) => {
   try {
     const [results, metadata] = await sequelize.query(`
-            select delivery_boy, tc.cust_name, tlo.cust_no , tc.contact_no, tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total from t_lkp_order tlo inner join t_customer tc 
+            select delivery_boy, tc.cust_name, tlo.cust_no , tc.contact_no, tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total from t_order tlo inner join t_customer tc 
             where tc.cust_no = tlo.cust_no 
             AND tlo.status="Shipped"
           `);
@@ -881,7 +901,7 @@ const getShippedOrders = async (req, res, next) => {
 const getDeliveredOrders = async (req, res, next) => {
   try {
     const [results, metadata] = await sequelize.query(`
-            select tc.cust_name, tlo.cust_no , tc.contact_no, tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total, delivery_boy from t_lkp_order tlo inner join t_customer tc 
+            select tc.cust_name, tlo.cust_no , tc.contact_no, tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total, delivery_boy from t_order tlo inner join t_customer tc 
             where tc.cust_no = tlo.cust_no 
             AND tlo.status="Delivered"
           `);
@@ -934,7 +954,7 @@ const getDeliveredOrders = async (req, res, next) => {
 const getCanceledorders = async (req, res, next) => {
   try {
     const [results, metadata] = await sequelize.query(`
-            select tc.cust_name, tlo.cust_no , tc.contact_no, tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total, delivery_boy,tlo.cancellation_reason from t_lkp_order tlo inner join t_customer tc 
+            select tc.cust_name, tlo.cust_no , tc.contact_no, tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total, delivery_boy,tlo.cancellation_reason from t_order tlo inner join t_customer tc 
             where tc.cust_no = tlo.cust_no 
             AND tlo.status="Cancelled"
           `);
@@ -992,11 +1012,11 @@ const assignDeliveryBoyForReturn = async (req, res, next) => {
   const { delivery_boy } = req.body;
 
   try {
-    const currentOrder = await Order.findOne({
+    const currentOrder = await ReturnOrder.findAll({
       where: { order_id },
     });
 
-    if (!currentOrder) {
+    if (currentOrder.length === 0) {
       return res.status(400).send({
         success: false,
         data: [],
@@ -1004,7 +1024,7 @@ const assignDeliveryBoyForReturn = async (req, res, next) => {
       });
     }
 
-    await Order.update(
+    await ReturnOrder.update(
       {
         delivery_boy,
       },
@@ -1013,7 +1033,17 @@ const assignDeliveryBoyForReturn = async (req, res, next) => {
       }
     );
 
-    const updatedOrder = await Order.findOne({
+    const currentDeliveryBoy = await User.findOne({
+      where: { id: delivery_boy },
+    });
+
+    sendPickupBoyNotificationToWhatsapp(
+      currentDeliveryBoy.full_name.toString(),
+      order_id.toString(),
+      currentDeliveryBoy.mobile_no.toString()
+    );
+
+    const updatedOrder = await ReturnOrder.findAll({
       where: { order_id },
     });
 
@@ -1051,14 +1081,6 @@ const rejectRequestedReturn = async (req, res, next) => {
     await Order.update(
       {
         return_status: "c",
-      },
-      {
-        where: { order_id },
-      }
-    );
-
-    await ReturnOrder.update(
-      {
         reject_reason,
       },
       {
@@ -1066,13 +1088,20 @@ const rejectRequestedReturn = async (req, res, next) => {
       }
     );
 
+    //Delete all records from return orders table which has order id
+
+    await ReturnOrder.destroy({
+      where: { order_id },
+    });
+
     const updatedOrder = await Order.findOne({
       where: { order_id },
     });
 
-    //Notify customer about status of return
+    //Notify customer about status of return reject
 
-    return res.status(400).send({
+
+    return res.status(200).send({
       success: true,
       data: updatedOrder,
       message: "Successfully rejected requested return",
@@ -1091,48 +1120,10 @@ const getReturns = async (req, res, next) => {
   try {
     const allOrders = await Order.findAll({
       where: { return_status },
+      order: [['created_at', 'DESC']],
     });
 
-    const orderPromise = allOrders.map(async (currentOrder) => {
-      const orderItems = await OrderItems.findAll({
-        where: { order_id: currentOrder.order_id },
-      });
-
-      const currentCustomer = await Customer.findOne({
-        where: { cust_no: currentOrder.cust_no },
-      });
-
-      const innerOrderItemsPromises = await orderItems.map(
-        async (currentItem) => {
-          const oldestBatch = await Batch.findOne({
-            where: { item_id: currentItem.item_id, mark_selected: 1 },
-          });
-
-          let currentInventory;
-          if (oldestBatch) {
-            currentInventory = await Inventory.findOne({
-              where: { batch_id: oldestBatch.id, item_id: currentItem.item_id },
-            });
-          }
-          return {
-            batchDetails: oldestBatch,
-            inventoryDetails: currentInventory,
-          };
-        }
-      );
-
-      const itemDetails = await Promise.all(innerOrderItemsPromises);
-
-      return {
-        currentCustomer,
-        currentOrder,
-        itemDetails,
-      };
-    });
-
-    const orders = await Promise.all(orderPromise);
-
-    if (orders.length === 0) {
+    if (allOrders.length === 0) {
       return res.status(200).send({
         success: true,
         data: [],
@@ -1140,10 +1131,182 @@ const getReturns = async (req, res, next) => {
       });
     }
 
+    const outerPromises = await allOrders.map(async (currentOrder) => {
+      let dbDetails = null;
+      let returnDate = null;
+
+      const returnedItems = await ReturnOrder.findAll({
+        where: { order_id: currentOrder.order_id },
+      });
+
+      console.log("Returned items for this order", returnedItems);
+
+      let coupon;
+      if (currentOrder.coupon_id) {
+        coupon = await Coupon.findOne({
+          where: { id: currentOrder.coupon_id },
+        });
+      }
+
+      let currentCustomer;
+      let returnedItemsWithoutUndefined = [];
+      let promises = [];
+
+      if (returnedItems.length !== 0) {
+        returnedItemsWithoutUndefined = await returnedItems.filter(
+          (current) => {
+            return current !== undefined;
+          }
+        );
+
+        promises = await returnedItemsWithoutUndefined.map(
+          async (currentReturnedItem) => {
+            returnDate = currentReturnedItem.created_at;
+
+            dbDetails = await User.findOne({
+              where: { id: currentReturnedItem.delivery_boy },
+            });
+
+            console.log("Delivery Boy details=======>", dbDetails);
+
+            const item = await Item.findOne({
+              where: { id: currentReturnedItem.item_id },
+            });
+
+            const selectedBatch = await Batch.findOne({
+              where: { item_id: currentReturnedItem.item_id, mark_selected: 1 },
+            });
+
+            let inventory;
+            if (selectedBatch) {
+              inventory = await Inventory.findOne({
+                where: {
+                  batch_id: selectedBatch.id,
+                  item_id: currentReturnedItem.item_id,
+                  location_id: 4,
+                  balance_type: 1,
+                },
+              });
+            }
+
+            currentCustomer = await Customer.findOne({
+              where: { cust_no: currentOrder.cust_no },
+            });
+
+            return {
+              itemId: currentReturnedItem.item_id,
+              returnedQuantity: currentReturnedItem.quantity,
+              itemName: item.name,
+              image: item.image,
+              MRP: selectedBatch ? selectedBatch.MRP : "",
+              salePrice: selectedBatch ? selectedBatch.sale_price : "",
+              expiryDate: selectedBatch ? selectedBatch.expiry_date : "",
+              discount: selectedBatch ? selectedBatch.discount : "",
+              costPrice: selectedBatch ? selectedBatch.cost_price : "",
+              cashback: inventory ? inventory.cashback : "",
+              cashbackIsPercentage: inventory
+                ? inventory.cashback_is_percentage
+                : "",
+            };
+          }
+        );
+
+        const itemDetails = await Promise.all(promises);
+
+        return {
+          orderId: currentOrder.order_id,
+          orderedDate: currentOrder.created_at,
+          returnDate,
+          deliveryBoy: dbDetails ? dbDetails.full_name : "",
+          customerAddress: currentOrder.address,
+          total: currentOrder.total,
+          payableAmount: currentOrder.final_payable_amount,
+          customerName: currentCustomer ? currentCustomer.cust_name : "",
+          customerPhoneNumber: currentCustomer
+            ? currentCustomer.contact_no
+            : "",
+          customerEmail: currentCustomer ? currentCustomer.email : "",
+          status: currentOrder.status,
+          returnStatus: currentOrder.return_status,
+          paidByWallet: currentOrder.wallet_balance_used,
+          couponUsed: coupon ? coupon.code : "",
+          couponDiscount: coupon ? coupon.amount_of_discount : "",
+          couponIsPercentage: coupon ? coupon.is_percentage : "",
+          itemDetails,
+        };
+      }
+    });
+
+    const resolved = await Promise.all(outerPromises);
+    const orders = await resolved.filter((current) => {
+      return current != undefined;
+    });
+
     return res.status(200).send({
       success: true,
       data: orders,
       message: "Found all requested returns",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "Please check data field for more details",
+    });
+  }
+};
+
+const getReturnedItems = async (req, res, next) => {
+  const { order_id } = req.body;
+  try {
+    const order = await Order.findOne({
+      where: { order_id },
+    });
+
+    if (!order) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "Requested order not found",
+      });
+    }
+
+    const returnItems = await ReturnOrder.findAll({
+      where: { order_id },
+    });
+
+    if (returnItems.length === 0) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "There are no returned items for this order",
+      });
+    }
+
+    const promises = returnItems.map(async (current) => {
+      const currentItem = await Item.findOne({
+        where: { id: current.item_id },
+      });
+
+      const selectedBatch = await Batch.findOne({
+        where: { item_id: current.item_id, mark_selected: 1 },
+      });
+
+      return {
+        itemName: currentItem ? currentItem.name : "",
+        returnedQuantity: current.quantity,
+        itemId: current.item_id,
+        MRP: selectedBatch ? selectedBatch.MRP : "",
+        salePrice: selectedBatch ? selectedBatch.sale_price : "",
+      };
+    });
+
+    const response = await Promise.all(promises);
+
+    return res.status(200).send({
+      success: true,
+      data: response,
+      message: "Found all returned items for requested order",
     });
   } catch (error) {
     return res.status(400).send({
@@ -1167,4 +1330,5 @@ module.exports = {
   assignDeliveryBoyForReturn,
   rejectRequestedReturn,
   getReturns,
+  getReturnedItems,
 };

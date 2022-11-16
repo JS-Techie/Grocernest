@@ -22,8 +22,8 @@ CREATE TABLE `t_wishlist_items` (
   PRIMARY KEY (`item_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = latin1;
 
--- grocernest.t_lkp_order definition
-CREATE TABLE `t_lkp_order` (
+-- grocernest.t_order definition
+CREATE TABLE `t_order` (
   `cust_no` varchar(20) NOT NULL,
   `order_id` varchar(255) NOT NULL,
   `status` enum(
@@ -87,9 +87,9 @@ ALTER TABLE
 ADD
   is_gift BOOL NULL;
 
---adding order_total field in t_lkp_order table
+--adding order_total field in t_order table
 ALTER TABLE
-  ecomm.t_lkp_order
+  ecomm.t_order
 ADD
   total BIGINT(40) NULL;
 
@@ -310,3 +310,52 @@ CREATE TABLE grocernest_pre_prod.t_feedback (
   `updated_at` timestamp NULL DEFAULT NULL,
   CONSTRAINT t_feedback_PK PRIMARY KEY (id)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
+
+-- grocernest_pre_prod.t_vendor_item definition
+
+CREATE TABLE `t_vendor_item` (
+  `vendor_id` varchar(100) DEFAULT NULL,
+  `item_id` bigint(20) DEFAULT NULL,
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `created_by` bigint(20) NOT NULL,
+  `updated_by` bigint(20) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+-- grocernest_pre_prod.t_banner definition
+
+CREATE TABLE `t_banner` (
+  `id` varchar(100) NOT NULL,
+  `name` varchar(500) DEFAULT NULL,
+  `size` enum('s','b') DEFAULT NULL,
+  `extension` varchar(100) DEFAULT NULL,
+  `url` varchar(500) DEFAULT NULL,
+  `active_ind` enum('Y','N') DEFAULT NULL,
+  `created_by` bigint(20) NOT NULL,
+  `updated_by` bigint(20) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+-- grocernest_pre_prod.t_featured_brands definition
+
+CREATE TABLE `t_featured_brands` (
+  `id` varchar(100) NOT NULL,
+  `heading` varchar(500) DEFAULT NULL,
+  `desc` varchar(500) DEFAULT NULL,
+  `brand_id` bigint(20) DEFAULT NULL,
+  `extension` varchar(100) DEFAULT NULL,
+  `name` varchar(100) DEFAULT NULL,
+  `active_ind` varchar(1) DEFAULT NULL,
+  `url` varchar(500) DEFAULT NULL,
+  `created_by` bigint(20) NOT NULL,
+  `updated_by` bigint(20) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

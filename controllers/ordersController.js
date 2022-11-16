@@ -68,6 +68,20 @@ const getAllOrders = async (req, res, next) => {
           where: { item_id: currentOrderItem.item_id, mark_selected: 1 },
         });
 
+        let canReturn = true;
+
+        const offers = await Offers.findAll({});
+        if (offers.length !== 0) {
+          offers.map((current) => {
+            if (
+              currentOrderItem.item_id === current.item_id_1 ||
+              currentOrderItem.item_id === current.item_id_2
+            ) {
+              canReturn = false;
+            }
+          });
+        }
+
         if (oldestBatch) {
           return {
             itemName: currentItem.name,
@@ -84,6 +98,7 @@ const getAllOrders = async (req, res, next) => {
             isOffer: currentOrderItem.is_offer === 1 ? true : false,
             canEdit:
               currentOrderItem.is_offer === 1 ? (isEdit ? true : false) : "",
+            canReturn,
             offerDetails: currentOffer
               ? {
                   offerID: currentOffer.id,
@@ -128,6 +143,7 @@ const getAllOrders = async (req, res, next) => {
         cashback_amount: currentOrder.cashback_amount,
         itemDetails: responseWithoutUndefined,
         return_status: currentOrder.return_status,
+        reject_reason: currentOrder.reject_reason,
       };
     });
 
@@ -159,14 +175,14 @@ const getOrderByOrderId = async (req, res, next) => {
     //Get that order according to its id
 
     const [singleOrder, metadata] =
-      await sequelize.query(`select t_lkp_order.order_id, t_lkp_order.created_at, t_lkp_order.status, t_lkp_order.return_status,t_item.id, t_item.name, t_order_items.quantity, t_item.image,
+      await sequelize.query(`select t_order.order_id, t_order.created_at, t_order.status, t_order.return_status,t_item.id, t_item.name, t_order_items.quantity, t_item.image,
       t_order_items.is_offer, t_order_items.is_gift, t_order_items.offer_price
-    from ((t_lkp_order
-    inner join t_order_items on t_order_items.order_id = t_lkp_order.order_id)
+    from ((t_order
+    inner join t_order_items on t_order_items.order_id = t_order.order_id)
     inner join t_item on t_item.id = t_order_items.item_id)
-    where t_lkp_order.cust_no = "${currentUser}"
+    where t_order.cust_no = "${currentUser}"
     AND 
-    t_lkp_order.order_id = ${orderId}`);
+    t_order.order_id = ${orderId}`);
 
     if (singleOrder.length === 0) {
       return res.status(404).send({
@@ -478,7 +494,7 @@ const returnOrder = async (req, res, next) => {
       currentOrder.status == "Returned" ||
       currentOrder.status == "Cancelled" ||
       currentOrder.return_status == "a" ||
-      currentOrder.return_status == "c" ||
+      currentOrder.return_status == "r" ||
       currentOrder.return_status == "i"
     ) {
       return res.status(400).send({
@@ -594,10 +610,61 @@ const trackOrder = async (req, res, next) => {
   }
 };
 
+const getAllReturns = async (req, res, next) => {
+  const { cust_no } = req;
+  const { order_id } = req.body;
+  try {
+    const returnedItems = await ReturnOrder.findAll({
+      where: { order_id, cust_no },
+    });
+
+    if (returnedItems.length === 0) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "There are no returned items for this order",
+      });
+    }
+
+    const promises = returnedItems.map(async (current) => {
+      const currentItem = await Item.findOne({
+        where: { id: current.item_id },
+      });
+
+      const selectedBatch = await Batch.findOne({
+        where: { item_id: currentItem.id, mark_selected: 1 },
+      });
+
+      return {
+        itemID: currentItem ? currentItem.id : "",
+        itemName: currentItem ? currentItem.name : "",
+        quantity: current.quantity,
+        salePrice: selectedBatch ? selectedBatch.sale_price : "",
+        MRP: selectedBatch ? selectedBatch.MRP : "",
+      };
+    });
+
+    const response = await Promise.all(promises);
+
+    return res.status(200).send({
+      success: true,
+      data: response,
+      message: "Successfully fetched returned items and their quantity",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "Please check data field for more details",
+    });
+  }
+};
+
 module.exports = {
   getAllOrders,
   getOrderByOrderId,
   cancelOrder,
   returnOrder,
   trackOrder,
+  getAllReturns,
 };

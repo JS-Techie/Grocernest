@@ -1,5 +1,6 @@
 require("dotenv").config();
 const refferal_job = require("./utils/CRON_REF_1");
+const pos_refferal_job = require("./utils/CRON_REF_3");
 // Swagger UI Setup
 const swaggerUI = require("swagger-ui-express");
 const endPoint = require("./services/swagger/swagger-output.json");
@@ -59,6 +60,7 @@ const taskRouter = require("./routes/taskRoutes");
 const posRouter = require("./routes/posRoutes");
 const attendanceRouter = require("./routes/attendanceRoutes");
 const feedbackRouter = require("./routes/feedbackRoutes");
+const homePageRouter = require("./routes/homepageRoutes");
 
 // admin routers import
 const adminOrderRouter = require("./routes/admin/orderRoutes");
@@ -71,7 +73,9 @@ const adminLeaveRouter = require("./routes/admin/leaveRoutes");
 const adminTaskRouter = require("./routes/admin/taskRoutes");
 const adminAttendanceRouter = require("./routes/admin/attendanceRoutes");
 const adminDeliveryRouter = require("./routes/admin/deliveryBoyRoutes");
-
+const adminItemsRouter = require("./routes/admin/itemRoutes");
+const adminBannerRouter = require("./routes/admin/bannerRoutes");
+const adminHomeRouter = require("./routes/admin/homeRoutes");
 //delivery boy routes
 
 const deliveryBoyOrderRouter = require("./routes/deliveryBoy/ordersRoutes");
@@ -84,6 +88,12 @@ const adminMilkItemsRouter = require("./routes/admin/milkItemsRoutes");
 const SubscriptionRouter = require("./routes/subscriptionRoutes");
 const deliveryRouter = require("./routes/deliveryRoutes");
 const adminMilkSubscriptionRouter = require("./routes/admin/milkSubscriptionRoutes");
+const adminVendorRouter = require("./routes/admin/vendorRoutes");
+const adminVendorItemRouter = require("./routes/admin/vendorItemRoutes");
+
+//Vendor routes import
+
+const vendorRouter = require("./routes/vendor/profileRoutes");
 
 //routes
 app.get("/responses", (req, res) => {
@@ -114,6 +124,7 @@ app.use("/task", taskRouter);
 app.use(posRouter);
 app.use(attendanceRouter);
 app.use("/feedback", feedbackRouter);
+app.use("/home", homePageRouter);
 
 // admin routes
 app.use("/admin/orders", adminOrderRouter);
@@ -126,6 +137,11 @@ app.use("/admin/leave", adminLeaveRouter);
 app.use("/admin/task", adminTaskRouter);
 app.use("/admin/attendance", adminAttendanceRouter);
 app.use("/admin/delivery", adminDeliveryRouter);
+app.use("/admin/vendor", adminVendorRouter);
+app.use("/admin/vendor/items", adminVendorItemRouter);
+app.use("/admin/items", adminItemsRouter);
+app.use("/admin/banners", adminBannerRouter);
+app.use("/admin/home", adminHomeRouter);
 
 // milk (user)
 app.use("/subscription", SubscriptionRouter);
@@ -139,13 +155,17 @@ app.use("/admin/milk/subscription", adminMilkSubscriptionRouter);
 app.use("/deliveryboy/orders", deliveryBoyOrderRouter);
 app.use("/deliveryboy/milk", deliveryBoyMilkRouter);
 
+//vendor routes
+
+app.use("/vendor", vendorRouter);
+
 //Start server and connect to DB
 const db = require("./services/dbSetupService.js");
 const PORT = process.env.PORT || 8080;
 const start = async () => {
   try {
-    console.log(`Database connected`);
     app.listen(PORT, () => {
+      console.log(`Database connected`);
       console.log(`Server started on port ${PORT}`);
     });
   } catch (error) {
@@ -155,3 +175,4 @@ const start = async () => {
 
 start();
 refferal_job();
+pos_refferal_job();

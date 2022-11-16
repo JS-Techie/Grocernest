@@ -3,20 +3,16 @@ const router = require("express").Router();
 const authenticateDeliveryBoy = require("../../middleware/authenticateDeliveryBoy");
 
 const {
-  getAllOrders,
-  getOrderById,
-  getOrderByStatus,
+  getAllDeliveryOrders,
   changeStatusOfDeliveryOrder,
   changeStatusOfReturnOrder,
   getAllRequestedReturns,
-  getAllDeliveryOrders
 } = require("../../controllers/deliveryBoy/ordersController");
 
-router.route("/view/all").get(authenticateDeliveryBoy, getAllOrders);
-router.route("/view/:order_id").get(authenticateDeliveryBoy, getOrderById);
+
 router
-  .route("/view/status/:status")
-  .get(authenticateDeliveryBoy, getOrderByStatus);
+  .route("/deliver/view/all")
+  .post(authenticateDeliveryBoy, getAllDeliveryOrders);
 router
   .route("/return/:order_id")
   .post(authenticateDeliveryBoy, changeStatusOfReturnOrder);
@@ -25,6 +21,6 @@ router
   .post(authenticateDeliveryBoy, changeStatusOfDeliveryOrder);
 
   router.route("/return/view/all").post(authenticateDeliveryBoy, getAllRequestedReturns);
-  router.route("/deliver/view/all").get(authenticateDeliveryBoy, getAllDeliveryOrders);
+
 
 module.exports = router;

@@ -1,7 +1,11 @@
 const db = require("../../models");
+const S3 = require("aws-sdk/clients/s3");
+const s3Config = require("../../config/s3Config");
 
 const Task = db.TaskModel;
 const User = db.UserModel;
+
+const s3 = new S3(s3Config);
 
 const getAllTasks = async (req, res, next) => {
   try {
@@ -292,6 +296,79 @@ const deleteTask = async (req, res, next) => {
   }
 };
 
+const deleteDocument = async (req, res, next) => {
+  const id = parseInt(req.params.id);
+  const { extension } = req.body;
+  try {
+    const currentTask = await Task.findOne({
+      where: { id },
+    });
+
+    if (!extension || extension === "") {
+      return res.status(404).send({
+        success: false,
+        data: [],
+        message: "File Extension not found",
+      });
+    }
+
+    if (!currentTask) {
+      return res.status(404).send({
+        success: false,
+        data: [],
+        message:
+          "Requested task/document not found, please try again in some time",
+      });
+    }
+
+    const params = {
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Key: `tasks/documents/${currentTask.user_id}-${currentTask.id}.${extension}`,
+    };
+
+    let deleteSuccess = true;
+    s3.deleteObject(params, (err, data) => {
+      if (err) {
+        deleteSuccess = false;
+      }
+    });
+
+    if (!deleteSuccess) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message:
+          "Something went wrong while deleting the document, please try again in sometime",
+      });
+    }
+
+    await Task.update(
+      {
+        document: null,
+      },
+      {
+        where: { id },
+      }
+    );
+
+    const updatedTask = await Task.findOne({
+      where: { id },
+    });
+
+    return res.status(200).send({
+      success: true,
+      data: updatedTask,
+      message: "Successfully deleted document for current task",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "Please check data field for more details",
+    });
+  }
+};
+
 module.exports = {
   getAllTasks,
   getTaskById,
@@ -300,4 +377,5 @@ module.exports = {
   editTask,
   editTaskStatus,
   deleteTask,
+  deleteDocument,
 };

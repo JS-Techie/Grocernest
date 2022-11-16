@@ -39,8 +39,9 @@ const getProfile = async (req, res, next) => {
         customerName: currentUserProfile.cust_name,
         firstName: currentUserProfile.cust_name.split(" ")[0],
         lastName: currentUserProfile.cust_name.split(" ")[1],
-        emailID: currentUserProfile.email,
+        emailID: currentUserProfile.email ? currentUserProfile.email : "",
         contactNumber: currentUserProfile.contact_no,
+        callingNumber: currentUserProfile.calling_number ? currentUserProfile.calling_number : "",
         profileImage: currentUserProfile.image
           ? currentUserProfile.image
           : generator.generateRandomAvatar(),
@@ -113,6 +114,7 @@ const editProfile = async (req, res, next) => {
   const enteredFirstName = req.body.firstName;
   const enteredLastName = req.body.lastName;
   const email = req.body.email;
+  const callingNumber = req.body.callingNumber;
   const { base64 } = req.body;
 
   let url = null;
@@ -157,11 +159,12 @@ const editProfile = async (req, res, next) => {
       {
         cust_name: enteredFirstName + " " + enteredLastName,
         email: email ? email : "",
+        calling_number: callingNumber ? callingNumber : "",
         image: base64
           ? url
           : currentUserProfile.image
-          ? currentUserProfile.image
-          : null,
+            ? currentUserProfile.image
+            : null,
       },
       { where: { cust_no: currentUser } }
     );

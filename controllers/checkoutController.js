@@ -262,6 +262,7 @@ const checkoutFromCart = async (req, res, next) => {
       // }
     });
 
+    let base_url = req.protocol + '://' + req.get('host');
     let email = "";
     let contact_no = "";
     Customer.findOne({
@@ -278,7 +279,8 @@ const checkoutFromCart = async (req, res, next) => {
         newOrder.order_id,
         email,
         contact_no,
-        opt_in
+        opt_in,
+        base_url
       );
     });
 
@@ -615,12 +617,14 @@ const buyNow = async (req, res, next) => {
 
       console.log("jjjjjjjjjjjjjjjjjjjjjjjjjjjjjj");
 
+      let base_url = req.protocol + '://' + req.get('host');
       await InvoiceGen(
         currentUser,
         newOrder.order_id,
         email,
         contact_no,
-        opt_in
+        opt_in,
+        base_url
       );
     });
 
@@ -650,7 +654,7 @@ const buyNow = async (req, res, next) => {
   }
 };
 
-const InvoiceGen = async (cust_no, order_id, email, contact_no, opt_in) => {
+const InvoiceGen = async (cust_no, order_id, email, contact_no, opt_in, base_url) => {
   console.log("INVOICE GENNNN");
   const currentCustomer = cust_no;
   const orderID = order_id;
@@ -735,7 +739,7 @@ const InvoiceGen = async (cust_no, order_id, email, contact_no, opt_in) => {
       }
       // send whatsapp
       if (contact_no != "") {
-        await sendInvoiceToWhatsapp(contact_no, response.orderID, invoice_link);
+        await sendInvoiceToWhatsapp(contact_no, response.orderID, invoice_link, base_url);
       }
     });
   } catch (error) {
