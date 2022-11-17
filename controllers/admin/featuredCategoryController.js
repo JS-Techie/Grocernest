@@ -1,28 +1,27 @@
 const db = require("../../models");
 const uniq = require("uniqid");
-
-const FeaturedBrand = db.FeaturedBrandsModel;
-
 const S3 = require("aws-sdk/clients/s3");
 const s3Config = require("../../config/s3Config");
 const s3 = new S3(s3Config);
 
-const getAllFeaturedBrands = async (req, res, next) => {
-  try {
-    const brands = await FeaturedBrand.findAll({});
+const FeaturedCategory = db.FeaturedCategoryModel;
 
-    if (brands.length === 0) {
+const getAllFeaturedCategories = async (req, res, next) => {
+  try {
+    const categories = await FeaturedCategory.findAll({});
+
+    if (categories.length === 0) {
       return res.status(200).send({
         success: true,
         data: [],
-        message: "There are no featured brands to show right now",
+        message: "There are no featured categories to show right now",
       });
     }
 
     return res.status(200).send({
       success: true,
-      data: brands,
-      message: "Found all featured brands successfully",
+      data: categories,
+      message: "Found all featured categories successfully",
     });
   } catch (error) {
     return res.status(400).send({
@@ -34,26 +33,26 @@ const getAllFeaturedBrands = async (req, res, next) => {
   }
 };
 
-const getFeaturedBrandById = async (req, res, next) => {
-  const{id} = req.params;
+const getFeaturedCategoryById = async (req, res, next) => {
+  const { id } = req.params;
   try {
-    const brand = await FeaturedBrand.findOne({
+    const category = await FeaturedCategory.findOne({
       where: { id },
     });
 
-    if (!brand) {
+    if (!category) {
       return res.status(404).send({
         success: false,
         data: [],
-        message: "Requested Featured Brand could not be found",
+        message: "Requested Featured category could not be found",
         devMessage: "The ID entered is incorrect, no mapping is present",
       });
     }
 
     return res.status(200).send({
       success: true,
-      data: brand,
-      message: "Requested featured brand found successfully",
+      data: category,
+      message: "Requested category found successfully",
     });
   } catch (error) {
     return res.status(400).send({
@@ -65,9 +64,9 @@ const getFeaturedBrandById = async (req, res, next) => {
   }
 };
 
-const createFeaturedBrand = async (req, res, next) => {
+const createFeaturedCategory = async (req, res, next) => {
   const { user_id } = req;
-  const { base64, heading, desc, brand_id, extension, name } = req.body;
+  const { base64, heading, desc, category_id, extension, name } = req.body;
   try {
     const id = uniq();
     const base64Data = new Buffer.from(
@@ -77,7 +76,7 @@ const createFeaturedBrand = async (req, res, next) => {
     //const type = base64.split(";")[0].split("/")[1];
     const params = {
       Bucket: process.env.AWS_BUCKET_NAME,
-      Key: `Featured-Brands/Images/${id}-${brand_id}-${name}.${extension}`,
+      Key: `Featured-Categories/Images/${id}-${category_id}-${name}.${extension}`,
       Body: base64Data,
       ContentEncoding: "base64",
       ContentType: `image/jpeg`,
@@ -86,11 +85,11 @@ const createFeaturedBrand = async (req, res, next) => {
     const s3UploadResponse = await s3.upload(params).promise();
     const url = s3UploadResponse.Location;
 
-    const newFeaturedBrand = await FeaturedBrand.create({
+    const newFeaturedCategory = await FeaturedCategory.create({
       id,
       heading,
       desc,
-      brand_id,
+      category_id,
       extension,
       name,
       created_by: user_id,
@@ -100,8 +99,8 @@ const createFeaturedBrand = async (req, res, next) => {
 
     return res.status(201).send({
       success: true,
-      data: newFeaturedBrand,
-      message: "Created new featured brand successfully",
+      data: newFeaturedCategory,
+      message: "Created new featured category successfully",
     });
   } catch (error) {
     return res.status(400).send({
@@ -113,9 +112,9 @@ const createFeaturedBrand = async (req, res, next) => {
   }
 };
 
-const editFeaturedBrand = async (req, res, next) => {
+const editFeaturedCategory = async (req, res, next) => {
   const { id } = req.params;
-  const { base64, heading, desc, brand_id, extension, name, active_ind } =
+  const { base64, heading, desc, category_id, extension, name, active_ind } =
     req.body;
   const { user_id } = req;
   try {
@@ -123,7 +122,7 @@ const editFeaturedBrand = async (req, res, next) => {
     let errMessage = "";
     let url;
 
-    const current = await FeaturedBrand.findOne({
+    const current = await FeaturedCategory.findOne({
       where: { id },
     });
 
@@ -131,7 +130,7 @@ const editFeaturedBrand = async (req, res, next) => {
       return res.status(404).send({
         success: false,
         data: [],
-        message: "Requested featured brand could not be found",
+        message: "Requested featured category could not be found",
         devMessage: "ID Entered is incorrect",
       });
     }
@@ -139,7 +138,7 @@ const editFeaturedBrand = async (req, res, next) => {
     if (base64) {
       const params = {
         Bucket: process.env.AWS_BUCKET_NAME,
-        Key: `Featured-Brands/Images/${id}-${current.brand_id}-${current.name}.${current.extension}`,
+        Key: `Featured-Categories/Images/${id}-${current.category_id}-${current.name}.${current.extension}`,
       };
 
       s3.deleteObject(params, (err, data) => {
@@ -152,7 +151,7 @@ const editFeaturedBrand = async (req, res, next) => {
       if (deleteSuccess) {
         const params2 = {
           Bucket: process.env.AWS_BUCKET_NAME,
-          Key: `Featured-Brands/Images/${id}-${brand_id}-${name}.${extension}`,
+          Key: `Featured-Categories/Images/${id}-${category_id}-${name}.${extension}`,
           Body: base64Data,
           ContentEncoding: "base64",
           ContentType: `image/jpeg`,
@@ -171,11 +170,11 @@ const editFeaturedBrand = async (req, res, next) => {
       }
     }
 
-    const update = await FeaturedBrand.update(
+    const update = await FeaturedCategory.update(
       {
         heading,
         desc,
-        brand_id,
+        category_id,
         extension,
         name,
         updated_by: user_id,
@@ -187,14 +186,14 @@ const editFeaturedBrand = async (req, res, next) => {
       }
     );
 
-    const updated = await FeaturedBrand.findOne({
+    const updated = await FeaturedCategory.findOne({
       where: { id },
     });
 
     return res.status(200).send({
       success: true,
       data: updated,
-      message: "Requested featured brand updated successfully",
+      message: "Requested featured category updated successfully",
     });
   } catch (error) {
     return res.status(400).send({
@@ -206,56 +205,57 @@ const editFeaturedBrand = async (req, res, next) => {
   }
 };
 
-const deleteFeaturedBrand = async (req, res, next) => {
-  const { id } = req.params;
+const deleteFeaturedCategory = async (req, res, next) => {
+    const { id } = req.params;
   try {
-    const current = await FeaturedBrand.findOne({
-      where: { id },
-    });
 
-    if (!current) {
-      return res.status(404).send({
-        success: false,
-        data: [],
-        message: "Requested featured brand could not be found",
-        devMessage: "ID Entered is incorrect",
+    const current = await FeaturedCategory.findOne({
+        where: { id },
       });
-    }
-
-    let deleteSuccess = true;
-    let errMessage = "";
-
-    const params = {
-      Bucket: process.env.AWS_BUCKET_NAME,
-      Key: `Featured-Brands/Images/${id}-${current.brand_id}-${current.name}.${current.extension}`,
-    };
-
-    s3.deleteObject(params, (err, data) => {
-      if (err) {
-        deleteSuccess = false;
-        errMessage = err;
+  
+      if (!current) {
+        return res.status(404).send({
+          success: false,
+          data: [],
+          message: "Requested featured category could not be found",
+          devMessage: "ID Entered is incorrect",
+        });
       }
-    });
-
-    if (!deleteSuccess) {
-      return res.status(400).send({
-        success: false,
-        data: [],
-        message:
-          "Could not delete already existing image, please try again in sometime",
-        devMessage: errMessage,
+  
+      let deleteSuccess = true;
+      let errMessage = "";
+  
+      const params = {
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: `Featured-Categories/Images/${id}-${current.category_id}-${current.name}.${current.extension}`,
+      };
+  
+      s3.deleteObject(params, (err, data) => {
+        if (err) {
+          deleteSuccess = false;
+          errMessage = err;
+        }
       });
-    }
-
-    const deleted = await FeaturedBrand.destroy({
-      where: { id },
-    });
-
-    return res.status(200).send({
-      success: true,
-      data: deleted,
-      message: "Deleted Featured Brand successfully",
-    });
+  
+      if (!deleteSuccess) {
+        return res.status(400).send({
+          success: false,
+          data: [],
+          message:
+            "Could not delete already existing image, please try again in sometime",
+          devMessage: errMessage,
+        });
+      }
+  
+      const deleted = await FeaturedCategory.destroy({
+        where: { id },
+      });
+  
+      return res.status(200).send({
+        success: true,
+        data: deleted,
+        message: "Deleted Featured Category successfully",
+      });
   } catch (error) {
     return res.status(400).send({
       success: false,
@@ -267,9 +267,9 @@ const deleteFeaturedBrand = async (req, res, next) => {
 };
 
 module.exports = {
-  getAllFeaturedBrands,
-  getFeaturedBrandById,
-  createFeaturedBrand,
-  editFeaturedBrand,
-  deleteFeaturedBrand,
+  getAllFeaturedCategories,
+  getFeaturedCategoryById,
+  createFeaturedCategory,
+  editFeaturedCategory,
+  deleteFeaturedCategory,
 };

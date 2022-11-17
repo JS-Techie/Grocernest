@@ -5,6 +5,7 @@ const FeaturedBrands = db.FeaturedBrandsModel;
 const WishlistItems = db.WishlistItemsModel;
 const Offers = db.OffersModel;
 const Item = db.ItemModel;
+const FeaturedCategory = db.FeaturedCategoryModel;
 
 const { sequelize } = require("../models");
 const { Op } = require("sequelize");
@@ -105,7 +106,7 @@ const getBestSellers = async (req, res, next) => {
           : "",
         isPercentage: offer ? (offer.is_percentage ? true : false) : "",
         createdBy: offer ? (offer.created_by ? offer.created_by : "") : "",
-        isGrocery : current.is_grocernest === 1 ? true : false
+        isGrocery: current.is_grocernest === 1 ? true : false,
       };
     });
 
@@ -211,9 +212,36 @@ const featuredBrands = async (req, res, next) => {
   }
 };
 
+const featuredCategories = async (req, res, next) => {
+  try {
+    const categories = await FeaturedCategory.findAll({});
+    if (categories.length === 0) {
+      return res.status(200).send({
+        success: true,
+        data: [],
+        message: "There are no featured brands to show right now",
+      });
+    }
+
+    return res.status(200).send({
+      success: true,
+      data: categories,
+      message: "Found all featured brands successfully",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "Something went wrong, please try again in sometime",
+      devMessage: "Please check data field for the error details",
+    });
+  }
+};
+
 module.exports = {
   getBestSellers,
   allBigBanners,
   allSmallBanners,
   featuredBrands,
+  featuredCategories
 };

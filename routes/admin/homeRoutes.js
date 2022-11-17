@@ -18,4 +18,5 @@ router
   .route("/delete/featured/:id")
   .delete(authenticateAdmin, deleteFeaturedBrand);
 
+
 module.exports = router;
