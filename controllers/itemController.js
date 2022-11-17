@@ -27,7 +27,7 @@ const getItemsInCategory = async (req, res, next) => {
   const category = req.params.categoryId;
   try {
     const [itemsInACategory, metadata] =
-      await sequelize.query(`select distinct t_item.id, t_item.name, t_item.show_discount, t_item.brand_id,t_item.UOM, t_item.category_id ,t_item.sub_category_id ,
+      await sequelize.query(`select distinct t_item.id, t_item.name, t_item.show_discount, t_item.brand_id,t_item.UOM, t_item.is_grocernest,t_item.category_id ,t_item.sub_category_id ,
       t_item.image ,t_item.description ,t_item.available_for_ecomm ,t_batch.batch_no ,
       t_batch.location_id ,t_batch.MRP ,t_batch.discount ,t_batch.cost_price ,t_batch.mfg_date ,t_batch.sale_price ,
       t_batch.created_at,t_lkp_color.color_name, t_lkp_brand.brand_name, t_lkp_category.group_name, t_batch.mark_selected,t_batch.id as "batch_id"
@@ -113,6 +113,7 @@ const getItemsInCategory = async (req, res, next) => {
           : "",
         isPercentage: offer ? (offer.is_percentage ? true : false) : "",
         createdBy: offer ? (offer.created_by ? offer.created_by : "") : "",
+        isGrocery : current.is_grocernest === 1 ? true : false
       };
     });
 
@@ -150,7 +151,7 @@ const getItemsInSubcategory = async (req, res, next) => {
 
   try {
     const [ItemsInASubcategory, metadata] =
-      await sequelize.query(`select distinct t_item.id, t_item.show_discount, t_item.name,t_item.brand_id,t_item.UOM ,t_item.category_id ,t_item.sub_category_id ,
+      await sequelize.query(`select distinct t_item.id, t_item.show_discount, t_item.name,t_item.brand_id,t_item.UOM ,t_item.is_grocernest,t_item.category_id ,t_item.sub_category_id ,
     t_item.image ,t_item.description ,t_item.available_for_ecomm ,t_batch.batch_no ,
     t_batch.location_id ,t_batch.MRP ,t_batch.discount ,t_batch.cost_price ,t_batch.mfg_date ,t_batch.sale_price ,
     t_batch.created_at,t_lkp_color.color_name, t_lkp_brand.brand_name ,t_lkp_sub_category.sub_cat_name, t_lkp_category.group_name,t_batch.mark_selected,t_batch.id as "batch_id"
@@ -237,6 +238,7 @@ const getItemsInSubcategory = async (req, res, next) => {
           : "",
         isPercentage: offer ? (offer.is_percentage ? true : false) : "",
         createdBy: offer ? (offer.created_by ? offer.created_by : "") : "",
+        isGrocery : current.is_grocernest === 1 ? true : false
       };
     });
 
@@ -272,7 +274,7 @@ const getItemsBySearchTerm = async (req, res, next) => {
 
   try {
     const [results, metadata] =
-      await sequelize.query(`select distinct t_item.id, t_item.name, t_item.show_discount, t_item.brand_id,t_item.UOM ,t_item.category_id, t_lkp_category.group_name,t_item.sub_category_id , t_lkp_sub_category.sub_cat_name 
+      await sequelize.query(`select distinct t_item.id, t_item.name, t_item.show_discount, t_item.brand_id,t_item.UOM ,t_item.is_grocernest, t_item.category_id, t_lkp_category.group_name,t_item.sub_category_id , t_lkp_sub_category.sub_cat_name 
     ,t_item.image ,t_item.description ,t_item.available_for_ecomm ,t_batch.batch_no ,
     t_batch.location_id ,t_batch.MRP ,t_batch.discount ,t_batch.cost_price ,t_batch.mfg_date ,t_batch.sale_price ,
     t_batch.created_at,t_lkp_color.color_name,t_batch.quantity, t_lkp_brand.brand_name,t_batch.mark_selected,t_batch.id as "batch_id"
@@ -359,6 +361,7 @@ const getItemsBySearchTerm = async (req, res, next) => {
           : "",
         isPercentage: offer ? (offer.is_percentage ? true : false) : "",
         createdBy: offer ? (offer.created_by ? offer.created_by : "") : "",
+        isGrocery : current.is_grocernest === 1 ? true : false
       };
     });
 
@@ -396,7 +399,7 @@ const getItemById = async (req, res, next) => {
   try {
     //Find all the details of the item pertaining to current item id
     const [itemResults, metadata] =
-      await sequelize.query(`select distinct t_item.id, t_item.name,t_item.show_discount ,t_item.brand_id,t_item.UOM ,t_item.category_id, t_lkp_category.group_name,t_item.sub_category_id , t_lkp_sub_category.sub_cat_name 
+      await sequelize.query(`select distinct t_item.id, t_item.name,t_item.show_discount ,t_item.brand_id,t_item.UOM ,t_item.category_id, t_item.is_grocernest,t_lkp_category.group_name,t_item.sub_category_id , t_lkp_sub_category.sub_cat_name 
       ,t_item.image ,t_item.description ,t_item.available_for_ecomm ,t_batch.batch_no ,t_item.how_to_use, t_item.ingredients, t_item.country_of_origin,t_item.manufacturer_name,
       t_batch.location_id ,t_batch.MRP ,t_batch.discount ,t_batch.cost_price ,t_batch.mfg_date ,t_batch.sale_price ,
       t_batch.expiry_date,
@@ -548,6 +551,7 @@ const getItemById = async (req, res, next) => {
         ingredients: item.ingredients ? item.ingredients : "",
         manufacturerName: item.manufacturer_name ? item.manufacturer_name : "",
         countryOfOrigin: item.country_of_origin ? item.country_of_origin : "",
+        isGrocery : item.is_grocernest === 1 ? true : false
       },
       message: "Details for requested item found",
     });
@@ -601,7 +605,7 @@ const getAllItemsInABrand = async (req, res, next) => {
   const {brandId} = req.params;
   try {
     const [itemsInACategory, metadata] =
-      await sequelize.query(`select distinct t_item.id, t_item.name, t_item.show_discount, t_item.brand_id,t_item.UOM, t_item.category_id ,t_item.sub_category_id ,
+      await sequelize.query(`select distinct t_item.id, t_item.name, t_item.show_discount,t_item.is_grocernest, t_item.brand_id,t_item.UOM, t_item.category_id ,t_item.sub_category_id ,
       t_item.image ,t_item.description ,t_item.available_for_ecomm ,t_batch.batch_no ,
       t_batch.location_id ,t_batch.MRP ,t_batch.discount ,t_batch.cost_price ,t_batch.mfg_date ,t_batch.sale_price ,
       t_batch.created_at,t_lkp_color.color_name, t_lkp_brand.brand_name, t_lkp_category.group_name, t_batch.mark_selected,t_batch.id as "batch_id"
@@ -687,6 +691,7 @@ const getAllItemsInABrand = async (req, res, next) => {
           : "",
         isPercentage: offer ? (offer.is_percentage ? true : false) : "",
         createdBy: offer ? (offer.created_by ? offer.created_by : "") : "",
+        isGrocery : current.is_grocernest === 1 ? true : false
       };
     });
 

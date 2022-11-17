@@ -20,7 +20,7 @@ const getBestSellers = async (req, res, next) => {
 
   try {
     const [bestsellers, metadata] =
-      await sequelize.query(`select distinct t_item.id,count(*), t_item.name,t_item.brand_id,t_item.UOM ,t_item.category_id ,t_item.sub_category_id ,
+      await sequelize.query(`select distinct t_item.id,count(*), t_item.name,t_item.brand_id,t_item.UOM ,t_item.is_grocernest,t_item.category_id ,t_item.sub_category_id ,
       t_item.image ,t_item.description ,t_item.available_for_ecomm ,t_batch.batch_no ,
       t_batch.location_id ,t_batch.MRP ,t_batch.discount ,t_batch.cost_price ,t_batch.mfg_date ,t_batch.sale_price ,
       t_batch.created_at,t_lkp_color.color_name, t_lkp_brand.brand_name, t_lkp_category.group_name, t_batch.mark_selected,t_batch.id as "batch_id"
@@ -105,6 +105,7 @@ const getBestSellers = async (req, res, next) => {
           : "",
         isPercentage: offer ? (offer.is_percentage ? true : false) : "",
         createdBy: offer ? (offer.created_by ? offer.created_by : "") : "",
+        isGrocery : current.is_grocernest === 1 ? true : false
       };
     });
 
