@@ -12,7 +12,7 @@ const {
 router.route("/view/all").get(authenticateAdmin, getAllFeaturedCategories);
 router.route("/view/:id").get(authenticateAdmin, getFeaturedCategoryById);
 router.route("/create").post(authenticateAdmin, createFeaturedCategory);
-router.route("edit/:id").put(authenticateAdmin, editFeaturedCategory);
+router.route("/edit/:id").put(authenticateAdmin, editFeaturedCategory);
 router.route("/delete/:id").delete(authenticateAdmin, deleteFeaturedCategory);
 
 module.exports = router;
