@@ -1,8 +1,10 @@
-const db = require("../../models");
 const uniq = require("uniqid");
-const S3 = require("aws-sdk/clients/s3");
-const s3Config = require("../../config/s3Config");
-const s3 = new S3(s3Config);
+
+const db = require("../../models");
+const {
+  uploadImageToS3,
+  deleteImageFromS3,
+} = require("../../services/s3Service");
 
 const FeaturedCategory = db.FeaturedCategoryModel;
 
@@ -67,23 +69,11 @@ const getFeaturedCategoryById = async (req, res, next) => {
 const createFeaturedCategory = async (req, res, next) => {
   const { user_id } = req;
   const { base64, heading, desc, category_id, extension, name } = req.body;
+
   try {
     const id = uniq();
-    const base64Data = new Buffer.from(
-      base64.replace(/^data:image\/\w+;base64,/, ""),
-      "base64"
-    );
-    //const type = base64.split(";")[0].split("/")[1];
-    const params = {
-      Bucket: process.env.AWS_BUCKET_NAME,
-      Key: `Featured-Categories/Images/${id}-${category_id}-${name}.${extension}`,
-      Body: base64Data,
-      ContentEncoding: "base64",
-      ContentType: `image/jpeg`,
-    };
-
-    const s3UploadResponse = await s3.upload(params).promise();
-    const url = s3UploadResponse.Location;
+    const key = `Featured-Categories/Images/${id}-${category_id}-${name}.${extension}`;
+    const url = await uploadImageToS3(base64, key);
 
     const newFeaturedCategory = await FeaturedCategory.create({
       id,
@@ -118,8 +108,6 @@ const editFeaturedCategory = async (req, res, next) => {
     req.body;
   const { user_id } = req;
   try {
-    let deleteSuccess = true;
-    let errMessage = "";
     let url;
 
     const current = await FeaturedCategory.findOne({
@@ -136,36 +124,19 @@ const editFeaturedCategory = async (req, res, next) => {
     }
 
     if (base64) {
-      const params = {
-        Bucket: process.env.AWS_BUCKET_NAME,
-        Key: `Featured-Categories/Images/${id}-${current.category_id}-${current.name}.${current.extension}`,
-      };
+      const deleteKey = `Featured-Categories/Images/${id}-${current.category_id}-${current.name}.${current.extension}`;
+      const deletionFromS3 = await deleteImageFromS3(deleteKey);
 
-      s3.deleteObject(params, (err, data) => {
-        if (err) {
-          deleteSuccess = false;
-          errMessage = err;
-        }
-      });
-
-      if (deleteSuccess) {
-        const params2 = {
-          Bucket: process.env.AWS_BUCKET_NAME,
-          Key: `Featured-Categories/Images/${id}-${category_id}-${name}.${extension}`,
-          Body: base64Data,
-          ContentEncoding: "base64",
-          ContentType: `image/jpeg`,
-        };
-
-        const s3UploadResponse = await s3.upload(params2).promise();
-        url = s3UploadResponse.Location;
+      if (deletionFromS3.deleteSuccess) {
+        const uploadKey = `Featured-Categories/Images/${id}-${category_id}-${name}.${extension}`;
+        url = await uploadImageToS3(base64, uploadKey);
       } else {
         return res.status(400).send({
           success: false,
           data: [],
           message:
             "Could not delete already existing image, please try again in sometime",
-          devMessage: errMessage,
+          devMessage: deletionFromS3.errMessage,
         });
       }
     }
@@ -206,56 +177,44 @@ const editFeaturedCategory = async (req, res, next) => {
 };
 
 const deleteFeaturedCategory = async (req, res, next) => {
-    const { id } = req.params;
+  const { id } = req.params;
   try {
-
     const current = await FeaturedCategory.findOne({
-        where: { id },
+      where: { id },
+    });
+
+    if (!current) {
+      return res.status(404).send({
+        success: false,
+        data: [],
+        message: "Requested featured category could not be found",
+        devMessage: "ID Entered is incorrect",
       });
-  
-      if (!current) {
-        return res.status(404).send({
-          success: false,
-          data: [],
-          message: "Requested featured category could not be found",
-          devMessage: "ID Entered is incorrect",
-        });
-      }
-  
-      let deleteSuccess = true;
-      let errMessage = "";
-  
-      const params = {
-        Bucket: process.env.AWS_BUCKET_NAME,
-        Key: `Featured-Categories/Images/${id}-${current.category_id}-${current.name}.${current.extension}`,
-      };
-  
-      s3.deleteObject(params, (err, data) => {
-        if (err) {
-          deleteSuccess = false;
-          errMessage = err;
-        }
+    }
+
+    const key = `Featured-Categories/Images/${id}-${current.category_id}-${current.name}.${current.extension}`;
+
+    const deletionFromS3 = await deleteImageFromS3(key);
+
+    if (!deletionFromS3.deleteSuccess) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message:
+          "Could not delete already existing image, please try again in sometime",
+        devMessage: deletionFromS3.errMessage,
       });
-  
-      if (!deleteSuccess) {
-        return res.status(400).send({
-          success: false,
-          data: [],
-          message:
-            "Could not delete already existing image, please try again in sometime",
-          devMessage: errMessage,
-        });
-      }
-  
-      const deleted = await FeaturedCategory.destroy({
-        where: { id },
-      });
-  
-      return res.status(200).send({
-        success: true,
-        data: deleted,
-        message: "Deleted Featured Category successfully",
-      });
+    }
+
+    const deleted = await FeaturedCategory.destroy({
+      where: { id },
+    });
+
+    return res.status(200).send({
+      success: true,
+      data: deleted,
+      message: "Deleted Featured Category successfully",
+    });
   } catch (error) {
     return res.status(400).send({
       success: false,
