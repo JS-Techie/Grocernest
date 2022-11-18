@@ -5164,7 +5164,7 @@
         }
       }
     },
-    "/admin/featured/categoriesedit/{id}": {
+    "/admin/featured/categories/edit/{id}": {
       "put": {
         "description": "",
         "parameters": [
