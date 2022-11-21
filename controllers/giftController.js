@@ -54,55 +54,66 @@ const getAllGifts = async (req, res, next) => {
 
     console.log(latestOrder);
 
+    //   const [gifts, metadata] =
+    //     await sequelize.query(`select t_item.id, t_item.name,t_item.brand_id,t_item.UOM ,t_item.category_id,t_item.sub_category_id
+    //     ,t_item.image ,t_item.description,t_lkp_color.color_name, t_lkp_brand.brand_name
+    //     from ((t_item
+    //           inner join t_lkp_color on t_lkp_color.id = t_item.color_id)
+    //           inner join t_lkp_brand on t_lkp_brand.id = t_item.brand_id)
+    //           where t_item.is_gift = 1 order by t_item.id
+    // `);
+
     const [gifts, metadata] =
-      await sequelize.query(`select t_item.id, t_item.name,t_item.brand_id,t_item.UOM ,t_item.category_id,t_item.sub_category_id
-      ,t_item.image ,t_item.description,t_lkp_color.color_name, t_lkp_brand.brand_name
-      from ((t_item
-            inner join t_lkp_color on t_lkp_color.id = t_item.color_id)
-            inner join t_lkp_brand on t_lkp_brand.id = t_item.brand_id)
-            where t_item.is_gift = 1 order by t_item.id 
-  `);
+      await sequelize.query(`select t_item.id, t_item.name,t_item.brand_id,t_item.category_id,t_item.sub_category_id
+  ,t_item.image ,t_item.description,t_lkp_color.color_name, t_lkp_brand.brand_name,t_batch.MRP,t_batch.sale_price,t_batch.cost_price ,t_batch.discount 
+  ,t_batch.mfg_date,t_inventory.quantity 
+  from ((((t_item
+        inner join t_lkp_color on t_lkp_color.id = t_item.color_id)
+        inner join t_lkp_brand on t_lkp_brand.id = t_item.brand_id)
+        inner join t_batch on t_batch.item_id = t_item.id)
+        inner join t_inventory on t_inventory.batch_id = t_batch.id)
+        where t_item.is_gift = 1 and t_batch.mark_selected = 1 and t_inventory.location_id = 4 and t_inventory.balance_type = 1 order by t_item.id `);
 
     console.log("GIFTS=====>", gifts);
 
     //Get all the gifts that exist
     let oldestBatch = null;
     const promises = gifts.map(async (current) => {
-      oldestBatch = await Batch.findOne({
-        where: { item_id: current.id, mark_selected: 1 },
-      });
+      // oldestBatch = await Batch.findOne({
+      //   where: { item_id: current.id, mark_selected: 1 },
+      // });
 
-      console.log("Selected batch of item====>", oldestBatch);
+      // console.log("Selected batch of item====>", oldestBatch);
 
-      let currentItem;
-      if (oldestBatch) {
-        currentItem = await Inventory.findOne({
-          where: {
-            item_id: current.id,
-            batch_id: oldestBatch.id,
-            balance_type: 1,
-            location_id: 4,
-          },
-        });
-      }
+      // let currentItem;
+      // if (oldestBatch) {
+      //   currentItem = await Inventory.findOne({
+      //     where: {
+      //       item_id: current.id,
+      //       batch_id: oldestBatch.id,
+      //       balance_type: 1,
+      //       location_id: 4,
+      //     },
+      //   });
+      // }
 
-      console.log("Current item=====>", currentItem);
+      // console.log("Current item=====>", currentItem);
 
-      if (oldestBatch && currentItem) {
-        return {
-          itemID: currentItem.id,
-          itemName: current.name,
-          availableQuantity: currentItem.quantity,
-          categoryID: current.category_id,
-          MRP: oldestBatch ? oldestBatch.MRP : "",
-          discount: oldestBatch ? oldestBatch.discount : "",
-          costPrice: oldestBatch ? oldestBatch.cost_price : "",
-          mfgDate: oldestBatch ? oldestBatch.mfg_date : "",
-          salePrice: oldestBatch ? oldestBatch.sale_price : "",
-          color: current.color_name,
-          brand: current.brand_name,
-        };
-      }
+      // if (oldestBatch && currentItem) {
+      return {
+        itemID: current.id,
+        itemName: current.name,
+        availableQuantity: current.quantity,
+        categoryID: current.category_id,
+        MRP: current.MRP,
+        discount: current.discount,
+        costPrice: current.cost_price,
+        mfgDate: current.mfg_date,
+        salePrice: current.sale_price,
+        color: current.color_name,
+        brand: current.brand_name,
+        // };
+      };
     });
 
     const resolved = await Promise.all(promises);
