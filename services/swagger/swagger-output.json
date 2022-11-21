@@ -5252,7 +5252,7 @@
         }
       }
     },
-    "/admin/daily/sales/view/all": {
+    "/admin/daily/sales/view": {
       "post": {
         "description": "",
         "parameters": [
