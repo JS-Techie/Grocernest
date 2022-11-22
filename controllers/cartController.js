@@ -168,7 +168,7 @@ const subtractItemFromCart = async (req, res, next) => {
 
   try {
     const itemExists = await Cart.findOne({
-      where: { cust_no: currentUser, item_id: itemID },
+      where: { cust_no: currentUser, item_id: itemID,is_offer:null },
     });
 
     if (!itemExists) {
@@ -197,7 +197,7 @@ const subtractItemFromCart = async (req, res, next) => {
 
     if (itemExists.quantity === 1) {
       removedItemFromCart = await Cart.destroy({
-        where: { cust_no: currentUser, item_id: itemID },
+        where: { cust_no: currentUser, item_id: itemID,is_offer : null },
       });
 
       if (offerItemToBeRemoved) {
