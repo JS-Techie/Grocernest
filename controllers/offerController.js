@@ -16,7 +16,7 @@ const offerForItem = async (req, res, next) => {
 
   try {
     const cart = await Cart.findOne({
-      where: { cust_no: currentUser, item_id: itemID },
+      where: { cust_no: currentUser, item_id: itemID, is_offer: 1 },
     });
 
     if (cart) {
@@ -74,7 +74,11 @@ const offerForItem = async (req, res, next) => {
             quantity: quantityToBeAdded,
           },
           {
-            where: { cust_no: currentUser, item_id: itemToBeAdded },
+            where: {
+              cust_no: currentUser,
+              item_id: itemToBeAdded,
+              is_offer: 1,
+            },
           }
         );
       } else {
@@ -118,7 +122,7 @@ const offerForItem = async (req, res, next) => {
     }
 
     offerItemInCart = await Cart.findOne({
-      where: { cust_no: currentUser, item_id: itemID },
+      where: { cust_no: currentUser, item_id: itemID, is_offer: 1 },
     });
 
     if (offerItemInCart) {
@@ -127,7 +131,7 @@ const offerForItem = async (req, res, next) => {
           quantity,
         },
         {
-          where: { cust_no: currentUser, item_id: itemID },
+          where: { cust_no: currentUser, item_id: itemID, is_offer: 1 },
         }
       );
     } else {
