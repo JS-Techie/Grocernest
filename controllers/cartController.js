@@ -224,6 +224,7 @@ const subtractItemFromCart = async (req, res, next) => {
 
     let itemQuantityUpdated = null;
     let isBigger = false;
+    let offerItemQuantityUpdated = 0
 
     if (offerItemToBeRemoved) {
       let newQuantityOfOfferItem = null;
@@ -284,7 +285,7 @@ const subtractItemFromCart = async (req, res, next) => {
         quantity: newQuantityOfNormalItem,
       },
       {
-        where: { cust_no: currentUser, item_id: itemID },
+        where: { cust_no: currentUser, item_id: itemID,is_offer : null },
       }
     );
 
