@@ -42,6 +42,7 @@ const addItemToCart = async (req, res, next) => {
       where: {
         item_id: itemId,
         cust_no: currentUser,
+        is_offer: 0,
       },
     });
 
@@ -201,7 +202,11 @@ const subtractItemFromCart = async (req, res, next) => {
 
       if (offerItemToBeRemoved) {
         removedOfferItemFromCart = await Cart.destroy({
-          where: { cust_no: currentUser, item_id: offerItemToBeRemoved },
+          where: {
+            cust_no: currentUser,
+            item_id: offerItemToBeRemoved,
+            is_offer: 1,
+          },
         });
       }
 
@@ -239,7 +244,7 @@ const subtractItemFromCart = async (req, res, next) => {
 
       if (isBigger) {
         offerItemQuantityUpdated = await Cart.destroy({
-          where: { cust_no: currentUser, item_id: offerItemToBeRemoved },
+          where: { cust_no: currentUser, item_id: offerItemToBeRemoved,is_offer:1 },
         });
       } else {
         offerItemQuantityUpdated = await Cart.update(
@@ -247,7 +252,7 @@ const subtractItemFromCart = async (req, res, next) => {
             quantity: newQuantityOfOfferItem,
           },
           {
-            where: { cust_no: currentUser, item_id: offerItemToBeRemoved },
+            where: { cust_no: currentUser, item_id: offerItemToBeRemoved,is_offer : 1 },
           }
         );
       }
@@ -342,7 +347,7 @@ const removeItemFromCart = async (req, res, next) => {
 
     if (offerItemToBeRemoved) {
       offerItemDestroyed = await Cart.destroy({
-        where: { cust_no: currentUser, item_id: offerItemToBeRemoved },
+        where: { cust_no: currentUser, item_id: offerItemToBeRemoved,is_offer : 1 },
       });
     }
 
@@ -442,14 +447,14 @@ const getCart = async (req, res, next) => {
 
   try {
     const [cartForUser, metadata] =
-      await sequelize.query(`select t_cart.item_id, t_cart.quantity,t_item.name, t_item.image, t_item.description,
+      await sequelize.query(`select t_cart.item_id, t_cart.id, t_cart.quantity,t_item.name, t_item.image, t_item.description,
     t_batch.MRP,t_batch.sale_price, t_batch.discount,t_lkp_color.color_name, t_lkp_brand.brand_name, t_cart.is_offer,t_cart.is_gift,t_cart.offer_item_price
     from ((((t_cart
     inner join t_item on t_item.id = t_cart.item_id)
     inner join t_batch on t_batch.item_id = t_cart.item_id )
     inner join t_lkp_color on t_lkp_color.id = t_item.color_id )
     inner join t_lkp_brand on t_lkp_brand.id = t_item.brand_id )
-    where t_cart.cust_no = "${currentUser}"`);
+    where t_cart.cust_no = "${currentUser}" group by t_cart.id`);
 
     if (cartForUser.length === 0) {
       return res.status(200).send({
@@ -547,7 +552,7 @@ const getCart = async (req, res, next) => {
 
     return res.status(200).send({
       success: true,
-      data: responseArray,
+      data: resolvedWithoutUndefined,
       message: "Cart successfully fetched for user",
     });
   } catch (error) {
