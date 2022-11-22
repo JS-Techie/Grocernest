@@ -133,7 +133,7 @@ const addItemToCart = async (req, res, next) => {
 
       const updatedItem = await Cart.update(
         { quantity: itemAlreadyExists.quantity + enteredQuantity },
-        { where: { item_id: itemId, cust_no: currentUser } }
+        { where: { item_id: itemId, cust_no: currentUser,is_offer : null } }
       );
       return res.status(201).send({
         success: true,
