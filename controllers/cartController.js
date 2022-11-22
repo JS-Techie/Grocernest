@@ -262,7 +262,7 @@ const subtractItemFromCart = async (req, res, next) => {
           quantity: newQuantityOfNormalItem,
         },
         {
-          where: { cust_no: currentUser, item_id: itemID },
+          where: { cust_no: currentUser, item_id: itemID,is_offer : null },
         }
       );
 
