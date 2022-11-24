@@ -99,6 +99,12 @@ function generateInvoiceTable(doc, invoice) {
     console.log(item.salePrice);
 
     const position = invoiceTableTop + (i + 2) * 30;
+
+    let salePrice = 0;
+    if (!item.isGift && !item.isOffer) {
+      salePrice = item.salePrice;
+    }
+
     generateTableRow(
       doc,
       position,
@@ -109,7 +115,7 @@ function generateInvoiceTable(doc, invoice) {
         : item.itemName,
       item.quantity,
       item.MRP,
-      item.isGift === true ? 0 : item.salePrice,
+      salePrice,
       item.salePrice * item.quantity
     );
     generateHr(doc, position + 20);
