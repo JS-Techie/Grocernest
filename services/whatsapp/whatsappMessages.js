@@ -119,7 +119,7 @@ const sendNotificationsToUser = async (itemName, phoneNumber, custName) => {
       message: {
         isHSM: "true",
         type: "text",
-        text: `Hi, ${firstName}, ${itemName} is now back in stock. Go get it!`,
+        text: `Hi, ${firstName}, ${itemName} is now back in stock. Go to grocernest.com now!`,
       },
     });
     console.log("Success Response", messageResponseFromGupshup);

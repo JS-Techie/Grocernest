@@ -320,6 +320,8 @@ const notify = async (req, res, next) => {
     });
   }
 };
+
+
 module.exports = {
   getBestSellers,
   allBigBanners,
