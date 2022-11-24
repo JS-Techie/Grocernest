@@ -14,7 +14,7 @@ const Customer = db.CustomerModel;
 const Demand = db.DemandModel;
 const Notify = db.NotifyModel;
 
-const { uploadToS3 } = require("../services/s3Service");
+const { uploadImageToS3 } = require("../services/s3Service");
 
 const { findCustomerNumber } = require("../middleware/customerNumber");
 
@@ -260,8 +260,8 @@ const createDemand = async (req, res, next) => {
     }
     let url = "";
     if (base64) {
-      const key = `customer/demand/${cust_no}/${uniq().slice(5)}.${extension}`;
-      url = await uploadToS3(base64, key);
+      const key = `customer/demand/${cust_no}/${uniq()}.${extension}`;
+      url = await uploadImageToS3(base64, key);
     }
 
     const newDemand = await Demand.create({
