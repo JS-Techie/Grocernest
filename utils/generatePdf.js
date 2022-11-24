@@ -79,8 +79,8 @@ function generateInvoiceTable(doc, invoice) {
     doc,
     position,
     "Item Name",
-    "Quantity",
     "MRP",
+    "Quantity",
     "Sale Price"
   );
 
