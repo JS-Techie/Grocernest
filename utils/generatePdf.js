@@ -118,7 +118,7 @@ function generateInvoiceTable(doc, invoice) {
       item.quantity,
       item.MRP,
       salePrice,
-      item.salePrice * item.quantity
+      total
     );
     generateHr(doc, position + 20);
   }
