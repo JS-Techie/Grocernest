@@ -83,7 +83,6 @@ function generateInvoiceTable(doc, invoice) {
     "Item Name",
     "Quantity",
     "MRP",
-
     "Sale Price",
     "Total"
   );
@@ -111,7 +110,7 @@ function generateInvoiceTable(doc, invoice) {
       item.quantity,
       item.MRP,
       item.isGift === true ? 0 : item.salePrice,
-      item.sale_price * item.quantity
+      item.salePrice * item.quantity
     );
     generateHr(doc, position + 20);
   }
