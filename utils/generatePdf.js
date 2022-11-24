@@ -105,8 +105,8 @@ function generateInvoiceTable(doc, invoice) {
         ? `${item.itemName} (offer)`
         : item.itemName,
       item.quantity,
-      item.MRP,
-      item.isGift === true ? 0 : item.salePrice
+      item.MRP * item.quantity,
+      item.isGift === true ? 0 : item.salePrice * item.quantity
     );
     generateHr(doc, position + 20);
   }
