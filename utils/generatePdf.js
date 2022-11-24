@@ -101,8 +101,10 @@ function generateInvoiceTable(doc, invoice) {
     const position = invoiceTableTop + (i + 2) * 30;
 
     let salePrice = 0;
+    let total = 0;
     if (!item.isGift && !item.isOffer) {
       salePrice = item.salePrice;
+      total = salePrice * item.quantity;
     }
 
     generateTableRow(
