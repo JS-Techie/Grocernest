@@ -67,7 +67,7 @@ module.exports = (sequelize) => {
     },
   };
   const options = {
-    tableName: "t_leave",
+    tableName: "t_notify",
     comment: "",
     indexes: [],
   };

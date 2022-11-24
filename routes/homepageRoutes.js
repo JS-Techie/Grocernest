@@ -1,6 +1,7 @@
 const router = require("express").Router();
 
 const authenticate = require("../middleware/authentication");
+
 const {
   allBigBanners,
   allSmallBanners,

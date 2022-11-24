@@ -63,6 +63,7 @@ function generateTableRow1(doc, y, c1, c4, c5) {
     .font("Helvetica-Bold")
     .fontSize(15)
     .text(c1, 50, y)
+    .text(c4, 250, y, { width: 90, align: "center" })
     .text(c4, 370, y, { width: 90, align: "center" })
     .text(c5, 0, y, { align: "right" });
 }
@@ -76,7 +77,7 @@ function generateInvoiceTable(doc, invoice) {
   let i,
     invoiceTableTop = 130;
   const position = invoiceTableTop + 1 * 30;
-  generateTableRow1(doc, position, "Item Name", "Quantity", "Sale Price");
+  generateTableRow1(doc, position, "Item Name", "Quantity","MRP" ,"Sale Price");
 
   const orderItems = invoice.orderItems.filter((currentItem) => {
     return currentItem != undefined;
@@ -101,6 +102,7 @@ function generateInvoiceTable(doc, invoice) {
           ? `${item.itemName} (offer)`
           : item.itemName,
       item.quantity,
+      item.MRP,
       item.isGift === true ? 0 : item.salePrice
     );
     generateHr(doc, position + 20);
