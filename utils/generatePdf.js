@@ -50,7 +50,7 @@ const generateCustomerInformation = (doc, invoice) => {
     });
 };
 
-function generateTableRow(doc, y, c1, c4, c5) {
+function generateTableRow(doc, y, c1, c2, c4, c5) {
   doc
     .font("Helvetica")
     .fontSize(15)
@@ -59,7 +59,7 @@ function generateTableRow(doc, y, c1, c4, c5) {
     .text(c4, 370, y, { width: 90, align: "center" })
     .text(c5, 0, y, { align: "right" });
 }
-function generateTableRow1(doc, y, c1, c4, c5) {
+function generateTableRow1(doc, y, c1, c4, c2, c5) {
   doc
     .font("Helvetica-Bold")
     .fontSize(15)
@@ -70,25 +70,27 @@ function generateTableRow1(doc, y, c1, c4, c5) {
 }
 
 function generateInvoiceTable(doc, invoice) {
-
-
   console.log("===================", invoice);
-
 
   let i,
     invoiceTableTop = 130;
   const position = invoiceTableTop + 1 * 30;
-  generateTableRow1(doc, position, "Item Name", "Quantity","MRP" ,"Sale Price");
+  generateTableRow1(
+    doc,
+    position,
+    "Item Name",
+    "Quantity",
+    "MRP",
+    "Sale Price"
+  );
 
   const orderItems = invoice.orderItems.filter((currentItem) => {
     return currentItem != undefined;
-  })
+  });
 
   console.log(orderItems);
 
   for (i = 0; i < orderItems.length; i++) {
-
-
     const item = orderItems[i];
 
     console.log(item.salePrice);
@@ -100,8 +102,8 @@ function generateInvoiceTable(doc, invoice) {
       item.isGift === true
         ? `${item.itemName} (gift)`
         : item.isOffer === true
-          ? `${item.itemName} (offer)`
-          : item.itemName,
+        ? `${item.itemName} (offer)`
+        : item.itemName,
       item.quantity,
       item.MRP,
       item.isGift === true ? 0 : item.salePrice
