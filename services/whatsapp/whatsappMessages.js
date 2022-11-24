@@ -108,9 +108,30 @@ const sendPOSInvoiceToUser = async (link, orderId, phoneNumber) => {
   }
 };
 
+const sendNotificationsToUser = async (itemName, phoneNumber, custName) => {
+  const firstName = custName.split(" ")[0];
+  try {
+    const messageResponseFromGupshup = await client.message.send({
+      channel: "whatsapp",
+      source: "919433804769",
+      destination: "91" + phoneNumber.toString(),
+      "src.name": "grocernest",
+      message: {
+        isHSM: "true",
+        type: "text",
+        text: `Hi, ${firstName}, ${itemName} is now back in stock. Go get it!`,
+      },
+    });
+    console.log("Success Response", messageResponseFromGupshup);
+  } catch (error) {
+    console.error("Error Response", error);
+  }
+};
+
 module.exports = {
   sendCouponToUser,
   sendOfferToUser,
   sendPOSInvoiceToUser,
   sendFirstCouponToUser,
+  sendNotificationsToUser,
 };

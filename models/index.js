@@ -175,6 +175,8 @@ db.FeaturedCategoryModel = require("./t_featured_categories")(
 
 db.DemandModel = require("./t_demand")(db.sequelize, Sequelize);
 
+db.NotifyModel = require("./t_notify")(db.sequelize, Sequelize);
+
 // Relations between tables
 
 db.MilkDashboardModel.hasMany(db.SubscriptionItemsModel, {

@@ -8,6 +8,7 @@ const {
   getBestSellers,
   featuredCategories,
   createDemand,
+  notify,
 } = require("../controllers/homepageController");
 
 router.route("/view/banners/big").get(allBigBanners);
@@ -16,5 +17,6 @@ router.route("/view/brands/featured").get(featuredBrands);
 router.route("/view/bestsellers").get(getBestSellers);
 router.route("/view/categories/featured").get(featuredCategories);
 router.route("/create/demand").post(createDemand);
+router.route("/notify").post(notify);
 
 module.exports = router;

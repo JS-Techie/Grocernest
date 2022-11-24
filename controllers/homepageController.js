@@ -12,6 +12,7 @@ const Item = db.ItemModel;
 const FeaturedCategory = db.FeaturedCategoryModel;
 const Customer = db.CustomerModel;
 const Demand = db.DemandModel;
+const Notify = db.NotifyModel;
 
 const { uploadToS3 } = require("../services/s3Service");
 
@@ -286,6 +287,39 @@ const createDemand = async (req, res, next) => {
   }
 };
 
+const notify = async (req, res, next) => {
+  const { cust_no } = req;
+  const { id } = req.body;
+  try {
+    const item = await Item.findOne({ where: { id } });
+
+    if (!item) {
+      return res.status(404).send({
+        success: false,
+        data: [],
+        message: "Requested item not found",
+      });
+    }
+
+    const newNotify = await Notify.create({
+      cust_no,
+      item_id: id,
+      created_by: 1,
+    });
+
+    return res.status(201).send({
+      success: true,
+      data: newNotify,
+      message: "You will be notified once this item is back in stock",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "Something went wrong, please try again in sometime",
+    });
+  }
+};
 module.exports = {
   getBestSellers,
   allBigBanners,
@@ -293,4 +327,5 @@ module.exports = {
   featuredBrands,
   featuredCategories,
   createDemand,
+  notify,
 };

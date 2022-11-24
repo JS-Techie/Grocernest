@@ -7,8 +7,12 @@ const {
 } = require("../../services/s3Service");
 const { sequelize } = require("../../models");
 
+const {
+  sendNotificationsToUser,
+} = require("../../services/whatsapp/whatsappMessages");
 const FeaturedBrand = db.FeaturedBrandsModel;
 const Demand = db.DemandModel;
+const Notify = db.NotifyModel;
 
 const getAllFeaturedBrands = async (req, res, next) => {
   try {
@@ -268,6 +272,41 @@ const getDemandList = async (req, res, next) => {
   }
 };
 
+const sendNotification = async (req, res, next) => {
+  const { id } = req.body;
+  try {
+    const [notifs, metadata] = await sequelize.query(
+      `select t_customer.cust_name, t_customer.contact_no,t_item.name from ((t_notify inner join t_customer on t_customer.cust_no = t_notify.cust_no) inner join t_item on t_item.id = t_notify.item_id) where t_notify.item_id = ${id}`
+    );
+
+    if (notifs.length > 0) {
+      notifs.map((current) => {
+        sendNotificationsToUser(
+          current.name,
+          current.contact_no,
+          current.cust_name
+        );
+      });
+    }
+
+    const [deleteResults, metadata2] = await sequelize.query(
+      `delete from t_notify where item_id = ${id}`
+    );
+
+    return res.status(200).send({
+      success: true,
+      data: deleteResults,
+      message: "Successfully sent notifications to customer",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "Something went wrong, please try again in sometime",
+    });
+  }
+};
+
 module.exports = {
   getAllFeaturedBrands,
   getFeaturedBrandById,
@@ -275,4 +314,5 @@ module.exports = {
   editFeaturedBrand,
   deleteFeaturedBrand,
   getDemandList,
+  sendNotification,
 };
