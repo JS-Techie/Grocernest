@@ -260,7 +260,7 @@ const createDemand = async (req, res, next) => {
     }
     let url = "";
     if (base64) {
-      const key = `customer/demand/${cust_no}/${uniq()}.${extension}`;
+      const key = `customer/demand/${cust_no}/${uniq().slice(5)}.${extension}`;
       url = await uploadToS3(base64, key);
     }
 
