@@ -1,3 +1,7 @@
+const { sequelize } = require("../models");
+const { Op } = require("sequelize");
+const uniq = require("uniqid");
+
 const db = require("../models");
 
 const Banner = db.BannerModel;
@@ -6,9 +10,10 @@ const WishlistItems = db.WishlistItemsModel;
 const Offers = db.OffersModel;
 const Item = db.ItemModel;
 const FeaturedCategory = db.FeaturedCategoryModel;
+const Customer = db.CustomerModel;
+const Demand = db.DemandModel;
 
-const { sequelize } = require("../models");
-const { Op } = require("sequelize");
+const { uploadToS3 } = require("../services/s3Service");
 
 const { findCustomerNumber } = require("../middleware/customerNumber");
 
@@ -33,7 +38,7 @@ const getBestSellers = async (req, res, next) => {
             inner join t_lkp_brand on t_lkp_brand.id = t_item.brand_id)
             inner join t_inventory on t_inventory.item_id = t_item.id)
             where t_inventory.location_id = 4 and t_inventory.balance_type = 1 and t_lkp_category.available_for_ecomm = 1 and t_item.available_for_ecomm = 1 and t_batch.mark_selected = 1
-            group by t_order_items.item_id order by count(*) desc`);
+            group by t_order_items.item_id order by count(*) asc`);
 
     if (bestsellers.length === 0) {
       return res.status(200).send({
@@ -238,10 +243,54 @@ const featuredCategories = async (req, res, next) => {
   }
 };
 
+const createDemand = async (req, res, next) => {
+  const { cust_no } = req;
+  const { title, desc, base64, extension } = req.body;
+  try {
+    const currentCustomer = await Customer.findOne({ where: { cust_no } });
+
+    if (!currentCustomer) {
+      return res.status(404).send({
+        success: false,
+        data: [],
+        message: "Requested user does not exist",
+        devMessage: "User ID entered does not exist",
+      });
+    }
+    let url = "";
+    if (base64) {
+      const key = `customer/demand/${cust_no}/${uniq()}.${extension}`;
+      url = await uploadToS3(base64, key);
+    }
+
+    const newDemand = await Demand.create({
+      cust_no,
+      title,
+      desc,
+      url,
+      created_by: 1,
+    });
+
+    return res.status(201).send({
+      success: true,
+      data: newDemand,
+      message: "Successfully submitted your request to Grocernest",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "Something went wrong, please try again in sometime",
+      devMessage: "Please check data field for the error details",
+    });
+  }
+};
+
 module.exports = {
   getBestSellers,
   allBigBanners,
   allSmallBanners,
   featuredBrands,
-  featuredCategories
+  featuredCategories,
+  createDemand,
 };

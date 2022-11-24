@@ -277,8 +277,60 @@ const deleteImage = async (req, res, next) => {
   }
 };
 
+const referenceItem = async (req, res, next) => {
+  const { reference, current } = req.body;
+  try {
+    const currentItemDetails = await Item.findOne({ where: { id: current } });
+    const referenceItemDetails = await Item.findOne({
+      where: { id: reference },
+    });
+
+    if (!referenceItemDetails) {
+      return res.status(404).send({
+        success: false,
+        data: [],
+        message: "Could not find the details for the reference item",
+      });
+    }
+
+    if (!currentItemDetails) {
+      return res.status(404).send({
+        success: false,
+        data: [],
+        message: "Could not find the details for the current item",
+      });
+    }
+
+    const update = await Item.update(
+      {
+        image: referenceItemDetails.image,
+      },
+      {
+        where: { id: current },
+      }
+    );
+
+    const updatedItemDetails = await Item.findOne({
+      where: { id: current },
+    });
+
+    return res.status(200).send({
+      success: true,
+      data: updatedItemDetails,
+      message: "Successfully updated image of requested item",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "Something went wrong, please try again in sometime",
+    });
+  }
+};
+
 module.exports = {
   uploadMultipleImages,
   editUploadedImages,
   deleteImage,
+  referenceItem,
 };

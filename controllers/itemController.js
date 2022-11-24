@@ -113,7 +113,7 @@ const getItemsInCategory = async (req, res, next) => {
           : "",
         isPercentage: offer ? (offer.is_percentage ? true : false) : "",
         createdBy: offer ? (offer.created_by ? offer.created_by : "") : "",
-        isGrocery : current.is_grocernest === 1 ? true : false
+        isGrocery: current.is_grocernest === 1 ? true : false,
       };
     });
 
@@ -238,7 +238,7 @@ const getItemsInSubcategory = async (req, res, next) => {
           : "",
         isPercentage: offer ? (offer.is_percentage ? true : false) : "",
         createdBy: offer ? (offer.created_by ? offer.created_by : "") : "",
-        isGrocery : current.is_grocernest === 1 ? true : false
+        isGrocery: current.is_grocernest === 1 ? true : false,
       };
     });
 
@@ -361,7 +361,7 @@ const getItemsBySearchTerm = async (req, res, next) => {
           : "",
         isPercentage: offer ? (offer.is_percentage ? true : false) : "",
         createdBy: offer ? (offer.created_by ? offer.created_by : "") : "",
-        isGrocery : current.is_grocernest === 1 ? true : false
+        isGrocery: current.is_grocernest === 1 ? true : false,
       };
     });
 
@@ -494,6 +494,15 @@ const getItemById = async (req, res, next) => {
       });
     }
 
+    let walletBalance = 0;
+    if (item.cashback) {
+      if (item.cashback_is_percentage) {
+        walletBalance = (item.cashback / 100) * item.sale_price;
+      } else {
+        walletBalance = item.cashback;
+      }
+    }
+
     const resolved = await Promise.all(promises);
     const couponForCurrentItem = resolved.filter((current) => {
       return current != undefined;
@@ -551,7 +560,8 @@ const getItemById = async (req, res, next) => {
         ingredients: item.ingredients ? item.ingredients : "",
         manufacturerName: item.manufacturer_name ? item.manufacturer_name : "",
         countryOfOrigin: item.country_of_origin ? item.country_of_origin : "",
-        isGrocery : item.is_grocernest === 1 ? true : false
+        isGrocery: item.is_grocernest === 1 ? true : false,
+        walletBalanceApplicable: walletBalance,
       },
       message: "Details for requested item found",
     });
@@ -602,7 +612,7 @@ const getAllItemsInABrand = async (req, res, next) => {
   console.log(currentUser);
 
   //Get category id from the request
-  const {brandId} = req.params;
+  const { brandId } = req.params;
   try {
     const [itemsInACategory, metadata] =
       await sequelize.query(`select distinct t_item.id, t_item.name, t_item.show_discount,t_item.is_grocernest, t_item.brand_id,t_item.UOM, t_item.category_id ,t_item.sub_category_id ,
@@ -691,7 +701,7 @@ const getAllItemsInABrand = async (req, res, next) => {
           : "",
         isPercentage: offer ? (offer.is_percentage ? true : false) : "",
         createdBy: offer ? (offer.created_by ? offer.created_by : "") : "",
-        isGrocery : current.is_grocernest === 1 ? true : false
+        isGrocery: current.is_grocernest === 1 ? true : false,
       };
     });
 

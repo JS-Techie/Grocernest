@@ -5,8 +5,10 @@ const {
   uploadImageToS3,
   deleteImageFromS3,
 } = require("../../services/s3Service");
+const { sequelize } = require("../../models");
 
 const FeaturedBrand = db.FeaturedBrandsModel;
+const Demand = db.DemandModel;
 
 const getAllFeaturedBrands = async (req, res, next) => {
   try {
@@ -224,10 +226,53 @@ const deleteFeaturedBrand = async (req, res, next) => {
   }
 };
 
+const getDemandList = async (req, res, next) => {
+  try {
+    const [demands, metadata] = await sequelize.query(
+      `select t_demand.title,t_demand.desc,t_demand.url,t_customer.cust_name,t_customer.email,t_customer.contact_no from t_demand inner join t_customer on t_customer.cust_no = t_demand.cust_no order by t_demand.created_at desc`
+    );
+
+    if (demands.length === 0) {
+      return res.status(200).send({
+        success: true,
+        data: [],
+        message: "There are no customer demands right now",
+      });
+    }
+
+    const promises = demands.map((current) => {
+      return {
+        title: current.title,
+        description: current.description,
+        image: current.url,
+        customerName: current.cust_name,
+        customerEmail: current.email ? current.email : "",
+        phoneNumber: current.contact_no,
+      };
+    });
+
+    const resolved = await Promise.resolve(promises);
+
+    return res.status(200).send({
+      success: true,
+      data: resolved,
+      message: "Successfully found customer demand list",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "Something went wrong, please try again in sometime",
+      devMessage: "Please check data field for more details",
+    });
+  }
+};
+
 module.exports = {
   getAllFeaturedBrands,
   getFeaturedBrandById,
   createFeaturedBrand,
   editFeaturedBrand,
   deleteFeaturedBrand,
+  getDemandList,
 };
