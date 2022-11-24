@@ -16,7 +16,7 @@ router.route("/view/banners/small").get(allSmallBanners);
 router.route("/view/brands/featured").get(featuredBrands);
 router.route("/view/bestsellers").get(getBestSellers);
 router.route("/view/categories/featured").get(featuredCategories);
-router.route("/create/demand").post(createDemand);
-router.route("/notify").post(notify);
+router.route("/create/demand").post(authenticate,createDemand);
+router.route("/notify").post(authenticate,notify);
 
 module.exports = router;
