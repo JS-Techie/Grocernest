@@ -56,8 +56,8 @@ function generateTableRow(doc, y, c1, c2, c3, c4, c5) {
     .fontSize(15)
     .text(c1, 50, y)
     .text(c2, 250, y, { width: 90, align: "center" })
-    .text(c3, 310, y, { width: 90, align: "center" })
-    .text(c4, 390, y, { width: 90, align: "center" })
+    .text(c3, 330, y, { width: 90, align: "center" })
+    .text(c4, 410, y, { width: 90, align: "center" })
     .text(c5, 0, y, { align: "right" });
 }
 function generateTableRow1(doc, y, c1, c2, c3, c4, c5) {
@@ -66,8 +66,8 @@ function generateTableRow1(doc, y, c1, c2, c3, c4, c5) {
     .fontSize(15)
     .text(c1, 50, y)
     .text(c2, 250, y, { width: 90, align: "center" })
-    .text(c3, 310, y, { width: 90, align: "center" })
-    .text(c4, 390, y, { width: 90, align: "center" })
+    .text(c3, 330, y, { width: 90, align: "center" })
+    .text(c4, 410, y, { width: 90, align: "center" })
     .text(c5, 0, y, { align: "right" });
 }
 
