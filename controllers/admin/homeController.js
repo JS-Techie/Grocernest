@@ -247,7 +247,7 @@ const getDemandList = async (req, res, next) => {
     const promises = demands.map((current) => {
       return {
         title: current.title,
-        description: current.description,
+        description: current.desc,
         image: current.url,
         customerName: current.cust_name,
         customerEmail: current.email ? current.email : "",
