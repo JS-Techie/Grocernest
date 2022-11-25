@@ -301,6 +301,17 @@ const notify = async (req, res, next) => {
       });
     }
 
+    const existingNotify = await Notify.findOne({
+      where: { cust_no, item_id: id },
+    });
+
+    if (existingNotify) {
+      return res.status(201).send({
+        success: true,
+        data: [],
+        message: "You will be notified once this item is back in stock",
+      });
+    }
     const newNotify = await Notify.create({
       cust_no,
       item_id: id,
@@ -320,7 +331,6 @@ const notify = async (req, res, next) => {
     });
   }
 };
-
 
 module.exports = {
   getBestSellers,
