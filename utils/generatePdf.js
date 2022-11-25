@@ -109,7 +109,7 @@ function generateInvoiceTable(doc, invoice) {
 
     let item_name = item.itemName;
     if (item_name.length > 15) {
-      item_name = item.itemName.slice(0,15) + "...";
+      item_name = item.itemName.slice(0,25) + "...";
     }
     generateTableRow(
       doc,
