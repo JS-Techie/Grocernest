@@ -7,6 +7,7 @@ const {
   getItemsBySearchTerm,
   getItemById,
   getAvailableQty,
+  getAllItemsInABrand
 
 } = require("../controllers/itemController");
 
@@ -17,6 +18,7 @@ router
 router.route("/search/:searchTerm").get(getItemsBySearchTerm);
 router.route("/:itemId").get(getItemById);
 router.route("/available/quantity").post(getAvailableQty);
+router.route("/brands/:brandId").get(getAllItemsInABrand)
 
 
 module.exports = router;

@@ -50,58 +50,79 @@ const generateCustomerInformation = (doc, invoice) => {
     });
 };
 
-function generateTableRow(doc, y, c1, c4, c5) {
+function generateTableRow(doc, y, c1, c2, c3, c4, c5) {
   doc
     .font("Helvetica")
     .fontSize(15)
     .text(c1, 50, y)
-    .text(c4, 370, y, { width: 90, align: "center" })
+    .text(c2, 250, y, { width: 90, align: "center" })
+    .text(c3, 330, y, { width: 90, align: "center" })
+    .text(c4, 410, y, { width: 90, align: "center" })
     .text(c5, 0, y, { align: "right" });
 }
-function generateTableRow1(doc, y, c1, c4, c5) {
+function generateTableRow1(doc, y, c1, c2, c3, c4, c5) {
   doc
     .font("Helvetica-Bold")
     .fontSize(15)
     .text(c1, 50, y)
-    .text(c4, 370, y, { width: 90, align: "center" })
+    .text(c2, 250, y, { width: 90, align: "center" })
+    .text(c3, 330, y, { width: 90, align: "center" })
+    .text(c4, 410, y, { width: 90, align: "center" })
     .text(c5, 0, y, { align: "right" });
 }
 
 function generateInvoiceTable(doc, invoice) {
-
-
   console.log("===================", invoice);
-
 
   let i,
     invoiceTableTop = 130;
   const position = invoiceTableTop + 1 * 30;
-  generateTableRow1(doc, position, "Item Name", "Quantity", "Sale Price");
+  generateTableRow1(
+    doc,
+    position,
+    "Item Name",
+    "Quantity",
+    "MRP",
+    "Sale Price",
+    "Total"
+  );
 
   const orderItems = invoice.orderItems.filter((currentItem) => {
     return currentItem != undefined;
-  })
+  });
 
   console.log(orderItems);
 
   for (i = 0; i < orderItems.length; i++) {
-
-
     const item = orderItems[i];
 
     console.log(item.salePrice);
 
     const position = invoiceTableTop + (i + 2) * 30;
+
+    let salePrice = 0;
+    let total = 0;
+    if (!item.isGift && !item.isOffer) {
+      salePrice = item.salePrice;
+      total = salePrice * item.quantity;
+    }
+
+    let item_name = item.itemName;
+    if (item_name.length > 15) {
+      item_name = item.itemName.slice(0,25) + "...";
+    }
     generateTableRow(
       doc,
       position,
       item.isGift === true
-        ? `${item.itemName} (gift)`
+        ? `${item_name} (Gift)`
         : item.isOffer === true
-          ? `${item.itemName} (offer)`
-          : item.itemName,
+        ? `${item_name} (Offer)`
+        : item_name,
       item.quantity,
-      item.isGift === true ? 0 : item.salePrice
+      item.MRP,
+      salePrice,
+      total
     );
     generateHr(doc, position + 20);
   }

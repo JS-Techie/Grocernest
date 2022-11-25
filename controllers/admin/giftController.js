@@ -11,6 +11,8 @@ const getGifts = async (req, res, next) => {
       where: { is_gift: 1 },
     });
 
+    console.log(gifts);
+
     if (gifts.length === 0) {
       return res.send(404).send({
         success: true,
@@ -20,6 +22,7 @@ const getGifts = async (req, res, next) => {
     }
 
     const promises = gifts.map(async (current) => {
+      console.log(current);
       const oldestBatch = await Batch.findOne({
         where: { item_id: current.id, mark_selected: 1 },
       });
@@ -34,6 +37,8 @@ const getGifts = async (req, res, next) => {
             balance_type: 1,
           },
         });
+
+        console.log(currentItem)
       }
 
       if (oldestBatch && currentItem) {
