@@ -107,14 +107,18 @@ function generateInvoiceTable(doc, invoice) {
       total = salePrice * item.quantity;
     }
 
+    let item_name = item.itemName;
+    if (item_name.length > 15) {
+      item_name = item.itemName.slice(15) + "...";
+    }
     generateTableRow(
       doc,
       position,
       item.isGift === true
-        ? `${item.itemName} (gift)`
+        ? `${item_name} (gift)`
         : item.isOffer === true
-        ? `${item.itemName} (offer)`
-        : item.itemName,
+        ? `${item_name} (offer)`
+        : item_name,
       item.quantity,
       item.MRP,
       salePrice,
