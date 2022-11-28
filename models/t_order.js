@@ -192,6 +192,15 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "pickup_date"
+    },
+    pin : {
+      type: DataTypes.BIGINT,
+      allowNull: false,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "pin"
     }
   };
   const options = {

@@ -175,7 +175,7 @@ const getOrderByOrderId = async (req, res, next) => {
     //Get that order according to its id
 
     const [singleOrder, metadata] =
-      await sequelize.query(`select t_order.order_id, t_order.created_at, t_order.status, t_order.return_status,t_item.id, t_item.name, t_order_items.quantity, t_item.image,
+      await sequelize.query(`select t_order.order_id, t_order.created_at,t_order.pin t_order.status, t_order.return_status,t_item.id, t_item.name, t_order_items.quantity, t_item.image,
       t_order_items.is_offer, t_order_items.is_gift, t_order_items.offer_price
     from ((t_order
     inner join t_order_items on t_order_items.order_id = t_order.order_id)
@@ -282,6 +282,7 @@ const getOrderByOrderId = async (req, res, next) => {
         orderTotal,
         itemDetails: responseArray,
         return_status: singleOrder[0].return_status,
+        pin: singleOrder[0].pin,
       },
       message: "Order successfully fetched for the user",
     });

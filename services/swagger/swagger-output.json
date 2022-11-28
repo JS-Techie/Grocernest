@@ -6352,6 +6352,9 @@
                 },
                 "date": {
                   "example": "any"
+                },
+                "pin": {
+                  "example": "any"
                 }
               }
             }

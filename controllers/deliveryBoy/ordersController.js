@@ -3,7 +3,7 @@ const db = require("../../models");
 const {
   sendOrderStatusToWhatsapp,
   sendReturnOrderStatusToWhatsapp,
-  sendReturnOrderRejectStatusToWhatsapp
+  sendReturnOrderRejectStatusToWhatsapp,
 } = require("../../services/whatsapp/whatsapp");
 
 const Order = db.OrderModel;
@@ -128,12 +128,16 @@ const getAllDeliveryOrders = async (req, res, next) => {
 const changeStatusOfDeliveryOrder = async (req, res, next) => {
   const { user_id } = req;
   const { order_id } = req.params;
-  const { status, date } = req.body;
+  const { status, date, pin } = req.body;
 
   try {
-    console.log(user_id);
-    console.log(status);
-    console.log(order_id);
+    if (status === "Delivered" && !pin) {
+      return res.status(404).send({
+        success: false,
+        data: [],
+        message: "Please enter the PIN to deliver the current order",
+      });
+    }
 
     const orderExists = await Order.findOne({
       where: { order_id, delivery_boy: user_id },
@@ -152,6 +156,18 @@ const changeStatusOfDeliveryOrder = async (req, res, next) => {
         success: false,
         data: orderExists,
         message: `You cant change the status of the order as it is ${orderExists.status}`,
+      });
+    }
+
+    if (
+      orderExists.status === "Shipped" &&
+      status === "Delivered" &&
+      parseInt(pin) !== orderExists.pin
+    ) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "PIN entered for current order is incorrect",
       });
     }
 
@@ -175,11 +191,9 @@ const changeStatusOfDeliveryOrder = async (req, res, next) => {
     });
     let ph_no = currentCustomer.contact_no;
 
-
     //Send notification in whatsapp about order status
     if (ph_no && order_id && order_status)
       sendOrderStatusToWhatsapp(ph_no, order_id, order_status);
-
 
     return res.status(200).send({
       success: true,
@@ -250,8 +264,9 @@ const changeStatusOfReturnOrder = async (req, res, next) => {
       return res.status(400).send({
         success: false,
         data: currentOrder.return_status,
-        message: `This return cannot be ${return_status === "a" ? "Accepted" : "Rejected"
-          } as it has already been cancelled by the admin`,
+        message: `This return cannot be ${
+          return_status === "a" ? "Accepted" : "Rejected"
+        } as it has already been cancelled by the admin`,
       });
     }
 
@@ -344,20 +359,29 @@ const changeStatusOfReturnOrder = async (req, res, next) => {
       where: { cust_no: cust_no },
     });
     let ph_no = currentCustomer.contact_no;
-    let return_status_full_name = return_status === "r" ? "Rejected" : "Accepted";
+    let return_status_full_name =
+      return_status === "r" ? "Rejected" : "Accepted";
     console.log("========", ph_no, order_id, return_status_full_name);
 
     //Send notification in whatsapp about order status
     if (return_status === "a") {
       if (ph_no && order_id && return_status_full_name)
-        sendReturnOrderStatusToWhatsapp(ph_no, order_id, return_status_full_name);
+        sendReturnOrderStatusToWhatsapp(
+          ph_no,
+          order_id,
+          return_status_full_name
+        );
     }
 
     if (return_status === "r") {
       if (ph_no && order_id && return_status_full_name && reject_reason)
-        sendReturnOrderRejectStatusToWhatsapp(ph_no, order_id, return_status_full_name, reject_reason);
+        sendReturnOrderRejectStatusToWhatsapp(
+          ph_no,
+          order_id,
+          return_status_full_name,
+          reject_reason
+        );
     }
-
 
     return res.status(200).send({
       success: true,
@@ -365,8 +389,9 @@ const changeStatusOfReturnOrder = async (req, res, next) => {
         oldOrderDetails: currentOrder,
         newOrderDetails: updatedOrder,
       },
-      message: `Return for this order was ${return_status === "r" ? "Rejected" : "Accepted"
-        }`,
+      message: `Return for this order was ${
+        return_status === "r" ? "Rejected" : "Accepted"
+      }`,
     });
   } catch (error) {
     return res.status(400).send({
