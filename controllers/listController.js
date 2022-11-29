@@ -207,6 +207,11 @@ const getAllOffers = async (req, res, next) => {
           discountItem,
           amountOfDiscount: currentOffer.amount_of_discount,
           isPercentage: currentOffer.is_percentage,
+          isTime: currentOffer.is_time ? true : false,
+          startTime: currentOffer.start_time,
+          endTime: currentOffer.end_time,
+          startDate: currentOffer.start_date,
+          endDate: currentOffer.end_date,
         };
       } else {
         const xItem = await Item.findOne({
