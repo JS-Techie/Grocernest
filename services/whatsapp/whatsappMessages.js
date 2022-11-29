@@ -130,6 +130,8 @@ const sendNotificationsToUser = async (itemName, phoneNumber, custName) => {
 
 const sendDeliveryPinToUser = async (custName, pin, orderId, phoneNumber) => {
   const firstName = custName.split(" ")[0];
+
+  console.log(firstName, pin, orderId, phoneNumber);
   try {
     const messageResponseFromGupshup = await client.message.send({
       channel: "whatsapp",
@@ -139,7 +141,7 @@ const sendDeliveryPinToUser = async (custName, pin, orderId, phoneNumber) => {
       message: {
         isHSM: "true",
         type: "text",
-        text: `Hi ${firstName}. Please share the pin ${pin} at the time of your delivery for order ${orderId}`,
+        text: `Hi ${firstName}. Please share the pin ${pin} at the time of your delivery for order ${orderId}.`,
       },
     });
     console.log("Success Response", messageResponseFromGupshup);
@@ -154,5 +156,5 @@ module.exports = {
   sendPOSInvoiceToUser,
   sendFirstCouponToUser,
   sendNotificationsToUser,
-  sendDeliveryPinToUser
+  sendDeliveryPinToUser,
 };
