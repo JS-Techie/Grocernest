@@ -832,18 +832,20 @@ const assignTransporter = async (req, res, next) => {
 
           //Send message to user with the pin
 
-          sendDeliveryPinToUser(
-            cust_name,
-            res.dataValues.pin,
-            req.body.orderId,
-            contact_no
-          );
+      
 
           // if (opt_in == 1) {
           sendOrderShippedToWhatsapp(
             contact_no,
             req.body.orderId,
             deliveryBoy.full_name.toString()
+          );
+
+          sendDeliveryPinToUser(
+            cust_name,
+            res.dataValues.pin,
+            req.body.orderId,
+            contact_no
           );
           // }
         });
