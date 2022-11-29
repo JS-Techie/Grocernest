@@ -843,7 +843,7 @@ const assignTransporter = async (req, res, next) => {
 
           sendDeliveryPinToUser(
             cust_name,
-            res.dataValues.pin,
+            res.dataValues.pin.toString(),
             req.body.orderId,
             contact_no
           );
