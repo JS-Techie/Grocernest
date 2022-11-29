@@ -181,7 +181,7 @@ const getAllBrands = async (req, res, next) => {
 const getAllOffers = async (req, res, next) => {
   try {
     const offers = await Offer.findAll({
-      where: { is_active: 1 },
+      where: { is_active: 1, is_ecomm: 1 },
       order: [["created_at", "DESC"]],
     });
 
@@ -222,6 +222,11 @@ const getAllOffers = async (req, res, next) => {
           yItem,
           xItemQuantity: currentOffer.item_1_quantity,
           yItemQuantity: currentOffer.item_2_quantity,
+          isTime: currentOffer.is_time ? true : false,
+          startTime: currentOffer.start_time,
+          endTime: currentOffer.end_time,
+          startDate: currentOffer.start_date,
+          endDate: currentOffer.end_date,
         };
       }
     });
