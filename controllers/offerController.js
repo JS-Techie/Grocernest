@@ -27,6 +27,7 @@ const offerForItem = async (req, res, next) => {
       where: {
         is_active: 1,
         [Op.or]: [{ item_id_1: itemID }, { item_id: itemID }],
+        is_ecomm : 1
       },
     });
     if (!offer) {
@@ -180,6 +181,7 @@ const offerForItemBuyNow = async (req, res, next) => {
       where: {
         is_active: 1,
         [Op.or]: [{ item_id_1: itemID }, { item_id: itemID }],
+        is_ecomm : 1
       },
     });
 

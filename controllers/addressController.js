@@ -148,3 +148,9 @@ module.exports = {
     updateAddress,
     deleteAddress
 }
+
+
+//pin
+//apartment
+//block
+//flat

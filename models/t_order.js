@@ -193,9 +193,9 @@ module.exports = sequelize => {
       comment: null,
       field: "pickup_date"
     },
-    pin : {
+    pin: {
       type: DataTypes.BIGINT,
-      allowNull: false,
+      allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,

@@ -1,6 +1,8 @@
-const { DataTypes } = require("sequelize");
+const {
+  DataTypes
+} = require('sequelize');
 
-module.exports = (sequelize) => {
+module.exports = sequelize => {
   const attributes = {
     id: {
       type: DataTypes.BIGINT,
@@ -9,25 +11,25 @@ module.exports = (sequelize) => {
       primaryKey: true,
       autoIncrement: true,
       comment: null,
-      field: "id",
+      field: "id"
     },
     cust_no: {
-      type: DataTypes.STRING,
-      allowNull: false,
+      type: DataTypes.STRING(20),
+      allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "cust_no",
+      field: "cust_no"
     },
     item_id: {
       type: DataTypes.BIGINT,
-      allowNull: false,
+      allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "item_id",
+      field: "item_id"
     },
     created_by: {
       type: DataTypes.BIGINT,
@@ -36,7 +38,7 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "created_by",
+      field: "created_by"
     },
     updated_by: {
       type: DataTypes.BIGINT,
@@ -45,16 +47,16 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "updated_by",
+      field: "updated_by"
     },
     created_at: {
       type: DataTypes.DATE,
       allowNull: true,
-      defaultValue: sequelize.fn("current_timestamp"),
+      defaultValue: sequelize.fn('current_timestamp'),
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "created_at",
+      field: "created_at"
     },
     updated_at: {
       type: DataTypes.DATE,
@@ -63,13 +65,13 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "updated_at",
-    },
+      field: "updated_at"
+    }
   };
   const options = {
     tableName: "t_notify",
     comment: "",
-    indexes: [],
+    indexes: []
   };
   const TNotifyModel = sequelize.define("t_notify_model", attributes, options);
   return TNotifyModel;
