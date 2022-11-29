@@ -3495,6 +3495,24 @@
                 },
                 "is_percentage": {
                   "example": "any"
+                },
+                "start_date": {
+                  "example": "any"
+                },
+                "end_date": {
+                  "example": "any"
+                },
+                "start_time": {
+                  "example": "any"
+                },
+                "end_time": {
+                  "example": "any"
+                },
+                "is_pos": {
+                  "example": "any"
+                },
+                "is_ecomm": {
+                  "example": "any"
                 }
               }
             }
@@ -3556,6 +3574,24 @@
                   "example": "any"
                 },
                 "is_percentage": {
+                  "example": "any"
+                },
+                "start_date": {
+                  "example": "any"
+                },
+                "start_time": {
+                  "example": "any"
+                },
+                "end_date": {
+                  "example": "any"
+                },
+                "end_time": {
+                  "example": "any"
+                },
+                "is_pos": {
+                  "example": "any"
+                },
+                "is_ecomm": {
                   "example": "any"
                 }
               }
