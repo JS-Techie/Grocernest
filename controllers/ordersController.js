@@ -144,6 +144,7 @@ const getAllOrders = async (req, res, next) => {
         itemDetails: responseWithoutUndefined,
         return_status: currentOrder.return_status,
         reject_reason: currentOrder.reject_reason,
+        pin: currentOrder.pin ? currentOrder.pin : "",
       };
     });
 

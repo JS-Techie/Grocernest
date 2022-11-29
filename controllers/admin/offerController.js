@@ -135,6 +135,7 @@ const getOfferById = async (req, res, next) => {
             : false
           : "",
         isPos: current.is_pos ? (current.is_pos === 1 ? true : false) : "",
+        isTime: current.is_time ? (current.is_time === 1 ? true : false) : "",
       },
       message: "Requested offer found",
     });
