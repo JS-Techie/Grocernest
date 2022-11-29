@@ -3513,6 +3513,9 @@
                 },
                 "is_ecomm": {
                   "example": "any"
+                },
+                "is_time": {
+                  "example": "any"
                 }
               }
             }
@@ -3592,6 +3595,9 @@
                   "example": "any"
                 },
                 "is_ecomm": {
+                  "example": "any"
+                },
+                "is_time": {
                   "example": "any"
                 }
               }

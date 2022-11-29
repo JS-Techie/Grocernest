@@ -183,6 +183,15 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "is_pos"
+    },
+    is_time: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "is_time"
     }
   };
   const options = {

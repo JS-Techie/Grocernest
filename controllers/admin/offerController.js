@@ -165,6 +165,7 @@ const createOffer = async (req, res, next) => {
     end_time,
     is_pos,
     is_ecomm,
+    is_time,
   } = req.body;
 
   let offer = null;
@@ -195,7 +196,7 @@ const createOffer = async (req, res, next) => {
     });
   }
 
-  if ((is_time && !start_date) || !start_time || !end_date || !end_time) {
+  if (is_time && (!start_date || !start_time || !end_date || !end_time)) {
     return res.status(400).send({
       success: false,
       data: [],
@@ -231,6 +232,7 @@ const createOffer = async (req, res, next) => {
       end_time,
       is_pos,
       is_ecomm,
+      is_time,
     });
 
     console.log("after offer query");
@@ -275,6 +277,7 @@ const updateOffer = async (req, res, next) => {
     end_time,
     is_pos,
     is_ecomm,
+    is_time,
   } = req.body;
 
   try {
@@ -310,7 +313,7 @@ const updateOffer = async (req, res, next) => {
       });
     }
 
-    if ((is_time && !start_date) || !start_time || !end_date || !end_time) {
+    if (is_time && (!start_date || !start_time || !end_date || !end_time)) {
       return res.status(400).send({
         success: false,
         data: [],
@@ -349,6 +352,7 @@ const updateOffer = async (req, res, next) => {
         end_time,
         is_pos,
         is_ecomm,
+        is_time,
       },
       {
         where: { id: offerID },
