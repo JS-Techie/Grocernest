@@ -17,6 +17,10 @@ const {
   sendAdminCancelledOrderStatusToWhatsapp,
   sendPickupBoyNotificationToWhatsapp,
 } = require("../../services/whatsapp/whatsapp");
+
+const {
+  sendDeliveryPinToUser,
+} = require("../../services/whatsapp/whatsappMessages");
 // const Customer = db.CustomerModel;
 
 const Batch = db.BatchModel;
@@ -827,6 +831,13 @@ const assignTransporter = async (req, res, next) => {
           // let opt_in = cust.dataValues.opt_in;
 
           //Send message to user with the pin
+
+          sendDeliveryPinToUser(
+            cust_name,
+            res.dataValues.pin,
+            req.body.orderId,
+            contact_no
+          );
 
           // if (opt_in == 1) {
           sendOrderShippedToWhatsapp(

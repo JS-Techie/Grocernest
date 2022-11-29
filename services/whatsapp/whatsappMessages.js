@@ -128,10 +128,31 @@ const sendNotificationsToUser = async (itemName, phoneNumber, custName) => {
   }
 };
 
+const sendDeliveryPinToUser = async (custName, pin, orderId, phoneNumber) => {
+  const firstName = custName.split(" ")[0];
+  try {
+    const messageResponseFromGupshup = await client.message.send({
+      channel: "whatsapp",
+      source: "919433804769",
+      destination: "91" + phoneNumber.toString(),
+      "src.name": "grocernest",
+      message: {
+        isHSM: "true",
+        type: "text",
+        text: `Hi ${firstName}. Please share the pin ${pin} at the time of your delivery for order ${orderId}`,
+      },
+    });
+    console.log("Success Response", messageResponseFromGupshup);
+  } catch (error) {
+    console.error("Error Response", error);
+  }
+};
+
 module.exports = {
   sendCouponToUser,
   sendOfferToUser,
   sendPOSInvoiceToUser,
   sendFirstCouponToUser,
   sendNotificationsToUser,
+  sendDeliveryPinToUser
 };
