@@ -7,7 +7,7 @@ module.exports = sequelize => {
     id: {
       type: DataTypes.BIGINT,
       allowNull: false,
-      defaultValue: literal("nextval(supplier_seq)"),
+      defaultValue: literal("supplier_seq"),
       primaryKey: true,
       autoIncrement: false,
       comment: null,

@@ -8,7 +8,7 @@ const generatePin = () => {
 
 const sendOTPToPhoneNumber = (otp) => {};
 
-console.log(generatePin());
+
 
 module.exports = {
   generateOTP,
