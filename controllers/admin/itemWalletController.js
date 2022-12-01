@@ -60,7 +60,7 @@ const getItemWalletById = async (req, res, next) => {
 const createItemWallet = async (req, res, next) => {
   const { item_id, cashback, is_percent, use } = req.body;
   try {
-    if (!id || !cashback || !use) {
+    if (!item_id || !cashback || !use) {
       return res.status(400).send({
         success: false,
         data: [],

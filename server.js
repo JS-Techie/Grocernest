@@ -61,6 +61,7 @@ const posRouter = require("./routes/posRoutes");
 const attendanceRouter = require("./routes/attendanceRoutes");
 const feedbackRouter = require("./routes/feedbackRoutes");
 const homePageRouter = require("./routes/homepageRoutes");
+const itemWalletCustomerRouter = require("./routes/itemWalletRoutes");
 
 // admin routers import
 const adminOrderRouter = require("./routes/admin/orderRoutes");
@@ -128,6 +129,7 @@ app.use(posRouter);
 app.use(attendanceRouter);
 app.use("/feedback", feedbackRouter);
 app.use("/home", homePageRouter);
+app.use("/itemsp", itemWalletCustomerRouter);
 
 // admin routes
 app.use("/admin/orders", adminOrderRouter);
