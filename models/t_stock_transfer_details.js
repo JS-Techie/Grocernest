@@ -164,24 +164,6 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "batch_id"
-    },
-    cashback: {
-      type: DataTypes.DECIMAL,
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "cashback"
-    },
-    cashback_is_percentage: {
-      type: DataTypes.INTEGER(1),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "cashback_is_percentage"
     }
   };
   const options = {
