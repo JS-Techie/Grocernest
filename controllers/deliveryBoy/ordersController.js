@@ -445,13 +445,14 @@ const getAllRequestedReturns = async (req, res, next) => {
           }
         );
 
+        let currentReturnedDate = null;
         promises = await returnedItemsWithoutUndefined.map(
           async (currentReturnedItem) => {
             console.log("Inside Map");
             const item = await Item.findOne({
               where: { id: currentReturnedItem.item_id },
             });
-
+            currentReturnedDate = currentReturnedItem.created_at;
             const selectedBatch = await Batch.findOne({
               where: { item_id: currentReturnedItem.item_id, mark_selected: 1 },
             });
@@ -494,7 +495,7 @@ const getAllRequestedReturns = async (req, res, next) => {
 
         return {
           orderId: currentOrder.order_id,
-          date: currentOrder.created_at,
+          date: currentReturnedDate,
           customerAddress: currentOrder.address,
           total: currentOrder.total,
           payableAmount: currentOrder.final_payable_amount,
