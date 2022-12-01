@@ -95,6 +95,7 @@ const createItemWallet = async (req, res, next) => {
       is_percent,
       use,
       is_active: 1,
+      created_by: 1,
     });
 
     return res.status(201).send({
