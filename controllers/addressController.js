@@ -150,9 +150,6 @@ module.exports = {
   deleteAddress,
 };
 
-//pin
-//apartment
-//block
-//flat
 
-//do we need masters for all of this
+
+
