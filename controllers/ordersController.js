@@ -52,6 +52,7 @@ const getAllOrders = async (req, res, next) => {
               { item_id_1: currentOrderItem.item_id },
               { item_id: currentOrderItem.item_id },
             ],
+            is_ecomm : 1
           },
         });
         if (currentOffer) {
@@ -206,6 +207,7 @@ const getOrderByOrderId = async (req, res, next) => {
             { item_id_1: currentOrderItem.id },
             { item_id: currentOrderItem.id },
           ],
+          is_ecomm : 1
         },
       });
 

@@ -249,6 +249,7 @@ const getOrderDetails = async (req, res, next) => {
               { item_id_1: currentOrderItem.id },
               { item_id: currentOrderItem.id },
             ],
+            is_ecomm : 1
           },
         });
         if (currentOffer) {

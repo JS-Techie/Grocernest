@@ -479,6 +479,7 @@ const getCart = async (req, res, next) => {
               { item_id: current.item_id },
             ],
           },
+          is_ecomm : 1
         });
       }
 
