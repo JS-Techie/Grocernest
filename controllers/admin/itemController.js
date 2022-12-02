@@ -285,19 +285,27 @@ const referenceItem = async (req, res, next) => {
       where: { id: reference },
     });
 
-    if (!referenceItemDetails) {
-      return res.status(404).send({
-        success: false,
-        data: [],
-        message: "Could not find the details for the reference item",
-      });
-    }
-
     if (!currentItemDetails) {
       return res.status(404).send({
         success: false,
         data: [],
         message: "Could not find the details for the current item",
+      });
+    }
+
+    if (!referenceItemDetails) {
+      await Item.update(
+        {
+          image: JSON.stringify([]),
+        },
+        {
+          where: { id: current },
+        }
+      );
+      return res.status(404).send({
+        success: false,
+        data: [],
+        message: "Could not find the details for the reference item",
       });
     }
 
