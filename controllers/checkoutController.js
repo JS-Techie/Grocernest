@@ -107,7 +107,7 @@ const checkoutFromCart = async (req, res, next) => {
         { where: { wallet_id: wallet_id } }
       );
 
-      if (item_wallet_used > 0) {
+      if (parseInt(item_wallet_used) > 0) {
         await Wallet.update(
           {
             item_specific_balance:
@@ -343,7 +343,7 @@ const buyNow = async (req, res, next) => {
     wallet_balance_used,
     wallet_id,
     cashback_amount,
-    item_wallet_used
+    item_wallet_used,
   } = req.body;
 
   if (!total) {
@@ -409,7 +409,7 @@ const buyNow = async (req, res, next) => {
       wallet_balance_used: wallet_balance_used,
       final_payable_amount: final_payable_amount,
       cashback_amount: cashback_amount,
-      item_wallet_used
+      item_wallet_used,
     });
 
     const user_wallet = await Wallet.findOne({
