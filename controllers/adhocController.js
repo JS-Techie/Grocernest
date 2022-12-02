@@ -51,6 +51,8 @@ const addWalletBalance = async (req, res, next) => {
         customer.cust_no
       }' order by t_order.created_at`);
 
+    console.log(firstOrderWithButter);
+
     //Amul Butter 500gm - 72533
 
     if (firstOrderWithButter.length === 0) {
@@ -59,6 +61,7 @@ const addWalletBalance = async (req, res, next) => {
       });
 
       let walletBalanceToBeAdded = null;
+
       currentOrderItems.map(async (currentItem) => {
         if (currentItem.item_id === 1073) {
           const selectedBatch = await Batch.findOne({
@@ -67,19 +70,24 @@ const addWalletBalance = async (req, res, next) => {
 
           if (selectedBatch) {
             walletBalanceToBeAdded =
-              currentItem.quantity * selectedBatch.sale_price;
+              0.5 * (currentItem.quantity * selectedBatch.sale_price);
           }
+
+          console.log(
+            "Wallet Balance to be added ======>",
+            walletBalanceToBeAdded
+          );
+
+          const update = await Wallet.update(
+            {
+              item_specific_balance: walletBalanceToBeAdded,
+            },
+            {
+              where: { cust_no: customer.cust_no },
+            }
+          );
         }
       });
-
-      await Wallet.update(
-        {
-          item_specific_balance: walletBalanceToBeAdded,
-        },
-        {
-          where: { cust_no: customer.cust_no },
-        }
-      );
 
       const updatedWallet = await Wallet.findOne({
         where: { cust_no: customer.cust_no },
