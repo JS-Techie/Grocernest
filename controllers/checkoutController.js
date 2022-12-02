@@ -37,6 +37,7 @@ const checkoutFromCart = async (req, res, next) => {
     wallet_balance_used,
     wallet_id,
     cashback_amount,
+    item_wallet_used,
   } = req.body;
 
   if (!total) {
@@ -89,6 +90,7 @@ const checkoutFromCart = async (req, res, next) => {
       wallet_balance_used: wallet_balance_used,
       final_payable_amount: final_payable_amount,
       cashback_amount: cashback_amount,
+      item_wallet_used,
     });
 
     const user_wallet = await Wallet.findOne({
@@ -104,6 +106,18 @@ const checkoutFromCart = async (req, res, next) => {
         },
         { where: { wallet_id: wallet_id } }
       );
+
+      if (item_wallet_used > 0) {
+        await Wallet.update(
+          {
+            item_specific_balance:
+              user_wallet.item_specific_balance - item_wallet_used,
+          },
+          {
+            where: { wallet_id: wallet_id },
+          }
+        );
+      }
 
       const wallet_transaction = await Wallet_Transaction.create({
         wallet_id: wallet_id,
@@ -262,7 +276,7 @@ const checkoutFromCart = async (req, res, next) => {
       // }
     });
 
-    let base_url = req.protocol + '://' + req.get('host');
+    let base_url = req.protocol + "://" + req.get("host");
     let email = "";
     let contact_no = "";
     Customer.findOne({
@@ -329,6 +343,7 @@ const buyNow = async (req, res, next) => {
     wallet_balance_used,
     wallet_id,
     cashback_amount,
+    item_wallet_used
   } = req.body;
 
   if (!total) {
@@ -394,6 +409,7 @@ const buyNow = async (req, res, next) => {
       wallet_balance_used: wallet_balance_used,
       final_payable_amount: final_payable_amount,
       cashback_amount: cashback_amount,
+      item_wallet_used
     });
 
     const user_wallet = await Wallet.findOne({
@@ -409,6 +425,18 @@ const buyNow = async (req, res, next) => {
         },
         { where: { wallet_id: wallet_id } }
       );
+
+      if (item_wallet_used > 0) {
+        await Wallet.update(
+          {
+            item_specific_balance:
+              user_wallet.item_specific_balance - item_wallet_used,
+          },
+          {
+            where: { wallet_id: wallet_id },
+          }
+        );
+      }
 
       const wallet_transaction = await Wallet_Transaction.create({
         wallet_id: wallet_id,
@@ -436,7 +464,7 @@ const buyNow = async (req, res, next) => {
     const orderItems = await Promise.all(promises);
 
     const offer = await Offers.findOne({
-      where: { is_active: 1, item_id: itemID, is_ecomm : 1 },
+      where: { is_active: 1, item_id: itemID, is_ecomm: 1 },
     });
 
     const oldestBatch = await Batch.findOne({
@@ -617,7 +645,7 @@ const buyNow = async (req, res, next) => {
 
       console.log("jjjjjjjjjjjjjjjjjjjjjjjjjjjjjj");
 
-      let base_url = req.protocol + '://' + req.get('host');
+      let base_url = req.protocol + "://" + req.get("host");
       await InvoiceGen(
         currentUser,
         newOrder.order_id,
@@ -654,7 +682,14 @@ const buyNow = async (req, res, next) => {
   }
 };
 
-const InvoiceGen = async (cust_no, order_id, email, contact_no, opt_in, base_url) => {
+const InvoiceGen = async (
+  cust_no,
+  order_id,
+  email,
+  contact_no,
+  opt_in,
+  base_url
+) => {
   console.log("INVOICE GENNNN");
   const currentCustomer = cust_no;
   const orderID = order_id;
@@ -739,7 +774,12 @@ const InvoiceGen = async (cust_no, order_id, email, contact_no, opt_in, base_url
       }
       // send whatsapp
       if (contact_no != "") {
-        await sendInvoiceToWhatsapp(contact_no, response.orderID, invoice_link, base_url);
+        await sendInvoiceToWhatsapp(
+          contact_no,
+          response.orderID,
+          invoice_link,
+          base_url
+        );
       }
     });
   } catch (error) {

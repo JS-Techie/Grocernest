@@ -132,9 +132,9 @@ function generateFooter(invoice, doc) {
   doc
     .text(`Invoice Total: ${invoice.total}`, 50, 500)
     .text(`Paid by wallet : ${invoice.walletBalanceUsed}`, 50, 520)
-    .text(`Applied discount : ${invoice.appliedDiscount}`, 50, 540)
-    .text(`Payment Mode : Cash on Delivery`, 50, 560)
-
+    .text(`Paid By Amul Butter Wallet : ${invoice.itemBasedWalletBalanceUsed}`,50,540)
+    .text(`Applied discount : ${invoice.appliedDiscount}`, 50, 560)
+    .text(`Payment Mode : Cash on Delivery`, 50, 580)
     .moveDown();
 }
 
