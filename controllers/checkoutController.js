@@ -114,7 +114,7 @@ const checkoutFromCart = async (req, res, next) => {
               user_wallet.item_specific_balance - item_wallet_used,
           },
           {
-            where: { wallet_id: wallet_id },
+            where: { cust_no: currentUser },
           }
         );
       }
