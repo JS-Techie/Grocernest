@@ -40,7 +40,7 @@ const getAllPendingOrders = async (req, res, next) => {
     const [results, metadata] = await sequelize.query(`
             select tc.cust_name, tlo.cust_no , tc.contact_no, tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total from t_order tlo inner join t_customer tc 
             where tc.cust_no = tlo.cust_no 
-            AND tlo.status="Placed"
+            AND tlo.status="Placed" order by tlo.created_at desc
           `);
 
     if (results.length === 0) {
@@ -130,7 +130,7 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
             ${phoneNoQuery}
             ${dateQuery}
             ${orderId}
-             order by created_at DESC
+             order by tlo.created_at DESC
           `);
 
     if (results.length === 0) {
@@ -742,7 +742,7 @@ const acceptedOrders = async (req, res, next) => {
     const [results, metadata] = await sequelize.query(`
             select tc.cust_name, tlo.cust_no , tc.contact_no, tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total from t_order tlo inner join t_customer tc 
             where tc.cust_no = tlo.cust_no 
-            AND tlo.status="Accepted"
+            AND tlo.status="Accepted" order by tlo.created_at desc
           `);
 
     if (results.length === 0) {
@@ -873,7 +873,7 @@ const getShippedOrders = async (req, res, next) => {
     const [results, metadata] = await sequelize.query(`
             select delivery_boy, tc.cust_name, tlo.cust_no , tc.contact_no, tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total from t_order tlo inner join t_customer tc 
             where tc.cust_no = tlo.cust_no 
-            AND tlo.status="Shipped"
+            AND tlo.status="Shipped" order by tlo.created_at desc
           `);
 
     if (results.length === 0) {
@@ -925,7 +925,7 @@ const getDeliveredOrders = async (req, res, next) => {
     const [results, metadata] = await sequelize.query(`
             select tc.cust_name, tlo.cust_no , tc.contact_no, tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total, delivery_boy from t_order tlo inner join t_customer tc 
             where tc.cust_no = tlo.cust_no 
-            AND tlo.status="Delivered"
+            AND tlo.status="Delivered" order by tlo.created_at desc
           `);
 
     if (results.length === 0) {
@@ -978,7 +978,7 @@ const getCanceledorders = async (req, res, next) => {
     const [results, metadata] = await sequelize.query(`
             select tc.cust_name, tlo.cust_no , tc.contact_no, tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total, delivery_boy,tlo.cancellation_reason from t_order tlo inner join t_customer tc 
             where tc.cust_no = tlo.cust_no 
-            AND tlo.status="Cancelled"
+            AND tlo.status="Cancelled" order by tlo.created_at desc
           `);
 
     if (results.length === 0) {
