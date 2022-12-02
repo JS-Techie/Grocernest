@@ -67,7 +67,7 @@ module.exports = (sequelize) => {
     },
     item_specific_balance: {
       type: DataTypes.BIGINT,
-      allowNull: false,
+      allowNull: TextTrackCue,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
