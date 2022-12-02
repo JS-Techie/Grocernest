@@ -47,7 +47,7 @@ const addWalletBalance = async (req, res, next) => {
         from ((t_order 
         inner join t_order_items on t_order_items.order_id = t_order.order_id)
         inner join t_batch on t_batch.item_id = t_order_items.item_id)
-        where t_batch.mark_selected = 1 and t_order_items.item_id = ${1073} and t_order.order_id <> ${order_id} and t_order.cust_no = '${
+        where t_batch.mark_selected = 1 and t_order_items.item_id = ${72648} and t_order.order_id <> ${order_id} and t_order.cust_no = '${
         customer.cust_no
       }' order by t_order.created_at`);
 
@@ -63,7 +63,7 @@ const addWalletBalance = async (req, res, next) => {
       let walletBalanceToBeAdded = null;
 
       currentOrderItems.map(async (currentItem) => {
-        if (currentItem.item_id === 1073) {
+        if (currentItem.item_id === 72648) {
           const selectedBatch = await Batch.findOne({
             where: { item_id: currentItem.item_id, mark_selected: 1 },
           });
