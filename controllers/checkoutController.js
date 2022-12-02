@@ -107,17 +107,6 @@ const checkoutFromCart = async (req, res, next) => {
         { where: { wallet_id: wallet_id } }
       );
 
-      if (parseInt(item_wallet_used) > 0) {
-        await Wallet.update(
-          {
-            item_specific_balance:
-              user_wallet.item_specific_balance - item_wallet_used,
-          },
-          {
-            where: { cust_no: currentUser },
-          }
-        );
-      }
 
       const wallet_transaction = await Wallet_Transaction.create({
         wallet_id: wallet_id,
@@ -127,6 +116,20 @@ const checkoutFromCart = async (req, res, next) => {
         transaction_details: newOrder.order_id,
         created_by: 2,
       });
+    }
+
+
+    
+    if (parseInt(item_wallet_used) > 0) {
+      await Wallet.update(
+        {
+          item_specific_balance:
+            user_wallet.item_specific_balance - item_wallet_used,
+        },
+        {
+          where: { cust_no: currentUser },
+        }
+      );
     }
 
     let oldestBatch = null;
