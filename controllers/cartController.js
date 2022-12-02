@@ -180,7 +180,7 @@ const subtractItemFromCart = async (req, res, next) => {
     }
 
     const offerExists = await Offers.findOne({
-      where: { is_active: 1, item_id_1: itemID },
+      where: { is_active: 1, item_id_1: itemID,is_ecomm : 1 },
     });
 
     let offerItemToBeRemoved = null;
@@ -330,6 +330,7 @@ const removeItemFromCart = async (req, res, next) => {
       where: {
         is_active: 1,
         [Op.or]: [{ item_id_1: itemID }, { item_id: itemID }],
+        is_ecomm : 1
       },
     });
 
@@ -478,6 +479,7 @@ const getCart = async (req, res, next) => {
               { item_id: current.item_id },
             ],
           },
+          is_ecomm : 1
         });
       }
 

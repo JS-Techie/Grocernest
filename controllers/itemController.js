@@ -60,6 +60,7 @@ const getItemsInCategory = async (req, res, next) => {
         where: {
           is_active: 1,
           [Op.or]: [{ item_id_1: current.id }, { item_id: current.id }],
+          is_ecomm : 1
         },
       });
 
@@ -184,6 +185,7 @@ const getItemsInSubcategory = async (req, res, next) => {
         where: {
           is_active: 1,
           [Op.or]: [{ item_id_1: current.id }, { item_id: current.id }],
+          is_ecomm : 1
         },
       });
 
@@ -307,6 +309,7 @@ const getItemsBySearchTerm = async (req, res, next) => {
         where: {
           is_active: 1,
           [Op.or]: [{ item_id_1: current.id }, { item_id: current.id }],
+          is_ecomm : 1
         },
       });
 
@@ -442,6 +445,7 @@ const getItemById = async (req, res, next) => {
       where: {
         is_active: 1,
         [Op.or]: [{ item_id_1: item.id }, { item_id: item.id }],
+        is_ecomm : 1
       },
     });
 
@@ -648,6 +652,7 @@ const getAllItemsInABrand = async (req, res, next) => {
         where: {
           is_active: 1,
           [Op.or]: [{ item_id_1: current.id }, { item_id: current.id }],
+          is_ecomm : 1
         },
       });
 

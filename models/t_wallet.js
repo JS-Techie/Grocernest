@@ -1,8 +1,6 @@
-const {
-  DataTypes
-} = require('sequelize');
+const { DataTypes } = require("sequelize");
 
-module.exports = sequelize => {
+module.exports = (sequelize) => {
   const attributes = {
     wallet_id: {
       type: DataTypes.STRING(20),
@@ -11,7 +9,7 @@ module.exports = sequelize => {
       primaryKey: true,
       autoIncrement: false,
       comment: null,
-      field: "wallet_id"
+      field: "wallet_id",
     },
     cust_no: {
       type: DataTypes.STRING(20),
@@ -20,7 +18,7 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "cust_no"
+      field: "cust_no",
     },
     balance: {
       type: DataTypes.DECIMAL,
@@ -29,7 +27,7 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "balance"
+      field: "balance",
     },
     created_by: {
       type: DataTypes.BIGINT,
@@ -38,7 +36,7 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "created_by"
+      field: "created_by",
     },
     updated_by: {
       type: DataTypes.BIGINT,
@@ -47,16 +45,16 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "updated_by"
+      field: "updated_by",
     },
     created_at: {
       type: DataTypes.DATE,
       allowNull: false,
-      defaultValue: sequelize.fn('current_timestamp'),
+      defaultValue: sequelize.fn("current_timestamp"),
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "created_at"
+      field: "created_at",
     },
     updated_at: {
       type: DataTypes.DATE,
@@ -65,13 +63,22 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "updated_at"
-    }
+      field: "updated_at",
+    },
+    item_specific_balance: {
+      type: DataTypes.DECIMAL,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "item_specific_balance",
+    },
   };
   const options = {
     tableName: "t_wallet",
     comment: "",
-    indexes: []
+    indexes: [],
   };
   const TWalletModel = sequelize.define("t_wallet_model", attributes, options);
   return TWalletModel;

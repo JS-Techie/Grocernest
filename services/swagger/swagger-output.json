@@ -2456,6 +2456,36 @@
         }
       }
     },
+    "/adhoc/itemsp/wallet/add": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "order_id": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
     "/admin/orders/pending": {
       "get": {
         "description": "",
@@ -3495,6 +3525,27 @@
                 },
                 "is_percentage": {
                   "example": "any"
+                },
+                "start_date": {
+                  "example": "any"
+                },
+                "end_date": {
+                  "example": "any"
+                },
+                "start_time": {
+                  "example": "any"
+                },
+                "end_time": {
+                  "example": "any"
+                },
+                "is_pos": {
+                  "example": "any"
+                },
+                "is_ecomm": {
+                  "example": "any"
+                },
+                "is_time": {
+                  "example": "any"
                 }
               }
             }
@@ -3556,6 +3607,27 @@
                   "example": "any"
                 },
                 "is_percentage": {
+                  "example": "any"
+                },
+                "start_date": {
+                  "example": "any"
+                },
+                "start_time": {
+                  "example": "any"
+                },
+                "end_date": {
+                  "example": "any"
+                },
+                "end_time": {
+                  "example": "any"
+                },
+                "is_pos": {
+                  "example": "any"
+                },
+                "is_ecomm": {
+                  "example": "any"
+                },
+                "is_time": {
                   "example": "any"
                 }
               }
@@ -5457,6 +5529,150 @@
         }
       }
     },
+    "/admin/itemsp/wallet/view/all": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/admin/itemsp/wallet/view/{id}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/admin/itemsp/wallet/create": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/admin/itemsp/wallet/edit/{id}": {
+      "patch": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/admin/itemsp/wallet/active/{id}": {
+      "patch": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/admin/itemsp/wallet/deactive/{id}": {
+      "patch": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
     "/subscription/view/all": {
       "get": {
         "description": "",
@@ -6351,6 +6567,9 @@
                   "example": "any"
                 },
                 "date": {
+                  "example": "any"
+                },
+                "pin": {
                   "example": "any"
                 }
               }

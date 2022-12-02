@@ -57,6 +57,7 @@ const getWishlist = async (req, res, next) => {
               { item_id_1: current.item_id },
               { item_id: current.item_id },
             ],
+            is_ecomm : 1
           },
         });
 

@@ -50,6 +50,16 @@ const getAllOffers = async (req, res, next) => {
           : "",
         isPercentage: current.is_percentage ? true : false,
         isActive: current.is_active ? true : false,
+        startDate: current.start_date,
+        startTime: current.start_time,
+        endDate: current.end_date,
+        endTime: current.end_time,
+        isEcomm: current.is_ecomm
+          ? current.is_ecomm === 1
+            ? true
+            : false
+          : "",
+        isPos: current.is_pos ? (current.is_pos === 1 ? true : false) : "",
       };
     });
 
@@ -115,6 +125,17 @@ const getOfferById = async (req, res, next) => {
           : "",
         isPercentage: current.is_percentage ? true : false,
         isActive: current.is_active ? true : false,
+        startDate: current.start_date,
+        startTime: current.start_time,
+        endDate: current.end_date,
+        endTime: current.end_time,
+        isEcomm: current.is_ecomm
+          ? current.is_ecomm === 1
+            ? true
+            : false
+          : "",
+        isPos: current.is_pos ? (current.is_pos === 1 ? true : false) : "",
+        isTime: current.is_time ? (current.is_time === 1 ? true : false) : "",
       },
       message: "Requested offer found",
     });
@@ -139,6 +160,13 @@ const createOffer = async (req, res, next) => {
     item_id,
     amount_of_discount,
     is_percentage,
+    start_date,
+    end_date,
+    start_time,
+    end_time,
+    is_pos,
+    is_ecomm,
+    is_time,
   } = req.body;
 
   let offer = null;
@@ -168,6 +196,23 @@ const createOffer = async (req, res, next) => {
       message: "Please enter the type of offer",
     });
   }
+
+  if (is_time && (!start_date || !start_time || !end_date || !end_time)) {
+    return res.status(400).send({
+      success: false,
+      data: [],
+      message: "Please enter correct details for time based offers",
+    });
+  }
+
+  if (!is_pos && !is_ecomm) {
+    return res.status(400).send({
+      success: false,
+      data: [],
+      message: "Please specify if this offer is for POS or ecomm or both",
+    });
+  }
+
   try {
     console.log("before offer query");
     const newOffer = await Offers.create({
@@ -182,6 +227,13 @@ const createOffer = async (req, res, next) => {
         is_percentage !== null ? (is_percentage === true ? 1 : null) : null,
       created_by: 1,
       is_active: 1,
+      start_date,
+      end_date,
+      start_time,
+      end_time,
+      is_pos,
+      is_ecomm,
+      is_time,
     });
 
     console.log("after offer query");
@@ -220,6 +272,13 @@ const updateOffer = async (req, res, next) => {
     item_id,
     amount_of_discount,
     is_percentage,
+    start_date,
+    start_time,
+    end_date,
+    end_time,
+    is_pos,
+    is_ecomm,
+    is_time,
   } = req.body;
 
   try {
@@ -255,6 +314,29 @@ const updateOffer = async (req, res, next) => {
       });
     }
 
+    if (is_time && (!start_date || !start_time || !end_date || !end_time)) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "Please enter correct details for time based offers",
+      });
+    }
+    if (!is_pos && !is_ecomm) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "Please specify if this offer is for POS or ecomm or both",
+      });
+    }
+
+    if (!type) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "Please enter the type of offer",
+      });
+    }
+
     const update = await Offers.update(
       {
         type,
@@ -265,6 +347,13 @@ const updateOffer = async (req, res, next) => {
         item_id,
         amount_of_discount,
         is_percentage: is_percentage === true ? 1 : null,
+        start_date,
+        start_time,
+        end_date,
+        end_time,
+        is_pos,
+        is_ecomm,
+        is_time,
       },
       {
         where: { id: offerID },
@@ -299,6 +388,16 @@ const updateOffer = async (req, res, next) => {
               : false
             : "",
           isActive: current.is_active ? true : false,
+          startDate: current.start_date,
+          startTime: current.start_time,
+          endDate: current.end_date,
+          endTime: current.end_time,
+          isEcomm: current.is_ecomm
+            ? current.is_ecomm === 1
+              ? true
+              : false
+            : "",
+          isPos: current.is_pos ? (current.is_pos === 1 ? true : false) : "",
         },
         newOffer: {
           offerID: updatedOffer.id,
@@ -321,6 +420,16 @@ const updateOffer = async (req, res, next) => {
               : false
             : "",
           isActive: current.is_active ? true : false,
+          startDate: current.start_date,
+          startTime: current.start_time,
+          endDate: current.end_date,
+          endTime: current.end_time,
+          isEcomm: current.is_ecomm
+            ? current.is_ecomm === 1
+              ? true
+              : false
+            : "",
+          isPos: current.is_pos ? (current.is_pos === 1 ? true : false) : "",
         },
         numberOfOffersUpdated: update,
       },

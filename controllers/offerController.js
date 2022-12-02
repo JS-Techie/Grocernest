@@ -27,6 +27,7 @@ const offerForItem = async (req, res, next) => {
       where: {
         is_active: 1,
         [Op.or]: [{ item_id_1: itemID }, { item_id: itemID }],
+        is_ecomm: 1,
       },
     });
     if (!offer) {
@@ -36,6 +37,8 @@ const offerForItem = async (req, res, next) => {
         message: "No offers exist for this item",
       });
     }
+
+    //add item check
 
     let itemToBeAdded = null;
     let quantityToBeAdded = null;
@@ -65,7 +68,7 @@ const offerForItem = async (req, res, next) => {
       }
 
       let offerItemInCart = await Cart.findOne({
-        where: { cust_no: currentUser, item_id: itemToBeAdded,is_offer : 1 },
+        where: { cust_no: currentUser, item_id: itemToBeAdded, is_offer: 1 },
       });
 
       if (offerItemInCart) {
@@ -180,6 +183,7 @@ const offerForItemBuyNow = async (req, res, next) => {
       where: {
         is_active: 1,
         [Op.or]: [{ item_id_1: itemID }, { item_id: itemID }],
+        is_ecomm: 1,
       },
     });
 
