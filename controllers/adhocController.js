@@ -45,9 +45,12 @@ const addWalletBalance = async (req, res, next) => {
         from ((t_order 
         inner join t_order_items on t_order_items.order_id = t_order.order_id)
         inner join t_batch on t_batch.item_id = t_item.id)
-        where t_batch.mark_selected = 1 and t_order_items.item_id = ${72533} and t_order.cust_no = '${
+        where t_batch.mark_selected = 1 and t_order_items.item_id = ${1073} and t_order.cust_no = '${
         customer.cust_no
       }' order by t_order.created_at`);
+
+
+      //Amul Butter 500gm - 72533
 
     if (firstOrderWithButter.length > 0) {
       firstOrderButterValue =
