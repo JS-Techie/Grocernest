@@ -45,34 +45,55 @@ const addWalletBalance = async (req, res, next) => {
         from ((t_order 
         inner join t_order_items on t_order_items.order_id = t_order.order_id)
         inner join t_batch on t_batch.item_id = t_order_items.item_id)
-        where t_batch.mark_selected = 1 and t_order_items.item_id = ${1073} and t_order.cust_no = '${
+        where t_batch.mark_selected = 1 and t_order_items.item_id = ${1073} and t_order.order_id <> ${order_id} and t_order.cust_no = '${
         customer.cust_no
       }' order by t_order.created_at`);
 
+    //Amul Butter 500gm - 72533
 
-      //Amul Butter 500gm - 72533
+    if (firstOrderWithButter.length === 0) {
+      const currentOrderItems = await OrderItems.findAll({
+        where: { order_id: order.order_id },
+      });
 
-    if (firstOrderWithButter.length > 0) {
-      firstOrderButterValue =
-        firstOrderWithButter[0].quantity * firstOrderWithButter[0].sale_price;
-      let itemWalletValue = 0.5 * firstOrderButterValue;
+      let walletBalanceToBeAdded = null;
+      currentOrderItems.map(async (currentItem) => {
+        if (currentItem.item_id === 1073) {
+          const selectedBatch = await Batch.findOne({
+            where: { item_id: currentItem.item_id, mark_selected: 1 },
+          });
+
+          if (selectedBatch) {
+            walletBalanceToBeAdded =
+              currentItem.quantity * selectedBatch.sale_price;
+          }
+        }
+      });
+
       await Wallet.update(
         {
-          item_specific_balance: itemWalletValue,
+          item_specific_balance: walletBalanceToBeAdded,
         },
         {
           where: { cust_no: customer.cust_no },
         }
       );
+
+      const updatedWallet = await Wallet.findOne({
+        where: { cust_no: customer.cust_no },
+      });
+
+      return res.status(200).send({
+        success: true,
+        data: updatedWallet,
+        message: "Successfully added Amul butter balance to customer wallet",
+      });
     }
 
-    const updatedWallet = await Wallet.findOne({
-      where: { cust_no: customer.cust_no },
-    });
     return res.status(200).send({
       success: true,
-      data: updatedWallet,
-      message: "Successfully added Amul butter balance to customer wallet",
+      data: [],
+      message: "Amul Balance not added as you have ordered it before",
     });
   } catch (error) {
     return res.status(400).send({
