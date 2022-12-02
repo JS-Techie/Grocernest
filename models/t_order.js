@@ -208,7 +208,7 @@ module.exports = (sequelize) => {
       field: "pin",
     },
     item_wallet_used: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.DECIMAL,
       allowNull: true,
       defaultValue: null,
       primaryKey: false,

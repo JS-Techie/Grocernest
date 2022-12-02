@@ -99,11 +99,11 @@ const checkoutFromCart = async (req, res, next) => {
       },
     });
 
-    if (parseInt(item_wallet_used) > 0) {
+    if (parseFloat(item_wallet_used) > 0) {
       await Wallet.update(
         {
           item_specific_balance:
-            user_wallet.item_specific_balance - parseInt(item_wallet_used),
+            user_wallet.item_specific_balance - parseFloat(item_wallet_used),
         },
         {
           where: { cust_no: currentUser },
@@ -418,11 +418,11 @@ const buyNow = async (req, res, next) => {
       },
     });
 
-    if (parseInt(item_wallet_used) > 0) {
+    if (parseFloat(item_wallet_used) > 0) {
       await Wallet.update(
         {
           item_specific_balance:
-            user_wallet.item_specific_balance - parseInt(item_wallet_used),
+            user_wallet.item_specific_balance - parseFloat(item_wallet_used),
         },
         {
           where: { cust_no: currentUser },

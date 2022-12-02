@@ -66,7 +66,7 @@ module.exports = (sequelize) => {
       field: "updated_at",
     },
     item_specific_balance: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.DECIMAL,
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
