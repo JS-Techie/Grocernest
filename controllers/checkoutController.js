@@ -418,6 +418,18 @@ const buyNow = async (req, res, next) => {
       },
     });
 
+    if (parseInt(item_wallet_used) > 0) {
+      await Wallet.update(
+        {
+          item_specific_balance:
+            user_wallet.item_specific_balance - parseInt(item_wallet_used),
+        },
+        {
+          where: { cust_no: currentUser },
+        }
+      );
+    }
+
     if (wallet_balance_used > 0) {
       const wallet = await Wallet.update(
         {
@@ -425,18 +437,6 @@ const buyNow = async (req, res, next) => {
         },
         { where: { wallet_id: wallet_id } }
       );
-
-      if (item_wallet_used > 0) {
-        await Wallet.update(
-          {
-            item_specific_balance:
-              user_wallet.item_specific_balance - item_wallet_used,
-          },
-          {
-            where: { wallet_id: wallet_id },
-          }
-        );
-      }
 
       const wallet_transaction = await Wallet_Transaction.create({
         wallet_id: wallet_id,
