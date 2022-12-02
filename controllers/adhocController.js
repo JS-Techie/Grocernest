@@ -5,6 +5,8 @@ const db = require("../models");
 const Customer = db.CustomerModel;
 const Wallet = db.WalletModel;
 const Order = db.OrderModel;
+const OrderItems = db.OrderItemsModel;
+const Batch = db.BatchModel;
 
 const addWalletBalance = async (req, res, next) => {
   const { order_id } = req.body;
