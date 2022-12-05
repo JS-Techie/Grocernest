@@ -149,7 +149,7 @@ const getAllOrders = async (req, res, next) => {
         return_status: currentOrder.return_status,
         reject_reason: currentOrder.reject_reason,
         pin: currentOrder.pin ? currentOrder.pin : "",
-        gifts: gifts.length === 0 ? "No gifts applicable" : gifts,
+        gifts
       };
     });
 
