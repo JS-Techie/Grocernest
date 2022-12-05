@@ -17,6 +17,7 @@ const Customer = db.CustomerModel;
 const ReturnOrder = db.ReturnOrdersModel;
 
 const { sendOrderStatusToWhatsapp } = require("../services/whatsapp/whatsapp");
+const { getGifts } = require("../services/giftService");
 
 const getAllOrders = async (req, res, next) => {
   //Get currentUser from req.payload.cust_no
@@ -52,7 +53,7 @@ const getAllOrders = async (req, res, next) => {
               { item_id_1: currentOrderItem.item_id },
               { item_id: currentOrderItem.item_id },
             ],
-            is_ecomm : 1
+            is_ecomm: 1,
           },
         });
         if (currentOffer) {
@@ -134,6 +135,8 @@ const getAllOrders = async (req, res, next) => {
       //   orderTotal += current.quantity * current.MRP;
       // });
 
+      const gifts = getGifts(currentOrder.order_id);
+
       return {
         orderID: currentOrder.order_id,
         Date: currentOrder.created_at,
@@ -146,6 +149,7 @@ const getAllOrders = async (req, res, next) => {
         return_status: currentOrder.return_status,
         reject_reason: currentOrder.reject_reason,
         pin: currentOrder.pin ? currentOrder.pin : "",
+        gifts: gifts.length === 0 ? "No gifts applicable" : gifts,
       };
     });
 
@@ -207,7 +211,7 @@ const getOrderByOrderId = async (req, res, next) => {
             { item_id_1: currentOrderItem.id },
             { item_id: currentOrderItem.id },
           ],
-          is_ecomm : 1
+          is_ecomm: 1,
         },
       });
 
