@@ -58,20 +58,21 @@ const getGifts = async (order_id) => {
   const strategy = await Strategy.findOne({
     where: {
       min_purchase: {
-        [Op.lte]: latestOrder,
+        [Op.lte]: currentOrder.total,
       },
       max_purchase: {
-        [Op.gte]: latestOrder,
+        [Op.gte]: currentOrder.total,
       },
     },
   });
 
+  let response = [];
+
   if (strategy) {
     response = giftsArray ? giftsArray.slice(0, strategy.no_of_gifts + 4) : [];
-    return response;
   }
 
-  return [];
+  return response;
 };
 
 module.exports = { getGifts };
