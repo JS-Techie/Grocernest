@@ -3,6 +3,7 @@ const db = require("../../models");
 const Vendor = db.SupplierModel;
 const VendorItem = db.VendorItemModel;
 const Item = db.ItemModel;
+const Brand = db.LkpBrandModel;
 
 const getAllVendorAndMappedItems = async (req, res, next) => {
   try {
@@ -29,11 +30,20 @@ const getAllVendorAndMappedItems = async (req, res, next) => {
             where: { id: current.item_id },
           });
 
+          let currentBrand = null;
+          if (currentItem) {
+            currentBrand = await Brand.findOne({
+              where: { id: currentItem.brand_id },
+            });
+          }
+
           return {
             itemId: currentItem ? currentItem.id : "",
             itemName: currentItem ? currentItem.name : "",
             image: currentItem ? currentItem.image : "",
             id: current ? current.id : "",
+            brandName: currentBrand ? currentBrand.brand_name : "",
+            brandId: currentBrand ? currentBrand.id : "",
           };
         });
 
