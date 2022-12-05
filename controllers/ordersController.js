@@ -135,7 +135,7 @@ const getAllOrders = async (req, res, next) => {
       //   orderTotal += current.quantity * current.MRP;
       // });
 
-      const gifts = getGifts(currentOrder.order_id);
+      const gifts = await getGifts(currentOrder.order_id);
 
       return {
         orderID: currentOrder.order_id,
