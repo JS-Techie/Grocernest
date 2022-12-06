@@ -7,6 +7,7 @@ const Wallet = db.WalletModel;
 const Order = db.OrderModel;
 const OrderItems = db.OrderItemsModel;
 const Batch = db.BatchModel;
+const Item = db.ItemModel;
 
 const addWalletBalance = async (req, res, next) => {
   const { order_id } = req.body;
@@ -114,4 +115,47 @@ const addWalletBalance = async (req, res, next) => {
   }
 };
 
-module.exports = { addWalletBalance };
+const checkBatchNo = async (req, res, next) => {
+  const { id, batch_no } = req.body;
+  try {
+    const currentItem = await Item.findOne({
+      where: { id },
+    });
+
+    if (!currentItem) {
+      return res.status(404).send({
+        success: false,
+        data: [],
+        message: "Requested item does not exist",
+      });
+    }
+
+    const batches = await Batch.findAll({
+      where: { item_id: id },
+    });
+
+    batches.map((current) => {
+      if (current.batch_no === batch_no) {
+        return res.status(400).send({
+          success: false,
+          data: [],
+          message: `Batch number ${batch_no} already exists, please enter a new batch number`,
+        });
+      }
+    });
+
+    return res.status(200).send({
+      success: true,
+      data: [],
+      message: "This is not a duplicate batch number",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "Something went wrong, please try again in sometime",
+    });
+  }
+};
+
+module.exports = { addWalletBalance, checkBatchNo };
