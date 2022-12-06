@@ -73,15 +73,19 @@ const getAllOrders = async (req, res, next) => {
         let canReturn = true;
 
         const offers = await Offers.findAll({});
-        if (offers.length !== 0) {
-          offers.map((current) => {
-            if (
-              currentOrderItem.item_id === current.item_id_1 ||
-              currentOrderItem.item_id === current.item_id_2
-            ) {
-              canReturn = false;
-            }
-          });
+        // if (offers.length !== 0) {
+        //   offers.map((current) => {
+        //     if (
+        //       currentOrderItem.item_id === current.item_id_1 ||
+        //       currentOrderItem.item_id === current.item_id_2
+        //     ) {
+        //       canReturn = false;
+        //     }
+        //   });
+        // }
+
+        if (currentOffer || currentOrderItem.is_offer === 1) {
+          canReturn = false;
         }
 
         if (oldestBatch) {
@@ -252,6 +256,7 @@ const getOrderByOrderId = async (req, res, next) => {
               : oldestBatch.sale_price,
 
           discount: oldestBatch.discount,
+
           isOffer: currentOrderItem.is_offer === 1 ? true : false,
           canEdit:
             currentOrderItem.is_offer === 1 ? (isEdit ? true : false) : "",
