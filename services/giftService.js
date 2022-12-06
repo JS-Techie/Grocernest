@@ -16,13 +16,13 @@ const getGifts = async (order_id) => {
     inner join t_lkp_brand on t_lkp_brand.id = t_item.brand_id)
     inner join t_batch on t_batch.item_id = t_item.id)
     inner join t_inventory on t_inventory.batch_id = t_batch.id)
-   where t_item.is_gift = 1 and t_batch.mark_selected = 1 and t_inventory.location_id = 4 and t_inventory.balance_type = 1 order by t_inventory.quantity`);
+   where t_item.is_gift = 1 and t_batch.mark_selected = 1 and t_inventory.location_id = 4 and t_inventory.balance_type = 1 and t_inventory.quantity > 0 order by t_inventory.quantity`);
 
   const currentOrder = await Order.findOne({
     where: { order_id },
   });
 
-  if (currentOrder.status === "Cancelled") {
+  if (currentOrder.status === "Cancelled" || gifts.length === 0) {
     return [];
   }
 
