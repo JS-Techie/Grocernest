@@ -118,6 +118,13 @@ const addWalletBalance = async (req, res, next) => {
 const checkBatchNo = async (req, res, next) => {
   const { id, batch_no } = req.body;
   try {
+    if (id === "" || batch_no === "") {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "Please enter all required details",
+      });
+    }
     const currentItem = await Item.findOne({
       where: { id },
     });
@@ -142,15 +149,20 @@ const checkBatchNo = async (req, res, next) => {
       });
     }
 
+    let existing = false
     batches.map((current) => {
       if (current.batch_no === batch_no) {
-        return res.status(400).send({
-          success: false,
-          data: [],
-          message: `Batch number ${batch_no} already exists, please enter a new batch number`,
-        });
+        existing = true
       }
     });
+
+    if(existing){
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: `Batch number ${batch_no} already exists, please enter a new batch number`,
+      });
+    }
 
     return res.status(200).send({
       success: true,
