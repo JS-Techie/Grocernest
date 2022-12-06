@@ -149,7 +149,7 @@ const getAllOrders = async (req, res, next) => {
         return_status: currentOrder.return_status,
         reject_reason: currentOrder.reject_reason,
         pin: currentOrder.pin ? currentOrder.pin : "",
-        gifts
+        gifts,
       };
     });
 
@@ -181,7 +181,7 @@ const getOrderByOrderId = async (req, res, next) => {
     //Get that order according to its id
 
     const [singleOrder, metadata] =
-      await sequelize.query(`select t_order.order_id, t_order.created_at,t_order.pin t_order.status, t_order.return_status,t_item.id, t_item.name, t_order_items.quantity, t_item.image,
+      await sequelize.query(`select t_order.order_id, t_order.created_at,t_order.pin,t_order.status, t_order.return_status,t_item.id, t_item.name, t_order_items.quantity, t_item.image,
       t_order_items.is_offer, t_order_items.is_gift, t_order_items.offer_price
     from ((t_order
     inner join t_order_items on t_order_items.order_id = t_order.order_id)
@@ -232,6 +232,12 @@ const getOrderByOrderId = async (req, res, next) => {
         where: { item_id: currentOrderItem.id, mark_selected: 1 },
       });
 
+      let canReturn = true;
+
+      if (currentOffer || currentOrderItem.is_offer === 1) {
+        canReturn = false;
+      }
+
       if (oldestBatch) {
         return {
           itemName: currentItem.name,
@@ -269,6 +275,7 @@ const getOrderByOrderId = async (req, res, next) => {
                 isActive: currentOffer.is_active ? true : false,
               }
             : "",
+          canReturn,
         };
       }
     });
