@@ -134,6 +134,14 @@ const checkBatchNo = async (req, res, next) => {
       where: { item_id: id },
     });
 
+    if (batches.length === 0) {
+      return res.status(200).send({
+        success: true,
+        data: [],
+        message: "There are no batches for this item",
+      });
+    }
+
     batches.map((current) => {
       if (current.batch_no === batch_no) {
         return res.status(400).send({
