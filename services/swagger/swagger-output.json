@@ -2486,6 +2486,39 @@
         }
       }
     },
+    "/adhoc/duplicate/batch": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "example": "any"
+                },
+                "batch_no": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
     "/admin/orders/pending": {
       "get": {
         "description": "",
@@ -5500,6 +5533,39 @@
       }
     },
     "/admin/daily/sales/view": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "fromDate": {
+                  "example": "any"
+                },
+                "toDate": {
+                  "example": "any"
+                },
+                "delivery": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/admin/daily/sales/view/delivery": {
       "post": {
         "description": "",
         "parameters": [

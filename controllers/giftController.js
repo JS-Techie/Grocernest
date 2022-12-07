@@ -72,12 +72,20 @@ const getAllGifts = async (req, res, next) => {
         inner join t_lkp_brand on t_lkp_brand.id = t_item.brand_id)
         inner join t_batch on t_batch.item_id = t_item.id)
         inner join t_inventory on t_inventory.batch_id = t_batch.id)
-        where t_item.is_gift = 1 and t_batch.mark_selected = 1 and t_inventory.location_id = 4 and t_inventory.balance_type = 1 order by t_item.id `);
+        where t_item.is_gift = 1 and t_batch.mark_selected = 1 and t_inventory.location_id = 4 and t_inventory.balance_type = 1 and t_inventory.quantity > 0 order by t_inventory.quantity`);
 
     console.log("GIFTS=====>", gifts);
 
     //Get all the gifts that exist
     let oldestBatch = null;
+
+    if (gifts.length === 0) {
+      return res.status(200).send({
+        success: true,
+        data: [],
+        message: "There are no gift items",
+      });
+    }
     const promises = gifts.map(async (current) => {
       // oldestBatch = await Batch.findOne({
       //   where: { item_id: current.id, mark_selected: 1 },

@@ -298,11 +298,17 @@ const updateOffer = async (req, res, next) => {
 
     if (item_id) {
       offer = await Offers.findOne({
-        where: { [Op.or]: [{ item_id_1: item_id }, { item_id }] },
+        where: {
+          [Op.or]: [{ item_id_1: item_id }, { item_id }],
+          [Op.not]: [{ id: offerID }],
+        },
       });
     } else {
       offer = await Offers.findOne({
-        where: { [Op.or]: [{ item_id: item_id_1 }, { item_id_1 }] },
+        where: {
+          [Op.or]: [{ item_id: item_id_1 }, { item_id_1 }],
+          [Op.not]: [{ id: offerID }],
+        },
       });
     }
 
