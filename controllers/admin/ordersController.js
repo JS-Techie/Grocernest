@@ -160,6 +160,7 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
         order_id: current.order_id,
         status: current.status,
         created_at: current.created_at,
+        delivery_date: results.delivery_date,
         created_by: current.created_by,
         transporter_name: dboy_name ? dboy_name.full_name : "",
         cancellation_reason: current.cancellation_reason,
