@@ -93,15 +93,15 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
       : " AND tc.contact_no LIKE '%" + phno + "%'";
   const dateQuery =
     startDate == undefined ||
-    startDate == "" ||
-    endDate == undefined ||
-    endDate == ""
+      startDate == "" ||
+      endDate == undefined ||
+      endDate == ""
       ? ""
       : " AND tlo.created_at BETWEEN '" +
-        startDate +
-        "' AND (SELECT DATE_ADD('" +
-        endDate +
-        "', INTERVAL 1 DAY))";
+      startDate +
+      "' AND (SELECT DATE_ADD('" +
+      endDate +
+      "', INTERVAL 1 DAY))";
   const orderId =
     orderid == undefined || orderid == ""
       ? ""
@@ -117,6 +117,7 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
             tlo.order_id,
             tlo.status,
             tlo.created_at,
+            tlo.delivery_date,
             tlo.created_by,
             tlo.total,
             delivery_boy,
@@ -249,7 +250,7 @@ const getOrderDetails = async (req, res, next) => {
               { item_id_1: currentOrderItem.id },
               { item_id: currentOrderItem.id },
             ],
-            is_ecomm : 1
+            is_ecomm: 1
           },
         });
         if (currentOffer) {
@@ -293,23 +294,23 @@ const getOrderDetails = async (req, res, next) => {
             currentOrderItem.is_offer === 1 ? (isEdit ? true : false) : "",
           offerDetails: currentOffer
             ? {
-                offerID: currentOffer.id,
-                offerType: currentOffer.type,
-                itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
-                quantityOfItemX: currentOffer.item_1_quantity
-                  ? currentOffer.item_1_quantity
-                  : "",
-                itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
-                quantityOfItemY: currentOffer.item_2_quantity
-                  ? currentOffer.item_2_quantity
-                  : "",
-                itemID: currentOffer.item_id ? currentOffer.item_id : "",
-                amountOfDiscount: currentOffer.amount_of_discount
-                  ? currentOffer.amount_of_discount
-                  : "",
-                isPercentage: currentOffer.is_percentage ? true : false,
-                isActive: currentOffer.is_active ? true : false,
-              }
+              offerID: currentOffer.id,
+              offerType: currentOffer.type,
+              itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
+              quantityOfItemX: currentOffer.item_1_quantity
+                ? currentOffer.item_1_quantity
+                : "",
+              itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
+              quantityOfItemY: currentOffer.item_2_quantity
+                ? currentOffer.item_2_quantity
+                : "",
+              itemID: currentOffer.item_id ? currentOffer.item_id : "",
+              amountOfDiscount: currentOffer.amount_of_discount
+                ? currentOffer.amount_of_discount
+                : "",
+              isPercentage: currentOffer.is_percentage ? true : false,
+              isActive: currentOffer.is_active ? true : false,
+            }
             : "",
         };
       }
@@ -556,8 +557,8 @@ const changeOrderStatus = async (req, res, next) => {
                   res.dataValues.wallet_balance_used,
                   res.dataValues.cust_no,
                   "cancelled order ID-" +
-                    req.body.orderId +
-                    " wallet balance refunded."
+                  req.body.orderId +
+                  " wallet balance refunded."
                 );
               }
             }
@@ -708,9 +709,9 @@ const changeOrderStatus = async (req, res, next) => {
                 email.toString(),
                 req.body.orderId,
                 "Your order " +
-                  req.body.orderId +
-                  " has been " +
-                  req.body.status
+                req.body.orderId +
+                " has been " +
+                req.body.status
               );
               // whatsapp for cancelled by user
               sendOrderStatusToWhatsapp(
@@ -821,9 +822,9 @@ const assignTransporter = async (req, res, next) => {
               email.toString(),
               req.body.orderId,
               "Your order " +
-                req.body.orderId +
-                " has been Shipped. Your order will be delivered by " +
-                deliveryBoy.full_name.toString()
+              req.body.orderId +
+              " has been Shipped. Your order will be delivered by " +
+              deliveryBoy.full_name.toString()
             );
 
           // send whatsapp
@@ -839,16 +840,16 @@ const assignTransporter = async (req, res, next) => {
             req.body.orderId,
             deliveryBoy.full_name.toString()
           );
-            
-          setTimeout(()=>{
+
+          setTimeout(() => {
             sendDeliveryPinToUser(
               cust_name,
               res.dataValues.pin.toString(),
               req.body.orderId,
               contact_no
             );
-          },3000)
-        
+          }, 3000)
+
           // }
         });
       });
