@@ -228,7 +228,7 @@ const getOrderDetails = async (req, res, next) => {
     from (((t_order
     inner join t_order_items on t_order_items.order_id = t_order.order_id)
     inner join t_item on t_item.id = t_order_items.item_id)
-    inner join t_lkp_brand.id = t_item.brand_id)
+    inner join t_lkp_brand on t_lkp_brand.id = t_item.brand_id)
     where t_order.order_id = ${orderId}`);
 
     if (singleOrder.length === 0) {
