@@ -62,7 +62,7 @@ const getOrdersByDate = async (req, res, next) => {
 };
 
 const getOrdersByDeliveryBoy = async (req, res, next) => {
-  const { fromDate, toDate } = req.body;
+  let { fromDate, toDate } = req.body;
 
   fromDate = fromDate.split("T")[0] + " " + "00:00:00.000";
   toDate = toDate.split("T")[0] + " " + "23:59:59.000";
