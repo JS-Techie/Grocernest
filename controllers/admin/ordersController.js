@@ -224,10 +224,11 @@ const getOrderDetails = async (req, res, next) => {
 
     const [singleOrder, metadata] = await sequelize.query(`
       select t_order.order_id, t_order.created_at, t_order.status, t_item.id, t_item.name, t_order_items.quantity, t_item.image,
-      t_order_items.is_offer, t_order_items.is_gift, t_order_items.offer_price,t_order.cashback_amount
-    from ((t_order
+      t_order_items.is_offer, t_order_items.is_gift, t_order_items.offer_price,t_order.cashback_amount,t_lkp_brand.brand_name
+    from (((t_order
     inner join t_order_items on t_order_items.order_id = t_order.order_id)
     inner join t_item on t_item.id = t_order_items.item_id)
+    inner join t_lkp_brand.id = t_item.brand_id)
     where t_order.order_id = ${orderId}`);
 
     if (singleOrder.length === 0) {
@@ -276,6 +277,7 @@ const getOrderDetails = async (req, res, next) => {
 
       if (oldestBatch) {
         return {
+          brandName : currentOrderItem.brand_name,
           itemName: currentItem.name,
           id: currentItem.id,
           category: category ? category.group_name : "",
