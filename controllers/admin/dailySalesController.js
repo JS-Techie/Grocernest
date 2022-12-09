@@ -41,6 +41,7 @@ const getOrdersByDate = async (req, res, next) => {
         orders,
         total,
         type: typeof delivery,
+        delivery,
         fromDate,
         toDate,
       },
