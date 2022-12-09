@@ -62,15 +62,27 @@ const getOrdersByDate = async (req, res, next) => {
 };
 
 const getOrdersByDeliveryBoy = async (req, res, next) => {
-  let { fromDate, toDate } = req.body;
+  let { fromDate, toDate, delivery } = req.body;
 
   fromDate = fromDate.split("T")[0] + " " + "00:00:00.000";
   toDate = toDate.split("T")[0] + " " + "23:59:59.000";
 
   try {
-    const [orders, metadata] =
-      await sequelize.query(`select sum(t_order.total) as total, t_user.full_name as name from (t_order
-      inner join t_user on t_user.id = t_order.delivery_boy) where t_order.status = 'Delivered' and t_order.delivery_date >= '${fromDate}' and t_order.delivery_date <= '${toDate}' group by t_user.full_name order by t_order.delivery_date desc`);
+
+    // let orders = [];
+    // if (delivery === "true") {
+
+    //   console.log("going here false");
+    //   let [orders, metadata] =
+    //     await sequelize.query(`select sum(t_order.final_payable_amount) as total, t_user.full_name as name from (t_order
+    //   inner join t_user on t_user.id = t_order.delivery_boy) where t_order.status = 'Delivered' and t_order.delivery_date >= '${fromDate}' and t_order.delivery_date <= '${toDate}' group by t_user.full_name order by t_order.delivery_date desc`);
+    // }
+
+
+    let [orders, metadata] =
+      await sequelize.query(`select sum(t_order.final_payable_amount) as total, t_user.full_name as name from (t_order
+      inner join t_user on t_user.id = t_order.delivery_boy) where t_order.status = 'Delivered' and t_order.created_at >= '${fromDate}' and t_order.created_at <= '${toDate}' group by t_user.full_name order by t_order.created_at desc`);
+
 
     return res.status(200).send({
       success: true,
