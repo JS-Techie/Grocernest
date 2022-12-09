@@ -21,7 +21,7 @@ const getOrdersByDate = async (req, res, next) => {
     inner join t_customer on t_customer.cust_no  = t_order.cust_no)
     where t_batch.mark_selected = 1 and t_order.status = "Delivered"`;
     let deliveryQuery = ` and t_order.delivery_date >= '${fromDate}' and t_order.delivery_date <= '${toDate}' group by order_id order by t_order.delivery_date desc`;
-    let orderedQuery = ` and t_order.created_at >= '${fromDate}' and t_order.created_at <= '${toDate}' group by order_id order by ordered_date desc`;
+    let orderedQuery = ` and t_order.created_at >= '${fromDate}' and t_order.created_at <= '${toDate}' group by t_order.order_id order by t_order.created_at desc`;
 
     let [orders, metadata] = "";
 
@@ -43,6 +43,7 @@ const getOrdersByDate = async (req, res, next) => {
       data: {
         orders,
         total,
+        type: typeOf(delivery),
       },
       message: "Successfully fetched Daily Sales Report for given dates",
     });
