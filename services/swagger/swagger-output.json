@@ -5580,6 +5580,9 @@
                 },
                 "toDate": {
                   "example": "any"
+                },
+                "delivery": {
+                  "example": "any"
                 }
               }
             }

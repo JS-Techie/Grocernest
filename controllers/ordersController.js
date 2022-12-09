@@ -84,7 +84,15 @@ const getAllOrders = async (req, res, next) => {
         //   });
         // }
 
-        if (currentOffer || currentOrderItem.is_offer === 1) {
+        if (currentOffer) {
+          if (!currentOffer.amount_of_discount) {
+            if (currentOffer.item_1_quantity <= currentOrderItem.quantity) {
+              canReturn = false;
+            }
+          }
+        }
+
+        if (currentOrderItem.is_offer === 1) {
           canReturn = false;
         }
 

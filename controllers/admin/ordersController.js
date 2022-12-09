@@ -93,15 +93,15 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
       : " AND tc.contact_no LIKE '%" + phno + "%'";
   const dateQuery =
     startDate == undefined ||
-    startDate == "" ||
-    endDate == undefined ||
-    endDate == ""
+      startDate == "" ||
+      endDate == undefined ||
+      endDate == ""
       ? ""
       : " AND tlo.created_at BETWEEN '" +
-        startDate +
-        "' AND (SELECT DATE_ADD('" +
-        endDate +
-        "', INTERVAL 1 DAY))";
+      startDate +
+      "' AND (SELECT DATE_ADD('" +
+      endDate +
+      "', INTERVAL 1 DAY))";
   const orderId =
     orderid == undefined || orderid == ""
       ? ""
@@ -117,6 +117,7 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
             tlo.order_id,
             tlo.status,
             tlo.created_at,
+            tlo.delivery_date,
             tlo.created_by,
             tlo.total,
             delivery_boy,
@@ -159,6 +160,7 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
         order_id: current.order_id,
         status: current.status,
         created_at: current.created_at,
+        delivery_date: current.delivery_date,
         created_by: current.created_by,
         transporter_name: dboy_name ? dboy_name.full_name : "",
         cancellation_reason: current.cancellation_reason,
@@ -222,10 +224,11 @@ const getOrderDetails = async (req, res, next) => {
 
     const [singleOrder, metadata] = await sequelize.query(`
       select t_order.order_id, t_order.created_at, t_order.status, t_item.id, t_item.name, t_order_items.quantity, t_item.image,
-      t_order_items.is_offer, t_order_items.is_gift, t_order_items.offer_price,t_order.cashback_amount
-    from ((t_order
+      t_order_items.is_offer, t_order_items.is_gift, t_order_items.offer_price,t_order.cashback_amount,t_lkp_brand.brand_name
+    from (((t_order
     inner join t_order_items on t_order_items.order_id = t_order.order_id)
     inner join t_item on t_item.id = t_order_items.item_id)
+    inner join t_lkp_brand on t_lkp_brand.id = t_item.brand_id)
     where t_order.order_id = ${orderId}`);
 
     if (singleOrder.length === 0) {
@@ -249,7 +252,7 @@ const getOrderDetails = async (req, res, next) => {
               { item_id_1: currentOrderItem.id },
               { item_id: currentOrderItem.id },
             ],
-            is_ecomm : 1
+            is_ecomm: 1
           },
         });
         if (currentOffer) {
@@ -274,6 +277,7 @@ const getOrderDetails = async (req, res, next) => {
 
       if (oldestBatch) {
         return {
+          brandName : currentOrderItem.brand_name,
           itemName: currentItem.name,
           id: currentItem.id,
           category: category ? category.group_name : "",
@@ -293,23 +297,23 @@ const getOrderDetails = async (req, res, next) => {
             currentOrderItem.is_offer === 1 ? (isEdit ? true : false) : "",
           offerDetails: currentOffer
             ? {
-                offerID: currentOffer.id,
-                offerType: currentOffer.type,
-                itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
-                quantityOfItemX: currentOffer.item_1_quantity
-                  ? currentOffer.item_1_quantity
-                  : "",
-                itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
-                quantityOfItemY: currentOffer.item_2_quantity
-                  ? currentOffer.item_2_quantity
-                  : "",
-                itemID: currentOffer.item_id ? currentOffer.item_id : "",
-                amountOfDiscount: currentOffer.amount_of_discount
-                  ? currentOffer.amount_of_discount
-                  : "",
-                isPercentage: currentOffer.is_percentage ? true : false,
-                isActive: currentOffer.is_active ? true : false,
-              }
+              offerID: currentOffer.id,
+              offerType: currentOffer.type,
+              itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
+              quantityOfItemX: currentOffer.item_1_quantity
+                ? currentOffer.item_1_quantity
+                : "",
+              itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
+              quantityOfItemY: currentOffer.item_2_quantity
+                ? currentOffer.item_2_quantity
+                : "",
+              itemID: currentOffer.item_id ? currentOffer.item_id : "",
+              amountOfDiscount: currentOffer.amount_of_discount
+                ? currentOffer.amount_of_discount
+                : "",
+              isPercentage: currentOffer.is_percentage ? true : false,
+              isActive: currentOffer.is_active ? true : false,
+            }
             : "",
         };
       }
@@ -556,8 +560,8 @@ const changeOrderStatus = async (req, res, next) => {
                   res.dataValues.wallet_balance_used,
                   res.dataValues.cust_no,
                   "cancelled order ID-" +
-                    req.body.orderId +
-                    " wallet balance refunded."
+                  req.body.orderId +
+                  " wallet balance refunded."
                 );
               }
             }
@@ -708,9 +712,9 @@ const changeOrderStatus = async (req, res, next) => {
                 email.toString(),
                 req.body.orderId,
                 "Your order " +
-                  req.body.orderId +
-                  " has been " +
-                  req.body.status
+                req.body.orderId +
+                " has been " +
+                req.body.status
               );
               // whatsapp for cancelled by user
               sendOrderStatusToWhatsapp(
@@ -821,9 +825,9 @@ const assignTransporter = async (req, res, next) => {
               email.toString(),
               req.body.orderId,
               "Your order " +
-                req.body.orderId +
-                " has been Shipped. Your order will be delivered by " +
-                deliveryBoy.full_name.toString()
+              req.body.orderId +
+              " has been Shipped. Your order will be delivered by " +
+              deliveryBoy.full_name.toString()
             );
 
           // send whatsapp
@@ -839,16 +843,16 @@ const assignTransporter = async (req, res, next) => {
             req.body.orderId,
             deliveryBoy.full_name.toString()
           );
-            
-          setTimeout(()=>{
+
+          setTimeout(() => {
             sendDeliveryPinToUser(
               cust_name,
               res.dataValues.pin.toString(),
               req.body.orderId,
               contact_no
             );
-          },3000)
-        
+          }, 3000)
+
           // }
         });
       });
