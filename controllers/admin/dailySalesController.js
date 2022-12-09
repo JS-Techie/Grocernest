@@ -4,8 +4,8 @@ const { sequelize } = require("../../models");
 const getOrdersByDate = async (req, res, next) => {
   let { fromDate, toDate, delivery } = req.body;
 
-  fromDate = fromDate.split("T")[0] + " " + "00:00:00.000Z";
-  toDate = toDate.split("T")[0] + " " + "23:59:59.999Z";
+  fromDate = fromDate.split("T")[0] + " " + "00:00:00.000";
+  toDate = toDate.split("T")[0] + " " + "23:59:59.000";
 
   try {
     let orderQuery = `select t_order.order_id,t_order.final_payable_amount,t_order.total, t_order.wallet_balance_used, t_customer.cust_name as customer_name,t_order.created_at as ordered_date,t_user.full_name as delivery_boy_name, t_order.delivery_date from 
@@ -16,7 +16,7 @@ const getOrdersByDate = async (req, res, next) => {
     inner join t_batch on t_batch.item_id = t_item.id)
     inner join t_inventory on t_inventory.batch_id  = t_batch.id)
     inner join t_customer on t_customer.cust_no  = t_order.cust_no)
-    where t_batch.mark_selected = 1 and t_order.status = "Delivered"`;
+    where t_batch.mark_selected = 1 and t_order.status = 'Delivered'`;
     let deliveryQuery = ` and t_order.delivery_date >= '${fromDate}' and t_order.delivery_date <= '${toDate}' group by order_id order by t_order.delivery_date desc`;
     let orderedQuery = ` and t_order.created_at >= '${fromDate}' and t_order.created_at <= '${toDate}' group by t_order.order_id order by t_order.created_at desc`;
 
