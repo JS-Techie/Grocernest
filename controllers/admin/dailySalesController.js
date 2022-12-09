@@ -7,6 +7,9 @@ const getOrdersByDate = async (req, res, next) => {
   fromDate = fromDate.split("T")[0] + " " + "00:00:00.000";
   toDate = toDate.split("T")[0] + " " + "23:59:59.000";
 
+  console.log(fromDate);
+  console.log(toDate);
+
   try {
     let orderQuery = `select t_order.order_id,t_order.final_payable_amount,t_order.total, t_order.wallet_balance_used, t_customer.cust_name as customer_name,t_order.created_at as ordered_date,t_user.full_name as delivery_boy_name, t_order.delivery_date from 
     ((((((t_order 
@@ -24,9 +27,10 @@ const getOrdersByDate = async (req, res, next) => {
 
     if (!delivery) {
       [orders, metadata] = await sequelize.query(orderQuery + orderedQuery);
+    } else {
+      [orders, metadata] = await sequelize.query(orderQuery + deliveryQuery);
     }
 
-    [orders, metadata] = await sequelize.query(orderQuery + deliveryQuery);
     let total = 0;
 
     if (orders.length > 0) {
