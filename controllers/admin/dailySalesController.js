@@ -25,7 +25,7 @@ const getOrdersByDate = async (req, res, next) => {
 
     let [orders, metadata] = "";
 
-    if (!delivery) {
+    if (delivery === "false") {
       [orders, metadata] = await sequelize.query(orderQuery + orderedQuery);
     } else {
       [orders, metadata] = await sequelize.query(orderQuery + deliveryQuery);
