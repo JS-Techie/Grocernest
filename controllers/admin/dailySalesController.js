@@ -1,17 +1,14 @@
 const db = require("../../models");
 const { sequelize } = require("../../models");
 
-
 const getOrdersByDate = async (req, res, next) => {
   let { fromDate, toDate, delivery } = req.body;
 
-
-
   toDate = toDate.substring(0, toDate.indexOf("T") + 1);
-  toDate = toDate + "23:59:59.999Z"
+  toDate = toDate + "23:59:59.999Z";
 
   fromDate = fromDate.substring(0, fromDate.indexOf("T") + 1);
-  fromDate = fromDate + "00:00:000Z"
+  fromDate = fromDate + "00:00:000Z";
 
   try {
     let orderQuery = `select t_order.order_id,t_order.final_payable_amount,t_order.total, t_order.wallet_balance_used, t_customer.cust_name as customer_name,t_order.created_at as ordered_date,t_user.full_name as delivery_boy_name, t_order.delivery_date from 
@@ -28,7 +25,7 @@ const getOrdersByDate = async (req, res, next) => {
 
     let [orders, metadata] = "";
 
-    if (!delivery) {S
+    if (!delivery) {
       [orders, metadata] = await sequelize.query(orderQuery + orderedQuery);
     }
 
