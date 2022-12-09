@@ -43,7 +43,7 @@ const getOrdersByDate = async (req, res, next) => {
       data: {
         orders,
         total,
-        type: typeOf(delivery),
+        type: typeof delivery,
       },
       message: "Successfully fetched Daily Sales Report for given dates",
     });
