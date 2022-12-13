@@ -121,8 +121,8 @@ const createVendor = async (req, res, next) => {
 
     //send whatsapp
 
-    let salt = bcrypt.genSaltSync(10);
-    let encryptedPassword = bcrypt.hashSync(password, salt);
+    let actualSalt = bcrypt.genSaltSync(10);
+    let encryptedPassword = bcrypt.hashSync(password, actualSalt);
 
     const newVendor = await Vendor.create({
       email,
@@ -134,10 +134,12 @@ const createVendor = async (req, res, next) => {
       password: encryptedPassword,
       business_name,
       created_by: 1,
-      active_ind: "Y"
+      active_ind: "Y",
     });
 
-    let randomPassword = bcrypt.hashSync(uniq(), salt);
+    let randomString = uniq();
+    let randomSalt = bcrypt.genSaltSync(10);
+    let randomPassword = bcrypt.hashSync(randomString, randomSalt);
 
     const currentVendor = await Vendor.findOne({
       where: { whatsapp_number },
@@ -146,6 +148,7 @@ const createVendor = async (req, res, next) => {
     const newUser = await User.create({
       id: currentVendor.id,
       full_name: first_name + " " + last_name,
+      mobile_no: whatsapp_number,
       email: uniq(),
       password: randomPassword,
       type_cd: "VENDOR",
