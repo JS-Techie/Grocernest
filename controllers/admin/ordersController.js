@@ -2,6 +2,8 @@ const { sequelize } = require("../../models");
 const { Op } = require("sequelize");
 const db = require("../../models");
 
+const { generatePin } = require("../../services/otpService");
+
 const {
   sendOrderStatusEmail,
   sendCancelledStatusEmail,
@@ -15,6 +17,10 @@ const {
   sendAdminCancelledOrderStatusToWhatsapp,
   sendPickupBoyNotificationToWhatsapp,
 } = require("../../services/whatsapp/whatsapp");
+
+const {
+  sendDeliveryPinToUser,
+} = require("../../services/whatsapp/whatsappMessages");
 // const Customer = db.CustomerModel;
 
 const Batch = db.BatchModel;
@@ -34,7 +40,7 @@ const getAllPendingOrders = async (req, res, next) => {
     const [results, metadata] = await sequelize.query(`
             select tc.cust_name, tlo.cust_no , tc.contact_no, tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total from t_order tlo inner join t_customer tc 
             where tc.cust_no = tlo.cust_no 
-            AND tlo.status="Placed"
+            AND tlo.status="Placed" order by tlo.created_at desc
           `);
 
     if (results.length === 0) {
@@ -111,6 +117,7 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
             tlo.order_id,
             tlo.status,
             tlo.created_at,
+            tlo.delivery_date,
             tlo.created_by,
             tlo.total,
             delivery_boy,
@@ -124,7 +131,7 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
             ${phoneNoQuery}
             ${dateQuery}
             ${orderId}
-             order by created_at DESC
+             order by tlo.created_at DESC
           `);
 
     if (results.length === 0) {
@@ -136,7 +143,6 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
     }
 
     let orders_total = 0;
-
 
     const promises = results.map(async (current) => {
       const dboy_name = await User.findOne({
@@ -154,6 +160,7 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
         order_id: current.order_id,
         status: current.status,
         created_at: current.created_at,
+        delivery_date: current.delivery_date,
         created_by: current.created_by,
         transporter_name: dboy_name ? dboy_name.full_name : "",
         cancellation_reason: current.cancellation_reason,
@@ -174,7 +181,7 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
       success: true,
       data: {
         orders: responseArray,
-        order_total: orders_total
+        order_total: orders_total,
       },
       message: "Successfully fetched all pending orders",
     });
@@ -217,10 +224,11 @@ const getOrderDetails = async (req, res, next) => {
 
     const [singleOrder, metadata] = await sequelize.query(`
       select t_order.order_id, t_order.created_at, t_order.status, t_item.id, t_item.name, t_order_items.quantity, t_item.image,
-      t_order_items.is_offer, t_order_items.is_gift, t_order_items.offer_price,t_order.cashback_amount
-    from ((t_order
+      t_order_items.is_offer, t_order_items.is_gift, t_order_items.offer_price,t_order.cashback_amount,t_lkp_brand.brand_name
+    from (((t_order
     inner join t_order_items on t_order_items.order_id = t_order.order_id)
     inner join t_item on t_item.id = t_order_items.item_id)
+    inner join t_lkp_brand on t_lkp_brand.id = t_item.brand_id)
     where t_order.order_id = ${orderId}`);
 
     if (singleOrder.length === 0) {
@@ -244,6 +252,7 @@ const getOrderDetails = async (req, res, next) => {
               { item_id_1: currentOrderItem.id },
               { item_id: currentOrderItem.id },
             ],
+            is_ecomm: 1
           },
         });
         if (currentOffer) {
@@ -268,6 +277,7 @@ const getOrderDetails = async (req, res, next) => {
 
       if (oldestBatch) {
         return {
+          brandName : currentOrderItem.brand_name,
           itemName: currentItem.name,
           id: currentItem.id,
           category: category ? category.group_name : "",
@@ -736,7 +746,7 @@ const acceptedOrders = async (req, res, next) => {
     const [results, metadata] = await sequelize.query(`
             select tc.cust_name, tlo.cust_no , tc.contact_no, tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total from t_order tlo inner join t_customer tc 
             where tc.cust_no = tlo.cust_no 
-            AND tlo.status="Accepted"
+            AND tlo.status="Accepted" order by tlo.created_at desc
           `);
 
     if (results.length === 0) {
@@ -786,10 +796,13 @@ const assignTransporter = async (req, res, next) => {
     },
   });
 
+  const pin = generatePin();
+
   Order.update(
     {
       status: "Shipped",
       delivery_boy: parseInt(transporterName),
+      pin,
     },
     { where: { order_id: orderId } }
   )
@@ -819,7 +832,10 @@ const assignTransporter = async (req, res, next) => {
 
           // send whatsapp
           let contact_no = cust.dataValues.contact_no;
+          let cust_name = cust.dataValues.cust_name;
           // let opt_in = cust.dataValues.opt_in;
+
+          //Send message to user with the pin
 
           // if (opt_in == 1) {
           sendOrderShippedToWhatsapp(
@@ -827,6 +843,16 @@ const assignTransporter = async (req, res, next) => {
             req.body.orderId,
             deliveryBoy.full_name.toString()
           );
+
+          setTimeout(() => {
+            sendDeliveryPinToUser(
+              cust_name,
+              res.dataValues.pin.toString(),
+              req.body.orderId,
+              contact_no
+            );
+          }, 3000)
+
           // }
         });
       });
@@ -851,7 +877,7 @@ const getShippedOrders = async (req, res, next) => {
     const [results, metadata] = await sequelize.query(`
             select delivery_boy, tc.cust_name, tlo.cust_no , tc.contact_no, tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total from t_order tlo inner join t_customer tc 
             where tc.cust_no = tlo.cust_no 
-            AND tlo.status="Shipped"
+            AND tlo.status="Shipped" order by tlo.created_at desc
           `);
 
     if (results.length === 0) {
@@ -903,7 +929,7 @@ const getDeliveredOrders = async (req, res, next) => {
     const [results, metadata] = await sequelize.query(`
             select tc.cust_name, tlo.cust_no , tc.contact_no, tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total, delivery_boy from t_order tlo inner join t_customer tc 
             where tc.cust_no = tlo.cust_no 
-            AND tlo.status="Delivered"
+            AND tlo.status="Delivered" order by tlo.created_at desc
           `);
 
     if (results.length === 0) {
@@ -956,7 +982,7 @@ const getCanceledorders = async (req, res, next) => {
     const [results, metadata] = await sequelize.query(`
             select tc.cust_name, tlo.cust_no , tc.contact_no, tlo.order_id ,tlo.status, tlo.created_at ,tlo.created_by ,tlo.total, delivery_boy,tlo.cancellation_reason from t_order tlo inner join t_customer tc 
             where tc.cust_no = tlo.cust_no 
-            AND tlo.status="Cancelled"
+            AND tlo.status="Cancelled" order by tlo.created_at desc
           `);
 
     if (results.length === 0) {
@@ -1100,7 +1126,6 @@ const rejectRequestedReturn = async (req, res, next) => {
 
     //Notify customer about status of return reject
 
-
     return res.status(200).send({
       success: true,
       data: updatedOrder,
@@ -1120,7 +1145,7 @@ const getReturns = async (req, res, next) => {
   try {
     const allOrders = await Order.findAll({
       where: { return_status },
-      order: [['created_at', 'DESC']],
+      order: [["created_at", "DESC"]],
     });
 
     if (allOrders.length === 0) {

@@ -4,32 +4,77 @@ const {
 
 module.exports = sequelize => {
   const attributes = {
-    order_id: {
-      type: DataTypes.STRING(255),
+    id: {
+      type: DataTypes.STRING(100),
       allowNull: false,
+      defaultValue: null,
+      primaryKey: true,
+      autoIncrement: false,
+      comment: null,
+      field: "id"
+    },
+    heading: {
+      type: DataTypes.STRING(500),
+      allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "order_id"
+      field: "heading"
     },
-    item_id: {
-      type: DataTypes.BIGINT,
-      allowNull: false,
+    desc: {
+      type: DataTypes.STRING(500),
+      allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "item_id"
+      field: "desc"
     },
-    quantity: {
+    category_id: {
       type: DataTypes.BIGINT,
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "quantity"
+      field: "category_id"
+    },
+    extension: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "extension"
+    },
+    name: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "name"
+    },
+    active_ind: {
+      type: DataTypes.STRING(1),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "active_ind"
+    },
+    url: {
+      type: DataTypes.STRING(500),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "url"
     },
     created_by: {
       type: DataTypes.BIGINT,
@@ -66,49 +111,13 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "updated_at"
-    },
-    id: {
-      type: DataTypes.BIGINT,
-      allowNull: false,
-      defaultValue: null,
-      primaryKey: true,
-      autoIncrement: true,
-      comment: null,
-      field: "id"
-    },
-    is_gift: {
-      type: DataTypes.INTEGER(1),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "is_gift"
-    },
-    is_offer: {
-      type: DataTypes.INTEGER(1),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "is_offer"
-    },
-    offer_price: {
-      type: DataTypes.DECIMAL,
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "offer_price"
     }
   };
   const options = {
-    tableName: "t_order_items",
+    tableName: "t_featured_categories",
     comment: "",
     indexes: []
   };
-  const TOrderItemsModel = sequelize.define("t_order_items_model", attributes, options);
-  return TOrderItemsModel;
+  const TFeaturedCategoriesModel = sequelize.define("t_featured_categories_model", attributes, options);
+  return TFeaturedCategoriesModel;
 };

@@ -4,32 +4,32 @@ const {
 
 module.exports = sequelize => {
   const attributes = {
-    order_id: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "order_id"
-    },
-    item_id: {
+    id: {
       type: DataTypes.BIGINT,
       allowNull: false,
       defaultValue: null,
+      primaryKey: true,
+      autoIncrement: true,
+      comment: null,
+      field: "id"
+    },
+    cust_no: {
+      type: DataTypes.STRING(20),
+      allowNull: true,
+      defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "item_id"
+      field: "cust_no"
     },
-    quantity: {
+    item_id: {
       type: DataTypes.BIGINT,
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "quantity"
+      field: "item_id"
     },
     created_by: {
       type: DataTypes.BIGINT,
@@ -66,49 +66,13 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "updated_at"
-    },
-    id: {
-      type: DataTypes.BIGINT,
-      allowNull: false,
-      defaultValue: null,
-      primaryKey: true,
-      autoIncrement: true,
-      comment: null,
-      field: "id"
-    },
-    is_gift: {
-      type: DataTypes.INTEGER(1),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "is_gift"
-    },
-    is_offer: {
-      type: DataTypes.INTEGER(1),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "is_offer"
-    },
-    offer_price: {
-      type: DataTypes.DECIMAL,
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "offer_price"
     }
   };
   const options = {
-    tableName: "t_order_items",
+    tableName: "t_notify",
     comment: "",
     indexes: []
   };
-  const TOrderItemsModel = sequelize.define("t_order_items_model", attributes, options);
-  return TOrderItemsModel;
+  const TNotifyModel = sequelize.define("t_notify_model", attributes, options);
+  return TNotifyModel;
 };

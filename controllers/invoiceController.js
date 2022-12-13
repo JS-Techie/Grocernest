@@ -52,15 +52,14 @@ const downloadInvoice = async (req, res, next) => {
           image: item.image,
           description: item.description,
           isGift: item.is_gift == 1 ? true : false,
-          isOffer: item.is_offer == 1 ? true : false,
-          offerPrice: item.is_offer == 1 ? offer_price : "",
-          salePrice: oldestBatch.sale_price
+          isOffer: current.is_offer == 1 ? true : false,
+          offerPrice: current.is_offer == 1 ? current.offer_price : "",
+          salePrice: oldestBatch.sale_price,
         };
       }
     });
 
     const resolved = await Promise.all(promises);
-
 
     const response = {
       customerName: currentUser.cust_name,
@@ -70,8 +69,13 @@ const downloadInvoice = async (req, res, next) => {
       total: currentOrder.total,
       date: currentOrder.created_at,
       payableTotal: currentOrder.final_payable_amount,
-      walletBalanceUsed: currentOrder.wallet_balance_used,
+      walletBalanceUsed: currentOrder.wallet_balance_used
+        ? currentOrder.wallet_balance_used
+        : 0,
+      itemBasedWalletBalanceUsed:
+        currentOrder.item_wallet_used > 0 ? currentOrder.item_wallet_used : 0,
       appliedDiscount: currentOrder.applied_discount,
+
       orderItems: resolved,
     };
 
@@ -106,20 +110,16 @@ const downloadInvoice = async (req, res, next) => {
   }
 };
 
-
-
-
 const getOriginalUrl = async (req, res, next) => {
-
-  let id = req.params.id.toString()
+  let id = req.params.id.toString();
 
   const current_url = await Url.findOne({
-    where: { id: id }
-  })
+    where: { id: id },
+  });
 
   if (current_url == null) {
-    return res.send("<center><h3>This url does not exist..</h3></center>",);
+    return res.send("<center><h3>This url does not exist..</h3></center>");
   }
   return res.redirect(current_url.original_url);
-}
+};
 module.exports = { downloadInvoice, getOriginalUrl };

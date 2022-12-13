@@ -1,11 +1,18 @@
 const db = require("../../models");
 const uniq = require("uniqid");
 
-const FeaturedBrand = db.FeaturedBrandsModel;
+const {
+  uploadImageToS3,
+  deleteImageFromS3,
+} = require("../../services/s3Service");
+const { sequelize } = require("../../models");
 
-const S3 = require("aws-sdk/clients/s3");
-const s3Config = require("../../config/s3Config");
-const s3 = new S3(s3Config);
+const {
+  sendNotificationsToUser,
+} = require("../../services/whatsapp/whatsappMessages");
+const FeaturedBrand = db.FeaturedBrandsModel;
+const Demand = db.DemandModel;
+const Notify = db.NotifyModel;
 
 const getAllFeaturedBrands = async (req, res, next) => {
   try {
@@ -35,6 +42,7 @@ const getAllFeaturedBrands = async (req, res, next) => {
 };
 
 const getFeaturedBrandById = async (req, res, next) => {
+  const { id } = req.params;
   try {
     const brand = await FeaturedBrand.findOne({
       where: { id },
@@ -69,21 +77,8 @@ const createFeaturedBrand = async (req, res, next) => {
   const { base64, heading, desc, brand_id, extension, name } = req.body;
   try {
     const id = uniq();
-    const base64Data = new Buffer.from(
-      base64.replace(/^data:image\/\w+;base64,/, ""),
-      "base64"
-    );
-    //const type = base64.split(";")[0].split("/")[1];
-    const params = {
-      Bucket: process.env.AWS_BUCKET_NAME,
-      Key: `Featured-Brands/Images/${id}-${brand_id}-${name}.${extension}`,
-      Body: base64Data,
-      ContentEncoding: "base64",
-      ContentType: `image/jpeg`,
-    };
-
-    const s3UploadResponse = await s3.upload(params).promise();
-    const url = s3UploadResponse.Location;
+    const key = `Featured-Brands/Images/${id}-${brand_id}-${name}.${extension}`;
+    const url = await uploadImageToS3(base64, key);
 
     const newFeaturedBrand = await FeaturedBrand.create({
       id,
@@ -118,8 +113,6 @@ const editFeaturedBrand = async (req, res, next) => {
     req.body;
   const { user_id } = req;
   try {
-    let deleteSuccess = true;
-    let errMessage = "";
     let url;
 
     const current = await FeaturedBrand.findOne({
@@ -136,36 +129,19 @@ const editFeaturedBrand = async (req, res, next) => {
     }
 
     if (base64) {
-      const params = {
-        Bucket: process.env.AWS_BUCKET_NAME,
-        Key: `Featured-Brands/Images/${id}-${current.brand_id}-${current.name}.${current.extension}`,
-      };
+      const deleteKey = `Featured-Brands/Images/${id}-${current.brand_id}-${current.name}.${current.extension}`;
+      const deletionFromS3 = await deleteImageFromS3(deleteKey);
 
-      s3.deleteObject(params, (err, data) => {
-        if (err) {
-          deleteSuccess = false;
-          errMessage = err;
-        }
-      });
-
-      if (deleteSuccess) {
-        const params2 = {
-          Bucket: process.env.AWS_BUCKET_NAME,
-          Key: `Featured-Brands/Images/${id}-${brand_id}-${name}.${extension}`,
-          Body: base64Data,
-          ContentEncoding: "base64",
-          ContentType: `image/jpeg`,
-        };
-
-        const s3UploadResponse = await s3.upload(params2).promise();
-        url = s3UploadResponse.Location;
+      if (deletionFromS3.deleteSuccess) {
+        const uploadKey = `Featured-Brands/Images/${id}-${brand_id}-${name}.${extension}`;
+        url = await uploadImageToS3(base64, uploadKey);
       } else {
         return res.status(400).send({
           success: false,
           data: [],
           message:
             "Could not delete already existing image, please try again in sometime",
-          devMessage: errMessage,
+          devMessage: deletionFromS3.errMessage,
         });
       }
     }
@@ -221,28 +197,17 @@ const deleteFeaturedBrand = async (req, res, next) => {
       });
     }
 
-    let deleteSuccess = true;
-    let errMessage = "";
+    const key = `Featured-Brands/Images/${id}-${current.brand_id}-${current.name}.${current.extension}`;
 
-    const params = {
-      Bucket: process.env.AWS_BUCKET_NAME,
-      Key: `Featured-Brands/Images/${id}-${current.brand_id}-${current.name}.${current.extension}`,
-    };
+    const deletionFromS3 = await deleteImageFromS3(key);
 
-    s3.deleteObject(params, (err, data) => {
-      if (err) {
-        deleteSuccess = false;
-        errMessage = err;
-      }
-    });
-
-    if (!deleteSuccess) {
+    if (!deletionFromS3.deleteSuccess) {
       return res.status(400).send({
         success: false,
         data: [],
         message:
           "Could not delete already existing image, please try again in sometime",
-        devMessage: errMessage,
+        devMessage: deletionFromS3.errMessage,
       });
     }
 
@@ -265,10 +230,89 @@ const deleteFeaturedBrand = async (req, res, next) => {
   }
 };
 
+const getDemandList = async (req, res, next) => {
+  try {
+    const [demands, metadata] = await sequelize.query(
+      `select t_demand.title,t_demand.desc,t_demand.url,t_customer.cust_name,t_customer.email,t_customer.contact_no from t_demand inner join t_customer on t_customer.cust_no = t_demand.cust_no order by t_demand.created_at desc`
+    );
+
+    if (demands.length === 0) {
+      return res.status(200).send({
+        success: true,
+        data: [],
+        message: "There are no customer demands right now",
+      });
+    }
+
+    const promises = demands.map((current) => {
+      return {
+        title: current.title,
+        description: current.desc,
+        image: current.url,
+        customerName: current.cust_name,
+        customerEmail: current.email ? current.email : "",
+        phoneNumber: current.contact_no,
+      };
+    });
+
+    const resolved = await Promise.resolve(promises);
+
+    return res.status(200).send({
+      success: true,
+      data: resolved,
+      message: "Successfully found customer demand list",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "Something went wrong, please try again in sometime",
+      devMessage: "Please check data field for more details",
+    });
+  }
+};
+
+const sendNotification = async (req, res, next) => {
+  const { id } = req.body;
+  try {
+    const [notifs, metadata] = await sequelize.query(
+      `select t_customer.cust_name, t_customer.contact_no,t_item.name from ((t_notify inner join t_customer on t_customer.cust_no = t_notify.cust_no) inner join t_item on t_item.id = t_notify.item_id) where t_notify.item_id = ${id}`
+    );
+
+    if (notifs.length > 0) {
+      notifs.map((current) => {
+        sendNotificationsToUser(
+          current.name,
+          current.contact_no,
+          current.cust_name
+        );
+      });
+    }
+
+    const [deleteResults, metadata2] = await sequelize.query(
+      `delete from t_notify where item_id = ${id}`
+    );
+
+    return res.status(200).send({
+      success: true,
+      data: deleteResults,
+      message: "Successfully sent notifications to customer",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "Something went wrong, please try again in sometime",
+    });
+  }
+};
+
 module.exports = {
   getAllFeaturedBrands,
   getFeaturedBrandById,
   createFeaturedBrand,
   editFeaturedBrand,
   deleteFeaturedBrand,
+  getDemandList,
+  sendNotification,
 };

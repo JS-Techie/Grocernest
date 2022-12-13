@@ -17,6 +17,7 @@ const Customer = db.CustomerModel;
 const ReturnOrder = db.ReturnOrdersModel;
 
 const { sendOrderStatusToWhatsapp } = require("../services/whatsapp/whatsapp");
+const { getGifts } = require("../services/giftService");
 
 const getAllOrders = async (req, res, next) => {
   //Get currentUser from req.payload.cust_no
@@ -52,6 +53,7 @@ const getAllOrders = async (req, res, next) => {
               { item_id_1: currentOrderItem.item_id },
               { item_id: currentOrderItem.item_id },
             ],
+            is_ecomm: 1,
           },
         });
         if (currentOffer) {
@@ -71,15 +73,27 @@ const getAllOrders = async (req, res, next) => {
         let canReturn = true;
 
         const offers = await Offers.findAll({});
-        if (offers.length !== 0) {
-          offers.map((current) => {
-            if (
-              currentOrderItem.item_id === current.item_id_1 ||
-              currentOrderItem.item_id === current.item_id_2
-            ) {
+        // if (offers.length !== 0) {
+        //   offers.map((current) => {
+        //     if (
+        //       currentOrderItem.item_id === current.item_id_1 ||
+        //       currentOrderItem.item_id === current.item_id_2
+        //     ) {
+        //       canReturn = false;
+        //     }
+        //   });
+        // }
+
+        if (currentOffer) {
+          if (!currentOffer.amount_of_discount) {
+            if (currentOffer.item_1_quantity <= currentOrderItem.quantity) {
               canReturn = false;
             }
-          });
+          }
+        }
+
+        if (currentOrderItem.is_offer === 1) {
+          canReturn = false;
         }
 
         if (oldestBatch) {
@@ -133,6 +147,8 @@ const getAllOrders = async (req, res, next) => {
       //   orderTotal += current.quantity * current.MRP;
       // });
 
+      const gifts = await getGifts(currentOrder.order_id);
+
       return {
         orderID: currentOrder.order_id,
         Date: currentOrder.created_at,
@@ -144,6 +160,8 @@ const getAllOrders = async (req, res, next) => {
         itemDetails: responseWithoutUndefined,
         return_status: currentOrder.return_status,
         reject_reason: currentOrder.reject_reason,
+        pin: currentOrder.pin ? currentOrder.pin : "",
+        gifts,
       };
     });
 
@@ -175,7 +193,7 @@ const getOrderByOrderId = async (req, res, next) => {
     //Get that order according to its id
 
     const [singleOrder, metadata] =
-      await sequelize.query(`select t_order.order_id, t_order.created_at, t_order.status, t_order.return_status,t_item.id, t_item.name, t_order_items.quantity, t_item.image,
+      await sequelize.query(`select t_order.order_id, t_order.created_at,t_order.pin,t_order.status, t_order.return_status,t_item.id, t_item.name, t_order_items.quantity, t_item.image,
       t_order_items.is_offer, t_order_items.is_gift, t_order_items.offer_price
     from ((t_order
     inner join t_order_items on t_order_items.order_id = t_order.order_id)
@@ -205,6 +223,7 @@ const getOrderByOrderId = async (req, res, next) => {
             { item_id_1: currentOrderItem.id },
             { item_id: currentOrderItem.id },
           ],
+          is_ecomm: 1,
         },
       });
 
@@ -225,6 +244,12 @@ const getOrderByOrderId = async (req, res, next) => {
         where: { item_id: currentOrderItem.id, mark_selected: 1 },
       });
 
+      let canReturn = true;
+
+      if (currentOffer || currentOrderItem.is_offer === 1) {
+        canReturn = false;
+      }
+
       if (oldestBatch) {
         return {
           itemName: currentItem.name,
@@ -239,6 +264,7 @@ const getOrderByOrderId = async (req, res, next) => {
               : oldestBatch.sale_price,
 
           discount: oldestBatch.discount,
+
           isOffer: currentOrderItem.is_offer === 1 ? true : false,
           canEdit:
             currentOrderItem.is_offer === 1 ? (isEdit ? true : false) : "",
@@ -262,6 +288,7 @@ const getOrderByOrderId = async (req, res, next) => {
                 isActive: currentOffer.is_active ? true : false,
               }
             : "",
+          canReturn,
         };
       }
     });
@@ -282,6 +309,7 @@ const getOrderByOrderId = async (req, res, next) => {
         orderTotal,
         itemDetails: responseArray,
         return_status: singleOrder[0].return_status,
+        pin: singleOrder[0].pin,
       },
       message: "Order successfully fetched for the user",
     });

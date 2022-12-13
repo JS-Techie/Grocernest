@@ -8,6 +8,8 @@ const {
   createFeaturedBrand,
   editFeaturedBrand,
   deleteFeaturedBrand,
+  getDemandList,
+  sendNotification
 } = require("../../controllers/admin/homeController");
 
 router.route("/view/all/featured").get(authenticateAdmin, getAllFeaturedBrands);
@@ -17,5 +19,9 @@ router.route("/edit/featured/:id").patch(authenticateAdmin, editFeaturedBrand);
 router
   .route("/delete/featured/:id")
   .delete(authenticateAdmin, deleteFeaturedBrand);
+
+  router.route("/list/view/demand").get(authenticateAdmin, getDemandList)
+  router.route("/send/notification").post(authenticateAdmin,sendNotification)
+
 
 module.exports = router;

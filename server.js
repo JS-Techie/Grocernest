@@ -61,6 +61,7 @@ const posRouter = require("./routes/posRoutes");
 const attendanceRouter = require("./routes/attendanceRoutes");
 const feedbackRouter = require("./routes/feedbackRoutes");
 const homePageRouter = require("./routes/homepageRoutes");
+const adhocRouter = require("./routes/adhocRoutes");
 
 // admin routers import
 const adminOrderRouter = require("./routes/admin/orderRoutes");
@@ -76,6 +77,8 @@ const adminDeliveryRouter = require("./routes/admin/deliveryBoyRoutes");
 const adminItemsRouter = require("./routes/admin/itemRoutes");
 const adminBannerRouter = require("./routes/admin/bannerRoutes");
 const adminHomeRouter = require("./routes/admin/homeRoutes");
+const adminFeaturedCategoryRouter = require("./routes/admin/featuredCategoryRoutes");
+const adminItemWalletRouter = require("./routes/admin/itemWalletRoutes");
 //delivery boy routes
 
 const deliveryBoyOrderRouter = require("./routes/deliveryBoy/ordersRoutes");
@@ -90,6 +93,7 @@ const deliveryRouter = require("./routes/deliveryRoutes");
 const adminMilkSubscriptionRouter = require("./routes/admin/milkSubscriptionRoutes");
 const adminVendorRouter = require("./routes/admin/vendorRoutes");
 const adminVendorItemRouter = require("./routes/admin/vendorItemRoutes");
+const adminDailySalesRouter = require("./routes/admin/dailySalesRoutes");
 
 //Vendor routes import
 
@@ -125,6 +129,7 @@ app.use(posRouter);
 app.use(attendanceRouter);
 app.use("/feedback", feedbackRouter);
 app.use("/home", homePageRouter);
+app.use("/adhoc", adhocRouter);
 
 // admin routes
 app.use("/admin/orders", adminOrderRouter);
@@ -142,6 +147,9 @@ app.use("/admin/vendor/items", adminVendorItemRouter);
 app.use("/admin/items", adminItemsRouter);
 app.use("/admin/banners", adminBannerRouter);
 app.use("/admin/home", adminHomeRouter);
+app.use("/admin/featured/categories", adminFeaturedCategoryRouter);
+app.use("/admin/daily/sales", adminDailySalesRouter);
+app.use("/admin/itemsp", adminItemWalletRouter);
 
 // milk (user)
 app.use("/subscription", SubscriptionRouter);

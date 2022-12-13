@@ -205,7 +205,6 @@ const editVendorProfile = async (req, res, next) => {
 
     if (
       !gst ||
-      !aadhar ||
       !billing_address ||
       !current_address ||
       !pan ||

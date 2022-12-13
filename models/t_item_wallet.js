@@ -4,32 +4,59 @@ const {
 
 module.exports = sequelize => {
   const attributes = {
-    order_id: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "order_id"
-    },
-    item_id: {
+    id: {
       type: DataTypes.BIGINT,
       allowNull: false,
       defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
+      primaryKey: true,
+      autoIncrement: true,
       comment: null,
-      field: "item_id"
+      field: "id"
     },
-    quantity: {
+    cashback: {
       type: DataTypes.BIGINT,
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "quantity"
+      field: "cashback"
+    },
+    item_id: {
+      type: DataTypes.BIGINT,
+      allowNull: false,
+      defaultValue: null,
+      primaryKey: true,
+      autoIncrement: false,
+      comment: null,
+      field: "item_id"
+    },
+    is_percent: {
+      type: DataTypes.INTEGER(1),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "is_percent"
+    },
+    use: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "use"
+    },
+    is_active: {
+      type: DataTypes.INTEGER(1),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "is_active"
     },
     created_by: {
       type: DataTypes.BIGINT,
@@ -66,49 +93,13 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "updated_at"
-    },
-    id: {
-      type: DataTypes.BIGINT,
-      allowNull: false,
-      defaultValue: null,
-      primaryKey: true,
-      autoIncrement: true,
-      comment: null,
-      field: "id"
-    },
-    is_gift: {
-      type: DataTypes.INTEGER(1),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "is_gift"
-    },
-    is_offer: {
-      type: DataTypes.INTEGER(1),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "is_offer"
-    },
-    offer_price: {
-      type: DataTypes.DECIMAL,
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "offer_price"
     }
   };
   const options = {
-    tableName: "t_order_items",
+    tableName: "t_item_wallet",
     comment: "",
     indexes: []
   };
-  const TOrderItemsModel = sequelize.define("t_order_items_model", attributes, options);
-  return TOrderItemsModel;
+  const TItemWalletModel = sequelize.define("t_item_wallet_model", attributes, options);
+  return TItemWalletModel;
 };
