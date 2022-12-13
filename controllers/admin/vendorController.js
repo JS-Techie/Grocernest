@@ -198,6 +198,8 @@ const editVendor = async (req, res, next) => {
       where: { id },
     });
 
+    console.log(password);
+
     if (!vendor) {
       return res.status(404).send({
         success: false,
@@ -267,11 +269,15 @@ const editVendor = async (req, res, next) => {
 
     let salt;
     let encryptedPassword;
-    if (password) {
+
+    if (password !== undefined) {
+      console.log("Password not undefined");
       salt = bcrypt.genSaltSync(10);
       encryptedPassword = bcrypt.hashSync(password, salt);
     }
 
+    let grocernestSalt = bcrypt.genSaltSync(10);
+    let grocernestPassword = bcrypt.hashSync("grocernest", grocernestSalt);
     //send email
     // if (email !== null && validator.validate(email) == true) {
     // Send email here
@@ -287,7 +293,8 @@ const editVendor = async (req, res, next) => {
         type,
         phone_number,
         whatsapp_number,
-        password: encryptedPassword,
+        password:
+          password === undefined ? grocernestPassword : encryptedPassword,
         business_name,
       },
       {
