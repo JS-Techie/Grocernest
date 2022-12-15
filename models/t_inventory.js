@@ -163,6 +163,15 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "cashback_is_percentage"
+    },
+    ecomm_quantity: {
+      type: DataTypes.DECIMAL,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "ecomm_quantity"
     }
   };
   const options = {
