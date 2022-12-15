@@ -22,15 +22,6 @@ module.exports = sequelize => {
       comment: null,
       field: "cashback"
     },
-    item_id: {
-      type: DataTypes.BIGINT,
-      allowNull: false,
-      defaultValue: null,
-      primaryKey: true,
-      autoIncrement: false,
-      comment: null,
-      field: "item_id"
-    },
     is_percent: {
       type: DataTypes.INTEGER(1),
       allowNull: true,
@@ -93,6 +84,15 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "updated_at"
+    },
+    item_id: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "item_id"
     }
   };
   const options = {
