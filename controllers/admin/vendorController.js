@@ -121,8 +121,8 @@ const createVendor = async (req, res, next) => {
 
     //send whatsapp
 
-    let salt = bcrypt.genSaltSync(10);
-    let encryptedPassword = bcrypt.hashSync(password, salt);
+    let actualSalt = bcrypt.genSaltSync(10);
+    let encryptedPassword = bcrypt.hashSync(password, actualSalt);
 
     const newVendor = await Vendor.create({
       email,
@@ -134,10 +134,12 @@ const createVendor = async (req, res, next) => {
       password: encryptedPassword,
       business_name,
       created_by: 1,
-      active_ind: "Y"
+      active_ind: "Y",
     });
 
-    let randomPassword = bcrypt.hashSync(uniq(), salt);
+    let randomString = uniq();
+    let randomSalt = bcrypt.genSaltSync(10);
+    let randomPassword = bcrypt.hashSync(randomString, randomSalt);
 
     const currentVendor = await Vendor.findOne({
       where: { whatsapp_number },
@@ -146,6 +148,7 @@ const createVendor = async (req, res, next) => {
     const newUser = await User.create({
       id: currentVendor.id,
       full_name: first_name + " " + last_name,
+      mobile_no: whatsapp_number,
       email: uniq(),
       password: randomPassword,
       type_cd: "VENDOR",
@@ -194,6 +197,8 @@ const editVendor = async (req, res, next) => {
     const vendor = await Vendor.findOne({
       where: { id },
     });
+
+    console.log(password);
 
     if (!vendor) {
       return res.status(404).send({
@@ -264,11 +269,15 @@ const editVendor = async (req, res, next) => {
 
     let salt;
     let encryptedPassword;
-    if (password) {
+
+    if (password !== undefined) {
+      console.log("Password not undefined");
       salt = bcrypt.genSaltSync(10);
       encryptedPassword = bcrypt.hashSync(password, salt);
     }
 
+    let grocernestSalt = bcrypt.genSaltSync(10);
+    let grocernestPassword = bcrypt.hashSync("grocernest", grocernestSalt);
     //send email
     // if (email !== null && validator.validate(email) == true) {
     // Send email here
@@ -284,7 +293,8 @@ const editVendor = async (req, res, next) => {
         type,
         phone_number,
         whatsapp_number,
-        password: encryptedPassword,
+        password:
+          password === undefined ? grocernestPassword : encryptedPassword,
         business_name,
       },
       {

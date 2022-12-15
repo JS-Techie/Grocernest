@@ -73,7 +73,7 @@ const downloadInvoice = async (req, res, next) => {
         ? currentOrder.wallet_balance_used
         : 0,
       itemBasedWalletBalanceUsed:
-        currentOrder.item_wallet_used > 0 ? currentOrder.item_wallet_used : 0,
+        currentOrder.item_wallet_used ? currentOrder.item_wallet_used : 0,
       appliedDiscount: currentOrder.applied_discount,
 
       orderItems: resolved,
