@@ -120,7 +120,7 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
             tlo.delivery_date,
             tlo.created_by,
             tlo.total,
-            delivery_boy,
+            tlo.delivery_boy,
             tlo.cancellation_reason,
             tlo.applied_discount,
             tlo.wallet_balance_used,
