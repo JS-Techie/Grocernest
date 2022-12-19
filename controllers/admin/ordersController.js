@@ -167,8 +167,8 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
         cancellation_reason: current.cancellation_reason,
         total: current.total,
         applied_discount: current.applied_discount,
-        wallet_balance_used: current.wallet_balance_used,
-        item_wallet_used: current.item_wallet_used,
+        wallet_balance_used: current.wallet_balance_used ? current.wallet_balance_used : 0,
+        item_wallet_used: current.item_wallet_used ? current.item_wallet_used : 0,
         final_payable_amount: current.final_payable_amount,
       };
     });
