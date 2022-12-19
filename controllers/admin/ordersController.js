@@ -125,10 +125,10 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
             tlo.applied_discount,
             tlo.wallet_balance_used,
             tlo.item_wallet_used,
-            tlo.final_payable_amount,
-            from t_order tlo inner join t_customer tc 
+            tlo.final_payable_amount
+            from (t_order tlo inner join t_customer tc)
             where tc.cust_no = tlo.cust_no 
-            AND tlo.status="${orderType}"
+            AND tlo.status='${orderType}'
             ${phoneNoQuery}
             ${dateQuery}
             ${orderId}
