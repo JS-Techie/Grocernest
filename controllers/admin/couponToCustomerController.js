@@ -2,6 +2,8 @@ const cc = require("coupon-code");
 const db = require("../../models");
 const uniq = require("uniqid");
 const CouponToCustomer = db.CouponToCustomerModel;
+const Customer = db.CustomerModel;
+const CustomerToCouponMapping = db.CustomerToCouponMappingModel;
 
 const createCouponToCustomer = async (req, res, next) => {
     const {
@@ -156,9 +158,71 @@ const deleteCouponToCustomer = async (req, res, next) => {
 }
 
 
+
+const mapCouponToCustomer = async (req, res, next) => {
+    const { cust_no, coupon_id, coupon_name } = req.body;
+    const { user_id } = req;
+
+    try {
+
+        // check coupon exist or not
+        let couponExist = await CouponToCustomer.findAll({
+            where: {
+                id: coupon_id,
+            }
+        })
+
+        if (couponExist.length < 1) {
+            return res.status(400).send({
+                success: false,
+                data: "",
+                message: "Coupon/Coupon ID does not exist.",
+            });
+        }
+
+        // check customer exist or not
+        let customerExist = await Customer.findAll({
+            where: {
+                cust_no
+            }
+        })
+
+        if (customerExist.length < 1) {
+            return res.status(400).send({
+                success: false,
+                data: "",
+                message: "Customer/Customer ID does not exist.",
+            });
+        }
+
+        // everything is valid, now create the map
+        const mapCustomerToCouponData = CustomerToCouponMapping.create({
+            cust_id: cust_no,
+            coupon_id,
+            coupon_name,
+            assignment_date: new Date().getTime(),
+            created_by: user_id
+        })
+
+        return res.status(200).send({
+            success: true,
+            data: mapCustomerToCouponData,
+            message: "User mapped to the coupon successfully!",
+        });
+    }
+    catch (error) {
+        return res.status(400).send({
+            success: false,
+            data: error.message,
+            message: "Something went wrong while mapping user to the coupon.",
+        });
+    }
+}
 module.exports = {
     createCouponToCustomer,
     displayCouponToCustomer,
     updateCouponToCustomer,
-    deleteCouponToCustomer
+    deleteCouponToCustomer,
+
+    mapCouponToCustomer
 };
