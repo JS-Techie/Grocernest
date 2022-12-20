@@ -11,24 +11,27 @@ const createCouponToCustomer = async (req, res, next) => {
         duration,
     } = req.body;
 
-
-    if (coupon_name == "" || amount_of_discount == "" || amount_of_discount <= 0 || duration == "" || duration <= 0) {
-        return res.status(400).send({
-            success: false,
-            data: [],
-            message: "Please enter all mandatory field and put valid data",
-        });
-    }
-
-    if (amount_of_discount === 0) {
-        return res.status(400).send({
-            success: false,
-            data: [],
-            message: "Please enter an amount, it cannot be zero",
-        });
-    }
+    const { user_id } = req;
 
     try {
+
+        if (coupon_name == "" || amount_of_discount == "" || amount_of_discount <= 0 || duration == "" || duration <= 0) {
+            return res.status(400).send({
+                success: false,
+                data: [],
+                message: "Please enter all mandatory field and put valid data",
+            });
+        }
+
+        if (amount_of_discount === 0) {
+            return res.status(400).send({
+                success: false,
+                data: [],
+                message: "Please enter an amount, it cannot be zero",
+            });
+        }
+
+
 
         // check that coupon code is available already or not
         const couponAvailable = await CouponToCustomer.findAll({
@@ -53,7 +56,7 @@ const createCouponToCustomer = async (req, res, next) => {
             coupon_desc,
             amount_of_discount,
             duration,
-            created_by: 1,
+            created_by: user_id,
         });
 
         return res.status(201).send({
@@ -93,6 +96,7 @@ const displayCouponToCustomer = async (req, res, next) => {
 const updateCouponToCustomer = async (req, res, next) => {
 
     const { id, coupon_desc, amount_of_discount, duration } = req.body;
+    const { user_id } = req;
 
     if (amount_of_discount <= 0 || amount_of_discount == "" || duration == "" || duration <= 0) {
         return res.status(400).send({
@@ -107,7 +111,9 @@ const updateCouponToCustomer = async (req, res, next) => {
             {
                 coupon_desc,
                 amount_of_discount,
-                duration
+                duration,
+                updated_at: new Date().getTime(),
+                updated_by: user_id
             },
             { where: { id } }
         )
