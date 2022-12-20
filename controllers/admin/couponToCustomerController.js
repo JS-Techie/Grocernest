@@ -169,6 +169,7 @@ const mapCouponToCustomer = async (req, res, next) => {
         let couponExist = await CouponToCustomer.findAll({
             where: {
                 id: coupon_id,
+                coupon_name: coupon_name
             }
         })
 
@@ -176,7 +177,7 @@ const mapCouponToCustomer = async (req, res, next) => {
             return res.status(400).send({
                 success: false,
                 data: "",
-                message: "Coupon/Coupon ID does not exist.",
+                message: "Coupon Name/Coupon ID does not exist.",
             });
         }
 
@@ -218,11 +219,78 @@ const mapCouponToCustomer = async (req, res, next) => {
         });
     }
 }
+
+const applyCoupon = async (req, res, next) => {
+    const { cust_no, coupon_name } = req.body;
+
+    try {
+        let customer_coupon_mapping = {};
+        // check coupon exist or not
+        let couponExist = await CouponToCustomer.findAll({
+            where: {
+                coupon_name: coupon_name
+            }
+        })
+
+        if (couponExist.length < 1) {
+            return res.status(400).send({
+                success: false,
+                data: "",
+                message: "Coupon does not exist.",
+            });
+        }
+
+        // check coupon belongs to customer or not
+        let mappingExist = await CustomerToCouponMapping.findAll({
+            where: {
+                cust_id: cust_no,
+                coupon_name
+            },
+            order: [["assignment_date", "ASC"]]
+        })
+
+        console.log(mappingExist.length)
+
+        if (mappingExist.length < 1) {
+            return res.status(400).send({
+                success: false,
+                data: "",
+                message: "Customer don't have this coupon in his account",
+            });
+        }
+
+        // if same coupon exist to same customer more than once, choose the older coupon first
+        if (mappingExist.length > 1) {
+            customer_coupon_mapping = mappingExist[0].dataValues;
+        }
+
+        // check for expired coupons
+
+        // fetch coupon from coupon table
+        // console.log(my_coupon);
+
+        return res.status(200).send({
+            success: true,
+            data: customer_coupon_mapping,
+            message: "Coupon Applied!",
+        });
+    }
+    catch (error) {
+        return res.status(400).send({
+            success: false,
+            data: error.message,
+            message: "Something went wrong while mapping user to the coupon.",
+        });
+    }
+
+}
+
 module.exports = {
     createCouponToCustomer,
     displayCouponToCustomer,
     updateCouponToCustomer,
     deleteCouponToCustomer,
 
-    mapCouponToCustomer
+    mapCouponToCustomer,
+    applyCoupon
 };

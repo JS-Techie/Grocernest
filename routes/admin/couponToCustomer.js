@@ -8,7 +8,8 @@ const {
     displayCouponToCustomer,
     updateCouponToCustomer,
     deleteCouponToCustomer,
-    mapCouponToCustomer
+    mapCouponToCustomer,
+    applyCoupon
 } = require("../../controllers/admin/couponToCustomerController");
 
 router.route("/create").post(admin, createCouponToCustomer); //create
@@ -17,6 +18,10 @@ router.route("/update").post(admin, updateCouponToCustomer); //update
 router.route("/delete").post(admin, deleteCouponToCustomer); //delete
 
 router.route("/map").post(admin, mapCouponToCustomer); //map coupon to customer
+
+router.route("/apply").post(admin, applyCoupon); //apply coupon to customer
+
+
 
 
 module.exports = router;
