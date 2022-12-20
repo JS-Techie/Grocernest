@@ -94,6 +94,7 @@ const adminMilkSubscriptionRouter = require("./routes/admin/milkSubscriptionRout
 const adminVendorRouter = require("./routes/admin/vendorRoutes");
 const adminVendorItemRouter = require("./routes/admin/vendorItemRoutes");
 const adminDailySalesRouter = require("./routes/admin/dailySalesRoutes");
+const couponToCustomer = require("./routes/admin/couponToCustomer");
 
 //Vendor routes import
 
@@ -133,6 +134,7 @@ app.use("/adhoc", adhocRouter);
 
 // admin routes
 app.use("/admin/orders", adminOrderRouter);
+app.use("/admin/coupon/to/customer", couponToCustomer);
 app.use("/admin/wallet", adminWalletRouter);
 app.use("/admin/customer", adminCustomerRouter);
 app.use("/admin/gift", adminGiftRouter);

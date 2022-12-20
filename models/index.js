@@ -103,6 +103,8 @@ db.WalletTransactionModel = require("./t_wallet_transaction")(
 
 db.WalletModel = require("./t_wallet")(db.sequelize, Sequelize);
 
+db.CouponToCustomerModel = require("./t_coupon_to_customer")(db.sequelize, Sequelize);
+
 db.WishlistModel = require("./t_lkp_wishlist")(db.sequelize, Sequelize);
 
 db.AddressModel = require("./t_address")(db.sequelize, Sequelize);
