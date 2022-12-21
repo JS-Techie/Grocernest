@@ -1,6 +1,7 @@
 const cc = require("coupon-code");
 const db = require("../../models");
 const uniq = require("uniqid");
+const { sequelize } = require("../../models");
 const CouponToCustomer = db.CouponToCustomerModel;
 const Customer = db.CustomerModel;
 const CustomerToCouponMapping = db.CustomerToCouponMappingModel;
@@ -285,12 +286,41 @@ const applyCoupon = async (req, res, next) => {
 
 }
 
+
+const displayMappedCouponToCustomer = async (req, res, next) => {
+
+    try {
+        const [allCustomerToCouponMapping, metadata] = await sequelize.query(
+            `select tccm.cust_id, tccm.coupon_id, tc.cust_name, tc.contact_no,
+            tccm.coupon_name, tccm.assignment_date, tccm.coupon_used_date
+            from t_customer_coupon_mapping tccm 
+            left outer join t_customer tc on tc.id = tccm.cust_id;`
+        );
+
+        // console.log(result);
+
+        return res.status(200).send({
+            success: true,
+            data: allCustomerToCouponMapping,
+            message: "All coupon to customer mapped data fetched successfully",
+        });
+    }
+    catch (error) {
+        return res.status(400).send({
+            success: false,
+            data: error.message,
+            message: "Something went wrong.",
+        });
+    }
+}
 module.exports = {
     createCouponToCustomer,
     displayCouponToCustomer,
     updateCouponToCustomer,
     deleteCouponToCustomer,
 
+
     mapCouponToCustomer,
+    displayMappedCouponToCustomer,
     applyCoupon
 };
