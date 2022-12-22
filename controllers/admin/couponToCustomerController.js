@@ -294,7 +294,7 @@ const displayMappedCouponToCustomer = async (req, res, next) => {
             `select tccm.cust_id, tccm.coupon_id, tc.cust_name, tc.contact_no,
             tccm.coupon_name, tccm.assignment_date, tccm.coupon_used_date
             from t_customer_coupon_mapping tccm 
-            left outer join t_customer tc on tc.id = tccm.cust_id;`
+            left outer join t_customer tc on tc.cust_no = tccm.cust_id;`
         );
 
         // console.log(result);
