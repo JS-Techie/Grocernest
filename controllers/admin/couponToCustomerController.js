@@ -221,6 +221,70 @@ const mapCouponToCustomer = async (req, res, next) => {
   }
 };
 
+const displayMappedCouponToCustomer = async (req, res, next) => {
+  try {
+    const [allCustomerToCouponMapping, metadata] = await sequelize.query(
+      `select tccm.cust_id, tccm.coupon_id, tc.cust_name, tc.contact_no,
+            tccm.coupon_name, tccm.assignment_date, tccm.expiry_date, tccm.coupon_used_date
+            from t_customer_coupon_mapping tccm 
+            left outer join t_customer tc on tc.cust_no = tccm.cust_id;`
+    );
+
+    // console.log(result);
+
+    return res.status(200).send({
+      success: true,
+      data: allCustomerToCouponMapping,
+      message: "All coupon to customer mapped data fetched successfully",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "Something went wrong.",
+    });
+  }
+};
+
+const applicableCouponForACustomer = async (req, res, next) => {
+  const { cust_no } = req.body;
+
+  if (!cust_no) {
+    return res.status(400).send({
+      success: false,
+      data: "",
+      message: "Please provide cust_no",
+    });
+  }
+  try {
+    const [allApplicableCouponsForThisCustomer, metadata] =
+      await sequelize.query(
+        `select tccm.id as map_id, tccm.coupon_id, tccm.coupon_name, tctc.amount_of_discount, 
+            tccm.assignment_date ,tccm.expiry_date
+            from t_customer_coupon_mapping tccm 
+            inner join t_coupon_to_customer tctc 
+            where tccm.cust_id ="` +
+          cust_no +
+          `" 
+            and tctc.coupon_name = tccm.coupon_name 
+            and DATE(tccm.expiry_date) >= CURDATE() ORDER by tccm.expiry_date ASC;
+        `
+      );
+
+    return res.status(200).send({
+      success: true,
+      data: allApplicableCouponsForThisCustomer,
+      message: "All coupons for this customer fetched successfully",
+    });
+  } catch (err) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "Something went wrong.",
+    });
+  }
+};
+
 const applyCoupon = async (req, res, next) => {
   const { map_id, cust_no } = req.body;
 
@@ -283,70 +347,6 @@ const applyCoupon = async (req, res, next) => {
       success: false,
       data: error.message,
       message: "Something went wrong while using the coupon.",
-    });
-  }
-};
-
-const displayMappedCouponToCustomer = async (req, res, next) => {
-  try {
-    const [allCustomerToCouponMapping, metadata] = await sequelize.query(
-      `select tccm.cust_id, tccm.coupon_id, tc.cust_name, tc.contact_no,
-            tccm.coupon_name, tccm.assignment_date, tccm.expiry_date, tccm.coupon_used_date
-            from t_customer_coupon_mapping tccm 
-            left outer join t_customer tc on tc.cust_no = tccm.cust_id;`
-    );
-
-    // console.log(result);
-
-    return res.status(200).send({
-      success: true,
-      data: allCustomerToCouponMapping,
-      message: "All coupon to customer mapped data fetched successfully",
-    });
-  } catch (error) {
-    return res.status(400).send({
-      success: false,
-      data: error.message,
-      message: "Something went wrong.",
-    });
-  }
-};
-
-const applicableCouponForACustomer = async (req, res, next) => {
-  const { cust_no } = req.body;
-
-  if (!cust_no) {
-    return res.status(400).send({
-      success: false,
-      data: "",
-      message: "Please provide cust_no",
-    });
-  }
-  try {
-    const [allApplicableCouponsForThisCustomer, metadata] =
-      await sequelize.query(
-        `select tccm.id as map_id, tccm.coupon_id, tccm.coupon_name, tctc.amount_of_discount, 
-            tccm.assignment_date ,tccm.expiry_date
-            from t_customer_coupon_mapping tccm 
-            inner join t_coupon_to_customer tctc 
-            where tccm.cust_id ="` +
-          cust_no +
-          `" 
-            and tctc.coupon_name = tccm.coupon_name 
-            and DATE(tccm.expiry_date) >= CURDATE() ORDER by tccm.expiry_date ASC;
-`
-      );
-
-    return res.status(200).send({
-      success: true,
-      data: allApplicableCouponsForThisCustomer,
-      message: "All coupons for this customer fetched successfully",
-    });
-  } catch (err) {
-    return res.status(400).send({
-      success: false,
-      data: error.message,
-      message: "Something went wrong.",
     });
   }
 };
