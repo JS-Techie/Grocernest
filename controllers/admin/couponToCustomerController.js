@@ -167,7 +167,7 @@ const mapCouponToCustomer = async (req, res, next) => {
     try {
 
         // check coupon exist or not
-        let couponExist = await CouponToCustomer.findAll({
+        let couponExist = await CouponToCustomer.findOne({
             where: {
                 id: coupon_id,
                 coupon_name: coupon_name
@@ -197,18 +197,22 @@ const mapCouponToCustomer = async (req, res, next) => {
             });
         }
 
+        var expiry_timestamp = new Date();
+        expiry_timestamp.setDate(expiry_timestamp.getDate() + parseInt(couponExist.duration));
+
         // everything is valid, now create the map
         const mapCustomerToCouponData = CustomerToCouponMapping.create({
             cust_id: cust_no,
             coupon_id,
             coupon_name,
             assignment_date: new Date().getTime(),
+            expiry_date: expiry_timestamp,
             created_by: user_id
         })
 
         return res.status(200).send({
             success: true,
-            data: mapCustomerToCouponData,
+            data: mapCustomerToCouponData,   
             message: "User mapped to the coupon successfully!",
         });
     }
@@ -291,8 +295,8 @@ const displayMappedCouponToCustomer = async (req, res, next) => {
 
     try {
         const [allCustomerToCouponMapping, metadata] = await sequelize.query(
-            `select tccm.cust_id, tccm.coupon_id, tc.cust_name, tc.contact_no,
-            tccm.coupon_name, tccm.assignment_date, tccm.coupon_used_date
+          `select tccm.cust_id, tccm.coupon_id, tc.cust_name, tc.contact_no,
+            tccm.coupon_name, tccm.assignment_date, tccm.expiry_date, tccm.coupon_used_date
             from t_customer_coupon_mapping tccm 
             left outer join t_customer tc on tc.cust_no = tccm.cust_id;`
         );
@@ -313,6 +317,21 @@ const displayMappedCouponToCustomer = async (req, res, next) => {
         });
     }
 }
+
+const applicableCouponForACustomer = async (req, res, next) => {
+    const { cust_no } = req.body;
+    
+    try {
+        const allApplicableCouponsForThisCustomer = await sequelize.query(
+            ``
+        );
+    }
+    catch (err) {
+        console.log(err)
+    }
+}
+
+
 module.exports = {
     createCouponToCustomer,
     displayCouponToCustomer,
@@ -322,5 +341,6 @@ module.exports = {
 
     mapCouponToCustomer,
     displayMappedCouponToCustomer,
-    applyCoupon
+    applyCoupon, //not done yet,
+    applicableCouponForACustomer
 };
