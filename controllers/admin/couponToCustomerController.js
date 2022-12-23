@@ -267,6 +267,7 @@ const applicableCouponForACustomer = async (req, res, next) => {
           cust_no +
           `" 
             and tctc.coupon_name = tccm.coupon_name 
+            and tccm.coupon_used_date is NULL
             and DATE(tccm.expiry_date) >= CURDATE() ORDER by tccm.expiry_date ASC;
         `
       );
