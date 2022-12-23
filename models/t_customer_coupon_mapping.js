@@ -49,6 +49,15 @@ module.exports = sequelize => {
       comment: null,
       field: "assignment_date"
     },
+    expiry_date: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "expiry_date"
+    },
     coupon_used_date: {
       type: DataTypes.DATE,
       allowNull: true,
