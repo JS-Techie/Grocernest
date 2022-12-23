@@ -222,64 +222,67 @@ const mapCouponToCustomer = async (req, res, next) => {
 };
 
 const applyCoupon = async (req, res, next) => {
-  const { cust_no, coupon_name } = req.body;
+  const { map_id, cust_no } = req.body;
 
   try {
-    let customer_coupon_mapping = {};
-    // check coupon exist or not
-    let couponExist = await CouponToCustomer.findAll({
-      where: {
-        coupon_name: coupon_name,
-      },
-    });
-
-    if (couponExist.length < 1) {
+    if (!map_id || !cust_no) {
       return res.status(400).send({
         success: false,
         data: "",
-        message: "Coupon does not exist.",
+        message: "Please provide map_id and cust_no",
       });
     }
 
-    // check coupon belongs to customer or not
-    let mappingExist = await CustomerToCouponMapping.findAll({
+    let assigned_coupon = await CustomerToCouponMapping.findOne({
       where: {
+        id: map_id,
         cust_id: cust_no,
-        coupon_name,
       },
-      order: [["assignment_date", "ASC"]],
     });
 
-    // console.log(mappingExist.length);
-
-    if (mappingExist.length < 1) {
+    // check coupon is valid or not
+    if (!assigned_coupon) {
       return res.status(400).send({
         success: false,
         data: "",
-        message: "Customer don't have this coupon in his account",
+        message: "No such coupons found.",
       });
     }
 
-    // if same coupon exist to same customer more than once, choose the older coupon first
-    if (mappingExist.length > 1) {
-      customer_coupon_mapping = mappingExist[0].dataValues;
+    // check this coupon used or not
+    if (assigned_coupon.coupon_used_date) {
+      return res.status(400).send({
+        success: false,
+        data: "",
+        message: "This coupon is already used!",
+      });
     }
 
-    // check for expired coupons
-
-    // fetch coupon from coupon table
-    // console.log(my_coupon);
+    let current_date = new Date();
+    // now everything is fine, coupon can be applied
+    const update_cust_coupon_map = await CustomerToCouponMapping.update(
+      {
+        coupon_used_date: current_date,
+        updated_at: current_date,
+      },
+      {
+        where: {
+          id: map_id,
+          cust_id: cust_no,
+        },
+      }
+    );
 
     return res.status(200).send({
       success: true,
-      data: customer_coupon_mapping,
-      message: "Coupon Applied!",
+      data: "",
+      message: "Coupon used successfully!",
     });
   } catch (error) {
     return res.status(400).send({
       success: false,
       data: error.message,
-      message: "Something went wrong while mapping user to the coupon.",
+      message: "Something went wrong while using the coupon.",
     });
   }
 };
@@ -312,6 +315,13 @@ const displayMappedCouponToCustomer = async (req, res, next) => {
 const applicableCouponForACustomer = async (req, res, next) => {
   const { cust_no } = req.body;
 
+  if (!cust_no) {
+    return res.status(400).send({
+      success: false,
+      data: "",
+      message: "Please provide cust_no",
+    });
+  }
   try {
     const [allApplicableCouponsForThisCustomer, metadata] =
       await sequelize.query(
@@ -349,6 +359,6 @@ module.exports = {
 
   mapCouponToCustomer,
   displayMappedCouponToCustomer,
-  applyCoupon, //not done yet,
   applicableCouponForACustomer,
+  applyCoupon
 };
