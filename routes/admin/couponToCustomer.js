@@ -10,7 +10,8 @@ const {
     deleteCouponToCustomer,
     mapCouponToCustomer,
     applyCoupon,
-    displayMappedCouponToCustomer
+    displayMappedCouponToCustomer,
+    applicableCouponForACustomer
 } = require("../../controllers/admin/couponToCustomerController");
 
 router.route("/create").post(admin, createCouponToCustomer); //create
@@ -22,7 +23,10 @@ router.route("/map").post(admin, mapCouponToCustomer); //map coupon to customer
 router.route("/map/display").get(admin, displayMappedCouponToCustomer); //map coupon to customer
 
 
-router.route("/apply").post(admin, applyCoupon); //apply coupon to customer
+router.route("/applicable/coupons").post(admin, applicableCouponForACustomer);
+
+
+router.route("/apply/coupon").post(admin, applyCoupon); //apply coupon to customer //not done yet
 
 
 
