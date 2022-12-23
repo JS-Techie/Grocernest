@@ -313,14 +313,15 @@ const applicableCouponForACustomer = async (req, res, next) => {
   const { cust_no } = req.body;
 
   try {
-    const [allApplicableCouponsForThisCustomer, metadata] = await sequelize.query(
-      `select tccm.coupon_id, tccm.coupon_name, tctc.amount_of_discount, 
+    const [allApplicableCouponsForThisCustomer, metadata] =
+      await sequelize.query(
+        `select tccm.id as map_id, tccm.coupon_id, tccm.coupon_name, tctc.amount_of_discount, 
             tccm.assignment_date ,tccm.expiry_date
             from t_customer_coupon_mapping tccm 
             inner join t_coupon_to_customer tctc 
             where tccm.cust_id ="` +
-        cust_no +
-        `" 
+          cust_no +
+          `" 
             and tctc.coupon_name = tccm.coupon_name 
             and DATE(tccm.expiry_date) >= CURDATE() ORDER by tccm.expiry_date ASC;
 `
