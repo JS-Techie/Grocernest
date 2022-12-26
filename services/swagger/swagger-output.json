@@ -3058,7 +3058,7 @@
         }
       }
     },
-    "/admin/coupon/to/customer/apply": {
+    "/admin/coupon/to/customer/apply/coupon": {
       "post": {
         "description": "",
         "parameters": [
@@ -3073,10 +3073,10 @@
             "schema": {
               "type": "object",
               "properties": {
-                "cust_no": {
+                "map_id": {
                   "example": "any"
                 },
-                "coupon_name": {
+                "cust_no": {
                   "example": "any"
                 }
               }
@@ -5864,6 +5864,29 @@
           }
         ],
         "responses": {
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/admin/ecomm/invoice/download": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
           "400": {
             "description": "Bad Request"
           },

@@ -79,6 +79,7 @@ const adminBannerRouter = require("./routes/admin/bannerRoutes");
 const adminHomeRouter = require("./routes/admin/homeRoutes");
 const adminFeaturedCategoryRouter = require("./routes/admin/featuredCategoryRoutes");
 const adminItemWalletRouter = require("./routes/admin/itemWalletRoutes");
+const adminEcommInvoiceRouter = require("./routes/admin/ecommInvoiceRoutes");
 //delivery boy routes
 
 const deliveryBoyOrderRouter = require("./routes/deliveryBoy/ordersRoutes");
@@ -152,6 +153,7 @@ app.use("/admin/home", adminHomeRouter);
 app.use("/admin/featured/categories", adminFeaturedCategoryRouter);
 app.use("/admin/daily/sales", adminDailySalesRouter);
 app.use("/admin/itemsp", adminItemWalletRouter);
+app.use("/admin/ecomm/invoice", adminEcommInvoiceRouter);
 
 // milk (user)
 app.use("/subscription", SubscriptionRouter);
