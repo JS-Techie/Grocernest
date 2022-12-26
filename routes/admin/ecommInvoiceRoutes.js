@@ -7,7 +7,7 @@ const {
   downloadEcommInvoice,
 } = require("../../controllers/admin/invoiceController");
 
-router.route("/download").post(downloadEcommInvoice);
+router.route("/download").post(authenticate, downloadEcommInvoice);
 
 // authenticate
 
