@@ -6,6 +6,11 @@ const CouponToCustomer = db.CouponToCustomerModel;
 const Customer = db.CustomerModel;
 const CustomerToCouponMapping = db.CustomerToCouponMappingModel;
 
+const {
+  sendCouponToUser,
+} = require("../../services/whatsapp/whatsappMessages");
+
+
 const createCouponToCustomer = async (req, res, next) => {
   const { coupon_name, coupon_desc, amount_of_discount, duration } = req.body;
 
@@ -191,6 +196,7 @@ const mapCouponToCustomer = async (req, res, next) => {
         message: "Customer/Customer ID does not exist.",
       });
     }
+    let currentCustomer = customerExist[0];
 
     var expiry_timestamp = new Date();
     expiry_timestamp.setDate(
@@ -207,6 +213,14 @@ const mapCouponToCustomer = async (req, res, next) => {
       created_by: user_id,
     });
 
+    // coupon mapped, now send notification to whatsapp
+    sendCouponToUser(
+      currentCustomer.cust_name.split(" ")[0],
+      coupon_name,
+      "",
+      couponExist.amount_of_discount.toString(),
+      currentCustomer.contact_no.toString()
+    );
     return res.status(200).send({
       success: true,
       data: mapCustomerToCouponData,
