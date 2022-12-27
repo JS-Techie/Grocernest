@@ -141,7 +141,7 @@ const sendDeliveryPinToUser = async (custName, pin, orderId, phoneNumber) => {
       message: {
         isHSM: "true",
         type: "text",
-        text: `Hi ${firstName}. Please share the pin ${pin} at the time of your delivery for order ${orderId}.`,
+        text: `Hi ${firstName}. Please share the pin *${pin}* at the time of your delivery for order *${orderId}*.`,
       },
     });
     console.log("Success Response", messageResponseFromGupshup);
