@@ -11,7 +11,7 @@ const {
 } = require("../../services/whatsapp/whatsappMessages");
 
 const createCouponToCustomer = async (req, res, next) => {
-  const { coupon_name, coupon_desc, amount_of_discount, duration } = req.body;
+  const { coupon_name, coupon_desc, amount_of_discount, duration, minPurchase, redeem_product_type } = req.body;
 
   const { user_id } = req;
 
@@ -21,7 +21,9 @@ const createCouponToCustomer = async (req, res, next) => {
       amount_of_discount == "" ||
       amount_of_discount <= 0 ||
       duration == "" ||
-      duration <= 0
+      duration <= 0 ||
+      minPurchase < 0 ||
+      redeem_product_type ===""
     ) {
       return res.status(400).send({
         success: false,
@@ -63,6 +65,8 @@ const createCouponToCustomer = async (req, res, next) => {
       amount_of_discount,
       duration,
       created_by: user_id,
+      min_purchase: minPurchase,
+      redeem_product_type: redeem_product_type
     });
 
     return res.status(201).send({

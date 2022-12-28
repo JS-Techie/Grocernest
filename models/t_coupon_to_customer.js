@@ -93,6 +93,24 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "is_active"
+    },
+    min_purchase: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "min_purchase"
+    },
+    redeem_product_type: {
+      type: DataTypes.STRING(50),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "redeem_product_type"
     }
   };
   const options = {
