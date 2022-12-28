@@ -189,7 +189,7 @@ const sendDeliveryBoyNotificationToWhatsapp = (name, order_id, contact_no) => {
       message: {
         isHSM: "true",
         type: "text",
-        text: "Hi! " + name + ", a new delivery with order id- " + order_id + " is assigned to you.",
+        text: "Hi! " + name + ", a new delivery with order id- " +"*"+order_id+"*"+ " is assigned to you.",
       },
     })
     .then((response) => {

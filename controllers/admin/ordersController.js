@@ -120,14 +120,15 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
             tlo.delivery_date,
             tlo.created_by,
             tlo.total,
-            delivery_boy,
+            tlo.delivery_boy,
             tlo.cancellation_reason,
             tlo.applied_discount,
             tlo.wallet_balance_used,
+            tlo.item_wallet_used,
             tlo.final_payable_amount
-            from t_order tlo inner join t_customer tc 
+            from (t_order tlo inner join t_customer tc)
             where tc.cust_no = tlo.cust_no 
-            AND tlo.status="${orderType}"
+            AND tlo.status='${orderType}'
             ${phoneNoQuery}
             ${dateQuery}
             ${orderId}
@@ -166,7 +167,8 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
         cancellation_reason: current.cancellation_reason,
         total: current.total,
         applied_discount: current.applied_discount,
-        wallet_balance_used: current.wallet_balance_used,
+        wallet_balance_used: current.wallet_balance_used ? current.wallet_balance_used : 0,
+        item_wallet_used: current.item_wallet_used ? current.item_wallet_used : 0,
         final_payable_amount: current.final_payable_amount,
       };
     });
@@ -223,7 +225,7 @@ const getOrderDetails = async (req, res, next) => {
     );
 
     const [singleOrder, metadata] = await sequelize.query(`
-      select t_order.order_id, t_order.created_at, t_order.status, t_item.id, t_item.name, t_order_items.quantity, t_item.image,
+      select t_order.order_id, t_order.wallet_balance_used, t_order.item_wallet_used, t_order.created_at, t_order.status, t_item.id, t_item.name, t_order_items.quantity, t_item.image,
       t_order_items.is_offer, t_order_items.is_gift, t_order_items.offer_price,t_order.cashback_amount,t_lkp_brand.brand_name
     from (((t_order
     inner join t_order_items on t_order_items.order_id = t_order.order_id)
@@ -277,7 +279,7 @@ const getOrderDetails = async (req, res, next) => {
 
       if (oldestBatch) {
         return {
-          brandName : currentOrderItem.brand_name,
+          brandName: currentOrderItem.brand_name,
           itemName: currentItem.name,
           id: currentItem.id,
           category: category ? category.group_name : "",
@@ -335,6 +337,8 @@ const getOrderDetails = async (req, res, next) => {
         orderID: singleOrder[0].order_id,
         Date: singleOrder[0].created_at,
         status: singleOrder[0].status,
+        wallet_balance_used: singleOrder[0].wallet_balance_used ? singleOrder[0].wallet_balance_used : 0,
+        item_balance_used: singleOrder[0].item_wallet_used ? singleOrder[0].item_wallet_used : 0,
         orderTotal,
         itemDetails: responseArray,
         customer_details: cust_result[0],
