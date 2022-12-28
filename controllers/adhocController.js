@@ -2,6 +2,10 @@ const { sequelize } = require("../models");
 const { Op } = require("sequelize");
 const db = require("../models");
 
+const xlsx = require("xlsx");
+const bcrypt = require("bcryptjs");
+const uniqid = require("uniqid");
+
 const Customer = db.CustomerModel;
 const Wallet = db.WalletModel;
 const Order = db.OrderModel;
@@ -149,14 +153,14 @@ const checkBatchNo = async (req, res, next) => {
       });
     }
 
-    let existing = false
+    let existing = false;
     batches.map((current) => {
       if (current.batch_no === batch_no) {
-        existing = true
+        existing = true;
       }
     });
 
-    if(existing){
+    if (existing) {
       return res.status(400).send({
         success: false,
         data: [],
@@ -178,4 +182,96 @@ const checkBatchNo = async (req, res, next) => {
   }
 };
 
-module.exports = { addWalletBalance, checkBatchNo };
+const migrateCustomers = async (req, res, next) => {
+  // tanmoy
+
+  console.log(req.body.start);
+  console.log(req.body.end);
+
+  // tanmoy
+
+  try {
+    const file = xlsx.readFile("Customers.xlsx");
+
+    const worksheet = file.Sheets["Sheet1"];
+
+    const jsonArray = xlsx.utils.sheet_to_json(worksheet);
+
+    let salt = bcrypt.genSaltSync(10);
+
+    let encryptedPassword = bcrypt.hashSync("grocernest", salt);
+
+    const customerArrayWithoutCheck = jsonArray
+      .slice(req.body.start, req.body.end)
+      .map((current) => {
+        if (current.Customer && current.MobileNo) {
+          return {
+            id: Math.floor(Math.random() * 10000000 + 1),
+
+            cust_no: uniqid(),
+
+            contact_no: current.MobileNo ? current.MobileNo.toString() : null,
+
+            cust_name: current.Customer,
+          };
+        }
+      });
+
+    console.log(customerArrayWithoutCheck);
+
+    customerArrayWithoutCheck.map(async (current) => {
+      if (current) {
+        const currentUser = await Customer.findOne({
+          where: { contact_no: current.contact_no },
+        });
+
+        if (!currentUser) {
+          await Customer.create({
+            id: current.id,
+
+            cust_no: current.cust_no,
+
+            active_ind: "Y",
+
+            cust_name: current.cust_name,
+
+            email: null,
+
+            contact_no: current.contact_no,
+
+            calling_number: current.contact_no,
+
+            password: encryptedPassword,
+
+            created_by: 1,
+
+            registered_for_ecomm: 1,
+          });
+
+          await Wallet.create({
+            wallet_id: uniqid(),
+
+            cust_no: current.cust_no,
+
+            balance: 0,
+
+            created_by: 2,
+          });
+        }
+      }
+    });
+    return res.status(200).send({
+      success: true,
+      data: "pratik da zindabad",
+      message: "good job mehul",
+    });
+  } catch (err) {
+    return res.status(400).send({
+      success: false,
+      data: err.message,
+      message: "wallet error",
+    });
+  }
+};
+
+module.exports = { addWalletBalance, checkBatchNo, migrateCustomers };
