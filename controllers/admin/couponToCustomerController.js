@@ -10,7 +10,6 @@ const {
   sendCouponToUser,
 } = require("../../services/whatsapp/whatsappMessages");
 
-
 const createCouponToCustomer = async (req, res, next) => {
   const { coupon_name, coupon_desc, amount_of_discount, duration } = req.body;
 
@@ -31,6 +30,7 @@ const createCouponToCustomer = async (req, res, next) => {
       });
     }
 
+    // string checking due
     if (amount_of_discount === 0) {
       return res.status(400).send({
         success: false,
@@ -81,8 +81,9 @@ const createCouponToCustomer = async (req, res, next) => {
 
 const displayCouponToCustomer = async (req, res, next) => {
   try {
-    const allCoupons = await CouponToCustomer.findAll();
+    const allCoupons = await CouponToCustomer.findAll({});
 
+    // No check for empty coupons
     return res.status(200).send({
       success: true,
       data: allCoupons,
@@ -115,6 +116,7 @@ const updateCouponToCustomer = async (req, res, next) => {
   }
 
   try {
+    // No  check if ID exists
     const updatedCoupon = CouponToCustomer.update(
       {
         coupon_desc,
@@ -143,6 +145,7 @@ const deleteCouponToCustomer = async (req, res, next) => {
   const { id } = req.body;
 
   try {
+    // No check for ID
     const deleted = await CouponToCustomer.destroy({
       where: { id },
     });
@@ -244,8 +247,7 @@ const displayMappedCouponToCustomer = async (req, res, next) => {
             left outer join t_customer tc on tc.cust_no = tccm.cust_id order by tccm.assignment_date DESC;`
     );
 
-    // console.log(result);
-
+    // Empty check
     return res.status(200).send({
       success: true,
       data: allCustomerToCouponMapping,
