@@ -280,7 +280,7 @@ const applicableCouponForACustomer = async (req, res, next) => {
     const [allApplicableCouponsForThisCustomer, metadata] =
       await sequelize.query(
         `select tccm.id as map_id, tccm.coupon_id, tccm.coupon_name, tctc.amount_of_discount, 
-            tccm.assignment_date ,tccm.expiry_date
+            tccm.assignment_date ,tccm.expiry_date,tctc.min_purchase,tctc.redeem_product_type
             from t_customer_coupon_mapping tccm 
             inner join t_coupon_to_customer tctc 
             where tccm.cust_id ="` +
