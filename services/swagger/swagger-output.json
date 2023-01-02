@@ -2519,36 +2519,6 @@
         }
       }
     },
-    "/adhoc/create/wallet": {
-      "post": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "start": {
-                  "example": "any"
-                },
-                "end": {
-                  "example": "any"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
-          }
-        }
-      }
-    },
     "/admin/orders/pending": {
       "get": {
         "description": "",
