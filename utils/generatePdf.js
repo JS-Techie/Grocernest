@@ -45,7 +45,7 @@ const generateCustomerInformation = (doc, invoice) => {
 
   doc
     .font("Helvetica-Bold")
-    .text(`Payable total: ${invoice.payableTotal}`, 50, 130, {
+    .text(`Payable total: ${invoice.payableTotal }`, 50, 130, {
       align: "center",
     });
 };
@@ -135,6 +135,11 @@ function generateFooter(invoice, doc) {
     .text(`Paid By Amul Butter Wallet : ${invoice.itemBasedWalletBalanceUsed}`,50,540)
     .text(`Applied discount : ${invoice.appliedDiscount}`, 50, 560)
     .text(`Payment Mode : Cash on Delivery`, 50, 580)
+    .text(`Total CGST : ${invoice.totalCGST}`, 50, 600)
+    .text(`Total SGST : ${invoice.totalSGST}`, 50, 620)
+    .text(`Total IGST : ${invoice.totalIGST}`, 50, 640)
+    .text(`Total Other Tax : ${invoice.totalOtherTax}`, 50, 660)
+    .text(`Total Taxes : ${invoice.totalCGST + invoice.totalIGST +invoice.totalSGST +invoice.totalOtherTax }`, 50,680)
     .moveDown();
 }
 
