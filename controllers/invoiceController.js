@@ -10,10 +10,17 @@ const Batch = db.BatchModel;
 const Customer = db.CustomerModel;
 const Inventory = db.InventoryModel;
 const Url = db.UrlModel;
+const TaxInfo = db.ItemTaxInfoModel;
 
 const downloadInvoice = async (req, res, next) => {
   //Get current user from jwt
   const currentCustomer = req.cust_no;
+
+
+  let totalCGST = 0;
+  let totalIGST = 0;
+  let totalSGST = 0;
+  let totalOtherTax = 0;
 
   const { orderID } = req.body;
 
@@ -40,11 +47,30 @@ const downloadInvoice = async (req, res, next) => {
         where: { id: current.item_id },
       });
 
+
+
       const oldestBatch = await Batch.findOne({
         where: { item_id: current.item_id, mark_selected: 1 },
       });
 
       if (oldestBatch) {
+        const currentTaxArray = await TaxInfo.findAll({
+          where: { item_id: current.item_id }
+        })
+
+        currentTaxArray.map((currentTax) => {
+          switch (currentTax.tax_type) {
+            case "CGST": (totalCGST += ((currentTax.tax_percentage) / 100) * oldestBatch.sale_price)
+              break;
+            case "SGST": totalSGST + (currentTax.tax_percentage) / 100 * oldestBatch.sale_price
+              break;
+            case "IGST": totalIGST + (currentTax.tax_percentage) / 100 * oldestBatch.sale_price
+              break;
+            case "OTHERS": totalOtherTax + (currentTax.tax_percentage) / 100 * oldestBatch.sale_price
+              break;
+            default: break;
+          }
+        })
         return {
           itemName: item.name,
           quantity: current.quantity,
@@ -77,6 +103,10 @@ const downloadInvoice = async (req, res, next) => {
       appliedDiscount: currentOrder.applied_discount,
 
       orderItems: resolved,
+      totalSGST,
+      totalCGST,
+      totalIGST,
+      totalOtherTax
     };
 
     let writeStream = await generatePdf(
