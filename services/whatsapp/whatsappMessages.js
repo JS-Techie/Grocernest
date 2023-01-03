@@ -15,7 +15,7 @@ const sendCouponToUser = async (
     const off =
       parseInt(isPercentage) === 1
         ? `${parseInt(amountOfDiscount)}%`
-        : `₹ ${parseInt(amountOfDiscount)}`;
+        : `₹${parseInt(amountOfDiscount)}`;
 
     console.log(off);
 
@@ -27,7 +27,7 @@ const sendCouponToUser = async (
       message: {
         isHSM: "true",
         type: "text",
-        text: `Hi, ${firstName}. Apply coupon ${couponCode} to receive ${off} off on your next order. `,
+        text: `Hi, ${firstName}. Apply coupon *${couponCode}* to receive *${off}* off on your next order. `,
       },
     });
 
@@ -141,7 +141,7 @@ const sendDeliveryPinToUser = async (custName, pin, orderId, phoneNumber) => {
       message: {
         isHSM: "true",
         type: "text",
-        text: `Hi ${firstName}. Please share the pin ${pin} at the time of your delivery for order ${orderId}.`,
+        text: `Hi ${firstName}. Please share the pin *${pin}* at the time of your delivery for order *${orderId}*.`,
       },
     });
     console.log("Success Response", messageResponseFromGupshup);

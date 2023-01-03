@@ -1,28 +1,27 @@
-const { generatePdf } = require("../utils/generatePdf");
+const { generatePdf } = require("../../utils/generatePdf");
 const fs = require("fs");
-const db = require("../models");
-const { uploadToS3 } = require("../services/s3Service");
+const db = require("../../models");
+const { uploadToS3 } = require("../../services/s3Service");
 
 const Order = db.OrderModel;
 const OrderItems = db.OrderItemsModel;
 const Item = db.ItemModel;
 const Batch = db.BatchModel;
 const Customer = db.CustomerModel;
-const Inventory = db.InventoryModel;
-const Url = db.UrlModel;
 
-const downloadInvoice = async (req, res, next) => {
+const downloadEcommInvoice = async (req, res, next) => {
   //Get current user from jwt
   const currentCustomer = req.cust_no;
 
-  const { orderID } = req.body;
+  const orderID  = req.body.order_id;
 
   try {
     const currentOrder = await Order.findOne({
       include: { model: OrderItems },
-      where: { order_id: orderID, cust_no: currentCustomer },
+      where: { order_id: orderID },
     });
 
+      console.log("currentOrder", currentOrder.cust_no);
     if (!currentOrder) {
       return res.status(404).send({
         success: false,
@@ -32,7 +31,7 @@ const downloadInvoice = async (req, res, next) => {
     }
 
     const currentUser = await Customer.findOne({
-      where: { cust_no: currentCustomer },
+      where: { cust_no: currentOrder.cust_no },
     });
 
     const promises = currentOrder.t_order_items_models.map(async (current) => {
@@ -72,8 +71,9 @@ const downloadInvoice = async (req, res, next) => {
       walletBalanceUsed: currentOrder.wallet_balance_used
         ? currentOrder.wallet_balance_used
         : 0,
-      itemBasedWalletBalanceUsed:
-        currentOrder.item_wallet_used ? currentOrder.item_wallet_used : 0,
+      itemBasedWalletBalanceUsed: currentOrder.item_wallet_used
+        ? currentOrder.item_wallet_used
+        : 0,
       appliedDiscount: currentOrder.applied_discount,
 
       orderItems: resolved,
@@ -110,16 +110,5 @@ const downloadInvoice = async (req, res, next) => {
   }
 };
 
-const getOriginalUrl = async (req, res, next) => {
-  let id = req.params.id.toString();
 
-  const current_url = await Url.findOne({
-    where: { id: id },
-  });
-
-  if (current_url == null) {
-    return res.send("<center><h3>This url does not exist..</h3></center>");
-  }
-  return res.redirect(current_url.original_url);
-};
-module.exports = { downloadInvoice, getOriginalUrl };
+module.exports = { downloadEcommInvoice };

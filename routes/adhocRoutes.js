@@ -2,7 +2,7 @@ const router = require("express").Router();
 
 const {
   addWalletBalance,
-  checkBatchNo,
+  checkBatchNo
 } = require("../controllers/adhocController");
 
 router.route("/itemsp/wallet/add").post(addWalletBalance);

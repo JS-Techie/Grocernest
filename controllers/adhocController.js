@@ -149,14 +149,14 @@ const checkBatchNo = async (req, res, next) => {
       });
     }
 
-    let existing = false
+    let existing = false;
     batches.map((current) => {
       if (current.batch_no === batch_no) {
-        existing = true
+        existing = true;
       }
     });
 
-    if(existing){
+    if (existing) {
       return res.status(400).send({
         success: false,
         data: [],

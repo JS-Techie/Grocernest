@@ -13,41 +13,59 @@ module.exports = sequelize => {
       comment: null,
       field: "id"
     },
-    cashback: {
-      type: DataTypes.BIGINT,
-      allowNull: true,
+    cust_id: {
+      type: DataTypes.STRING(100),
+      allowNull: false,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "cashback"
+      field: "cust_id"
     },
-    is_percent: {
-      type: DataTypes.INTEGER(1),
-      allowNull: true,
+    coupon_id: {
+      type: DataTypes.STRING(100),
+      allowNull: false,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "is_percent"
+      field: "coupon_id"
     },
-    use: {
-      type: DataTypes.BIGINT,
+    coupon_name: {
+      type: DataTypes.STRING(100),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "use"
+      field: "coupon_name"
     },
-    is_active: {
-      type: DataTypes.INTEGER(1),
+    assignment_date: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: sequelize.fn('current_timestamp'),
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "assignment_date"
+    },
+    expiry_date: {
+      type: DataTypes.DATE,
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "is_active"
+      field: "expiry_date"
+    },
+    coupon_used_date: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "coupon_used_date"
     },
     created_by: {
       type: DataTypes.BIGINT,
@@ -84,22 +102,13 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "updated_at"
-    },
-    item_id: {
-      type: DataTypes.BIGINT,
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "item_id"
     }
   };
   const options = {
-    tableName: "t_item_wallet",
+    tableName: "t_customer_coupon_mapping",
     comment: "",
     indexes: []
   };
-  const TItemWalletModel = sequelize.define("t_item_wallet_model", attributes, options);
-  return TItemWalletModel;
+  const TCustomerCouponMappingModel = sequelize.define("t_customer_coupon_mapping_model", attributes, options);
+  return TCustomerCouponMappingModel;
 };

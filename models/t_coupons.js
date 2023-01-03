@@ -77,7 +77,7 @@ module.exports = sequelize => {
       field: "brand_id"
     },
     description: {
-      type: DataTypes.STRING(100),
+      type: DataTypes.STRING(5000),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,

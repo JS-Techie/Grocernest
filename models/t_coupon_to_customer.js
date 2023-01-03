@@ -5,49 +5,49 @@ const {
 module.exports = sequelize => {
   const attributes = {
     id: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.STRING(100),
       allowNull: false,
       defaultValue: null,
       primaryKey: true,
-      autoIncrement: true,
+      autoIncrement: false,
       comment: null,
       field: "id"
     },
-    cashback: {
+    coupon_name: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "coupon_name"
+    },
+    coupon_desc: {
+      type: DataTypes.STRING(1000),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "coupon_desc"
+    },
+    amount_of_discount: {
       type: DataTypes.BIGINT,
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "cashback"
+      field: "amount_of_discount"
     },
-    is_percent: {
-      type: DataTypes.INTEGER(1),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "is_percent"
-    },
-    use: {
+    duration: {
       type: DataTypes.BIGINT,
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "use"
-    },
-    is_active: {
-      type: DataTypes.INTEGER(1),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "is_active"
+      field: "duration"
     },
     created_by: {
       type: DataTypes.BIGINT,
@@ -85,21 +85,39 @@ module.exports = sequelize => {
       comment: null,
       field: "updated_at"
     },
-    item_id: {
+    is_active: {
+      type: DataTypes.INTEGER(1),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "is_active"
+    },
+    min_purchase: {
       type: DataTypes.BIGINT,
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "item_id"
+      field: "min_purchase"
+    },
+    redeem_product_type: {
+      type: DataTypes.STRING(50),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "redeem_product_type"
     }
   };
   const options = {
-    tableName: "t_item_wallet",
+    tableName: "t_coupon_to_customer",
     comment: "",
     indexes: []
   };
-  const TItemWalletModel = sequelize.define("t_item_wallet_model", attributes, options);
-  return TItemWalletModel;
+  const TCouponToCustomerModel = sequelize.define("t_coupon_to_customer_model", attributes, options);
+  return TCouponToCustomerModel;
 };
