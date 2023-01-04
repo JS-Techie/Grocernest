@@ -5911,8 +5911,49 @@
     "/admin/special/wallet/create": {
       "post": {
         "description": "",
-        "parameters": [],
-        "responses": {}
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "offer_name": {
+                  "example": "any"
+                },
+                "offer_desc": {
+                  "example": "any"
+                },
+                "amount_of_discount": {
+                  "example": "any"
+                },
+                "is_percentage": {
+                  "example": "any"
+                },
+                "items_list": {
+                  "example": "any"
+                },
+                "status": {
+                  "example": "any"
+                },
+                "start_date": {
+                  "example": "any"
+                },
+                "expiry_date": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
       }
     },
     "/admin/special/wallet/view": {

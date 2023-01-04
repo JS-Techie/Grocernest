@@ -14,19 +14,44 @@ const createStrategy = async (req, res, next) => {
     status,
     start_date,
     expiry_date,
+    is_instant_cashback,
+    is_first_buy,
   } = req.body;
   try {
+    //validations
+    if (
+      !offer_name ||
+      !amount_of_discount ||
+      !is_percentage ||
+      !items_list ||
+      !status ||
+      !start_date ||
+      !expiry_date ||
+      !is_instant_cashback ||
+      !is_first_buy
+    ) {
+      return res.status(400).send({
+        success: false,
+        data: "",
+        message:
+          "Some fields are missing, please provide them. required fields are (offer_name, amount_of_discount, is_percentage, items_list, status, start_date, expiry_date, is_instant_cashback, is_first_buy)",
+      });
+    }
+
     let strategy_id = uniqid();
+
     const new_strategy = await WalletStrategy.create({
       id: strategy_id,
       offer_name,
       offer_desc,
-      amount_of_discount,
-      is_percentage,
+      amount_of_discount: parseInt(amount_of_discount),
+      is_percentage: parseInt(is_percentage),
       items_list,
       status,
       start_date,
       expiry_date,
+      instant_cashback: parseInt(is_instant_cashback),
+      first_buy: parseInt(is_first_buy),
       created_by: 1,
     });
     return res.status(200).send({
@@ -43,7 +68,26 @@ const createStrategy = async (req, res, next) => {
   }
 };
 
-const viewStrategy = async (req, res, next) => {};
+const viewStrategy = async (req, res, next) => {
+  try {
+    let allStrategy = await WalletStrategy.findAll({});
+    console.log(allStrategy);
+
+    // for
+
+    return res.status(200).send({
+      success: true,
+      data: allStrategy,
+      message: "Fetched",
+    });
+  } catch (err) {
+    return res.status(400).send({
+      success: false,
+      data: err.message,
+      message: "Something went wrong, please try again in sometime",
+    });
+  }
+};
 
 const editStrategy = async (req, res, next) => {};
 
