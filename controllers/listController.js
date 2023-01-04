@@ -12,6 +12,7 @@ const getAllCategories = async (req, res, next) => {
   //Fetch all categories and subcategories within them
   try {
     const categories = await Category.findAll({
+      order: [['group_name', 'ASC']],
       where: { available_for_ecomm: 1 },
       include: [
         {
@@ -101,6 +102,7 @@ const getAllSubcategoriesInCategory = async (req, res, next) => {
       where: {
         category_id: categoryId,
       },
+      order: [['sub_cat_name', 'ASC']]
     });
 
     const category = await Category.findOne({
@@ -145,7 +147,9 @@ const getAllSubcategoriesInCategory = async (req, res, next) => {
 
 const getAllBrands = async (req, res, next) => {
   try {
-    const brands = await Brand.findAll({});
+    const brands = await Brand.findAll({
+      order: [['brand_name', 'ASC']]
+    });
 
     if (brands.length === 0) {
       return res.status(200).send({
