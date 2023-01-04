@@ -138,6 +138,15 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "first_buy"
+    },
+    redeem_amt: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "redeem_amt"
     }
   };
   const options = {
