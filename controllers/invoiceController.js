@@ -46,7 +46,9 @@ const downloadInvoice = async (req, res, next) => {
       const item = await Item.findOne({
         where: { id: current.item_id },
       });
-
+      const currentQuantity = await OrderItems.findOne({
+        where: {quantity: current.quantity}
+      })
 
 
       const oldestBatch = await Batch.findOne({
@@ -58,15 +60,17 @@ const downloadInvoice = async (req, res, next) => {
           where: { item_id: current.item_id }
         })
 
+        
+
         currentTaxArray.map((currentTax) => {
           switch (currentTax.tax_type) {
-            case "CGST": (totalCGST += ((currentTax.tax_percentage) / 100) * oldestBatch.sale_price)
+            case "CGST": totalCGST += ((((currentTax.tax_percentage) / 100) * oldestBatch.sale_price)*currentQuantity.quantity)
               break;
-            case "SGST": totalSGST += (currentTax.tax_percentage) / 100 * oldestBatch.sale_price
+            case "SGST": totalSGST += (((currentTax.tax_percentage) / 100 * oldestBatch.sale_price)*currentQuantity.quantity)
               break;
-            case "IGST": totalIGST += (currentTax.tax_percentage) / 100 * oldestBatch.sale_price
+            case "IGST": totalIGST += (((currentTax.tax_percentage) / 100 * oldestBatch.sale_price)*currentQuantity.quantity)
               break;
-            case "OTHERS": totalOtherTax += (currentTax.tax_percentage) / 100 * oldestBatch.sale_price
+            case "OTHERS": totalOtherTax += (((currentTax.tax_percentage) / 100 * oldestBatch.sale_price)*currentQuantity.quantity)
               break;
             default: break;
           }
