@@ -5941,6 +5941,12 @@
                 },
                 "expiry_date": {
                   "example": "any"
+                },
+                "is_instant_cashback": {
+                  "example": "any"
+                },
+                "is_first_buy": {
+                  "example": "any"
                 }
               }
             }
@@ -5960,7 +5966,14 @@
       "post": {
         "description": "",
         "parameters": [],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
       }
     },
     "/admin/special/wallet/edit": {
