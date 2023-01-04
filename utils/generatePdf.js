@@ -40,7 +40,13 @@ const generateCustomerInformation = (doc, invoice) => {
     .text(`Invoice Number: ${invoice.orderID}`, 50, 60)
     .text(`Invoice Date: ${moment(invoice.date).format("DD-MM-YYYY")}`, 50, 75)
     .text(`${invoice.customerName}`, 300, 60, { align: "right" })
-    .text(invoice.address, 300, 75, { align: "right" })
+    // .text(`${invoice.customerName}`,{columns: 3,
+    //   columnGap: 15,
+    //   height: 100,
+    //   width: 465,
+    //   align: 'justify'})
+    .text(`Contact No.: ${invoice.contactNo}`,320,75,{align:"right"})
+    .text(invoice.address, 300, 90, { align: "right" })
     .moveDown();
 
   doc
@@ -135,11 +141,11 @@ function generateFooter(invoice, doc) {
     .text(`Paid By Amul Butter Wallet : ${invoice.itemBasedWalletBalanceUsed}`,50,540)
     .text(`Applied discount : ${invoice.appliedDiscount}`, 50, 560)
     .text(`Payment Mode : Cash on Delivery`, 50, 580)
-    .text(`Total CGST : ${invoice.totalCGST}`, 50, 600)
-    .text(`Total SGST : ${invoice.totalSGST}`, 50, 620)
-    .text(`Total IGST : ${invoice.totalIGST}`, 50, 640)
-    .text(`Total Other Tax : ${invoice.totalOtherTax}`, 50, 660)
-    .text(`Total Taxes : ${invoice.totalCGST + invoice.totalIGST +invoice.totalSGST +invoice.totalOtherTax }`, 50,680)
+    .text(`Total CGST : ${invoice.totalCGST.toFixed(2)}`, 390, 500)
+    .text(`Total SGST : ${invoice.totalSGST.toFixed(2)}`, 390, 520)
+    .text(`Total IGST : ${invoice.totalIGST.toFixed(2)}`, 390, 540)
+    .text(`Total Other Tax : ${invoice.totalOtherTax.toFixed(2)}`, 390, 560)
+    .text(`Total Taxes : ${(invoice.totalCGST + invoice.totalIGST +invoice.totalSGST +invoice.totalOtherTax).toFixed(2) }`, 390,580)
     .moveDown();
 }
 

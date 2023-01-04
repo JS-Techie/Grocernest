@@ -62,11 +62,11 @@ const downloadInvoice = async (req, res, next) => {
           switch (currentTax.tax_type) {
             case "CGST": (totalCGST += ((currentTax.tax_percentage) / 100) * oldestBatch.sale_price)
               break;
-            case "SGST": totalSGST + (currentTax.tax_percentage) / 100 * oldestBatch.sale_price
+            case "SGST": totalSGST += (currentTax.tax_percentage) / 100 * oldestBatch.sale_price
               break;
-            case "IGST": totalIGST + (currentTax.tax_percentage) / 100 * oldestBatch.sale_price
+            case "IGST": totalIGST += (currentTax.tax_percentage) / 100 * oldestBatch.sale_price
               break;
-            case "OTHERS": totalOtherTax + (currentTax.tax_percentage) / 100 * oldestBatch.sale_price
+            case "OTHERS": totalOtherTax += (currentTax.tax_percentage) / 100 * oldestBatch.sale_price
               break;
             default: break;
           }
@@ -89,6 +89,7 @@ const downloadInvoice = async (req, res, next) => {
 
     const response = {
       customerName: currentUser.cust_name,
+      contactNo: currentUser.contact_no,
       orderID: currentOrder.order_id,
       status: currentOrder.status,
       address: currentOrder.address,
