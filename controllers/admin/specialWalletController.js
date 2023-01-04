@@ -16,6 +16,7 @@ const createStrategy = async (req, res, next) => {
     expiry_date,
     is_instant_cashback,
     is_first_buy,
+    redeem_amt,
   } = req.body;
   try {
     //validations
@@ -46,13 +47,14 @@ const createStrategy = async (req, res, next) => {
       offer_desc,
       amount_of_discount: parseInt(amount_of_discount),
       is_percentage: parseInt(is_percentage),
-      items_list,
+      items_list: JSON.stringify(items_list),
       status,
       start_date,
       expiry_date,
       instant_cashback: parseInt(is_instant_cashback),
       first_buy: parseInt(is_first_buy),
       created_by: 1,
+      redeem_amt: parseInt(redeem_amt),
     });
     return res.status(200).send({
       success: true,
@@ -73,7 +75,13 @@ const viewStrategy = async (req, res, next) => {
     let allStrategy = await WalletStrategy.findAll({});
     console.log(allStrategy);
 
-    // for
+    //loop through strategies
+    const strategies = allStrategy.map(async (currentStrategy) => {
+      console.log(currentStrategy.items_list);
+      // const thisStrategy = await currentStrategy.findOne({
+      //   where: { id: currentLeave.user_id },
+      // });
+    });
 
     return res.status(200).send({
       success: true,
