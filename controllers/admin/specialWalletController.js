@@ -3,6 +3,7 @@ const { sequelize } = require("../../models");
 const uniqid = require("uniqid");
 
 const WalletStrategy = db.SpecialWalletStrategy;
+const itemTable = db.ItemModel;
 
 const createStrategy = async (req, res, next) => {
   const {
@@ -72,20 +73,40 @@ const createStrategy = async (req, res, next) => {
 
 const viewStrategy = async (req, res, next) => {
   try {
+    let item_name_list = [];
     let allStrategy = await WalletStrategy.findAll({});
     console.log(allStrategy);
 
     //loop through strategies
-    const strategies = allStrategy.map(async (currentStrategy) => {
-      console.log(currentStrategy.items_list);
-      // const thisStrategy = await currentStrategy.findOne({
-      //   where: { id: currentLeave.user_id },
-      // });
+    const s_p = allStrategy.map(async (currentStrategy) => {
+      item_list = currentStrategy.items_list;
+
+      let item_name_list = [];
+      const item_name_list_p = JSON.parse(item_list)
+        .map(async (item_id) => {
+          console.log(item_id);
+          let item = await itemTable.findOne({
+            where: {
+              id: item_id,
+            },
+          });
+          return {
+            id: item?.id,
+            name: item?.name,
+          };
+        })
+        .filter((current) => {
+          return current !== undefined;
+        });
+      item_name_list = await Promise.all(item_name_list_p);
+      currentStrategy["items_list"] = item_name_list;
+      return currentStrategy;
     });
 
+    const strategies = await Promise.all(s_p);
     return res.status(200).send({
       success: true,
-      data: allStrategy,
+      data: strategies,
       message: "Fetched",
     });
   } catch (err) {
