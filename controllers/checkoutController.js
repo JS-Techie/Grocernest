@@ -20,6 +20,9 @@ const Batch = db.BatchModel;
 const Item = db.ItemModel;
 const Customer = db.CustomerModel;
 const Inventory = db.InventoryModel;
+const TaxInfo = db.ItemTaxInfoModel;
+
+const fs = require("fs");
 
 const { sendOrderPlacedEmail } = require("../services/mail/mailService");
 
@@ -288,15 +291,28 @@ const checkoutFromCart = async (req, res, next) => {
       contact_no = cust.dataValues.contact_no;
       let opt_in = cust.dataValues.opt_in;
 
-      await InvoiceGen(
-        currentUser,
-        newOrder.order_id,
-        email,
+      // await InvoiceGen(
+      //   currentUser,
+      //   newOrder.order_id,
+      //   email,
+      //   contact_no,
+      //   opt_in,
+      //   base_url
+      // );
+    });
+
+    if (email != "") {
+      sendOrderPlacedEmail(email, response.orderID);
+    }
+    // send whatsapp
+    if (contact_no != "") {
+      await sendInvoiceToWhatsapp(
         contact_no,
-        opt_in,
+        response.orderID,
+        invoice_link,
         base_url
       );
-    });
+    }
 
     const deletedItemsFromCart = await Cart.destroy({
       where: { cust_no: currentUser },
@@ -646,15 +662,28 @@ const buyNow = async (req, res, next) => {
       console.log("jjjjjjjjjjjjjjjjjjjjjjjjjjjjjj");
 
       let base_url = req.protocol + "://" + req.get("host");
-      await InvoiceGen(
-        currentUser,
-        newOrder.order_id,
-        email,
+      // await InvoiceGen(
+      //   currentUser,
+      //   newOrder.order_id,
+      //   email,
+      //   contact_no,
+      //   opt_in,
+      //   base_url
+      // );
+    });
+
+    if (email != "") {
+      sendOrderPlacedEmail(email, response.orderID);
+    }
+    // send whatsapp
+    if (contact_no != "") {
+      await sendInvoiceToWhatsapp(
         contact_no,
-        opt_in,
+        response.orderID,
+        invoice_link,
         base_url
       );
-    });
+    }
 
     const deletedItemsFromCart = await Cart.destroy({
       where: { cust_no: currentUser, is_gift: 1 },
@@ -715,12 +744,49 @@ const InvoiceGen = async (
       const item = await Item.findOne({
         where: { id: current.item_id },
       });
+      const currentQuantity = await OrderItems.findOne({
+        where: { quantity: current.quantity },
+      });
 
       const oldestBatch = await Batch.findOne({
         where: { item_id: current.item_id, mark_selected: 1 },
       });
 
       if (oldestBatch) {
+        const currentTaxArray = await TaxInfo.findAll({
+          where: { item_id: current.item_id },
+        });
+
+        currentTaxArray.map((currentTax) => {
+          switch (currentTax.tax_type) {
+            case "CGST":
+              totalCGST +=
+                (currentTax.tax_percentage / 100) *
+                oldestBatch.sale_price *
+                currentQuantity.quantity;
+              break;
+            case "SGST":
+              totalSGST +=
+                (currentTax.tax_percentage / 100) *
+                oldestBatch.sale_price *
+                currentQuantity.quantity;
+              break;
+            case "IGST":
+              totalIGST +=
+                (currentTax.tax_percentage / 100) *
+                oldestBatch.sale_price *
+                currentQuantity.quantity;
+              break;
+            case "OTHERS":
+              totalOtherTax +=
+                (currentTax.tax_percentage / 100) *
+                oldestBatch.sale_price *
+                currentQuantity.quantity;
+              break;
+            default:
+              break;
+          }
+        });
         return {
           itemName: item.name,
           quantity: current.quantity,
@@ -728,8 +794,8 @@ const InvoiceGen = async (
           image: item.image,
           description: item.description,
           isGift: item.is_gift == 1 ? true : false,
-          isOffer: item.is_offer == 1 ? true : false,
-          offerPrice: item.is_offer == 1 ? offer_price : "",
+          isOffer: current.is_offer == 1 ? true : false,
+          offerPrice: current.is_offer == 1 ? current.offer_price : "",
           salePrice: oldestBatch.sale_price,
         };
       }
@@ -739,31 +805,42 @@ const InvoiceGen = async (
 
     const response = {
       customerName: currentUser.cust_name,
+      contactNo: currentUser.contact_no,
       orderID: currentOrder.order_id,
       status: currentOrder.status,
       address: currentOrder.address,
       total: currentOrder.total,
       date: currentOrder.created_at,
       payableTotal: currentOrder.final_payable_amount,
-      walletBalanceUsed: currentOrder.wallet_balance_used,
+      walletBalanceUsed: currentOrder.wallet_balance_used
+        ? currentOrder.wallet_balance_used
+        : 0,
+      itemBasedWalletBalanceUsed: currentOrder.item_wallet_used
+        ? currentOrder.item_wallet_used
+        : 0,
       appliedDiscount: currentOrder.applied_discount,
+
       orderItems: resolved,
+      totalSGST,
+      totalCGST,
+      totalIGST,
+      totalOtherTax,
     };
 
     let writeStream = await generatePdf(
       response,
-      `invoice-${currentOrder.order_id}.pdf`
+      `invoice-${response.orderID}.pdf`
     );
-    let uploadResponse = null;
+
     writeStream.on("finish", async () => {
       console.log("stored pdf on local");
-
-      // s3 upload
-      uploadResponse = await uploadToS3(
+      let uploadResponse = await uploadToS3(
         `invoice-${response.orderID}.pdf`,
         "pdfs/invoices/invoice-" + response.orderID + ".pdf"
       );
-      console.log("stored on s3");
+
+      fs.unlinkSync(`invoice-${response.orderID}.pdf`);
+
       const invoice_link = uploadResponse.Location;
 
       // console.log("final here==>>>", email, contact_no, invoice_link);

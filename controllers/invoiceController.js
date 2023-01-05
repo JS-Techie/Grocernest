@@ -24,9 +24,11 @@ const downloadInvoice = async (req, res, next) => {
   const { orderID } = req.body;
 
   try {
-    const exists = checkIfFileExists(
-      `https://ecomm-dev.s3.ap-south-1.amazonaws.com/pdfs/invoices/invoice-${orderID}.pdf`
+    const exists = await checkIfFileExists(
+      `pdfs/invoices/invoice-${orderID}.pdf`
     );
+
+    console.log("File exists=====>", exists);
 
     if (exists) {
       return res.status(200).send({
