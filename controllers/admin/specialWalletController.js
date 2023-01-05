@@ -120,11 +120,70 @@ const viewStrategy = async (req, res, next) => {
 
 const editStrategy = async (req, res, next) => {};
 
-const deleteStrategy = async (req, res, next) => {};
+const deleteStrategy = async (req, res, next) => {
+  const { strategy_id } = req.body;
+  try {
+    if (!strategy_id) {
+      return res.status(400).send({
+        success: false,
+        data: "",
+        message: "strategy_id is required",
+      });
+    }
+
+    const deleted_strategy = await WalletStrategy.destroy({
+      where: {
+        id: strategy_id,
+      },
+    });
+
+    return res.status(200).send({
+      success: true,
+      data: deleted_strategy,
+      message: "Strategy deleted successfully",
+    });
+  } catch (err) {
+    return res.status(400).send({
+      success: false,
+      data: err.message,
+      message: "Something went wrong, please try again in sometime",
+    });
+  }
+};
+
+const toggleStrategy = async (req, res, next) => {
+  const { strategy_id, status } = req.body;
+
+  try {
+    let updated_wallet_strategy = await WalletStrategy.update(
+      {
+        status: parseInt(status),
+      },
+      {
+        where: {
+          id: strategy_id,
+        },
+      }
+    );
+
+    return res.status(200).send({
+      success: true,
+      data: { status: status },
+      message: "Strategy activated/deactivated successfully",
+    });
+  } catch (err) {
+    return res.status(400).send({
+      success: false,
+      data: err.message,
+      message: "Something went wrong, please try again in sometime",
+    });
+  }
+};
 
 module.exports = {
   createStrategy,
   viewStrategy,
   editStrategy,
   deleteStrategy,
+  toggleStrategy,
 };
