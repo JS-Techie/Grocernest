@@ -91,7 +91,7 @@ const viewStrategy = async (req, res, next) => {
             },
           });
           return {
-            id: item?.id,
+            id: item?.id == "all" ? "all" : item.id,
             name: item?.name,
           };
         })
