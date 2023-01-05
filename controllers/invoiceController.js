@@ -31,7 +31,9 @@ const downloadInvoice = async (req, res, next) => {
     if (exists) {
       return res.status(200).send({
         success: true,
-        data: `https://ecomm-dev.s3.ap-south-1.amazonaws.com/pdfs/invoices/invoice-${orderID}.pdf`,
+        data: {
+          URL: `https://ecomm-dev.s3.ap-south-1.amazonaws.com/pdfs/invoices/invoice-${orderID}.pdf`,
+        },
         message: "Invoice generated successfully",
         devMessage: "Invoice already exists",
       });
