@@ -8,6 +8,7 @@ const {
   viewStrategy,
   editStrategy,
   deleteStrategy,
+  toggleStrategy,
 } = require("../../controllers/admin/specialWalletController.js");
 
 // authenticateAdmin
@@ -15,5 +16,7 @@ router.route("/create").post(createStrategy);
 router.route("/view").get(viewStrategy);
 router.route("/edit").post(editStrategy);
 router.route("/delete").post(deleteStrategy);
+
+router.route("/toggle").post(toggleStrategy);
 
 module.exports = router;

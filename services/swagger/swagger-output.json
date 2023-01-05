@@ -5947,6 +5947,9 @@
                 },
                 "is_first_buy": {
                   "example": "any"
+                },
+                "redeem_amt": {
+                  "example": "any"
                 }
               }
             }
@@ -5963,7 +5966,7 @@
       }
     },
     "/admin/special/wallet/view": {
-      "post": {
+      "get": {
         "description": "",
         "parameters": [],
         "responses": {
@@ -5986,8 +5989,58 @@
     "/admin/special/wallet/delete": {
       "post": {
         "description": "",
-        "parameters": [],
-        "responses": {}
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "strategy_id": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/admin/special/wallet/toggle": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "strategy_id": {
+                  "example": "any"
+                },
+                "status": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
       }
     },
     "/subscription/view/all": {
