@@ -90,8 +90,15 @@ const viewStrategy = async (req, res, next) => {
               id: item_id,
             },
           });
+
+          if (item_id == "all") {
+            return {
+              id: "all",
+              name: "all",
+            };
+          }
           return {
-            id: item?.id == "all" ? "all" : item.id,
+            id: item?.id,
             name: item?.name,
           };
         })
