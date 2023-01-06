@@ -132,7 +132,7 @@ function generateInvoiceTable(doc, invoice) {
     );
     generateHr(doc, position + 20);
   }
-  generateTableRow(doc, position, "TOTAL", " ", " ", " ", invoice.total);
+  generateTableRow(doc, position + 20, "TOTAL", " ", " ", " ", invoice.total);
 }
 
 function generateFooter(invoice, doc) {
