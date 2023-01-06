@@ -98,6 +98,7 @@ function generateInvoiceTable(doc, invoice) {
   });
 
   console.log(orderItems);
+  let last_position = 0;
 
   for (i = 0; i < orderItems.length; i++) {
     const item = orderItems[i];
@@ -131,8 +132,17 @@ function generateInvoiceTable(doc, invoice) {
       total
     );
     generateHr(doc, position + 20);
+    last_position = position + 20;
   }
-  generateTableRow(doc, position + 20, "TOTAL", " ", " ", " ", invoice.total);
+  generateTableRow(
+    doc,
+    last_position + 20,
+    "TOTAL",
+    " ",
+    " ",
+    " ",
+    invoice.total
+  );
 }
 
 function generateFooter(invoice, doc) {
