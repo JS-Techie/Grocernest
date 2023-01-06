@@ -146,9 +146,9 @@ function generateInvoiceTable(doc, invoice) {
 }
 
 function generateFooter(invoice, doc) {
+  doc.font("Helvetica-Bold").text(`Delivery Charges : Free`, 50, 500);
   doc
-    .font("Helvetica-Bold")
-    .text(`Delivery Charges : Free`, 50, 500)
+    .font("Helvetica")
     .text(`Paid by wallet : ${invoice.walletBalanceUsed}`, 50, 520)
     .text(
       `Paid By Amul Butter Wallet : ${invoice.itemBasedWalletBalanceUsed}`,
