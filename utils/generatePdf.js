@@ -45,13 +45,13 @@ const generateCustomerInformation = (doc, invoice) => {
     //   height: 100,
     //   width: 465,
     //   align: 'justify'})
-    .text(`Contact No.: ${invoice.contactNo}`,320,75,{align:"right"})
+    .text(`Contact No.: ${invoice.contactNo}`, 320, 75, { align: "right" })
     .text(invoice.address, 300, 90, { align: "right" })
     .moveDown();
 
   doc
     .font("Helvetica-Bold")
-    .text(`Payable total: ${invoice.payableTotal }`, 50, 130, {
+    .text(`Payable total: ${invoice.payableTotal}`, 50, 130, {
       align: "center",
     });
 };
@@ -115,7 +115,7 @@ function generateInvoiceTable(doc, invoice) {
 
     let item_name = item.itemName;
     if (item_name.length > 15) {
-      item_name = item.itemName.slice(0,25) + "...";
+      item_name = item.itemName.slice(0, 25) + "...";
     }
     generateTableRow(
       doc,
@@ -132,20 +132,34 @@ function generateInvoiceTable(doc, invoice) {
     );
     generateHr(doc, position + 20);
   }
+  generateTableRow(doc, position, "TOTAL", " ", " ", " ", invoice.total);
 }
 
 function generateFooter(invoice, doc) {
   doc
-    .text(`Invoice Total: ${invoice.total}`, 50, 500)
+    .text(`Delivery Charges : Free`, 50, 500)
     .text(`Paid by wallet : ${invoice.walletBalanceUsed}`, 50, 520)
-    .text(`Paid By Amul Butter Wallet : ${invoice.itemBasedWalletBalanceUsed}`,50,540)
+    .text(
+      `Paid By Amul Butter Wallet : ${invoice.itemBasedWalletBalanceUsed}`,
+      50,
+      540
+    )
     .text(`Applied discount : ${invoice.appliedDiscount}`, 50, 560)
     .text(`Payment Mode : Cash on Delivery`, 50, 580)
     .text(`Total CGST : ${invoice.totalCGST.toFixed(2)}`, 390, 500)
     .text(`Total SGST : ${invoice.totalSGST.toFixed(2)}`, 390, 520)
     .text(`Total IGST : ${invoice.totalIGST.toFixed(2)}`, 390, 540)
     .text(`Total Other Tax : ${invoice.totalOtherTax.toFixed(2)}`, 390, 560)
-    .text(`Total Taxes : ${(invoice.totalCGST + invoice.totalIGST +invoice.totalSGST +invoice.totalOtherTax).toFixed(2) }`, 390,580)
+    .text(
+      `Total Taxes : ${(
+        invoice.totalCGST +
+        invoice.totalIGST +
+        invoice.totalSGST +
+        invoice.totalOtherTax
+      ).toFixed(2)}`,
+      390,
+      580
+    )
     .moveDown();
 }
 
