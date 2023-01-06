@@ -2,6 +2,8 @@ const { sequelize } = require("../models");
 const { Op } = require("sequelize");
 const db = require("../models");
 
+const SpecialWalletService = require("../services/specialWalletService");
+
 const Customer = db.CustomerModel;
 const Wallet = db.WalletModel;
 const Order = db.OrderModel;
@@ -249,10 +251,17 @@ const addSpecialWalletBalance = async (req, res, next) => {
     console.log(special_wallet_transactions);
     console.log(special_wallet_balance);
 
+    let specialWalletService = new SpecialWalletService();
+    specialWalletService.creditAmount(
+      special_wallet_balance,
+      order.cust_no,
+      "special wallet balance added"
+    );
+
     return res.status(200).send({
       success: true,
-      data: allStrategies,
-      message: "Successfully added Amul butter balance to customer wallet",
+      data: "",
+      message: "Successfully added special wallet balance to customer wallet",
     });
 
     // only first time?
