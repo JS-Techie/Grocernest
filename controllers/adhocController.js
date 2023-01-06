@@ -33,7 +33,7 @@ const addWalletBalance = async (req, res, next) => {
       where: {
         cust_no: order.cust_no,
         item_specific_balance: {
-          [Op.not]: null,
+          [Op.gt]: 500,
         },
       },
     });
@@ -203,6 +203,7 @@ const addSpecialWalletBalance = async (req, res, next) => {
     });
 
     // fetch all stretegies
+    let promises = [];
     const allStrategies = await WalletStrategyTable.findAll({
       where: {
         status: 1,
@@ -215,14 +216,13 @@ const addSpecialWalletBalance = async (req, res, next) => {
       },
     });
 
-    let special_wallet_transactions = [];
     let special_wallet_balance = 0;
 
     order_details.map((current_item) => {
       let this_item_id = current_item.item_id;
       let this_item_qty = current_item.quantity;
 
-      allStrategies.map(async (currentStrategy) => {
+      promises = allStrategies.map(async (currentStrategy) => {
         let item_list = JSON.parse(currentStrategy.items_list);
 
         // console.log("ABCD", this_item_id, item_list);
@@ -260,7 +260,9 @@ const addSpecialWalletBalance = async (req, res, next) => {
                 item_qty: current_item.quantity,
                 offer_name: currentStrategy.offer_name,
               };
-              special_wallet_transactions.push(transaction);
+              console.log("=>", transaction);
+
+              return transaction;
             }
           } else {
             wallet_amt =
@@ -276,14 +278,22 @@ const addSpecialWalletBalance = async (req, res, next) => {
               item_qty: current_item.quantity,
               offer_name: currentStrategy.offer_name,
             };
-            special_wallet_transactions.push(transaction);
+            console.log("=>", transaction);
+            return transaction;
           }
         }
       });
     });
 
-    console.log(special_wallet_transactions);
-    console.log(special_wallet_balance);
+    // console.log(special_wallet_transactions);
+    // console.log(special_wallet_balance);
+
+    const special_wallet_transactions = await Promise.all(promises);
+
+    console.log(
+      "Special Wallet Trabnsactions---->",
+      special_wallet_transactions
+    );
 
     specialWalletService.creditAmount(
       special_wallet_balance,
