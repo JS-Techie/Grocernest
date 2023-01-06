@@ -134,7 +134,7 @@ function generateInvoiceTable(doc, invoice) {
     generateHr(doc, position + 20);
     last_position = position + 20;
   }
-  generateTableRow(
+  generateTableRow1(
     doc,
     last_position + 20,
     "TOTAL",
@@ -147,6 +147,7 @@ function generateInvoiceTable(doc, invoice) {
 
 function generateFooter(invoice, doc) {
   doc
+    .font("Helvetica-Bold")
     .text(`Delivery Charges : Free`, 50, 500)
     .text(`Paid by wallet : ${invoice.walletBalanceUsed}`, 50, 520)
     .text(
@@ -154,7 +155,7 @@ function generateFooter(invoice, doc) {
       50,
       540
     )
-    .text(`Applied discount : ${invoice.appliedDiscount}`, 50, 560)
+    .text(`Applied coupon discount : ${invoice.appliedDiscount}`, 50, 560)
     .text(`Payment Mode : Cash on Delivery`, 50, 580)
     .text(`Total CGST : ${invoice.totalCGST.toFixed(2)}`, 390, 500)
     .text(`Total SGST : ${invoice.totalSGST.toFixed(2)}`, 390, 520)
