@@ -96,6 +96,7 @@ const adminVendorRouter = require("./routes/admin/vendorRoutes");
 const adminVendorItemRouter = require("./routes/admin/vendorItemRoutes");
 const adminDailySalesRouter = require("./routes/admin/dailySalesRoutes");
 const couponToCustomer = require("./routes/admin/couponToCustomer");
+const specialWalletRouter = require("./routes/admin/specialWalletRoutes");
 
 //Vendor routes import
 
@@ -154,6 +155,8 @@ app.use("/admin/featured/categories", adminFeaturedCategoryRouter);
 app.use("/admin/daily/sales", adminDailySalesRouter);
 app.use("/admin/itemsp", adminItemWalletRouter);
 app.use("/admin/ecomm/invoice", adminEcommInvoiceRouter);
+
+app.use("/admin/special/wallet", specialWalletRouter);
 
 // milk (user)
 app.use("/subscription", SubscriptionRouter);

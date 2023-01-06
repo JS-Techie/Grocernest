@@ -188,7 +188,9 @@ const getAllGifts = async (req, res, next) => {
       });
     }
 
-    response = giftsArray ? giftsArray.slice(0, strategy.no_of_gifts + 4) : [];
+    response = giftsArray ? giftsArray : [];
+
+    // .slice(0, strategy.no_of_gifts + 4)
 
     return res.status(200).send({
       success: true,

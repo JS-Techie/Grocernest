@@ -40,7 +40,13 @@ const generateCustomerInformation = (doc, invoice) => {
     .text(`Invoice Number: ${invoice.orderID}`, 50, 60)
     .text(`Invoice Date: ${moment(invoice.date).format("DD-MM-YYYY")}`, 50, 75)
     .text(`${invoice.customerName}`, 300, 60, { align: "right" })
-    .text(invoice.address, 300, 75, { align: "right" })
+    // .text(`${invoice.customerName}`,{columns: 3,
+    //   columnGap: 15,
+    //   height: 100,
+    //   width: 465,
+    //   align: 'justify'})
+    .text(`Contact No.: ${invoice.contactNo}`, 320, 75, { align: "right" })
+    .text(invoice.address, 300, 90, { align: "right" })
     .moveDown();
 
   doc
@@ -92,6 +98,7 @@ function generateInvoiceTable(doc, invoice) {
   });
 
   console.log(orderItems);
+  let last_position = 0;
 
   for (i = 0; i < orderItems.length; i++) {
     const item = orderItems[i];
@@ -109,7 +116,7 @@ function generateInvoiceTable(doc, invoice) {
 
     let item_name = item.itemName;
     if (item_name.length > 15) {
-      item_name = item.itemName.slice(0,25) + "...";
+      item_name = item.itemName.slice(0, 25) + "...";
     }
     generateTableRow(
       doc,
@@ -125,16 +132,45 @@ function generateInvoiceTable(doc, invoice) {
       total
     );
     generateHr(doc, position + 20);
+    last_position = position + 20;
   }
+  generateTableRow1(
+    doc,
+    last_position + 20,
+    "TOTAL",
+    " ",
+    " ",
+    " ",
+    invoice.total
+  );
 }
 
 function generateFooter(invoice, doc) {
+  doc.font("Helvetica-Bold").text(`Delivery Charges : Free`, 50, 500);
   doc
-    .text(`Invoice Total: ${invoice.total}`, 50, 500)
+    .font("Helvetica")
     .text(`Paid by wallet : ${invoice.walletBalanceUsed}`, 50, 520)
-    .text(`Paid By Amul Butter Wallet : ${invoice.itemBasedWalletBalanceUsed}`,50,540)
-    .text(`Applied discount : ${invoice.appliedDiscount}`, 50, 560)
+    .text(
+      `Paid By Amul Butter Wallet : ${invoice.itemBasedWalletBalanceUsed}`,
+      50,
+      540
+    )
+    .text(`Applied coupon discount : ${invoice.appliedDiscount}`, 50, 560)
     .text(`Payment Mode : Cash on Delivery`, 50, 580)
+    .text(`Total CGST : ${invoice.totalCGST.toFixed(2)}`, 390, 500)
+    .text(`Total SGST : ${invoice.totalSGST.toFixed(2)}`, 390, 520)
+    .text(`Total IGST : ${invoice.totalIGST.toFixed(2)}`, 390, 540)
+    .text(`Total Other Tax : ${invoice.totalOtherTax.toFixed(2)}`, 390, 560)
+    .text(
+      `Total Taxes : ${(
+        invoice.totalCGST +
+        invoice.totalIGST +
+        invoice.totalSGST +
+        invoice.totalOtherTax
+      ).toFixed(2)}`,
+      390,
+      580
+    )
     .moveDown();
 }
 

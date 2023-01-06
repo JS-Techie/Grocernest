@@ -65,9 +65,28 @@ const deleteImageFromS3 = async (key) => {
   };
 };
 
+const checkIfFileExists = async (key) => {
+  try {
+    console.log("Before headObject");
+    await s3
+      .headObject({ Bucket: process.env.AWS_BUCKET_NAME, Key: key })
+      .promise();
+    console.log("After headObject");
+    return true;
+  } catch (err) {
+    console.log(err);
+    if (err.code === "NotFound") {
+      return false;
+    } else {
+      throw err;
+    }
+  }
+};
+
 module.exports = {
   uploadToS3,
   getFromS3,
   uploadImageToS3,
   deleteImageFromS3,
+  checkIfFileExists,
 };

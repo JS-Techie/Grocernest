@@ -1,7 +1,7 @@
 const { generatePdf } = require("../utils/generatePdf");
 const fs = require("fs");
 const db = require("../models");
-const { uploadToS3 } = require("../services/s3Service");
+const { uploadToS3, checkIfFileExists } = require("../services/s3Service");
 
 const Order = db.OrderModel;
 const OrderItems = db.OrderItemsModel;
@@ -10,14 +10,37 @@ const Batch = db.BatchModel;
 const Customer = db.CustomerModel;
 const Inventory = db.InventoryModel;
 const Url = db.UrlModel;
+const TaxInfo = db.ItemTaxInfoModel;
 
 const downloadInvoice = async (req, res, next) => {
   //Get current user from jwt
   const currentCustomer = req.cust_no;
 
+  let totalCGST = 0;
+  let totalIGST = 0;
+  let totalSGST = 0;
+  let totalOtherTax = 0;
+
   const { orderID } = req.body;
 
   try {
+    const exists = await checkIfFileExists(
+      `pdfs/invoices/invoice-${orderID}.pdf`
+    );
+
+    console.log("File exists=====>", exists);
+
+    if (exists) {
+      return res.status(200).send({
+        success: true,
+        data: {
+          URL: `https://ecomm-dev.s3.ap-south-1.amazonaws.com/pdfs/invoices/invoice-${orderID}.pdf`,
+        },
+        message: "Invoice generated successfully",
+        devMessage: "Invoice already exists",
+      });
+    }
+
     const currentOrder = await Order.findOne({
       include: { model: OrderItems },
       where: { order_id: orderID, cust_no: currentCustomer },
@@ -39,12 +62,49 @@ const downloadInvoice = async (req, res, next) => {
       const item = await Item.findOne({
         where: { id: current.item_id },
       });
+      const currentQuantity = await OrderItems.findOne({
+        where: { quantity: current.quantity },
+      });
 
       const oldestBatch = await Batch.findOne({
         where: { item_id: current.item_id, mark_selected: 1 },
       });
 
       if (oldestBatch) {
+        const currentTaxArray = await TaxInfo.findAll({
+          where: { item_id: current.item_id },
+        });
+
+        currentTaxArray.map((currentTax) => {
+          switch (currentTax.tax_type) {
+            case "CGST":
+              totalCGST +=
+                (currentTax.tax_percentage / 100) *
+                oldestBatch.sale_price *
+                currentQuantity.quantity;
+              break;
+            case "SGST":
+              totalSGST +=
+                (currentTax.tax_percentage / 100) *
+                oldestBatch.sale_price *
+                currentQuantity.quantity;
+              break;
+            case "IGST":
+              totalIGST +=
+                (currentTax.tax_percentage / 100) *
+                oldestBatch.sale_price *
+                currentQuantity.quantity;
+              break;
+            case "OTHERS":
+              totalOtherTax +=
+                (currentTax.tax_percentage / 100) *
+                oldestBatch.sale_price *
+                currentQuantity.quantity;
+              break;
+            default:
+              break;
+          }
+        });
         return {
           itemName: item.name,
           quantity: current.quantity,
@@ -63,6 +123,7 @@ const downloadInvoice = async (req, res, next) => {
 
     const response = {
       customerName: currentUser.cust_name,
+      contactNo: currentUser.contact_no,
       orderID: currentOrder.order_id,
       status: currentOrder.status,
       address: currentOrder.address,
@@ -72,11 +133,16 @@ const downloadInvoice = async (req, res, next) => {
       walletBalanceUsed: currentOrder.wallet_balance_used
         ? currentOrder.wallet_balance_used
         : 0,
-      itemBasedWalletBalanceUsed:
-        currentOrder.item_wallet_used ? currentOrder.item_wallet_used : 0,
+      itemBasedWalletBalanceUsed: currentOrder.item_wallet_used
+        ? currentOrder.item_wallet_used
+        : 0,
       appliedDiscount: currentOrder.applied_discount,
 
       orderItems: resolved,
+      totalSGST,
+      totalCGST,
+      totalIGST,
+      totalOtherTax,
     };
 
     let writeStream = await generatePdf(

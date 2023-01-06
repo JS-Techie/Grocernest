@@ -131,6 +131,8 @@ db.OffersModel = require("./t_offers")(db.sequelize, Sequelize);
 
 db.OffersCacheModel = require("./t_offer_cache")(db.sequelize, Sequelize);
 
+db.SpecialWalletStrategy = require("./t_special_wallet_strategy")(db.sequelize, Sequelize);
+
 db.MilkItemsModel = require("./t_milk_items")(db.sequelize, Sequelize);
 
 db.SubscriptionsModel = require("./t_subscription")(db.sequelize, Sequelize);
