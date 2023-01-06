@@ -12,8 +12,6 @@ const Batch = db.BatchModel;
 const Item = db.ItemModel;
 const WalletStrategyTable = db.SpecialWalletStrategy;
 
-let specialWalletService = new SpecialWalletService();
-
 const addWalletBalance = async (req, res, next) => {
   const { order_id } = req.body;
   try {
@@ -184,6 +182,7 @@ const checkBatchNo = async (req, res, next) => {
 };
 
 const addSpecialWalletBalance = async (req, res, next) => {
+  let specialWalletService = new SpecialWalletService();
   console.log("coming here");
   const { order_id } = req.body;
   try {
