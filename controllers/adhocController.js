@@ -230,22 +230,30 @@ const addSpecialWalletBalance = async (req, res, next) => {
         let ress = item_list.filter((item) => {
           return item == this_item_id;
         });
+        // check item exist in any strategy or not
         if (ress.length > 0) {
+          // check if it is instant cashback
           if (currentStrategy.instant_cashback) {
-            wallet_amt =
-              current_item.quantity *
-              ((current_item.offer_price / 100) *
-                currentStrategy.amount_of_discount);
+            // check if it is not first buy
+            if (!currentStrategy.first_buy) {
+              wallet_amt =
+                current_item.quantity *
+                ((current_item.offer_price / 100) *
+                  currentStrategy.amount_of_discount);
 
-            special_wallet_balance = special_wallet_balance + wallet_amt;
+              special_wallet_balance = special_wallet_balance + wallet_amt;
 
-            let transaction = {
-              wallet_amt: wallet_amt,
-              item_id: current_item.item_id,
-              item_qty: current_item.quantity,
-              offer_name: currentStrategy.offer_name,
-            };
-            special_wallet_transactions.push(transaction);
+              let transaction = {
+                wallet_amt: wallet_amt,
+                item_id: current_item.item_id,
+                item_qty: current_item.quantity,
+                offer_name: currentStrategy.offer_name,
+              };
+              special_wallet_transactions.push(transaction);
+            } else {
+              // if this is first buy
+              // check this is your first purchase in the time span or not
+            }
           }
         }
       });
