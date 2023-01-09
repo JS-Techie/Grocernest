@@ -8,9 +8,15 @@ const OrderItems = db.OrderItemsModel;
 const Item = db.ItemModel;
 const Batch = db.BatchModel;
 const Customer = db.CustomerModel;
+const TaxInfo = db.ItemTaxInfoModel;
 
 const downloadEcommInvoice = async (req, res, next) => {
   const orderID = req.body.order_id;
+
+  let totalCGST = 0;
+  let totalIGST = 0;
+  let totalSGST = 0;
+  let totalOtherTax = 0;
 
   try {
     const currentOrder = await Order.findOne({
@@ -36,11 +42,50 @@ const downloadEcommInvoice = async (req, res, next) => {
         where: { id: current.item_id },
       });
 
+      const currentQuantity = await OrderItems.findOne({
+        where: { quantity: current.quantity },
+      });
+
       const oldestBatch = await Batch.findOne({
         where: { item_id: current.item_id, mark_selected: 1 },
       });
 
       if (oldestBatch) {
+        const currentTaxArray = await TaxInfo.findAll({
+          where: { item_id: current.item_id },
+        });
+
+        currentTaxArray.map((currentTax) => {
+          switch (currentTax.tax_type) {
+            case "CGST":
+              totalCGST +=
+                (currentTax.tax_percentage / 100) *
+                oldestBatch.sale_price *
+                currentQuantity.quantity;
+              break;
+            case "SGST":
+              totalSGST +=
+                (currentTax.tax_percentage / 100) *
+                oldestBatch.sale_price *
+                currentQuantity.quantity;
+              break;
+            case "IGST":
+              totalIGST +=
+                (currentTax.tax_percentage / 100) *
+                oldestBatch.sale_price *
+                currentQuantity.quantity;
+              break;
+            case "OTHERS":
+              totalOtherTax +=
+                (currentTax.tax_percentage / 100) *
+                oldestBatch.sale_price *
+                currentQuantity.quantity;
+              break;
+            default:
+              break;
+          }
+        });
+
         return {
           itemName: item.name,
           quantity: current.quantity,
@@ -74,6 +119,10 @@ const downloadEcommInvoice = async (req, res, next) => {
       appliedDiscount: currentOrder.applied_discount,
 
       orderItems: resolved,
+      totalSGST,
+      totalCGST,
+      totalIGST,
+      totalOtherTax,
     };
 
     let writeStream = await generatePdf(
