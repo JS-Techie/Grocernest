@@ -10,10 +10,7 @@ const Batch = db.BatchModel;
 const Customer = db.CustomerModel;
 
 const downloadEcommInvoice = async (req, res, next) => {
-  //Get current user from jwt
-  const currentCustomer = req.cust_no;
-
-  const orderID  = req.body.order_id;
+  const orderID = req.body.order_id;
 
   try {
     const currentOrder = await Order.findOne({
@@ -21,7 +18,7 @@ const downloadEcommInvoice = async (req, res, next) => {
       where: { order_id: orderID },
     });
 
-      console.log("currentOrder", currentOrder.cust_no);
+    console.log("currentOrder", currentOrder.cust_no);
     if (!currentOrder) {
       return res.status(404).send({
         success: false,
@@ -109,6 +106,5 @@ const downloadEcommInvoice = async (req, res, next) => {
     });
   }
 };
-
 
 module.exports = { downloadEcommInvoice };
