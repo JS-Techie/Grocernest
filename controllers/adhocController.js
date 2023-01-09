@@ -182,7 +182,6 @@ const checkBatchNo = async (req, res, next) => {
 };
 
 const addSpecialWalletBalance = async (req, res, next) => {
-  let specialWalletService = new SpecialWalletService();
   console.log("coming here");
   const { order_id } = req.body;
   try {
@@ -203,50 +202,42 @@ const addSpecialWalletBalance = async (req, res, next) => {
     });
 
     // fetch all stretegies
-    let promises = [];
     const allStrategies = await WalletStrategyTable.findAll({
       where: {
         status: 1,
       },
     });
 
+    // fetch the order
     const order_details = await OrderItems.findAll({
       where: {
         order_id: order_id,
       },
     });
 
+    let special_wallet_transactions = [];
     let special_wallet_balance = 0;
 
     order_details.map((current_item) => {
       let this_item_id = current_item.item_id;
       let this_item_qty = current_item.quantity;
 
-      promises = allStrategies.map(async (currentStrategy) => {
+      allStrategies.map(async (currentStrategy) => {
         let item_list = JSON.parse(currentStrategy.items_list);
 
         // console.log("ABCD", this_item_id, item_list);
 
-        let ress = item_list.filter((item) => {
+        let ress = item_list.filter(async (item) => {
           return item == this_item_id;
         });
-
+        // check item exist in any strategy or not
         if (ress.length > 0) {
-          if (currentStrategy.first_buy == 1) {
-            console.log("Start Date====>", currentStrategy.start_date);
-            console.log("End Date===>", currentStrategy.expiry_date);
-            //This item exists in my order
-            const [isFirstOrder, metadata_2] =
-              await sequelize.query(`select t_order.order_id,t_order_items.quantity,t_batch.sale_price
-          from ((t_order
-          inner join t_order_items on t_order_items.order_id = t_order.order_id)
-          inner join t_batch on t_batch.item_id = t_order_items.item_id)
-          where t_batch.mark_selected = 1 and t_order_items.item_id = ${current_item.item_id} and t_order.order_id <> ${order_id} and t_order.cust_no = '${customer.cust_no}' 
-          and t_order.created_at >= '${currentStrategy.start_date}' and t_order.created_at<= '${currentStrategy.expiry_date}' order by t_order.created_at
-          `);
-
-            if (isFirstOrder.length === 0) {
-              //credit
+          // check if it is instant cashback
+          if (currentStrategy.instant_cashback) {
+            // check if it is not first buy
+            // console.log("FIRST BUY????????");
+            if (!currentStrategy.first_buy) {
+              // console.log("NOOOOOO");
               wallet_amt =
                 current_item.quantity *
                 ((current_item.offer_price / 100) *
@@ -260,26 +251,57 @@ const addSpecialWalletBalance = async (req, res, next) => {
                 item_qty: current_item.quantity,
                 offer_name: currentStrategy.offer_name,
               };
-              console.log("=>", transaction);
+              special_wallet_transactions.push(transaction);
+            } else {
+              // console.log("YESSSSS");
+              let is_first_buy = true;
+              // if this is first buy
+              // check this is your first purchase in the time span or not
 
-              return transaction;
+              const startDate = new Date(
+                currentStrategy.start_date
+              ).toISOString();
+              const endDate = new Date(
+                currentStrategy.expiry_date
+              ).toISOString();
+
+              const [ordresInTheSpan, metadata_2] =
+                await sequelize.query(`select * from t_order where cust_no = "971medumge3l7prya6i" and status='Delivered'
+                and created_at BETWEEN '${startDate}' and '${endDate}'`);
+              // console.log(ordresInTheSpan);
+              ordresInTheSpan.map(async (current_order) => {
+                // console.log(current_order.order_id);
+                const [order_items, metadata_3] = await sequelize.query(`
+                select item_id from t_order_items toi where toi.order_id = ${current_order.order_id}
+                `);
+                // console.log(current_order.order_id + " => ");
+                // console.log(order_items);
+
+                order_items.map((prev_order_current_item) => {
+                  if (prev_order_current_item.item_id == current_item.item_id) {
+                    is_first_buy = false;
+                  }
+                });
+              });
+
+              // if this purchase is first buy then add balance
+              if (is_first_buy) {
+                wallet_amt =
+                  current_item.quantity *
+                  ((current_item.offer_price / 100) *
+                    currentStrategy.amount_of_discount);
+
+                special_wallet_balance = special_wallet_balance + wallet_amt;
+
+                let transaction = {
+                  wallet_amt: wallet_amt,
+                  item_id: current_item.item_id,
+                  item_qty: current_item.quantity,
+                  offer_name: currentStrategy.offer_name,
+                };
+                special_wallet_transactions.push(transaction);
+              }
             }
-          } else {
-            wallet_amt =
-              current_item.quantity *
-              ((current_item.offer_price / 100) *
-                currentStrategy.amount_of_discount);
-
-            special_wallet_balance = special_wallet_balance + wallet_amt;
-
-            let transaction = {
-              wallet_amt: wallet_amt,
-              item_id: current_item.item_id,
-              item_qty: current_item.quantity,
-              offer_name: currentStrategy.offer_name,
-            };
-            console.log("=>", transaction);
-            return transaction;
           }
         }
       });
@@ -288,17 +310,18 @@ const addSpecialWalletBalance = async (req, res, next) => {
     // console.log(special_wallet_transactions);
     // console.log(special_wallet_balance);
 
-    const special_wallet_transactions = await Promise.all(promises);
+    let specialWalletService = new SpecialWalletService();
 
-    console.log(
-      "Special Wallet Trabnsactions---->",
-      special_wallet_transactions
-    );
-
+    // credit amount
     specialWalletService.creditAmount(
       special_wallet_balance,
       order.cust_no,
-      "special wallet balance added",
+      "special wallet balance added"
+    );
+
+    // credit transaction
+    specialWalletService.creditAmountTransaction(
+      order.cust_no,
       special_wallet_transactions
     );
 

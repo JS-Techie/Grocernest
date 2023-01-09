@@ -151,7 +151,7 @@ function generateFooter(invoice, doc) {
     .font("Helvetica")
     .text(`Paid by wallet : ${invoice.walletBalanceUsed}`, 50, 520)
     .text(
-      `Paid By Amul Butter Wallet : ${invoice.itemBasedWalletBalanceUsed}`,
+      `Paid By Special Wallet : ${invoice.itemBasedWalletBalanceUsed}`,
       50,
       540
     )
