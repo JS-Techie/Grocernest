@@ -104,6 +104,7 @@ const downloadEcommInvoice = async (req, res, next) => {
 
     const response = {
       customerName: currentUser.cust_name,
+      contactNo: currentUser.contact_no,
       orderID: currentOrder.order_id,
       status: currentOrder.status,
       address: currentOrder.address,
