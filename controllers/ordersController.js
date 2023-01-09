@@ -102,11 +102,11 @@ const getAllOrders = async (req, res, next) => {
             id: currentItem.id,
             image: currentItem.image,
             quantity: currentOrderItem.quantity,
-            MRP: oldestBatch.MRP,
+            MRP: currentOrderItem.MRP,
             salePrice:
               currentOrderItem.is_offer === 1
                 ? currentOrderItem.offer_price
-                : oldestBatch.sale_price,
+                : currentOrderItem.sale_price,
             discount: oldestBatch.discount,
             isGift: currentItem.is_gift === 1 ? true : false,
             isOffer: currentOrderItem.is_offer === 1 ? true : false,
@@ -667,8 +667,8 @@ const getAllReturns = async (req, res, next) => {
         itemID: currentItem ? currentItem.id : "",
         itemName: currentItem ? currentItem.name : "",
         quantity: current.quantity,
-        salePrice: selectedBatch ? selectedBatch.sale_price : "",
-        MRP: selectedBatch ? selectedBatch.MRP : "",
+        salePrice: current ? current.sale_price : "",
+        MRP: current ? current.MRP : "",
       };
     });
 
