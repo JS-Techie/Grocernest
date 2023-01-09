@@ -222,12 +222,12 @@ const addSpecialWalletBalance = async (req, res, next) => {
       let this_item_id = current_item.item_id;
       let this_item_qty = current_item.quantity;
 
-      allStrategies.map((currentStrategy) => {
+      allStrategies.map(async (currentStrategy) => {
         let item_list = JSON.parse(currentStrategy.items_list);
 
         // console.log("ABCD", this_item_id, item_list);
 
-        let ress = item_list.filter((item) => {
+        let ress = item_list.filter(async (item) => {
           return item == this_item_id;
         });
         // check item exist in any strategy or not
@@ -235,7 +235,9 @@ const addSpecialWalletBalance = async (req, res, next) => {
           // check if it is instant cashback
           if (currentStrategy.instant_cashback) {
             // check if it is not first buy
+            // console.log("FIRST BUY????????");
             if (!currentStrategy.first_buy) {
+              // console.log("NOOOOOO");
               wallet_amt =
                 current_item.quantity *
                 ((current_item.offer_price / 100) *
@@ -251,16 +253,62 @@ const addSpecialWalletBalance = async (req, res, next) => {
               };
               special_wallet_transactions.push(transaction);
             } else {
+              // console.log("YESSSSS");
+              let is_first_buy = true;
               // if this is first buy
               // check this is your first purchase in the time span or not
+
+              const startDate = new Date(
+                currentStrategy.start_date
+              ).toISOString();
+              const endDate = new Date(
+                currentStrategy.expiry_date
+              ).toISOString();
+
+              const [ordresInTheSpan, metadata_2] =
+                await sequelize.query(`select * from t_order where cust_no = "971medumge3l7prya6i" and status='Delivered'
+                and created_at BETWEEN '${startDate}' and '${endDate}'`);
+              // console.log(ordresInTheSpan);
+              ordresInTheSpan.map(async (current_order) => {
+                // console.log(current_order.order_id);
+                const [order_items, metadata_3] = await sequelize.query(`
+                select item_id from t_order_items toi where toi.order_id = ${current_order.order_id}
+                `);
+                // console.log(current_order.order_id + " => ");
+                // console.log(order_items);
+
+                order_items.map((prev_order_current_item) => {
+                  if (prev_order_current_item.item_id == current_item.item_id) {
+                    is_first_buy = false;
+                  }
+                });
+              });
+
+              // if this purchase is first buy then add balance
+              if (is_first_buy) {
+                wallet_amt =
+                  current_item.quantity *
+                  ((current_item.offer_price / 100) *
+                    currentStrategy.amount_of_discount);
+
+                special_wallet_balance = special_wallet_balance + wallet_amt;
+
+                let transaction = {
+                  wallet_amt: wallet_amt,
+                  item_id: current_item.item_id,
+                  item_qty: current_item.quantity,
+                  offer_name: currentStrategy.offer_name,
+                };
+                special_wallet_transactions.push(transaction);
+              }
             }
           }
         }
       });
     });
 
-    console.log(special_wallet_transactions);
-    console.log(special_wallet_balance);
+    // console.log(special_wallet_transactions);
+    // console.log(special_wallet_balance);
 
     let specialWalletService = new SpecialWalletService();
 
@@ -282,16 +330,6 @@ const addSpecialWalletBalance = async (req, res, next) => {
       data: [],
       message: "Successfully added special wallet balance to customer wallet",
     });
-
-    // only first time?
-    const [firstOrderWithButter, metadata_2] =
-      await sequelize.query(`select t_order.order_id,t_order_items.quantity,t_batch.sale_price
-        from ((t_order
-        inner join t_order_items on t_order_items.order_id = t_order.order_id)
-        inner join t_batch on t_batch.item_id = t_order_items.item_id)
-        where t_batch.mark_selected = 1 and t_order_items.item_id = ${72533} and t_order.order_id <> ${order_id} and t_order.cust_no = '${
-        customer.cust_no
-      }' order by t_order.created_at`);
   } catch (error) {
     return res.status(400).send({
       success: false,
