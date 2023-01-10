@@ -89,7 +89,9 @@ const addSpecialWalletBalance = async (req, res, next) => {
       });
     }
 
-    console.log(order);
+    // console.log(order);
+
+    let specialWalletService = new SpecialWalletService();
 
     const customer = await Customer.findOne({
       where: { cust_no: order.cust_no },
@@ -146,7 +148,7 @@ const addSpecialWalletBalance = async (req, res, next) => {
                     item_id: current_item.item_id,
                     item_qty: current_item.quantity,
                     offer_name: currentStrategy.offer_name,
-                    order_id: current_order.order_id,
+                    order_id: order_id,
                   },
                 ];
 
@@ -213,7 +215,7 @@ const addSpecialWalletBalance = async (req, res, next) => {
                       item_id: current_item.item_id,
                       item_qty: current_item.quantity,
                       offer_name: currentStrategy.offer_name,
-                      order_id: current_order.order_id,
+                      order_id: order_id,
                     },
                   ];
 
@@ -247,11 +249,9 @@ const addSpecialWalletBalance = async (req, res, next) => {
         });
     });
 
-    console.log("VALUES TO BE ADDED");
-    console.log(special_wallet_transactions);
-    console.log(special_wallet_balance);
-
-    let specialWalletService = new SpecialWalletService();
+    // console.log("VALUES TO BE ADDED");
+    // console.log(special_wallet_transactions);
+    // console.log(special_wallet_balance);
 
     return res.status(200).send({
       success: true,

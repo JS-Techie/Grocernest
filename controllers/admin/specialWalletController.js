@@ -57,6 +57,12 @@ const createStrategy = async (req, res, next) => {
       created_by: 1,
       redeem_amt: parseInt(redeem_amt),
     });
+
+    // search any strategy is "ALL" or not, if ALL ia active then DEACTIVATE all
+    // const all_strategies = await WalletStrategy.findAll({});
+    // all_strategies.map((current_strategy) => {
+    // })
+
     return res.status(200).send({
       success: true,
       data: new_strategy,
