@@ -146,6 +146,7 @@ const addSpecialWalletBalance = async (req, res, next) => {
                     item_id: current_item.item_id,
                     item_qty: current_item.quantity,
                     offer_name: currentStrategy.offer_name,
+                    order_id: current_order.order_id,
                   },
                 ];
 
@@ -212,6 +213,7 @@ const addSpecialWalletBalance = async (req, res, next) => {
                       item_id: current_item.item_id,
                       item_qty: current_item.quantity,
                       offer_name: currentStrategy.offer_name,
+                      order_id: current_order.order_id,
                     },
                   ];
 
