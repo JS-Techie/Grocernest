@@ -102,6 +102,24 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "offer_price"
+    },
+    MRP: {
+      type: DataTypes.DECIMAL,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "MRP"
+    },
+    sale_price: {
+      type: DataTypes.DECIMAL,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "sale_price"
     }
   };
   const options = {

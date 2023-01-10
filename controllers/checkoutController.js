@@ -156,6 +156,8 @@ const checkoutFromCart = async (req, res, next) => {
         offer_price: currentItem.offer_item_price
           ? currentItem.offer_item_price
           : oldestBatch.sale_price,
+        MRP: oldestBatch.MRP,
+        sale_price: oldestBatch.sale_price,
       };
     });
 
@@ -508,6 +510,8 @@ const buyNow = async (req, res, next) => {
       created_by: newOrder.created_by,
       is_offer: offer ? 1 : null,
       offer_price: offer ? newSalePrice : null,
+      MRP: oldestBatch.MRP,
+      sale_price: oldestBatch.sale_price,
     });
 
     const offerItem = await OffersCache.findOne({
