@@ -278,48 +278,39 @@ const deleteImage = async (req, res, next) => {
 };
 
 const referenceItem = async (req, res, next) => {
-  const { reference, current } = req.body;
+  const { images, id } = req.body;
   try {
-    const currentItemDetails = await Item.findOne({ where: { id: current } });
-    const referenceItemDetails = await Item.findOne({
-      where: { id: reference },
-    });
-
-    if (!currentItemDetails) {
-      return res.status(404).send({
+    if (images.length === 0) {
+      return res.status(400).send({
         success: false,
         data: [],
-        message: "Could not find the details for the current item",
+        message: "Please select the reference images",
       });
     }
 
-    if (!referenceItemDetails) {
-      await Item.update(
-        {
-          image: JSON.stringify([]),
-        },
-        {
-          where: { id: current },
-        }
-      );
+    const currentItem = await Item.findOne({
+      where: { id },
+    });
+
+    if (!currentItem) {
       return res.status(404).send({
         success: false,
         data: [],
-        message: "Could not find the details for the reference item",
+        message: "Requested item not found",
       });
     }
 
     const update = await Item.update(
       {
-        image: referenceItemDetails.image,
+        image: JSON.stringify(images),
       },
       {
-        where: { id: current },
+        where: { id },
       }
     );
 
     const updatedItemDetails = await Item.findOne({
-      where: { id: current },
+      where: { id },
     });
 
     return res.status(200).send({
@@ -342,3 +333,45 @@ module.exports = {
   deleteImage,
   referenceItem,
 };
+
+// const currentItemDetails = await Item.findOne({ where: { id: current } });
+// const referenceItemDetails = await Item.findOne({
+//   where: { id: reference },
+// });
+
+// if (!currentItemDetails) {
+//   return res.status(404).send({
+//     success: false,
+//     data: [],
+//     message: "Could not find the details for the current item",
+//   });
+// }
+
+// if (!referenceItemDetails) {
+//   await Item.update(
+//     {
+//       image: JSON.stringify([]),
+//     },
+//     {
+//       where: { id: current },
+//     }
+//   );
+//   return res.status(404).send({
+//     success: false,
+//     data: [],
+//     message: "Could not find the details for the reference item",
+//   });
+// }
+
+// const update = await Item.update(
+//   {
+//     image: referenceItemDetails.image,
+//   },
+//   {
+//     where: { id: current },
+//   }
+// );
+
+// const updatedItemDetails = await Item.findOne({
+//   where: { id: current },
+// });
