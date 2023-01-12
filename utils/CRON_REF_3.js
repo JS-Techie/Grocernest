@@ -45,82 +45,82 @@ const pos_cashback_job = async () => {
 
     // map the invoices
     await invoices.map(async (current_invoice) => {
-      // if (current_invoice.cashback_processed != 1) {
-      const invoice_items = await invoice_item_dtls.findAll({
-        where: {
-          invoice_id: current_invoice.id,
-        },
-      });
-
-      // items per invoice
-      invoice_items.map(async (current_item) => {
-        // console.log(item.item_id)
-        const inventory_item = await inventory.findOne({
+      if (current_invoice.cashback_processed != "1") {
+        const invoice_items = await invoice_item_dtls.findAll({
           where: {
-            item_id: current_item.item_id,
-            batch_id: current_item.batch_id,
-            balance_type: 1,
+            invoice_id: current_invoice.id,
           },
         });
 
-        // console.log(typeof inventory_item.cashback);
-        if (inventory_item.cashback) {
-          // c += 1
-          // console.log("-", inventory_item.cashback)
-          // console.log("SALE_PRICE", current_item.sale_price);
-          // console.log("CASHBACK IS P", inventory_item.cashback_is_percentage);
-          // console.log("HAS CASHBACK", inventory_item.cashback);
-          let cashback_amt = 0;
-          if (inventory_item.cashback_is_percentage == 1) {
-            cashback_amt = (
-              (current_item.sale_price / 100) *
-              inventory_item.cashback
-            ).toFixed(2);
-          } else {
-            cashback_amt = inventory_item.cashback;
-          }
-
-          let this_invoice = await Invoice.findOne({
-            where: { id: current_invoice.id },
-          });
-          console.log("cashback=>", cashback_amt);
-
-          // insert into wallet
-          // fetch customer
-
-          let cust = await Customers.findOne({
+        // items per invoice
+        invoice_items.map(async (current_item) => {
+          // console.log(item.item_id)
+          const inventory_item = await inventory.findOne({
             where: {
-              id: current_invoice.cust_id,
+              item_id: current_item.item_id,
+              batch_id: current_item.batch_id,
+              balance_type: 1,
             },
           });
-          // console.log("current_invoice---", cust);
-          if (cust.password)
-            await walletService.creditAmount(
-              cashback_amt,
-              cust.cust_no,
-              "Cashback added for Store Purchase INV/PREFIX/" +
-                current_invoice.id
-            );
 
-          await Invoice.update(
-            {
-              cashback_processed: "1",
-              cashback_amount:
-                parseFloat(
-                  this_invoice.cashback_amount
-                    ? this_invoice.cashback_amount
-                    : 0
-                ) + parseFloat(cashback_amt),
-            },
-            {
-              where: {
-                id: current_invoice.id,
-              },
+          // console.log(typeof inventory_item.cashback);
+          if (inventory_item.cashback) {
+            // c += 1
+            // console.log("-", inventory_item.cashback)
+            // console.log("SALE_PRICE", current_item.sale_price);
+            // console.log("CASHBACK IS P", inventory_item.cashback_is_percentage);
+            // console.log("HAS CASHBACK", inventory_item.cashback);
+            let cashback_amt = 0;
+            if (inventory_item.cashback_is_percentage == 1) {
+              cashback_amt = (
+                (current_item.sale_price / 100) *
+                inventory_item.cashback
+              ).toFixed(2);
+            } else {
+              cashback_amt = inventory_item.cashback;
             }
-          );
-        }
-      });
-      // }
+
+            let this_invoice = await Invoice.findOne({
+              where: { id: current_invoice.id },
+            });
+            console.log("cashback=>", cashback_amt);
+
+            // insert into wallet
+            // fetch customer
+
+            let cust = await Customers.findOne({
+              where: {
+                id: current_invoice.cust_id,
+              },
+            });
+            // console.log("current_invoice---", cust);
+            if (cust.password)
+              await walletService.creditAmount(
+                cashback_amt,
+                cust.cust_no,
+                "Cashback added for Store Purchase INV/PREFIX/" +
+                  current_invoice.id
+              );
+
+            await Invoice.update(
+              {
+                cashback_processed: "1",
+                cashback_amount:
+                  parseFloat(
+                    this_invoice.cashback_amount
+                      ? this_invoice.cashback_amount
+                      : 0
+                  ) + parseFloat(cashback_amt),
+              },
+              {
+                where: {
+                  id: current_invoice.id,
+                },
+              }
+            );
+          }
+        });
+      }
     });
 
     // console.log("C==>>", c);
@@ -132,3 +132,5 @@ const pos_cashback_job = async () => {
 // cashback_job();
 // job();
 module.exports = pos_refferal_job;
+
+// pos_cashback_job();
