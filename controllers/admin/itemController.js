@@ -37,7 +37,7 @@ const uploadMultipleImages = async (req, res, next) => {
       });
     }
 
-    const promises = uploadedImages.map(async (currentImage) => {
+    const promises = uploadedImages.map(async (currentImage, index) => {
       const base64Data = new Buffer.from(
         currentImage.base64.replace(/^data:image\/\w+;base64,/, ""),
         "base64"
@@ -59,7 +59,7 @@ const uploadMultipleImages = async (req, res, next) => {
       return {
         imageName: currentImage.name,
         url,
-        serialNumber: currentImage.serialNumber,
+        serialNumber: index + 1,
       };
     });
 
@@ -300,9 +300,17 @@ const referenceItem = async (req, res, next) => {
       });
     }
 
+    const uploadedImages = images.map((current, index) => {
+      return {
+        imageName: current.imageName,
+        url: current.url,
+        serialNumber: index + 1,
+      };
+    });
+
     const update = await Item.update(
       {
-        image: JSON.stringify(images),
+        image: JSON.stringify(uploadedImages),
       },
       {
         where: { id },
