@@ -34,6 +34,7 @@ const pos_cashback_job = async () => {
     const invoices = await Invoice.findAll({
       where: {
         return_flag: "N",
+        payment_conf_ind: "Y",
         created_at: {
           // [Op.startsWith]: "2022-10-26",
           [Op.startsWith]: new Date().toISOString().slice(0, 10),
