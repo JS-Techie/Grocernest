@@ -5100,10 +5100,10 @@
             "schema": {
               "type": "object",
               "properties": {
-                "reference": {
+                "images": {
                   "example": "any"
                 },
-                "current": {
+                "id": {
                   "example": "any"
                 }
               }

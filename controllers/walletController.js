@@ -18,6 +18,7 @@ const getAllTransactionsOfUser = (req, res, next) => {
     where: {
       cust_no: customer_no,
     },
+    order: [["created_at", "DESC"]],
   })
     .then((resData) => {
       return res.status(201).json({
