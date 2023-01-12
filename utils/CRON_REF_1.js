@@ -8,16 +8,16 @@ const Wallet = db.WalletModel;
 const Wallet_Transaction = db.WalletTransactionModel;
 const WalletService = require("../services/walletService");
 
-const refferal_job = () => {
+const refferal_job = async () => {
   // schedule time is a utc time (11.30pm ist = 6:00pm utc/18:00)
-  cron.schedule("0 0 18 * * *", () => {
+  cron.schedule("0 0 18 * * *", async () => {
     console.log("Running scheduled CRON-JOB.....");
 
     // referral task
-    job();
+    await job();
 
     // cashback task
-    cashback_job();
+    await cashback_job();
   });
 };
 
@@ -136,7 +136,7 @@ const cashback_job = async () => {
         where: {
           cust_no: currentUser.cust_no,
           status: "Delivered",
-          cashback_amount: { [Op.ne]: null },
+          cashback_processed: { [Op.ne]: null },
         },
       });
 
