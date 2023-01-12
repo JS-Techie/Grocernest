@@ -18,7 +18,7 @@ const getAllTransactionsOfUser = (req, res, next) => {
     where: {
       cust_no: customer_no,
     },
-    order: [["created_at", "ASC"]],
+    order: [["transaction_date_time", "ASC"]],
   })
     .then((resData) => {
       return res.status(201).json({
@@ -30,7 +30,7 @@ const getAllTransactionsOfUser = (req, res, next) => {
     .catch((err) => {
       return res.status(400).json({
         success: false,
-        data: error.message,
+        data: err.message,
         message: "Error while fetching transaction from database",
       });
     });
