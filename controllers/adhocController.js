@@ -127,10 +127,11 @@ const addSpecialWalletBalance = async (req, res, next) => {
           // let ress = item_list.filter(async (item) => {
           //   return item == this_item_id;
           // });
-          let isItemAvailable = item_list.indexOf(this_item_id);
-
+          let isItemAvailable = item_list.indexOf(JSON.stringify(this_item_id));
+          console.log("CHECK," + this_item_id + " " + item_list);
           // check item exist in any strategy or not
           if (isItemAvailable >= 0) {
+            console.log("YES ITEM AVAILABLE," + this_item_id);
             // check if it is instant cashback
             if (currentStrategy.instant_cashback) {
               // check if it is not first buy
