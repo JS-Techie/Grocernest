@@ -38,7 +38,7 @@ class SpecialWalletService {
               (wallet_id, transaction_id, transaction_type, transaction_amount, transaction_details, transaction_date_time, created_by, updated_by, created_at, updated_at)
               VALUES((
               select wallet_id from t_wallet where cust_no="${cust_no}"
-              ), "${transaction_id}", "C", ${current.wallet_amt}, "for the offer ${current.offer_name} and order id 1${current.order_id} ", current_timestamp(), 2, NULL, current_timestamp(), current_timestamp()); 
+              ), "${transaction_id}", "C", ${current.wallet_amt}, "for the offer ${current.offer_name} and order id ${current.order_id} ", current_timestamp(), 2, NULL, current_timestamp(), current_timestamp()); 
           `);
     });
   }
