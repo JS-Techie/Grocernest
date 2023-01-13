@@ -106,12 +106,7 @@ const pos_cashback_job = async () => {
             await Invoice.update(
               {
                 cashback_processed: "1",
-                cashback_amount:
-                  parseFloat(
-                    this_invoice.cashback_amount
-                      ? this_invoice.cashback_amount
-                      : 0
-                  ) + parseFloat(cashback_amt),
+                cashback_amount: parseFloat(cashback_amt),
               },
               {
                 where: {
