@@ -41,7 +41,7 @@ const checkoutFromCart = async (req, res, next) => {
     wallet_id,
     cashback_amount,
     item_wallet_used,
-    coupon_id
+    //coupon_id
   } = req.body;
 
   if (!total) {
@@ -95,7 +95,7 @@ const checkoutFromCart = async (req, res, next) => {
       final_payable_amount: final_payable_amount,
       cashback_amount: cashback_amount,
       item_wallet_used,
-      coupon_id
+      //coupon_id
     });
 
     const user_wallet = await Wallet.findOne({
@@ -364,7 +364,7 @@ const buyNow = async (req, res, next) => {
     wallet_id,
     cashback_amount,
     item_wallet_used,
-    coupon_id
+    //coupon_id
   } = req.body;
 
   if (!total) {
@@ -431,7 +431,7 @@ const buyNow = async (req, res, next) => {
       final_payable_amount: final_payable_amount,
       cashback_amount: cashback_amount,
       item_wallet_used,
-      coupon_id
+      //coupon_id
     });
 
     const user_wallet = await Wallet.findOne({

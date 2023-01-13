@@ -145,7 +145,7 @@ const downloadInvoice = async (req, res, next) => {
         ? currentOrder.item_wallet_used
         : 0,
       appliedDiscount: currentOrder.applied_discount,
-      appliedCoupon: currentCoupon ? currentCoupon.code : null,
+      //appliedCoupon: currentCoupon ? currentCoupon.code : null,
 
       orderItems: resolved,
       totalSGST,
