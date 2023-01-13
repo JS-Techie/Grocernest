@@ -11,6 +11,7 @@ const Customer = db.CustomerModel;
 const Inventory = db.InventoryModel;
 const Url = db.UrlModel;
 const TaxInfo = db.ItemTaxInfoModel;
+const Coupon = db.CouponsModel;
 
 const downloadInvoice = async (req, res, next) => {
   //Get current user from jwt
@@ -57,6 +58,13 @@ const downloadInvoice = async (req, res, next) => {
     const currentUser = await Customer.findOne({
       where: { cust_no: currentCustomer },
     });
+
+    let currentCoupon;
+    if (currentOrder.coupon_id) {
+      currentCoupon = await Coupon.findOne({
+        where: { id: currentOrder.coupon_id },
+      });
+    }
 
     const promises = currentOrder.t_order_items_models.map(async (current) => {
       const item = await Item.findOne({
@@ -137,6 +145,7 @@ const downloadInvoice = async (req, res, next) => {
         ? currentOrder.item_wallet_used
         : 0,
       appliedDiscount: currentOrder.applied_discount,
+      //appliedCoupon: currentCoupon ? currentCoupon.code : null,
 
       orderItems: resolved,
       totalSGST,

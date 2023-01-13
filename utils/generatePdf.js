@@ -171,6 +171,13 @@ function generateFooter(invoice, doc) {
       390,
       580
     )
+    // .text(
+    //   `Applied Coupon : ${
+    //     invoice.appliedCoupon ? invoice.appliedCoupon : "None"
+    //   }`,
+    //   390,
+    //   600
+    // )
     .moveDown();
 }
 
