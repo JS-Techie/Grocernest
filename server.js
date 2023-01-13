@@ -189,5 +189,7 @@ const start = async () => {
 };
 
 start();
+
+// Cron Jobs
 refferal_job();
 pos_refferal_job();

@@ -5,34 +5,35 @@ const WalletTransaction = db.WalletTransactionModel;
 const { sequelize } = require("../models");
 
 // Find all the transactions of particular customer and send it
-const getAllTransactionsOfUser = (req, res, next) => {
+const getAllTransactionsOfUser = async (req, res, next) => {
   // Get current user from JWT
-  const customer_no = req.cust_no;
 
-  Wallet.findAll({
-    include: [
-      {
-        model: WalletTransaction,
+  try {
+    const customer_no = req.cust_no;
+
+    const [wallet_info, metadata] = await sequelize.query(
+      `SELECT * from t_wallet tw where tw.cust_no ="${customer_no}"`
+    );
+    let wallet_data = wallet_info[0];
+    const [wallet_transaction, metadata_2] = await sequelize.query(
+      `SELECT * from t_wallet_transaction twt where twt.wallet_id ="${wallet_data.wallet_id}" order by twt.transaction_date_time DESC`
+    );
+
+    return res.status(200).send({
+      success: true,
+      data: {
+        wallet_data,
+        wallet_transaction,
       },
-    ],
-    where: {
-      cust_no: customer_no,
-    },
-  })
-    .then((resData) => {
-      return res.status(201).json({
-        success: true,
-        data: resData,
-        message: "Successfully fetched Transaction Data",
-      });
-    })
-    .catch((err) => {
-      return res.status(400).json({
-        success: false,
-        data: error.message,
-        message: "Error while fetching transaction from database",
-      });
+      message: "Successfully fetched wallet transaction",
     });
+  } catch (err) {
+    return res.status(400).json({
+      success: false,
+      data: err.message,
+      message: "Error while fetching transaction from database",
+    });
+  }
 };
 
 // Get Wallet Balance of a customer

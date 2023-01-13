@@ -203,13 +203,7 @@ const editVendorProfile = async (req, res, next) => {
       });
     }
 
-    if (
-      !gst ||
-      !billing_address ||
-      !current_address ||
-      !pan ||
-      !cin
-    ) {
+    if (!gst || !billing_address || !current_address) {
       return res.status(400).send({
         success: false,
         data: [],
