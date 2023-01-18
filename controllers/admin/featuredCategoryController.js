@@ -20,6 +20,10 @@ const getAllFeaturedCategories = async (req, res, next) => {
       });
     }
 
+    categories.sort(function (a, b) {
+      return a.serial_no - b.serial_no;
+    });
+
     return res.status(200).send({
       success: true,
       data: categories,

@@ -26,6 +26,10 @@ const getAllFeaturedBrands = async (req, res, next) => {
       });
     }
 
+    brands.sort(function (a, b) {
+      return a.serial_no - b.serial_no;
+    });
+
     return res.status(200).send({
       success: true,
       data: brands,
