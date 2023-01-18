@@ -111,6 +111,15 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "updated_at"
+    },
+    serial_no: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "serial_no"
     }
   };
   const options = {
