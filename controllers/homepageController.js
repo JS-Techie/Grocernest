@@ -61,7 +61,7 @@ const getBestSellers = async (req, res, next) => {
         where: {
           is_active: 1,
           [Op.or]: [{ item_id_1: current.id }, { item_id: current.id }],
-          is_ecomm : 1
+          is_ecomm: 1,
         },
       });
 
@@ -204,6 +204,10 @@ const featuredBrands = async (req, res, next) => {
       });
     }
 
+    brands.sort(function (a, b) {
+      return a.serial_no - b.serial_no;
+    });
+
     return res.status(200).send({
       success: true,
       data: brands,
@@ -229,6 +233,10 @@ const featuredCategories = async (req, res, next) => {
         message: "There are no featured brands to show right now",
       });
     }
+
+    categories.sort(function (a, b) {
+      return a.serial_no - b.serial_no;
+    });
 
     return res.status(200).send({
       success: true,
