@@ -27,8 +27,47 @@ const sendCouponToUser = async (
       message: {
         isHSM: "true",
         type: "text",
+        text: `Hi, ${firstName}. Apply coupon *${couponCode}* to receive *${off}* off on your next order. `,
+        // text: `Congratulations! You've got a new coupon. Coupon code is " *${couponCode}* ". You will recieve *${off}* off on your next purchase from the store. Expires on 30.12.2022. Redeem your coupon before it expires.`,
+      },
+    });
+
+    console.log("Success Response", messageResponseFromGupshup);
+  } catch (error) {
+    console.error("Error Response", error);
+  }
+};
+
+const sendCouponToCustomer = async (
+  firstName,
+  couponCode,
+  isPercentage,
+  amountOfDiscount,
+  phoneNumber,
+  expiryDate
+) => {
+  try {
+    const off =
+      parseInt(isPercentage) === 1
+        ? `${parseInt(amountOfDiscount)}%`
+        : `₹${parseInt(amountOfDiscount)}`;
+
+    console.log(off);
+
+    let exp_date = new Date(expiryDate.toString());
+    const options = { day: "numeric", month: "short", year: "numeric" };
+    exp_date = exp_date.toLocaleDateString("en-US", options);
+
+    const messageResponseFromGupshup = await client.message.send({
+      channel: "whatsapp",
+      source: "919433804769",
+      destination: "91" + phoneNumber.toString(),
+      "src.name": "grocernest",
+      message: {
+        isHSM: "true",
+        type: "text",
         // text: `Hi, ${firstName}. Apply coupon *${couponCode}* to receive *${off}* off on your next order. `,
-        text: `Congratulations! You've got a new coupon. Coupon code is " *${couponCode}* ". You will recieve *${off}* off on your next purchase from the store. Expires on 30.12.2022. Redeem your coupon before it expires.`,
+        text: `Congratulations! You've got a new coupon. Coupon code is " *${couponCode}* ". You will recieve *${off}* off on your next purchase from the store. Expires on *${exp_date}*. Redeem your coupon before it expires.`,
       },
     });
 
@@ -158,4 +197,5 @@ module.exports = {
   sendFirstCouponToUser,
   sendNotificationsToUser,
   sendDeliveryPinToUser,
+  sendCouponToCustomer,
 };
