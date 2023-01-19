@@ -5686,6 +5686,13 @@
         }
       }
     },
+    "/admin/featured/categories/reorder/all": {
+      "post": {
+        "description": "",
+        "parameters": [],
+        "responses": {}
+      }
+    },
     "/admin/daily/sales/view": {
       "post": {
         "description": "",

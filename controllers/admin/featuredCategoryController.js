@@ -8,6 +8,42 @@ const {
 
 const FeaturedCategory = db.FeaturedCategoryModel;
 
+const reorderAllFeaturedCategories = async (req, res, next) => {
+  console.log("reorder All Featured Categories");
+  let reOrderedData = req.body.reOrderedData;
+
+  if (reOrderedData.length == 0) {
+    return res.status(400).send({
+      success: false,
+      data: "",
+      message: "No data available to sort Categories.",
+    });
+  }
+
+  try {
+    reOrderedData.map(async (current_category_card, index) => {
+      await FeaturedCategory.update(
+        {
+          serial_no: index,
+        },
+        { where: { id: current_category_card.id } }
+      );
+    });
+
+    return res.status(200).send({
+      success: true,
+      data: "",
+      message: "Featured Categories are sorted successfully",
+    });
+  } catch (err) {
+    return res.status(400).send({
+      success: false,
+      data: err.message,
+      message: "Something went wrong while sorting Categories",
+    });
+  }
+};
+
 const getAllFeaturedCategories = async (req, res, next) => {
   try {
     const categories = await FeaturedCategory.findAll({});
@@ -235,4 +271,6 @@ module.exports = {
   createFeaturedCategory,
   editFeaturedCategory,
   deleteFeaturedCategory,
+
+  reorderAllFeaturedCategories,
 };

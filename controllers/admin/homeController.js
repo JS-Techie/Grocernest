@@ -45,6 +45,41 @@ const getAllFeaturedBrands = async (req, res, next) => {
   }
 };
 
+const reorderAllFeaturedBrands = async (req, res, next) => {
+  let reOrderedData = req.body.reOrderedData;
+
+  if (reOrderedData.length == 0) {
+    return res.status(400).send({
+      success: false,
+      data: "",
+      message: "No data available to sort Brands.",
+    });
+  }
+
+  try {
+    reOrderedData.map(async (current_brand_card, index) => {
+      await FeaturedBrand.update(
+        {
+          serial_no: index,
+        },
+        { where: { id: current_brand_card.id } }
+      );
+    });
+
+    return res.status(200).send({
+      success: true,
+      data: "",
+      message: "Featured Brands are sorted successfully",
+    });
+  } catch (err) {
+    return res.status(400).send({
+      success: false,
+      data: err.message,
+      message: "Something went wrong while sorting Brands",
+    });
+  }
+};
+
 const getFeaturedBrandById = async (req, res, next) => {
   const { id } = req.params;
   try {
@@ -319,4 +354,6 @@ module.exports = {
   deleteFeaturedBrand,
   getDemandList,
   sendNotification,
+
+  reorderAllFeaturedBrands,
 };
