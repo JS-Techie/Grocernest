@@ -56,7 +56,7 @@ const sendCouponToCustomer = async (
 
     let exp_date = new Date(expiryDate.toString());
     const options = { day: "numeric", month: "short", year: "numeric" };
-    exp_date = exp_date.toLocaleDateString("en-US", options);
+    let format_exp_date = exp_date.toLocaleDateString("en-US", options);
 
     const messageResponseFromGupshup = await client.message.send({
       channel: "whatsapp",
@@ -67,7 +67,7 @@ const sendCouponToCustomer = async (
         isHSM: "true",
         type: "text",
         // text: `Hi, ${firstName}. Apply coupon *${couponCode}* to receive *${off}* off on your next order. `,
-        text: `Congratulations! You've got a new coupon. Coupon code is " *${couponCode}* ". You will recieve *${off}* off on your next purchase from the store. Expires on *${exp_date}*. Redeem your coupon before it expires.`,
+        text: `Congratulations! You've got a new coupon. Coupon code is " *${couponCode}* ". You will recieve *${off}* off on your next purchase from the store. Expires on *${format_exp_date}*. Redeem your coupon before it expires.`,
       },
     });
 
