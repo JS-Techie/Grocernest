@@ -14,7 +14,7 @@ const {
 } = require("../../controllers/admin/homeController");
 
 router.route("/view/all/featured").get(authenticateAdmin, getAllFeaturedBrands);
-router.route("/reorder/all/featured").get(reorderAllFeaturedBrands);
+router.route("/reorder/all/featured").post(reorderAllFeaturedBrands);
 
 router.route("/view/featured/:id").get(authenticateAdmin, getFeaturedBrandById);
 router.route("/create/featured").post(authenticateAdmin, createFeaturedBrand);
