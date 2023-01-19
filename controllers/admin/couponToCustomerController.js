@@ -234,7 +234,7 @@ const mapCouponToCustomer = async (req, res, next) => {
       "",
       couponExist.amount_of_discount.toString(),
       currentCustomer.contact_no.toString(),
-      expiry_date
+      expiry_timestamp
     );
     return res.status(200).send({
       success: true,
