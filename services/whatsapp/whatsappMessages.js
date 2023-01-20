@@ -44,7 +44,8 @@ const sendCouponToCustomer = async (
   isPercentage,
   amountOfDiscount,
   phoneNumber,
-  expiryDate
+  expiryDate,
+  min_purchase
 ) => {
   try {
     const off =
@@ -67,7 +68,7 @@ const sendCouponToCustomer = async (
         isHSM: "true",
         type: "text",
         // text: `Hi, ${firstName}. Apply coupon *${couponCode}* to receive *${off}* off on your next order. `,
-        text: `Congratulations! You've got a new coupon. Coupon code is " *${couponCode}* ". You will recieve *${off}* off on your next purchase from the store. Expires on *${format_exp_date}*. Redeem your coupon before it expires.`,
+        text: `Congratulations! You've got a new coupon. Coupon code is " *${couponCode}* ". You will recieve *${off}* off on your next purchase from the store (on minimum purchase of ${min_purchase}). Expires on *${format_exp_date}*. Redeem your coupon before it expires.`,
       },
     });
 
