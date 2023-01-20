@@ -190,6 +190,25 @@ const sendDeliveryPinToUser = async (custName, pin, orderId, phoneNumber) => {
   }
 };
 
+const sendCronReport = async (msg) => {
+  try {
+    const messageResponseFromGupshup = await client.message.send({
+      channel: "whatsapp",
+      source: "919433804769",
+      destination: "918910443583",
+      "src.name": "grocernest",
+      message: {
+        isHSM: "true",
+        type: "text",
+        text: `cron job successfull for ${msg}`,
+      },
+    });
+    console.log("Success Response", messageResponseFromGupshup);
+  } catch (error) {
+    console.error("Error Response", error);
+  }
+};
+
 module.exports = {
   sendCouponToUser,
   sendOfferToUser,
@@ -198,4 +217,5 @@ module.exports = {
   sendNotificationsToUser,
   sendDeliveryPinToUser,
   sendCouponToCustomer,
+  sendCronReport,
 };

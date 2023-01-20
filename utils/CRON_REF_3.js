@@ -1,7 +1,7 @@
 const { Op } = require("sequelize");
 const cron = require("node-cron");
 const uniqid = require("uniqid");
-
+const { sequelize } = require("../models");
 const db = require("../models");
 
 const Customers = db.CustomerModel;
@@ -12,6 +12,8 @@ const inventory = db.InventoryModel;
 const Wallet = db.WalletModel;
 const Wallet_Transaction = db.WalletTransactionModel;
 const WalletService = require("../services/walletService");
+
+const { sendCronReport } = require("../services/whatsapp/whatsappMessages");
 
 const pos_refferal_job = async () => {
   // schedule time is a utc time (11.55pm ist = 6:25pm utc/18:25)
@@ -30,18 +32,27 @@ const pos_cashback_job = async () => {
   try {
     let walletService = new WalletService();
 
-    // search invoices for today's date
-    const invoices = await Invoice.findAll({
-      where: {
-        return_flag: "N",
-        payment_conf_ind: "Y",
-      },
-    });
+    const [invoices, metadata] = await sequelize.query(
+      `select * from t_invoice ti where 
+      ti.return_flag ="N" and 
+      payment_conf_ind = "Y" and 
+      cashback_processed is null and
+      cashback_amount is not null and
+      cashback_amount > 0;`
+    );
 
-    // created_at: {
-    //   // [Op.startsWith]: "2022-10-26",
-    //   [Op.startsWith]: new Date().toISOString().slice(0, 10),
-    // },
+    // search invoices for today's date
+    // const invoices = await Invoice.findAll({
+    //   where: {
+    //     return_flag: "N",
+    //     payment_conf_ind: "Y",
+    //     cashback_processed: null,
+    //     created_at: {
+    //       // [Op.startsWith]: "2022-10-26",
+    //       [Op.startsWith]: new Date().toISOString().slice(0, 10),
+    //     },
+    //   },
+    // });
 
     // console.log("INVOICE====", invoices.length)
 
@@ -119,10 +130,11 @@ const pos_cashback_job = async () => {
         });
       }
     });
-
+    sendCronReport("SUCCESS");
     // console.log("C==>>", c);
   } catch (err) {
     console.log("CASHBACK POS CRON JOB ERROR=> ", err);
+    sendCronReport("FAILED");
   }
 };
 
