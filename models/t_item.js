@@ -167,7 +167,7 @@ module.exports = sequelize => {
       field: "image"
     },
     description: {
-      type: DataTypes.STRING(10000),
+      type: DataTypes.STRING(37600),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,

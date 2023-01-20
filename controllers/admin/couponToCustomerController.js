@@ -7,11 +7,18 @@ const Customer = db.CustomerModel;
 const CustomerToCouponMapping = db.CustomerToCouponMappingModel;
 
 const {
-  sendCouponToUser,
+  sendCouponToCustomer,
 } = require("../../services/whatsapp/whatsappMessages");
 
 const createCouponToCustomer = async (req, res, next) => {
-  const { coupon_name, coupon_desc, amount_of_discount, duration, minPurchase, redeem_product_type } = req.body;
+  const {
+    coupon_name,
+    coupon_desc,
+    amount_of_discount,
+    duration,
+    minPurchase,
+    redeem_product_type,
+  } = req.body;
 
   const { user_id } = req;
 
@@ -23,7 +30,7 @@ const createCouponToCustomer = async (req, res, next) => {
       duration == "" ||
       duration <= 0 ||
       minPurchase < 0 ||
-      redeem_product_type ===""
+      redeem_product_type === ""
     ) {
       return res.status(400).send({
         success: false,
@@ -66,7 +73,7 @@ const createCouponToCustomer = async (req, res, next) => {
       duration,
       created_by: user_id,
       min_purchase: minPurchase,
-      redeem_product_type: redeem_product_type
+      redeem_product_type: redeem_product_type,
     });
 
     return res.status(201).send({
@@ -221,12 +228,14 @@ const mapCouponToCustomer = async (req, res, next) => {
     });
 
     // coupon mapped, now send notification to whatsapp
-    sendCouponToUser(
+    sendCouponToCustomer(
       currentCustomer.cust_name.split(" ")[0],
       coupon_name,
       "",
       couponExist.amount_of_discount.toString(),
-      currentCustomer.contact_no.toString()
+      currentCustomer.contact_no.toString(),
+      expiry_timestamp,
+      couponExist.min_purchase
     );
     return res.status(200).send({
       success: true,
@@ -381,5 +390,5 @@ module.exports = {
   mapCouponToCustomer,
   displayMappedCouponToCustomer,
   applicableCouponForACustomer,
-  applyCoupon
+  applyCoupon,
 };
