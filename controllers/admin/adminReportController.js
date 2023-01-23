@@ -50,6 +50,11 @@ const fetchCustomerReport = async (req, res) => {
     });
   } else {
     //if customer number is not available
+    return res.status(400).send({
+      success: true,
+      data: "",
+      message: "customer number is not available.",
+    });
   }
 };
 
