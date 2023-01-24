@@ -71,6 +71,7 @@ const getAllAvailableCoupons = async (req, res, next) => {
           yesterday.setDate(yesterday.getDate() - 1);
           if (new Date(current.expiry_date) >= yesterday) {
             return {
+              couponId: current.id,
               couponCode: current.code,
               amount: current.is_percentage
                 ? current.amount_of_discount + " %"
@@ -80,6 +81,7 @@ const getAllAvailableCoupons = async (req, res, next) => {
           }
         } else {
           return {
+            couponId: current.id,
             couponCode: current.code,
             amount: current.is_percentage
               ? current.amount_of_discount + " %"
@@ -130,6 +132,7 @@ const getAllAvailableCoupons = async (req, res, next) => {
 
           if (new Date(current.expiry_date) >= yesterday) {
             return {
+              couponId: current.id,
               couponCode: current.code,
               amount: current.is_percentage
                 ? current.amount_of_discount + " %"
@@ -142,6 +145,7 @@ const getAllAvailableCoupons = async (req, res, next) => {
           // console.log(Date.now());
           // console.log(new Date());
           return {
+            couponId: current.id,
             couponCode: current.code,
             amount: current.is_percentage
               ? current.amount_of_discount + " %"
