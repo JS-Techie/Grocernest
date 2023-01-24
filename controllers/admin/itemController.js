@@ -2,8 +2,10 @@ const db = require("../../models");
 const S3 = require("aws-sdk/clients/s3");
 const s3Config = require("../../config/s3Config");
 const uniq = require("uniqid");
-
+const { sequelize } = require("../../models");
+const {getItemTaxArray} = require("../../services/itemsResponse");
 const Item = db.ItemModel;
+const Batch = db.BatchModel;
 const s3 = new S3(s3Config);
 
 const uploadMultipleImages = async (req, res, next) => {
@@ -335,11 +337,70 @@ const referenceItem = async (req, res, next) => {
   }
 };
 
+const getLastThreeItemBatches = async(req,res,next) => {
+const {item_id} = req.params;
+try {
+  if(!item_id){
+    return res.status(400).send({
+      status: 400,
+      message:"Item id not found",
+      data: []
+    })
+  }
+  const availableBatch = await Batch.findAll({
+    where: {item_id},
+    order: [["created_at", "DESC"]],
+    limit: 3
+  })
+  if(availableBatch.length === 0){
+    return res.status(400).send({
+      status: 400,
+      message: "Requested item doesnot have any batches",
+      data: []
+    })
+  }
+  const taxResolved = await getItemTaxArray(item_id);
+  // console.log("=============================>",taxResolved)
+  // console.log("hellooo",availableBatch)
+//  const promises = availableBatch.map((current) =>{
+//    return ({
+//      costPrice: current.cost_price,
+//      mrp: current.MRP,
+//      salePrice: current.sale_price,
+//      discount: current.discount
+//    })
+//  })
+//  const resolved = await Promise.all(promises)
+
+  
+// const [lastThreeBatches, metadata] = await sequelize.query(`select t_batch.MRP ,t_batch.cost_price ,t_batch.sale_price ,t_batch.item_id  from t_batch
+// order by created_at DESC
+// limit 3
+// where t_batch.item_id= ${item_id}
+// `)
+// console.log("testtttttttttttttttt",lastThreeBatches)
+return res.status(200).send({
+  status: 200,
+  message: "Successssfully fetched last three batches of the requested item id",
+  data: {
+    availableBatch,
+    taxResolved
+  }
+})
+} catch (error) {
+  return res.status(500).send({
+    status: 500,
+    message: "Something went wrong , please try agian later",
+    data: error.message
+  })
+}
+}
 module.exports = {
   uploadMultipleImages,
   editUploadedImages,
   deleteImage,
   referenceItem,
+  getLastThreeItemBatches
 };
 
 // const currentItemDetails = await Item.findOne({ where: { id: current } });
