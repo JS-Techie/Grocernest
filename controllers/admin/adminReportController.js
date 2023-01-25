@@ -21,7 +21,7 @@ const fetchCustomerReport = async (req, res) => {
 
       let date_field_query_add_on = "";
       if (data.start_date && data.end_date) {
-        date_field_query_add_on = ` and created_at BETWEEN "${data.start_date}" and "${data.end_date}"`;
+        date_field_query_add_on = ` and created_at >= "${data.start_date}" and created_at <= "${data.end_date}"`;
       }
 
       const getCustomerPurchaseData = async () => {
@@ -52,12 +52,12 @@ const fetchCustomerReport = async (req, res) => {
     } else {
       let date_field_query_add_on = "";
       if (data.start_date && data.end_date) {
-        date_field_query_add_on = ` and created_at BETWEEN "${data.start_date}" and "${data.end_date}"`;
+        date_field_query_add_on = ` and created_at >= "${data.start_date}" and created_at <= "${data.end_date}"`;
       }
 
       let date_field_query_add_on_2 = "";
       if (data.start_date && data.end_date) {
-        date_field_query_add_on_2 = ` and t_invoice.created_at BETWEEN "${data.start_date}" and "${data.end_date}"`;
+        date_field_query_add_on_2 = ` and t_invoice.created_at >= "${data.start_date}" and t_invoice.created_at <= "${data.end_date}"`;
       }
 
       const [customer_purchase_count_report, metadata] = await sequelize.query(
