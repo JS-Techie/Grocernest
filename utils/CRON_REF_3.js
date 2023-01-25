@@ -21,7 +21,8 @@ const pos_refferal_job = async () => {
     console.log("Running scheduled CRON-JOB.....");
 
     // cashback task
-    await pos_cashback_job();
+    // await pos_cashback_job();
+    await pos_cashback_job_new();
   });
 };
 
@@ -138,8 +139,75 @@ const pos_cashback_job = async () => {
   }
 };
 
+const pos_cashback_job_new = async () => {
+  console.log("POS CASHBACK CRONJOB STARTED..");
+  let c = 0;
+
+  try {
+    let walletService = new WalletService();
+
+    const [invoices, metadata] = await sequelize.query(
+      `select * from t_invoice ti where 
+      ti.return_flag ="N" and 
+      payment_conf_ind = "Y" and 
+      cashback_processed is null and
+      cashback_amount is not null and
+      cashback_amount > 0;`
+    );
+
+    // map the invoices
+    await invoices.map(async (current_invoice) => {
+      if (current_invoice.cashback_processed != "1") {
+        // items per invoice
+
+        if (current_invoice.cashback_amount) {
+          let cashback_amt = 0;
+
+          cashback_amt = current_invoice.cashback_amount;
+
+          // insert into wallet
+          // fetch customer
+
+          let cust = await Customers.findOne({
+            where: {
+              id: current_invoice.cust_id,
+            },
+          });
+          // console.log("current_invoice---", cust);
+          if (cust.password)
+            await walletService.creditAmount(
+              cashback_amt,
+              cust.cust_no,
+              "Cashback added for Store Purchase INV/PREFIX/" +
+                current_invoice.id
+            );
+
+          await Invoice.update(
+            {
+              cashback_processed: "1",
+              cashback_amount: parseFloat(cashback_amt),
+            },
+            {
+              where: {
+                id: current_invoice.id,
+              },
+            }
+          );
+        }
+      }
+    });
+    sendCronReport("SUCCESS");
+    // console.log("C==>>", c);
+  } catch (err) {
+    console.log("CASHBACK POS CRON JOB ERROR=> ", err);
+    sendCronReport("FAILED");
+  }
+};
+
 // cashback_job();
 // job();
+
 module.exports = pos_refferal_job;
 
 // pos_cashback_job();
+// pos_cashback_job_new();

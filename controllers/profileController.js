@@ -42,6 +42,7 @@ const getProfile = async (req, res, next) => {
         emailID: currentUserProfile.email ? currentUserProfile.email : "",
         contactNumber: currentUserProfile.contact_no,
         callingNumber: currentUserProfile.calling_number ? currentUserProfile.calling_number : "",
+        registeredDate: currentUserProfile.created_at,
         profileImage: currentUserProfile.image
           ? currentUserProfile.image
           : generator.generateRandomAvatar(),
