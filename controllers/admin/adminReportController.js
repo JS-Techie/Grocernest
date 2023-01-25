@@ -57,15 +57,15 @@ const fetchCustomerReport = async (req, res) => {
 
       let date_field_query_add_on_2 = "";
       if (data.start_date && data.end_date) {
-        date_field_query_add_on_2 = ` and t_order.created_at BETWEEN "${data.start_date}" and "${data.end_date}"`;
+        date_field_query_add_on_2 = ` and t_invoice.created_at BETWEEN "${data.start_date}" and "${data.end_date}"`;
       }
 
       const [customer_purchase_count_report, metadata] = await sequelize.query(
-        `select t_customer.cust_no,t_customer.id, count(t_order.order_id) as customer_purchase_count from t_customer
-      inner join t_order on t_order.cust_no = t_customer.cust_no ` +
+        `      select t_customer.cust_no,t_customer.id, count(t_invoice.id) as customer_purchase_count from t_customer
+        inner join t_invoice on t_invoice.cust_id = t_customer.id ` +
           date_field_query_add_on_2 +
           ` group by t_customer.cust_no 
-      order by customer_purchase_count desc`
+          order by customer_purchase_count desc`
       );
 
       let customer_purchase_report = [];
@@ -77,15 +77,15 @@ const fetchCustomerReport = async (req, res) => {
         `
         );
 
-        const [purchase_history, metadata2] = await sequelize.query(
-          `select cust_id, invoice_no, teller_name, invoice_type, total_amount from t_invoice where cust_id = "${customer_purchase_count_report[i].id}"
+        const [cust_purchase_history, metadata2] = await sequelize.query(
+          `select id, cust_id, invoice_no, teller_name, invoice_type, total_amount from t_invoice where cust_id = "${customer_purchase_count_report[i].id}"
           ` + date_field_query_add_on
         );
         customer_obj = {
           customer_info: customer_info[0],
           customer_purchase_count:
             customer_purchase_count_report[i].customer_purchase_count,
-          customer_purchase_report: purchase_history,
+          customer_purchase_report: cust_purchase_history,
         };
         customer_purchase_report.push(customer_obj);
       }
