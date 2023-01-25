@@ -1,8 +1,6 @@
-const {
-  DataTypes
-} = require('sequelize');
+const { DataTypes } = require("sequelize");
 
-module.exports = sequelize => {
+module.exports = (sequelize) => {
   const attributes = {
     id: {
       type: DataTypes.BIGINT,
@@ -11,7 +9,7 @@ module.exports = sequelize => {
       primaryKey: true,
       autoIncrement: true,
       comment: null,
-      field: "id"
+      field: "id",
     },
     type: {
       type: DataTypes.STRING(100),
@@ -20,7 +18,7 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "type"
+      field: "type",
     },
     item_id_1: {
       type: DataTypes.BIGINT,
@@ -29,7 +27,7 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "item_id_1"
+      field: "item_id_1",
     },
     item_id_2: {
       type: DataTypes.BIGINT,
@@ -38,7 +36,7 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "item_id_2"
+      field: "item_id_2",
     },
     item_id: {
       type: DataTypes.BIGINT,
@@ -47,7 +45,7 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "item_id"
+      field: "item_id",
     },
     amount_of_discount: {
       type: DataTypes.BIGINT,
@@ -56,7 +54,7 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "amount_of_discount"
+      field: "amount_of_discount",
     },
     is_percentage: {
       type: DataTypes.INTEGER(1),
@@ -65,7 +63,7 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "is_percentage"
+      field: "is_percentage",
     },
     created_by: {
       type: DataTypes.BIGINT,
@@ -74,7 +72,7 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "created_by"
+      field: "created_by",
     },
     updated_by: {
       type: DataTypes.BIGINT,
@@ -83,16 +81,16 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "updated_by"
+      field: "updated_by",
     },
     created_at: {
       type: DataTypes.DATE,
       allowNull: true,
-      defaultValue: sequelize.fn('current_timestamp'),
+      defaultValue: sequelize.fn("current_timestamp"),
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "created_at"
+      field: "created_at",
     },
     updated_at: {
       type: DataTypes.DATE,
@@ -101,7 +99,7 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "updated_at"
+      field: "updated_at",
     },
     item_1_quantity: {
       type: DataTypes.BIGINT,
@@ -110,7 +108,7 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "item_1_quantity"
+      field: "item_1_quantity",
     },
     item_2_quantity: {
       type: DataTypes.BIGINT,
@@ -119,7 +117,7 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "item_2_quantity"
+      field: "item_2_quantity",
     },
     is_active: {
       type: DataTypes.INTEGER(1),
@@ -128,7 +126,7 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "is_active"
+      field: "is_active",
     },
     start_date: {
       type: DataTypes.DATE,
@@ -137,7 +135,7 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "start_date"
+      field: "start_date",
     },
     start_time: {
       type: DataTypes.BIGINT,
@@ -146,7 +144,7 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "start_time"
+      field: "start_time",
     },
     end_date: {
       type: DataTypes.DATE,
@@ -155,7 +153,7 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "end_date"
+      field: "end_date",
     },
     end_time: {
       type: DataTypes.BIGINT,
@@ -164,7 +162,7 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "end_time"
+      field: "end_time",
     },
     is_ecomm: {
       type: DataTypes.BIGINT,
@@ -173,7 +171,7 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "is_ecomm"
+      field: "is_ecomm",
     },
     is_pos: {
       type: DataTypes.BIGINT,
@@ -182,7 +180,7 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "is_pos"
+      field: "is_pos",
     },
     is_time: {
       type: DataTypes.BIGINT,
@@ -191,13 +189,13 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "is_time"
-    }
+      field: "is_time",
+    },
   };
   const options = {
     tableName: "t_offers",
     comment: "",
-    indexes: []
+    indexes: [],
   };
   const TOffersModel = sequelize.define("t_offers_model", attributes, options);
   return TOffersModel;
