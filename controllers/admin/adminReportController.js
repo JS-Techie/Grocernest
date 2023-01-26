@@ -29,7 +29,7 @@ const fetchCustomerReport = async (req, res) => {
           customer.map(async (current_customer) => {
             const [purchase_history, metadata2] = await sequelize.query(
               `
-              select * from t_invoice where cust_id = "${data.cust_id}"
+              select * from t_invoice where cust_id = "${data.cust_id}" and t_invoice.payment_conf_ind = "Y"
               ` + date_field_query_add_on
             );
             let cust_obj = {
