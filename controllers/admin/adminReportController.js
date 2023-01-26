@@ -29,7 +29,7 @@ const fetchCustomerReport = async (req, res) => {
           customer.map(async (current_customer) => {
             const [purchase_history, metadata2] = await sequelize.query(
               `
-              select * from t_invoice where cust_id = "${data.cust_id}"
+              select * from t_invoice where cust_id = "${data.cust_id}" and t_invoice.payment_conf_ind = "Y"
               ` + date_field_query_add_on
             );
             let cust_obj = {
@@ -64,7 +64,7 @@ const fetchCustomerReport = async (req, res) => {
         `      select t_customer.cust_no,t_customer.id, count(t_invoice.id) as customer_purchase_count from t_customer
         inner join t_invoice on t_invoice.cust_id = t_customer.id ` +
           date_field_query_add_on_2 +
-          ` group by t_customer.cust_no 
+          ` and t_invoice.payment_conf_ind = "Y" group by t_customer.cust_no 
           order by customer_purchase_count desc`
       );
 
