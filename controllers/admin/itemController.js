@@ -392,6 +392,7 @@ const getLastThreeItemBatches = async (req, res, next) => {
         salePrice: currentBatch.sale_price,
         mfgDate: currentBatch.mfg_date,
         expiryDate: currentBatch.expiry_date,
+        createdAt: currentBatch.created_at,
         taxDetails,
       };
     });
