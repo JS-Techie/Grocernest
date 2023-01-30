@@ -15,6 +15,7 @@ const Offers = db.OffersModel;
 const Inventory = db.InventoryModel;
 const Customer = db.CustomerModel;
 const ReturnOrder = db.ReturnOrdersModel;
+const Cart = db.CartModel;
 
 const { sendOrderStatusToWhatsapp } = require("../services/whatsapp/whatsapp");
 const { getGifts } = require("../services/giftService");
@@ -688,6 +689,68 @@ const getAllReturns = async (req, res, next) => {
   }
 };
 
+const repeatOrder = async (req, res, next) => {
+  const { cust_no } = req;
+  const { order_id } = req.body;
+  try {
+    const currentOrder = await Order.findOne({
+      where: { order_id, cust_no },
+    });
+
+    if (!currentOrder) {
+      return res.status(404).send({
+        success: false,
+        data: [],
+        message: "Requested order was not found for current customer",
+      });
+    }
+
+    const orderItems = await OrderItems.findAll({
+      where: { order_id },
+    });
+
+    if (orderItems.length === 0) {
+      return res.status(404).send({
+        success: false,
+        data: [],
+        message: "There are no items in the requested order",
+      });
+    }
+
+    //Aritrika add offer logic
+    const cartArray = orderItems.map(async (currentItem) => {
+      const itemDetails = await Item.findOne({
+        where: { id: currentItem.item_id },
+      });
+      //In the following array make sure the offer item is also added to the cart
+      return {
+        cust_no,
+        item_id: currentItem.item_id,
+        quantity: currentItem.quantity,
+        is_gift: itemDetails.is_gift,
+        //is_offer :
+        //offer_item_price :
+        created_by: currentItem.created_by,
+      };
+    });
+
+    const resolved = await Promise.all(cartArray);
+    const addItemsToCart = await Cart.bulkCreate(resolved);
+
+    return res.status(200).send({
+      success: true,
+      data: addItemsToCart,
+      message: "Successfully added all the items of repeat order to cart",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "Something went wrong, please try again in sometime",
+    });
+  }
+};
+
 module.exports = {
   getAllOrders,
   getOrderByOrderId,
@@ -695,4 +758,5 @@ module.exports = {
   returnOrder,
   trackOrder,
   getAllReturns,
+  repeatOrder,
 };

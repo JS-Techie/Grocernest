@@ -10,6 +10,7 @@ const {
   featuredCategories,
   createDemand,
   notify,
+  frequentlyBoughtItems
 } = require("../controllers/homepageController");
 
 router.route("/view/banners/big").get(allBigBanners);
@@ -19,5 +20,6 @@ router.route("/view/bestsellers").get(getBestSellers);
 router.route("/view/categories/featured").get(featuredCategories);
 router.route("/create/demand").post(authenticate,createDemand);
 router.route("/notify").post(authenticate,notify);
+router.route("/frequent").post(authenticate,frequentlyBoughtItems);
 
 module.exports = router;
