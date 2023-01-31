@@ -8,6 +8,7 @@ const MarketSurvey = db.MarketSurveyModel;
 const getMarketSurveyList = async (req, res, next) => {
   try {
     const marketSurveyList = await MarketSurvey.findAll();
+
     if (marketSurveyList.length === 0) {
       return res.status(200).send({
         success: true,
@@ -16,9 +17,27 @@ const getMarketSurveyList = async (req, res, next) => {
       });
     }
 
+    const promises = marketSurveyList.map(async (current) => {
+      const currentItem = await Item.findOne({
+        where: { id: current.item_id },
+      });
+      const marketSurveyDetails = await MarketSurvey.findAll({
+        where: { item_id: current.item_id },
+      });
+
+      return {
+        item_name: currentItem.name,
+        item_name: currentItem.id,
+        image: currentItem.image,
+        item_code: currentItem.item_cd,
+        marketSurveyDetails,
+      };
+    });
+
+    const response = await Promise.all(promises);
     return res.status(200).send({
       success: true,
-      data: marketSurveyList,
+      data: response,
       message: "Successfully found market survey list",
     });
   } catch (error) {
