@@ -8,7 +8,14 @@ const Item = db.ItemModel;
 
 const getMarketSurveyList = async (req, res, next) => {
   try {
-    const marketSurveyList = await MarketSurvey.findAll();
+    const [marketSurveyList, metadata] = await sequelize.query(
+      `select distinct item_id from t_market_survey`
+    );
+
+    // MarketSurvey.findAll({
+    //   attributes: ["item_id"],
+    //   distinct: true,
+    // });
 
     if (marketSurveyList.length === 0) {
       return res.status(200).send({
