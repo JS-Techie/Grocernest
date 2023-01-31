@@ -7,7 +7,7 @@ const MarketSurvey = db.MarketSurveyModel;
 
 const getMarketSurveyList = async (req, res, next) => {
   try {
-    const marketSurveyList = MarketSurvey.findAll({});
+    const marketSurveyList = MarketSurvey.findAll();
     if (marketSurveyList.length === 0) {
       return res.status(200).send({
         success: true,
