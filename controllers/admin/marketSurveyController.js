@@ -28,7 +28,7 @@ const getMarketSurveyList = async (req, res, next) => {
 
       return {
         item_name: currentItem.name,
-        item_name: currentItem.id,
+        item_id: currentItem.id,
         image: currentItem.image,
         item_code: currentItem.item_cd,
         marketSurveyDetails,
