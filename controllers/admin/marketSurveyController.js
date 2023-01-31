@@ -4,6 +4,7 @@ const db = require("../../models");
 const { sequelize } = require("../../models");
 
 const MarketSurvey = db.MarketSurveyModel;
+const Item = db.ItemModel;
 
 const getMarketSurveyList = async (req, res, next) => {
   try {
