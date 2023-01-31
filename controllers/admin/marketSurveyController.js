@@ -7,7 +7,7 @@ const MarketSurvey = db.MarketSurveyModel;
 
 const getMarketSurveyList = async (req, res, next) => {
   try {
-    const marketSurveyList = MarketSurvey.findAll();
+    const marketSurveyList = await MarketSurvey.findAll();
     if (marketSurveyList.length === 0) {
       return res.status(200).send({
         success: true,
@@ -33,7 +33,7 @@ const getMarketSurveyList = async (req, res, next) => {
 const getMarketSurveyListByItemId = async (req, res, next) => {
   const { item_id } = req.params;
   try {
-    const marketSurveyList = MarketSurvey.findAll({ where: { item_id } });
+    const marketSurveyList = await MarketSurvey.findAll({ where: { item_id } });
     if (marketSurveyList.length === 0) {
       return res.status(200).send({
         success: true,
