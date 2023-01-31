@@ -93,6 +93,14 @@ const getMarketSurveyListByCompany = async (req, res, next) => {
 const createNewMarketSurvey = async (req, res, next) => {
   const { source, item_id, sale_price, MRP, offer, discount } = req.body;
   try {
+    if (!item_id) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message:
+          "Please enter the item ID you would like to create a survey for",
+      });
+    }
     const marketSurveyExists = await MarketSurvey.findOne({
       where: { source, item_id, sale_price, MRP, offer, discount },
     });
@@ -134,6 +142,14 @@ const editMarketSurvey = async (req, res, next) => {
   const { id } = req.params;
   const { source, item_id, sale_price, MRP, offer, discount } = req.body;
   try {
+    if (!item_id) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message:
+          "Please enter the item ID you would like to create a survey for",
+      });
+    }
     const oldMarketSurvey = await MarketSurvey.findOne({
       where: { id },
     });
