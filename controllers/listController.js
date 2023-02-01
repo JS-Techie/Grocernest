@@ -201,9 +201,9 @@ const getAllOffers = async (req, res, next) => {
     }
 
     const promises = offers.map(async (currentOffer) => {
-      if (currentOffer.item_id) {
+      if (currentOffer.item_x) {
         const discountItem = await Item.findOne({
-          where: { id: currentOffer.item_id },
+          where: { id: currentOffer.item_x},
         });
 
         return {
@@ -219,18 +219,18 @@ const getAllOffers = async (req, res, next) => {
         };
       } else {
         const xItem = await Item.findOne({
-          where: { id: currentOffer.item_id_1 },
+          where: { id: currentOffer.item_x },
         });
         const yItem = await Item.findOne({
-          where: { id: currentOffer.item_id_2 },
+          where: { id: currentOffer.item_y},
         });
 
         return {
           type: "offer",
           xItem,
           yItem,
-          xItemQuantity: currentOffer.item_1_quantity,
-          yItemQuantity: currentOffer.item_2_quantity,
+          xItemQuantity: currentOffer.item_x_quantity,
+          yItemQuantity: currentOffer.item_y_quantity,
           isTime: currentOffer.is_time ? true : false,
           startTime: currentOffer.start_time,
           endTime: currentOffer.end_time,
