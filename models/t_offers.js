@@ -13,41 +13,41 @@ module.exports = sequelize => {
       comment: null,
       field: "id"
     },
-    type: {
-      type: DataTypes.STRING(100),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "type"
-    },
-    item_id_1: {
+    type_id: {
       type: DataTypes.BIGINT,
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "item_id_1"
+      field: "type_id"
     },
-    item_id_2: {
+    item_y: {
       type: DataTypes.BIGINT,
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "item_id_2"
+      field: "item_y"
     },
-    item_id: {
+    item_z: {
       type: DataTypes.BIGINT,
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "item_id"
+      field: "item_z"
+    },
+    item_x: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "item_x"
     },
     amount_of_discount: {
       type: DataTypes.BIGINT,
@@ -103,23 +103,23 @@ module.exports = sequelize => {
       comment: null,
       field: "updated_at"
     },
-    item_1_quantity: {
+    item_y_quantity: {
       type: DataTypes.BIGINT,
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "item_1_quantity"
+      field: "item_y_quantity"
     },
-    item_2_quantity: {
+    item_z_quantity: {
       type: DataTypes.BIGINT,
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "item_2_quantity"
+      field: "item_z_quantity"
     },
     is_active: {
       type: DataTypes.INTEGER(1),
@@ -140,7 +140,7 @@ module.exports = sequelize => {
       field: "start_date"
     },
     start_time: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.DATE,
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
@@ -158,7 +158,7 @@ module.exports = sequelize => {
       field: "end_date"
     },
     end_time: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.DATE,
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
@@ -192,6 +192,15 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "is_time"
+    },
+    item_x_quantity: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "item_x_quantity"
     }
   };
   const options = {
