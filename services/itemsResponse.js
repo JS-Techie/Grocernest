@@ -1,3 +1,9 @@
+const { sequelize } = require("../models");
+const db = require("../models");
+
+
+const ItemTaxInfo = db.ItemTaxInfoModel;
+
 const responseFormat = async (
     id,
     UOM,
@@ -45,7 +51,34 @@ const responseFormat = async (
   //   return nameAndQuantity;
   // };
 
+  const getItemTaxArray = async (item_id) => {
+    const itemTaxInfoList = await ItemTaxInfo.findAll({
+      where: { item_id: item_id },
+    });
+    let response = [];
+    if (itemTaxInfoList.length > 0) {
+      const promises = itemTaxInfoList.map((current) => {
+        return {
+          createdBy: current.created_by,
+          createdAt: current.created_at,
+          updatedBy: current.updated_by,
+          updatedAt: current.updated_at,
+          isActive: current.active_ind,
+          id: current.id,
+          itemId: current.item_cd,
+          taxType: current.tax_type,
+          taxName: current.tax_name,
+          taxPercentage: current.tax_percentage,
+        };
+      });
+    
+      response = await Promise.all(promises);
+    }
+    console.log(response);
+    return response;
+  };
   module.exports = {
     responseFormat,
+    getItemTaxArray
     // findNameAndQuantity,
   }

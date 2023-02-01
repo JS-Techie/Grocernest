@@ -2,8 +2,11 @@ const db = require("../../models");
 const S3 = require("aws-sdk/clients/s3");
 const s3Config = require("../../config/s3Config");
 const uniq = require("uniqid");
-
+const { sequelize } = require("../../models");
+const { getItemTaxArray } = require("../../services/itemsResponse");
 const Item = db.ItemModel;
+const Batch = db.BatchModel;
+const GrnDetails = db.GrnDetailsModel;
 const s3 = new S3(s3Config);
 
 const uploadMultipleImages = async (req, res, next) => {
@@ -335,11 +338,89 @@ const referenceItem = async (req, res, next) => {
   }
 };
 
+const getLastThreeItemBatches = async (req, res, next) => {
+  const { item_id } = req.params;
+  try {
+    if (!item_id) {
+      return res.status(400).send({
+        status: 400,
+        message: "Item id not found",
+        data: [],
+      });
+    }
+    const availableBatches = await Batch.findAll({
+      where: { item_id, location_id: 4 },
+      order: [["created_at", "DESC"]],
+      limit: 3,
+    });
+    if (availableBatches.length === 0) {
+      return res.status(400).send({
+        status: 400,
+        message: "Requested item doesnot have any batches",
+        data: [],
+      });
+    }
+
+    const responsePromises = availableBatches.map(async (currentBatch) => {
+      const taxDetailsDB = await GrnDetails.findAll({
+        where: { item_id, BATCH_NO: currentBatch.batch_no },
+      });
+
+      let taxDetailsPromises = [];
+      if (taxDetailsDB.length > 0) {
+        taxDetailsPromises = taxDetailsDB.map((currentDetails) => {
+          return {
+            cgst: currentDetails.cgst,
+            sgst: currentDetails.sgst,
+            igst: currentDetails.igst,
+            otherTax: currentDetails.other_tax,
+            supplierDiscount: currentDetails.supplier_disc,
+            basePrice: currentDetails.base_price,
+            shelfNo: currentDetails.shelf_no,
+          };
+        });
+      }
+
+      const taxDetails = await Promise.all(taxDetailsPromises);
+
+      return {
+        batchId: currentBatch.id,
+        batchNo: currentBatch.batch_no,
+        MRP: currentBatch.MRP,
+        discount: currentBatch.discount,
+        costPrice: currentBatch.cost_price,
+        salePrice: currentBatch.sale_price,
+        mfgDate: currentBatch.mfg_date,
+        expiryDate: currentBatch.expiry_date,
+        createdAt: currentBatch.created_at,
+        taxDetails,
+      };
+    });
+
+    const response = await Promise.all(responsePromises);
+
+    return res.status(200).send({
+      success: true,
+      message:
+        "Successssfully fetched last three batches of the requested item id",
+      data: {
+        availableBatches: response,
+      },
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      message: "Something went wrong , please try agian later",
+      data: error.message,
+    });
+  }
+};
 module.exports = {
   uploadMultipleImages,
   editUploadedImages,
   deleteImage,
   referenceItem,
+  getLastThreeItemBatches,
 };
 
 // const currentItemDetails = await Item.findOne({ where: { id: current } });

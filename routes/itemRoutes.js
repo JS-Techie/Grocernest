@@ -21,4 +21,5 @@ router.route("/available/quantity").post(getAvailableQty);
 router.route("/brands/:brandId").get(getAllItemsInABrand)
 
 
+
 module.exports = router;

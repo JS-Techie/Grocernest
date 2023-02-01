@@ -44,7 +44,8 @@ const sendCouponToCustomer = async (
   isPercentage,
   amountOfDiscount,
   phoneNumber,
-  expiryDate
+  expiryDate,
+  min_purchase
 ) => {
   try {
     const off =
@@ -67,7 +68,7 @@ const sendCouponToCustomer = async (
         isHSM: "true",
         type: "text",
         // text: `Hi, ${firstName}. Apply coupon *${couponCode}* to receive *${off}* off on your next order. `,
-        text: `Congratulations! You've got a new coupon. Coupon code is " *${couponCode}* ". You will recieve *${off}* off on your next purchase from the store. Expires on *${format_exp_date}*. Redeem your coupon before it expires.`,
+        text: `Congratulations! You've got a new coupon. Coupon code is " *${couponCode}* ". You will recieve *${off}* off on your next purchase from the store (on minimum purchase of *₹${min_purchase}* ). Expires on *${format_exp_date}*. Redeem your coupon before it expires.`,
       },
     });
 
@@ -190,6 +191,25 @@ const sendDeliveryPinToUser = async (custName, pin, orderId, phoneNumber) => {
   }
 };
 
+const sendCronReport = async (msg) => {
+  try {
+    const messageResponseFromGupshup = await client.message.send({
+      channel: "whatsapp",
+      source: "919433804769",
+      destination: "918910443583",
+      "src.name": "grocernest",
+      message: {
+        isHSM: "true",
+        type: "text",
+        text: `cron job successfull for ${msg}`,
+      },
+    });
+    console.log("Success Response", messageResponseFromGupshup);
+  } catch (error) {
+    console.error("Error Response", error);
+  }
+};
+
 module.exports = {
   sendCouponToUser,
   sendOfferToUser,
@@ -198,4 +218,5 @@ module.exports = {
   sendNotificationsToUser,
   sendDeliveryPinToUser,
   sendCouponToCustomer,
+  sendCronReport,
 };
