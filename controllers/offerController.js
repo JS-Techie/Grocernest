@@ -26,7 +26,8 @@ const offerForItem = async (req, res, next) => {
     const offer = await Offers.findOne({
       where: {
         is_active: 1,
-        [Op.or]: [{ item_id_1: itemID }, { item_id: itemID }],
+        item_x: itemID,
+        [Op.or]: [{ type_id: 1 }, { type_id: 2 }],
         is_ecomm: 1,
       },
     });
@@ -47,18 +48,18 @@ const offerForItem = async (req, res, next) => {
     let response = null;
     let newSalePrice = null;
 
-    if (offer.item_id_1) {
-      itemToBeAdded = offer.item_id_2;
-      if (quantity >= offer.item_1_quantity) {
+    if (offer.item_x) {
+      itemToBeAdded = offer.item_y;
+      if (quantity >= offer.item_x_quantity) {
         quantityToBeAdded =
-          Math.floor(quantity / offer.item_1_quantity) * offer.item_2_quantity;
+          Math.floor(quantity / offer.item_x_quantity) * offer.item_y_quantity;
         console.log("New quantity of item in cart ====>", quantity);
         console.log(
           "New quantity of offer item in cart ====>",
           quantityToBeAdded
         );
-        console.log("Xquantity ===>", offer.item_1_quantity);
-        console.log("Yquantity====>", offer.item_2_quantity);
+        console.log("Xquantity ===>", offer.item_x_quantity);
+        console.log("Yquantity====>", offer.item_y_quantity);
       } else {
         return res.status(200).send({
           success: true,
@@ -119,9 +120,9 @@ const offerForItem = async (req, res, next) => {
 
     if (isPercentage) {
       newSalePrice =
-        oldestBatch.sale_price - (discount / 100) * oldestBatch.sale_price;
+        oldestBatch.MRP - (discount / 100) * oldestBatch.MRP;
     } else {
-      newSalePrice = oldestBatch.sale_price - discount;
+      newSalePrice = oldestBatch.MRP - discount;
     }
 
     offerItemInCart = await Cart.findOne({
@@ -167,7 +168,7 @@ const offerForItemBuyNow = async (req, res, next) => {
   //Get current user from JWT
   const currentUser = req.cust_no;
 
-  //Get item id and quantity from request bidy
+  //Get item id and quantity from request body
   const { itemID, quantity } = req.body;
 
   if (!itemID || !quantity) {
@@ -182,7 +183,8 @@ const offerForItemBuyNow = async (req, res, next) => {
     const offer = await Offers.findOne({
       where: {
         is_active: 1,
-        [Op.or]: [{ item_id_1: itemID }, { item_id: itemID }],
+        item_x: itemID,
+        [Op.or]: [{ type_id: 1 }, { type_id: 2 }],
         is_ecomm: 1,
       },
     });
@@ -218,15 +220,15 @@ const offerForItemBuyNow = async (req, res, next) => {
     let newSalePrice = null;
     let offerItemID = null;
 
-    if (offer.item_id_1) {
-      offerItemID = offer.item_id_2;
+    if (offer.item_x) {
+      offerItemID = offer.item_y;
 
       const oldestBatch = await Batch.findOne({
         where: { item_id: itemID, mark_selected: 1 },
       });
 
       const Xitem = await Item.findOne({
-        where: { id: offer.item_id_1 },
+        where: { id: offer.item_x },
       });
 
       const Yitem = await Item.findOne({
@@ -234,9 +236,9 @@ const offerForItemBuyNow = async (req, res, next) => {
       });
 
       let quantityOfOfferItem = null;
-      if (quantity >= offer.item_1_quantity) {
+      if (quantity >= offer.item_x_quantity) {
         quantityOfOfferItem =
-          Math.floor(quantity / offer.item_1_quantity) * offer.item_2_quantity;
+          Math.floor(quantity / offer.item_x_quantity) * offer.item_y_quantity;
       }
 
       const saveOfferItemInCache = await OffersCache.create({
@@ -267,11 +269,11 @@ const offerForItemBuyNow = async (req, res, next) => {
     }
 
     const offerItemFromDB = await Item.findOne({
-      where: { id: offer.item_id },
+      where: { id: offer.item_x },
     });
 
     let oldestBatchForOfferItem = await Batch.findOne({
-      where: { item_id: offer.item_id, mark_selected: 1 },
+      where: { item_id: offer.item_x, mark_selected: 1 },
     });
 
     if (offer.is_percentage) {

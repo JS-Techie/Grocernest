@@ -56,11 +56,14 @@ const getBestSellers = async (req, res, next) => {
           where: { cust_no: currentUser, item_id: current.id },
         });
       }
-
+/**
+ * TODO: Check master table according type_id 1 &2
+ */
       const offer = await Offers.findOne({
         where: {
           is_active: 1,
-          [Op.or]: [{ item_id_1: current.id }, { item_id: current.id }],
+          item_x : current.id,
+          [Op.or]: [{ type_id: 1 }, { type_id: 2}],
           is_ecomm: 1,
         },
       });
@@ -68,10 +71,15 @@ const getBestSellers = async (req, res, next) => {
       let itemIDOfOfferItem;
       let offerItem;
       if (offer) {
-        if (offer.item_id) {
+       /* if (offer.item_id) {
           itemIDOfOfferItem = offer.item_id;
         } else {
           itemIDOfOfferItem = offer.item_id_2;
+        }*/
+        if(offer.type_id === 1){
+          itemIDOfOfferItem = offer.item_y;
+        }else if(offer.type_id === 2){
+          itemIDOfOfferItem = offer.item_x;
         }
         offerItem = await Item.findOne({
           where: { id: itemIDOfOfferItem },
@@ -96,13 +104,13 @@ const getBestSellers = async (req, res, next) => {
         offerType: offer ? offer.type : "",
         itemIDOfOfferItem,
         XQuantity: offer
-          ? offer.item_1_quantity
-            ? offer.item_1_quantity
+          ? offer.item_x_quantity
+            ? offer.item_x_quantity
             : ""
           : "",
         YQuantity: offer
-          ? offer.item_2_quantity
-            ? offer.item_2_quantity
+          ? offer.item_y_quantity
+            ? offer.item_y_quantity
             : ""
           : "",
         YItemName: offerItem ? offerItem.name : "",
