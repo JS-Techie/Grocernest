@@ -457,7 +457,7 @@ const getItemById = async (req, res, next) => {
         is_ecomm : 1
       },
     });
-
+   console.log(offer);
     let itemIDOfOfferItem;
     let offerItem;
     if (offer) {
