@@ -50,6 +50,7 @@ const getItemsInCategory = async (req, res, next) => {
     }
 
     const promises = await itemsInACategory.map(async (current) => {
+
       let itemInWishlist;
       if (currentUser) {
         itemInWishlist = await WishlistItems.findOne({
@@ -60,7 +61,11 @@ const getItemsInCategory = async (req, res, next) => {
       const offer = await Offers.findOne({
         where: {
           is_active: 1,
-          [Op.or]: [{ item_id_1: current.id }, { item_id: current.id }],
+          item_x: current.id, 
+          [Op.or]: [
+            {type_id: 1},
+            {type_id:2}
+          ],
           is_ecomm : 1
         },
       });
@@ -68,10 +73,10 @@ const getItemsInCategory = async (req, res, next) => {
       let itemIDOfOfferItem;
       let offerItem;
       if (offer) {
-        if (offer.item_id) {
-          itemIDOfOfferItem = offer.item_id;
-        } else {
-          itemIDOfOfferItem = offer.item_id_2;
+        if (offer.type_id === 2) {
+          itemIDOfOfferItem = offer.item_x;
+        } else if(offer.type_id === 1) {
+          itemIDOfOfferItem = offer.item_y;
         }
         offerItem = await Item.findOne({
           where: { id: itemIDOfOfferItem },
@@ -98,13 +103,13 @@ const getItemsInCategory = async (req, res, next) => {
         offerType: offer ? offer.type : "",
         itemIDOfOfferItem,
         XQuantity: offer
-          ? offer.item_1_quantity
-            ? offer.item_1_quantity
+          ? offer.item_x_quantity
+            ? offer.item_x_quantity
             : ""
           : "",
         YQuantity: offer
-          ? offer.item_2_quantity
-            ? offer.item_2_quantity
+          ? offer.item_y_quantity
+            ? offer.item_y_quantity
             : ""
           : "",
         YItemName: offerItem ? offerItem.name : "",
@@ -185,7 +190,8 @@ const getItemsInSubcategory = async (req, res, next) => {
       const offer = await Offers.findOne({
         where: {
           is_active: 1,
-          [Op.or]: [{ item_id_1: current.id }, { item_id: current.id }],
+          item_x: current.id ,
+          [Op.or]: [{ type_id: 1}, { type_id: 2 }],
           is_ecomm : 1
         },
       });
@@ -193,10 +199,10 @@ const getItemsInSubcategory = async (req, res, next) => {
       let itemIDOfOfferItem;
       let offerItem;
       if (offer) {
-        if (offer.item_id) {
-          itemIDOfOfferItem = offer.item_id;
-        } else {
-          itemIDOfOfferItem = offer.item_id_2;
+        if (offer.type_id ===2) {
+          itemIDOfOfferItem = offer.item_x;
+        } else if(offer.type_id ===1){
+          itemIDOfOfferItem = offer.item_y;
         }
         offerItem = await Item.findOne({
           where: { id: itemIDOfOfferItem },
@@ -224,13 +230,13 @@ const getItemsInSubcategory = async (req, res, next) => {
         offerType: offer ? offer.type : "",
         itemIDOfOfferItem,
         XQuantity: offer
-          ? offer.item_1_quantity
-            ? offer.item_1_quantity
+          ? offer.item_x_quantity
+            ? offer.item_x_quantity
             : ""
           : "",
         YQuantity: offer
-          ? offer.item_2_quantity
-            ? offer.item_2_quantity
+          ? offer.item_y_quantity
+            ? offer.item_y_quantity
             : ""
           : "",
         YItemName: offerItem ? offerItem.name : "",
@@ -309,7 +315,8 @@ const getItemsBySearchTerm = async (req, res, next) => {
       const offer = await Offers.findOne({
         where: {
           is_active: 1,
-          [Op.or]: [{ item_id_1: current.id }, { item_id: current.id }],
+          item_x: current.id,
+          [Op.or]: [{ type_id: 1 }, { type_id: 2}],
           is_ecomm : 1
         },
       });
@@ -317,10 +324,10 @@ const getItemsBySearchTerm = async (req, res, next) => {
       let itemIDOfOfferItem;
       let offerItem;
       if (offer) {
-        if (offer.item_id) {
-          itemIDOfOfferItem = offer.item_id;
-        } else {
-          itemIDOfOfferItem = offer.item_id_2;
+        if (offer.type_id ===2 ) {
+          itemIDOfOfferItem = offer.item_x;
+        } else if (offer.type_id ===1 ){
+          itemIDOfOfferItem = offer.item_y;
         }
         offerItem = await Item.findOne({
           where: { id: itemIDOfOfferItem },
@@ -348,13 +355,13 @@ const getItemsBySearchTerm = async (req, res, next) => {
         offerType: offer ? offer.type : "",
         itemIDOfOfferItem,
         XQuantity: offer
-          ? offer.item_1_quantity
-            ? offer.item_1_quantity
+          ? offer.item_x_quantity
+            ? offer.item_x_quantity
             : ""
           : "",
         YQuantity: offer
-          ? offer.item_2_quantity
-            ? offer.item_2_quantity
+          ? offer.item_y_quantity
+            ? offer.item_y_quantity
             : ""
           : "",
         YItemName: offerItem ? offerItem.name : "",
@@ -416,7 +423,7 @@ const getItemById = async (req, res, next) => {
             left outer join t_lkp_sub_category on t_lkp_sub_category.id = t_item.sub_category_id)
             inner join t_lkp_brand on t_lkp_brand.id = t_item.brand_id)
             inner join t_inventory on t_inventory.item_id = t_item.id)
-             where t_item.id = ${currentItemId} and t_inventory.location_id = 4 and t_lkp_category.available_for_ecomm = 1 and t_item.available_for_ecomm = 1 and t_batch.mark_selected = 1`);
+             where t_item.id = ${currentItemId} and t_inventory.location_id = 4 and t_lkp_category.available_for_ecomm = 1 and t_item.available_for_ecomm = 1 and t_batch.mark_selected = 1 and t_inventory.balance_type =`);
 
     if (itemResults.length == 0) {
       return res.status(404).send({
@@ -434,7 +441,7 @@ const getItemById = async (req, res, next) => {
         location_id: 4,
       },
     });
-
+  
     let itemInWishlist;
     if (currentUser) {
       itemInWishlist = await WishlistItems.findOne({
@@ -445,7 +452,8 @@ const getItemById = async (req, res, next) => {
     const offer = await Offers.findOne({
       where: {
         is_active: 1,
-        [Op.or]: [{ item_id_1: item.id }, { item_id: item.id }],
+        item_x: item.id,
+        [Op.or]: [{ type_id: 1 }, { type_id: 2 }],
         is_ecomm : 1
       },
     });
@@ -453,10 +461,10 @@ const getItemById = async (req, res, next) => {
     let itemIDOfOfferItem;
     let offerItem;
     if (offer) {
-      if (offer.item_id) {
-        itemIDOfOfferItem = offer.item_id;
-      } else {
-        itemIDOfOfferItem = offer.item_id_2;
+      if (offer.type_id==2) {
+        itemIDOfOfferItem = offer.item_x;
+      } else if (offer.type_id==1) {
+        itemIDOfOfferItem = offer.item_y;
       }
       offerItem = await Item.findOne({
         where: { id: itemIDOfOfferItem },
@@ -653,7 +661,8 @@ const getAllItemsInABrand = async (req, res, next) => {
       const offer = await Offers.findOne({
         where: {
           is_active: 1,
-          [Op.or]: [{ item_id_1: current.id }, { item_id: current.id }],
+          item_x: current.id,
+          [Op.or]: [{ type_id: 1 }, { type_id: 2}],
           is_ecomm : 1
         },
       });
@@ -661,10 +670,10 @@ const getAllItemsInABrand = async (req, res, next) => {
       let itemIDOfOfferItem;
       let offerItem;
       if (offer) {
-        if (offer.item_id) {
-          itemIDOfOfferItem = offer.item_id;
-        } else {
-          itemIDOfOfferItem = offer.item_id_2;
+        if (offer.type_id === 2) {
+          itemIDOfOfferItem = offer.item_x;
+        } else if (offer.type_id === 1) {
+          itemIDOfOfferItem = offer.item_y;
         }
         offerItem = await Item.findOne({
           where: { id: itemIDOfOfferItem },
@@ -691,13 +700,13 @@ const getAllItemsInABrand = async (req, res, next) => {
         offerType: offer ? offer.type : "",
         itemIDOfOfferItem,
         XQuantity: offer
-          ? offer.item_1_quantity
-            ? offer.item_1_quantity
+          ? offer.item_x_quantity
+            ? offer.item_x_quantity
             : ""
           : "",
         YQuantity: offer
-          ? offer.item_2_quantity
-            ? offer.item_2_quantity
+          ? offer.item_y_quantity
+            ? offer.item_y_quantity
             : ""
           : "",
         YItemName: offerItem ? offerItem.name : "",

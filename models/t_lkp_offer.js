@@ -4,14 +4,14 @@ const {
 
 module.exports = sequelize => {
   const attributes = {
-    offer_id: {
+    id: {
       type: DataTypes.BIGINT,
       allowNull: false,
       defaultValue: null,
       primaryKey: true,
       autoIncrement: false,
       comment: null,
-      field: "offer_id"
+      field: "id"
     },
     offer_type: {
       type: DataTypes.STRING(100),
