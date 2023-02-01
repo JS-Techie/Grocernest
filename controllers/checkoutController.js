@@ -486,7 +486,7 @@ const buyNow = async (req, res, next) => {
     const orderItems = await Promise.all(promises);
 
     const offer = await Offers.findOne({
-      where: { is_active: 1, item_id: itemID, is_ecomm: 1 },
+      where: { is_active: 1, item_x: itemID, is_ecomm: 1 },
     });
 
     const oldestBatch = await Batch.findOne({

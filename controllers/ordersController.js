@@ -49,9 +49,14 @@ const getAllOrders = async (req, res, next) => {
         currentOffer = await Offers.findOne({
           where: {
             is_active: 1,
-            [Op.or]: [
+            item_x: currentOrderItem.item_id,
+            /*[Op.or]: [
               { item_id_1: currentOrderItem.item_id },
               { item_id: currentOrderItem.item_id },
+            ]*/
+            [Op.or]:[
+              {type_id: 1},
+              {type_id: 2}
             ],
             is_ecomm: 1,
           },
@@ -117,15 +122,14 @@ const getAllOrders = async (req, res, next) => {
               ? {
                   offerID: currentOffer.id,
                   offerType: currentOffer.type,
-                  itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
-                  quantityOfItemX: currentOffer.item_1_quantity
-                    ? currentOffer.item_1_quantity
+                  itemX: currentOffer.item_x ? currentOffer.item_x : "",
+                  quantityOfItemX: currentOffer.item_x_quantity
+                    ? currentOffer.item_x_quantity
                     : "",
-                  itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
-                  quantityOfItemY: currentOffer.item_2_quantity
-                    ? currentOffer.item_2_quantity
+                  itemY: currentOffer.item_y? currentOffer.item_y : "",
+                  quantityOfItemY: currentOffer.item_y_quantity
+                    ? currentOffer.item_y_quantity
                     : "",
-                  itemID: currentOffer.item_id ? currentOffer.item_id : "",
                   amountOfDiscount: currentOffer.amount_of_discount
                     ? currentOffer.amount_of_discount
                     : "",
@@ -219,10 +223,15 @@ const getOrderByOrderId = async (req, res, next) => {
       currentOffer = await Offers.findOne({
         where: {
           is_active: 1,
+          item_x: currentOrderItem.id,
           [Op.or]: [
+            {type_id: 1},
+            {type_id: 2}
+          ],
+         /* [Op.or]: [
             { item_id_1: currentOrderItem.id },
             { item_id: currentOrderItem.id },
-          ],
+          ],*/
           is_ecomm: 1,
         },
       });
@@ -272,15 +281,15 @@ const getOrderByOrderId = async (req, res, next) => {
             ? {
                 offerID: currentOffer.id,
                 offerType: currentOffer.type,
-                itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
-                quantityOfItemX: currentOffer.item_1_quantity
-                  ? currentOffer.item_1_quantity
+                itemX: currentOffer.item_x ? currentOffer.item_x: "",
+                quantityOfItemX: currentOffer.item_x_quantity
+                  ? currentOffer.item_x_quantity
                   : "",
-                itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
-                quantityOfItemY: currentOffer.item_2_quantity
-                  ? currentOffer.item_2_quantity
+                itemY: currentOffer.item_y ? currentOffer.item_y: "",
+                quantityOfItemY: currentOffer.item_y_quantity
+                  ? currentOffer.item_y_quantity
                   : "",
-                itemID: currentOffer.item_id ? currentOffer.item_id : "",
+                itemID: currentOffer.item_x ? currentOffer.item_x : "",
                 amountOfDiscount: currentOffer.amount_of_discount
                   ? currentOffer.amount_of_discount
                   : "",

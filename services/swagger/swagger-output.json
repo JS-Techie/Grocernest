@@ -484,6 +484,18 @@
             "name": "authorization",
             "in": "header",
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "item_x_quantity": {
+                  "example": "any"
+                }
+              }
+            }
           }
         ],
         "responses": {
@@ -3689,22 +3701,22 @@
             "schema": {
               "type": "object",
               "properties": {
-                "type": {
+                "type_id": {
                   "example": "any"
                 },
-                "item_id_1": {
+                "item_x": {
                   "example": "any"
                 },
-                "item_id_2": {
+                "item_y": {
                   "example": "any"
                 },
-                "item_1_quantity": {
+                "item_x_quantity": {
                   "example": "any"
                 },
-                "item_2_quantity": {
+                "item_y_quantity": {
                   "example": "any"
                 },
-                "item_id": {
+                "item_z": {
                   "example": "any"
                 },
                 "amount_of_discount": {
@@ -5271,6 +5283,33 @@
         }
       }
     },
+    "/admin/home/reorder/all/featured": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reOrderedData": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
     "/admin/home/view/featured/{id}": {
       "get": {
         "description": "",
@@ -5689,8 +5728,28 @@
     "/admin/featured/categories/reorder/all": {
       "post": {
         "description": "",
-        "parameters": [],
-        "responses": {}
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reOrderedData": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
       }
     },
     "/admin/daily/sales/view": {
