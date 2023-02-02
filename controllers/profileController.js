@@ -41,13 +41,16 @@ const getProfile = async (req, res, next) => {
         lastName: currentUserProfile.cust_name.split(" ")[1],
         emailID: currentUserProfile.email ? currentUserProfile.email : "",
         contactNumber: currentUserProfile.contact_no,
-        callingNumber: currentUserProfile.calling_number ? currentUserProfile.calling_number : "",
+        callingNumber: currentUserProfile.calling_number
+          ? currentUserProfile.calling_number
+          : "",
         registeredDate: currentUserProfile.created_at,
         profileImage: currentUserProfile.image
           ? currentUserProfile.image
           : generator.generateRandomAvatar(),
         referral_code: currentUserProfile.referral_code,
         opt_in: currentUserProfile.opt_in == 1 ? true : false,
+        registeredDate: currentUserProfile.created_at,
       },
     });
   } catch (error) {
@@ -164,8 +167,8 @@ const editProfile = async (req, res, next) => {
         image: base64
           ? url
           : currentUserProfile.image
-            ? currentUserProfile.image
-            : null,
+          ? currentUserProfile.image
+          : null,
       },
       { where: { cust_no: currentUser } }
     );
@@ -330,5 +333,3 @@ module.exports = {
   editPhoneNumber,
   changePhoneNumber,
 };
-
-
