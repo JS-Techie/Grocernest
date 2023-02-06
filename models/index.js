@@ -188,6 +188,8 @@ db.ItemSpecificWalletModel = require("./t_item_wallet")(
   Sequelize
 );
 
+db.MarketSurveyModel = require("./t_market_survey")(db.sequelize, Sequelize);
+
 // Relations between tables
 
 db.MilkDashboardModel.hasMany(db.SubscriptionItemsModel, {
