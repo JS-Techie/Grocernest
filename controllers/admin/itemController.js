@@ -6,6 +6,7 @@ const { sequelize } = require("../../models");
 const { getItemTaxArray } = require("../../services/itemsResponse");
 const Item = db.ItemModel;
 const Batch = db.BatchModel;
+const GrnDetails = db.GrnDetailsModel;
 const s3 = new S3(s3Config);
 
 const uploadMultipleImages = async (req, res, next) => {
