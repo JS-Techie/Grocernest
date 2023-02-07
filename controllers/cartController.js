@@ -180,16 +180,16 @@ const subtractItemFromCart = async (req, res, next) => {
     }
 
     const offerExists = await Offers.findOne({
-      where: { is_active: 1, item_id_1: itemID,is_ecomm : 1 },
+      where: { is_active: 1, item_x: itemID,is_ecomm : 1 },
     });
 
     let offerItemToBeRemoved = null;
     let Xquantity = null;
     let Yquantity = null;
     if (offerExists) {
-      offerItemToBeRemoved = offerExists.item_id_2;
-      Xquantity = offerExists.item_1_quantity;
-      Yquantity = offerExists.item_2_quantity;
+      offerItemToBeRemoved = offerExists.item_y;
+      Xquantity = offerExists.item_x_quantity;
+      Yquantity = offerExists.item_y_quantity;
     }
 
     let removedItemFromCart = null;
@@ -231,16 +231,16 @@ const subtractItemFromCart = async (req, res, next) => {
       if (newQuantityOfNormalItem < Xquantity) {
         console.log("in if");
         isBigger = true;
-      } else if (newQuantityOfNormalItem % offerExists.item_1_quantity === 0) {
+      } else if (newQuantityOfNormalItem % offerExists.item_x_quantity === 0) {
         console.log("in else if");
         newQuantityOfOfferItem =
-          (newQuantityOfNormalItem / offerExists.item_1_quantity) *
-          offerExists.item_2_quantity;
+          (newQuantityOfNormalItem / offerExists.item_x_quantity) *
+          offerExists.item_y_quantity;
       } else {
         console.log("in else");
         newQuantityOfOfferItem =
-          Math.floor(newQuantityOfNormalItem / offerExists.item_1_quantity) *
-          offerExists.item_2_quantity;
+          Math.floor(newQuantityOfNormalItem / offerExists.item_x_quantity) *
+          offerExists.item_y_quantity;
       }
 
       if (isBigger) {
@@ -312,11 +312,13 @@ const removeItemFromCart = async (req, res, next) => {
   const currentUser = req.cust_no;
 
   //get Item id from params
-  const itemID = req.params.itemId;
+ // const itemID = req.params.itemId;
+  const {itemId} = req.params;
 
+  const{item_x_quantity} = req.body;
   try {
     const itemExists = await Cart.findOne({
-      where: { cust_no: currentUser, item_id: itemID },
+      where: { cust_no: currentUser, item_id: itemId },
     });
 
     if (!itemExists) {
@@ -326,25 +328,31 @@ const removeItemFromCart = async (req, res, next) => {
         message: "Requested item does not exist in user's cart",
       });
     }
+    /**
+     * find active ecomm offer which is  
+     */
     const offerExists = await Offers.findOne({
       where: {
         is_active: 1,
-        [Op.or]: [{ item_id_1: itemID }, { item_id: itemID }],
+        //[Op.or]: [{ item_id_1: itemID }, { item_id: itemID }],
+        item_x:itemId ,
+        [Op.or]: [{type_id:1}, {type_id:2}],
+        item_x_quantity,
         is_ecomm : 1
-      },
+      }
     });
 
     let offerItemToBeRemoved = null;
     let offerItemDestroyed = null;
 
     if (offerExists) {
-      if (offerExists.item_id_1) {
-        offerItemToBeRemoved = offerExists.item_id_2;
+      if (offerExists.item_x) {
+        offerItemToBeRemoved = offerExists.item_y;
       }
     }
 
     const normalItemDestroyed = await Cart.destroy({
-      where: { cust_no: currentUser, item_id: itemID },
+      where: { cust_no: currentUser, item_id: itemId },
     });
 
     if (offerItemToBeRemoved) {
@@ -468,18 +476,30 @@ const getCart = async (req, res, next) => {
 
     console.log(cartForUser);
 
+    /**
+     * TODO: check the master table according 1 & 2 type_id
+     */
     const promises = cartForUser.map(async (current) => {
       let currentOffer = null;
       if (current.is_offer === 1) {
         currentOffer = await Offers.findOne({
           where: {
             is_active: 1,
+            item_x : current.item_id,
+            [Op.or]: [
+              { type_id: 1 },
+              { type_id: 2 },
+             
+            ],
+            is_ecomm : 1
+            
+            /*
             [Op.or]: [
               { item_id_1: current.item_id },
               { item_id: current.item_id },
-            ],
-          },
-          is_ecomm : 1
+            ],*/
+          }
+          
         });
       }
 

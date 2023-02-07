@@ -216,6 +216,15 @@ module.exports = (sequelize) => {
       comment: null,
       field: "item_wallet_used",
     },
+    special_cashback_processed: {
+      type: DataTypes.STRING(20),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "special_cashback_processed",
+    },
   };
   const options = {
     tableName: "t_order",

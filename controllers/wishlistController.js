@@ -53,9 +53,10 @@ const getWishlist = async (req, res, next) => {
         const offer = await Offers.findOne({
           where: {
             is_active: 1,
+            item_x: current.item_id,
             [Op.or]: [
-              { item_id_1: current.item_id },
-              { item_id: current.item_id },
+              { type_id: 1 },
+              { type_id: 2 },
             ],
             is_ecomm : 1
           },
@@ -64,10 +65,10 @@ const getWishlist = async (req, res, next) => {
         let itemIDOfOfferItem;
         let offerItem;
         if (offer) {
-          if (offer.item_id) {
-            itemIDOfOfferItem = offer.item_id;
-          } else {
-            itemIDOfOfferItem = offer.item_id_2;
+          if (offer.type_id ===2 ) {
+            itemIDOfOfferItem = offer.item_x;
+          } else if (offer.type_id ===1 ) {
+            itemIDOfOfferItem = offer.item_y;
           }
           offerItem = await Item.findOne({
             where: { id: itemIDOfOfferItem },
@@ -95,13 +96,13 @@ const getWishlist = async (req, res, next) => {
             offerType: offer ? offer.type : "",
             itemIDOfOfferItem,
             XQuantity: offer
-              ? offer.item_1_quantity
-                ? offer.item_1_quantity
+              ? offer.item_x_quantity
+                ? offer.item_x_quantity
                 : ""
               : "",
             YQuantity: offer
-              ? offer.item_2_quantity
-                ? offer.item_2_quantity
+              ? offer.item_y_quantity
+                ? offer.item_y_quantity
                 : ""
               : "",
             YItemName: offerItem ? offerItem.name : "",

@@ -152,12 +152,12 @@ const createOffer = async (req, res, next) => {
   //Get current user from JWT
 
   const {
-    type,
-    item_id_1,
-    item_id_2,
-    item_1_quantity,
-    item_2_quantity,
-    item_id,
+    type_id,
+    item_x,
+    item_y,
+    item_x_quantity,
+    item_y_quantity,
+    item_z,
     amount_of_discount,
     is_percentage,
     start_date,
@@ -166,20 +166,20 @@ const createOffer = async (req, res, next) => {
     end_time,
     is_pos,
     is_ecomm,
-    is_time,
+    is_time
   } = req.body;
 
   let offer = null;
 
-  if (item_id) {
+  if (item_x) {
     offer = await Offers.findOne({
-      where: { [Op.or]: [{ item_id_1: item_id }, { item_id }] },
-    });
-  } else {
-    offer = await Offers.findOne({
-      where: { [Op.or]: [{ item_id_1 }, { item_id_1: item_id }] },
+      where: {
+        item_x,
+        [Op.or]: [{ type_id: 1 }, { type_id: 2 }]
+      },
     });
   }
+  
 
   if (offer) {
     return res.status(400).send({
@@ -189,7 +189,7 @@ const createOffer = async (req, res, next) => {
     });
   }
 
-  if (!type) {
+  if (!type_id) {
     return res.status(400).send({
       success: false,
       data: [],
@@ -216,12 +216,12 @@ const createOffer = async (req, res, next) => {
   try {
     console.log("before offer query");
     const newOffer = await Offers.create({
-      type,
-      item_id_1,
-      item_id_2,
-      item_1_quantity,
-      item_2_quantity,
-      item_id,
+      type_id,
+      item_x,
+      item_y,
+      item_x_quantity,
+      item_y_quantity,
+      item_z,
       amount_of_discount,
       is_percentage:
         is_percentage !== null ? (is_percentage === true ? 1 : null) : null,
@@ -233,7 +233,7 @@ const createOffer = async (req, res, next) => {
       end_time,
       is_pos,
       is_ecomm,
-      is_time,
+      is_time
     });
 
     console.log("after offer query");

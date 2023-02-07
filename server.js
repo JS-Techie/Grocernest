@@ -81,6 +81,7 @@ const adminFeaturedCategoryRouter = require("./routes/admin/featuredCategoryRout
 const adminItemWalletRouter = require("./routes/admin/itemWalletRoutes");
 const adminEcommInvoiceRouter = require("./routes/admin/ecommInvoiceRoutes");
 const adminReportRouter = require("./routes/admin/adminReportRouter");
+const adminMarketSurveyRouter = require("./routes/admin/marketSurveyRoutes");
 
 //delivery boy routes
 
@@ -157,6 +158,7 @@ app.use("/admin/featured/categories", adminFeaturedCategoryRouter);
 app.use("/admin/daily/sales", adminDailySalesRouter);
 app.use("/admin/itemsp", adminItemWalletRouter);
 app.use("/admin/ecomm/invoice", adminEcommInvoiceRouter);
+app.use("/admin/market/survey", adminMarketSurveyRouter);
 
 // report
 app.use("/admin/report", adminReportRouter);
