@@ -80,7 +80,7 @@ const downloadInvoice = async (req, res, next) => {
      
 
       const oldestBatch = await OrderItems.findOne({
-        where: {item_id: currentOrder.item_id}
+        where: {item_id: current.item_id}
       })
 
       if (oldestBatch) {

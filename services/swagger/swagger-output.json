@@ -5079,29 +5079,6 @@
         }
       }
     },
-    "/admin/items/upload/description": {
-      "post": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "example": "any"
-                },
-                "description": {
-                  "example": "any"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {}
-      }
-    },
     "/admin/items/edit/images": {
       "post": {
         "description": "",
