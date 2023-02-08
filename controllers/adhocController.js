@@ -181,37 +181,18 @@ const addSpecialWalletBalance = async (req, res, next) => {
                 // if this is first buy
                 // check this is your first purchase in the time span or not
 
-                const startDate = new Date(
-                  currentStrategy.start_date
-                ).toISOString();
-                const endDate = new Date(
-                  currentStrategy.expiry_date
-                ).toISOString();
+                const startDate = currentStrategy.start_date.split(" ")[0];
+                const endDate = currentStrategy.expiry_date.split(" ")[0];
 
                 const [ordresInTheSpan, metadata_2] =
                   await sequelize.query(`select * from t_order where cust_no = "${order.cust_no}" and status='Delivered'
                 and created_at BETWEEN '${startDate}' and '${endDate}'`);
                 // console.log(ordresInTheSpan);
-                ordresInTheSpan.map(async (current_order) => {
+                await ordresInTheSpan.map(async (current_order) => {
                   // console.log(current_order.order_id);
                   const [order_items, metadata_3] = await sequelize.query(`
                 select item_id from t_order_items toi where toi.order_id = ${current_order.order_id}
                 `);
-                  // console.log(current_order.order_id + " => ");
-                  // console.log(order_items);
-
-                  // const promises = myArray.map(item => {
-                  //   return new Promise(resolve => {
-                  //     setTimeout(() => {
-                  //       console.log(item);
-                  //       resolve();
-                  //     }, 1000);
-                  //   });
-                  // });
-
-                  // Promise.all(promises).then(() => {
-                  //   console.log('All promises have resolved');
-                  // });
 
                   await order_items.map((prev_order_current_item) => {
                     if (
