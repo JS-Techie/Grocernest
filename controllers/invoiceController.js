@@ -77,11 +77,10 @@ const downloadInvoice = async (req, res, next) => {
       // const oldestBatch = await Batch.findOne({
       //   where: { item_id: current.item_id, mark_selected: 1 },
       // });
-     
 
-      const oldestBatch = await OrderItems.findOne({
-        where: {item_id: current.item_id}
-      })
+      const oldestBatch = await Batch.findOne({
+        where: { item_id: current.item_id, mark_selected: 1 },
+      });
 
       if (oldestBatch) {
         const currentTaxArray = await TaxInfo.findAll({
