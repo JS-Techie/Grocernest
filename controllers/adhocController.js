@@ -189,7 +189,7 @@ const addSpecialWalletBalance = async (req, res, next) => {
                 ).toISOString();
 
                 const [ordresInTheSpan, metadata_2] =
-                  await sequelize.query(`select * from t_order where cust_no = "971medumge3l7prya6i" and status='Delivered'
+                  await sequelize.query(`select * from t_order where cust_no = "${order.cust_no}" and status='Delivered'
                 and created_at BETWEEN '${startDate}' and '${endDate}'`);
                 // console.log(ordresInTheSpan);
                 ordresInTheSpan.map(async (current_order) => {
