@@ -5,7 +5,6 @@ const db = require("../models");
 const SpecialWalletService = require("../services/specialWalletService");
 
 const Customer = db.CustomerModel;
-const Wallet = db.WalletModel;
 const Order = db.OrderModel;
 const OrderItems = db.OrderItemsModel;
 const Batch = db.BatchModel;
@@ -167,6 +166,14 @@ const addSpecialWalletBalance = async (req, res, next) => {
                   order.cust_no,
                   transaction
                 );
+
+                const updated_order = await Order.update(
+                  {
+                    special_cashback_processed: 1,
+                  },
+                  { where: { order_id: order_id } }
+                );
+
                 // special_wallet_transactions.push(transaction);
               } else {
                 // console.log("YESSSSS");
@@ -234,14 +241,13 @@ const addSpecialWalletBalance = async (req, res, next) => {
                     order.cust_no,
                     transaction
                   );
-                  // console.log(
-                  //   "=>",
-                  //   wallet_amt,
-                  //   current_item.quantity,
-                  //   current_item.sale_price,
-                  //   currentStrategy.amount_of_discount
-                  // );
-                  // special_wallet_transactions.push(transaction);
+
+                  const updated_order = await Order.update(
+                    {
+                      special_cashback_processed: 1,
+                    },
+                    { where: { order_id: order_id } }
+                  );
                 }
               }
             }
