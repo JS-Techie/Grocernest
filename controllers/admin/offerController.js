@@ -1,6 +1,7 @@
 const { Op } = require("sequelize");
 const db = require("../../models");
 
+const lkp_offers = db.lkpOffersModel;
 const Offers = db.OffersModel;
 const Item = db.ItemModel;
 const Customer = db.CustomerModel;
@@ -23,28 +24,34 @@ const getAllOffers = async (req, res, next) => {
     }
 
     const promises = offers.map(async (current) => {
-      const item1 = await Item.findOne({
-        where: { id: current.item_id_1 },
+      const itemx = await Item.findOne({
+        where: { id: current.item_x },
       });
-      const item2 = await Item.findOne({
-        where: { id: current.item_id_2 },
+      const itemy = await Item.findOne({
+        where: { id: current.item_y },
       });
-
-      const item = await Item.findOne({
+    
+    /*  const item = await Item.findOne({
         where: { id: current.item_id },
-      });
+      });*/
 
+      const type = await lkp_offers.findOne(
+        {
+          where: {id: current.type_id}
+        }
+      )
       return {
         offerID: current.id,
-        offerType: current.type,
-        itemX: current.item_id_1 ? current.item_id_1 : "",
-        firstItem: item1 ? item1.name : "",
-        quantityOfItemX: current.item_1_quantity ? current.item_1_quantity : "",
-        itemY: current.item_id_2 ? current.item_id_2 : "",
-        secondItem: item2 ? item2.name : "",
-        quantityOfItemY: current.item_2_quantity ? current.item_2_quantity : "",
-        itemID: current.item_id ? current.item_id : "",
-        itemName: item ? item.name : "",
+        offerType: current.type_id,
+        offerName: type.offer_type,
+        itemX: current.item_x ? current.item_x : "",
+        firstItem: itemx ? itemx.name : "",
+        quantityOfItemX: current.item_x_quantity ? current.item_x_quantity : "",
+        itemY: current.item_y ? current.item_y : "",
+        secondItem: itemy ? itemy.name : "",
+        quantityOfItemY: current.item_y_quantity ? current.item_y_quantity : "",
+      //  itemID: current.item_id ? current.item_id : "",
+       // itemName: item ? item.name : "",
         amountOfDiscount: current.amount_of_discount
           ? current.amount_of_discount
           : "",
@@ -97,29 +104,29 @@ const getOfferById = async (req, res, next) => {
       });
     }
 
-    const item1 = await Item.findOne({
-      where: { id: current.item_id_1 },
+    const itemX = await Item.findOne({
+      where: { id: current.item_x },
     });
-    const item2 = await Item.findOne({
-      where: { id: current.item_id_2 },
+    const itemY = await Item.findOne({
+      where: { id: current.item_y },
     });
-    const item = await Item.findOne({
+   /* const item = await Item.findOne({
       where: { id: current.item_id },
     });
-
+*/
     return res.status(200).send({
       success: true,
       data: {
         offerID: current.id,
         offerType: current.type,
-        itemX: current.item_id_1 ? current.item_id_1 : "",
-        firstItem: item1 ? item1.name : "",
-        quantityOfItemX: current.item_1_quantity ? current.item_1_quantity : "",
-        itemY: current.item_id_2 ? current.item_id_2 : "",
-        secondItem: item2 ? item2.name : "",
-        quantityOfItemY: current.item_2_quantity ? current.item_2_quantity : "",
-        itemID: current.item_id ? current.item_id : "",
-        itemName: item ? item.name : "",
+        itemX: current.item_x ? current.item_x : "",
+        firstItem: itemX ? itemX.name : "",
+        quantityOfItemX: current.item_x_quantity ? current.item_x_quantity : "",
+        itemY: current.item_y ? current.item_y : "",
+        secondItem: itemY ? itemY.name : "",
+        quantityOfItemY: current.item_y_quantity ? current.item_y_quantity : "",
+      //  itemID: current.item_id ? current.item_id : "",
+      //  itemName: item ? item.name : "",
         amountOfDiscount: current.amount_of_discount
           ? current.amount_of_discount
           : "",
@@ -168,19 +175,24 @@ const createOffer = async (req, res, next) => {
     is_ecomm,
     is_time
   } = req.body;
+  /**
+   * TODO: check if x,y,z item exists in t_item
+   */
 
+  /**
+   * on each item with same quantity duplicate offer does not exists - in case of x-item
+   */
   let offer = null;
-
   if (item_x) {
     offer = await Offers.findOne({
       where: {
         item_x,
-        [Op.or]: [{ type_id: 1 }, { type_id: 2 }]
+        [Op.or]: [{ type_id: 1 }, { type_id: 2 }],
+        item_x_quantity
       },
     });
   }
   
-
   if (offer) {
     return res.status(400).send({
       success: false,
@@ -188,6 +200,7 @@ const createOffer = async (req, res, next) => {
       message: "Offer already exists for this item",
     });
   }
+  
 
   if (!type_id) {
     return res.status(400).send({
@@ -196,6 +209,32 @@ const createOffer = async (req, res, next) => {
       message: "Please enter the type of offer",
     });
   }
+
+  let testing = null;
+  switch(type_id){
+    case 1 : 
+      break;
+    case 2 : 
+      //checkForTypeId2(amount_of_discount, is_percentage, item_x)
+      const existingOffer = await Offers.findOne({
+        where: { item_x, amount_of_discount, is_percentage }
+      })
+      if(existingOffer){
+        testing = true
+      }
+      break;
+    default:
+      console.log("abcd")  
+  }    
+
+  if(testing){
+    return res.status(400).send({
+      success: false,
+      data: [],
+      message: "Discount can't be same for same item"
+    })
+  }
+
 
   if (is_time && (!start_date || !start_time || !end_date || !end_time)) {
     return res.status(400).send({
@@ -264,12 +303,11 @@ const updateOffer = async (req, res, next) => {
   const offerID = req.params.id;
 
   const {
-    type,
-    item_id_1,
-    item_id_2,
-    item_1_quantity,
-    item_2_quantity,
-    item_id,
+    type_id,
+    item_x,
+    item_y,
+    item_x_quantity,
+    item_y_quantity,
     amount_of_discount,
     is_percentage,
     start_date,
@@ -295,18 +333,11 @@ const updateOffer = async (req, res, next) => {
     }
 
     let offer = null;
-
-    if (item_id) {
+    if (item_x) {
       offer = await Offers.findOne({
         where: {
-          [Op.or]: [{ item_id_1: item_id }, { item_id }],
-          [Op.not]: [{ id: offerID }],
-        },
-      });
-    } else {
-      offer = await Offers.findOne({
-        where: {
-          [Op.or]: [{ item_id: item_id_1 }, { item_id_1 }],
+          item_x,
+          [Op.or]: [{ type_id: 1 }, { type_id: 2 }],
           [Op.not]: [{ id: offerID }],
         },
       });
@@ -335,7 +366,7 @@ const updateOffer = async (req, res, next) => {
       });
     }
 
-    if (!type) {
+    if (!type_id) {
       return res.status(400).send({
         success: false,
         data: [],
@@ -343,14 +374,43 @@ const updateOffer = async (req, res, next) => {
       });
     }
 
+    let testing = null;
+    switch(type_id){
+      case 1 : 
+        break;
+      case 2 : 
+        //checkForTypeId2(amount_of_discount, is_percentage, item_x)
+        const existingOffer = await Offers.findOne({
+          where: { item_x, 
+                   amount_of_discount, 
+                   is_percentage ,
+                   [Op.not]: [{ id: offerID }]
+          }
+        })
+        if(existingOffer){
+          testing = true
+        }
+        break;
+      default:
+        console.log("abcd")  
+    }    
+  
+    if(testing){
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "Discount can't be same for same item"
+      })
+    }
+
     const update = await Offers.update(
       {
-        type,
-        item_id_1,
-        item_id_2,
-        item_1_quantity,
-        item_2_quantity,
-        item_id,
+        type_id,
+        item_x,
+        item_y,
+        item_x_quantity,
+        item_y_quantity,
+       // item_id,
         amount_of_discount,
         is_percentage: is_percentage === true ? 1 : null,
         start_date,
@@ -376,15 +436,15 @@ const updateOffer = async (req, res, next) => {
         oldOffer: {
           offerID: current.id,
           offerType: current.type,
-          itemX: current.item_id_1 ? current.item_id_1 : "",
-          quantityOfItemX: current.item_1_quantity
-            ? current.item_1_quantity
+          itemX: current.item_x ? current.item_x : "",
+          quantityOfItemX: current.item_x_quantity
+            ? current.item_x_quantity
             : "",
-          itemY: current.item_id_2 ? current.item_id_2 : "",
-          quantityOfItemY: current.item_2_quantity
-            ? current.item_2_quantity
+          itemY: current.item_y ? current.item_y : "",
+          quantityOfItemY: current.item_y_quantity
+            ? current.item_y_quantity
             : "",
-          itemID: current.item_id ? current.item_id : "",
+         // itemID: current.item_id ? current.item_id : "",
           amountOfDiscount: current.amount_of_discount
             ? current.amount_of_discount
             : "",
@@ -450,6 +510,7 @@ const updateOffer = async (req, res, next) => {
   }
 };
 
+/**problem in deleteOffer*/
 const deleteOffer = async (req, res, next) => {
   //Get current user from JWT
 
@@ -481,15 +542,15 @@ const deleteOffer = async (req, res, next) => {
         deletedOffer: {
           offerID: current.id,
           offerType: current.type,
-          itemX: current.item_id_1 ? current.item_id_1 : "",
-          quantityOfItemX: current.item_1_quantity
-            ? current.item_1_quantity
+          itemX: current.item_x ? current.item_x : "",
+          quantityOfItemX: current.item_x_quantity
+            ? current.item_x_quantity
             : "",
-          itemY: current.item_id_2 ? current.item_id_2 : "",
-          quantityOfItemY: current.item_2_quantity
-            ? current.item_2_quantity
+          itemY: current.item_y ? current.item_y : "",
+          quantityOfItemY: current.item_y_quantity
+            ? current.item_y_quantity
             : "",
-          itemID: current.item_id ? current.item_id : "",
+         // itemID: current.item_id ? current.item_id : "",
           amountOfDiscount: current.amount_of_discount
             ? current.amount_of_discount
             : "",
@@ -562,4 +623,4 @@ module.exports = {
   updateOffer,
   deleteOffer,
   activateOffer,
-};
+}
