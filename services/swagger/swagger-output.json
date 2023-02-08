@@ -3842,22 +3842,19 @@
             "schema": {
               "type": "object",
               "properties": {
-                "type": {
+                "type_id": {
                   "example": "any"
                 },
-                "item_id_1": {
+                "item_x": {
                   "example": "any"
                 },
-                "item_id_2": {
+                "item_y": {
                   "example": "any"
                 },
-                "item_1_quantity": {
+                "item_x_quantity": {
                   "example": "any"
                 },
-                "item_2_quantity": {
-                  "example": "any"
-                },
-                "item_id": {
+                "item_y_quantity": {
                   "example": "any"
                 },
                 "amount_of_discount": {
@@ -3905,7 +3902,7 @@
       }
     },
     "/admin/offers/delete/{id}": {
-      "delete": {
+      "patch": {
         "description": "",
         "parameters": [
           {
