@@ -17,7 +17,7 @@ const { sendCronReport } = require("../services/whatsapp/whatsappMessages");
 
 const pos_refferal_job = async () => {
   // schedule time is a utc time (11.55pm ist = 6:25pm utc/18:25)
-  cron.schedule("0 25 18 * * *", async () => {
+  cron.schedule("0 15 18 * * *", async () => {
     console.log("Running scheduled CRON-JOB.....");
 
     // cashback task
@@ -131,14 +131,14 @@ const pos_cashback_job = async () => {
         });
       }
     });
-    sendCronReport("SUCCESS");
+    sendCronReport("cron_ref_3_S");
     // console.log("C==>>", c);
   } catch (err) {
     console.log("CASHBACK POS CRON JOB ERROR=> ", err);
-    sendCronReport("FAILED");
+    sendCronReport("cron_ref_3_F");
   }
 };
-
+//ONLY FOR POS,
 const pos_cashback_job_new = async () => {
   console.log("POS CASHBACK CRONJOB STARTED..");
   let c = 0;

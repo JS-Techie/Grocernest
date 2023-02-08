@@ -7,10 +7,11 @@ const Order = db.OrderModel;
 const Wallet = db.WalletModel;
 const Wallet_Transaction = db.WalletTransactionModel;
 const WalletService = require("../services/walletService");
+const { sendCronReport } = require("../services/whatsapp/whatsappMessages");
 
 const refferal_job = async () => {
   // schedule time is a utc time (11.30pm ist = 6:00pm utc/18:00)
-  cron.schedule("0 0 18 * * *", async () => {
+  cron.schedule("0 25 18 * * *", async () => {
     console.log("Running scheduled CRON-JOB.....");
 
     // referral task
@@ -136,12 +137,16 @@ const cashback_job = async () => {
         where: {
           cust_no: currentUser.cust_no,
           status: "Delivered",
-          cashback_processed: { [Op.ne]: null },
+          cashback_processed: { [Op.eq]: null },
+          special_cashback_processed: { [Op.eq]: null },
         },
       });
 
       await all_orders.map(async (current_order) => {
-        if (current_order.dataValues.cashback_processed == null) {
+        if (
+          current_order.dataValues.cashback_processed == null &&
+          current_order.dataValues.special_cashback_processed == null
+        ) {
           // which cashback is not processed
           console.log(
             "Cashback amount credited=>",
@@ -174,8 +179,10 @@ const cashback_job = async () => {
         }
       });
     });
+    sendCronReport("cron_ref_1_S");
   } catch (err) {
     console.log("CASHBACK CRON JOB ERROR=>", err);
+    sendCronReport("cron_ref_1_F");
   }
 };
 
