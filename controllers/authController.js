@@ -374,6 +374,7 @@ const verifyOTP = async (req, res, next) => {
       wallet_id: uniqid(),
       cust_no: newUser.cust_no,
       balance: 0,
+      item_specific_balance: 0,
       created_by: 2,
     });
 
@@ -648,7 +649,7 @@ const getOTP = async (req, res, next) => {
   }
 };
 
-const resendToken = async (req, res, next) => { };
+const resendToken = async (req, res, next) => {};
 
 module.exports = {
   login,
