@@ -180,6 +180,7 @@ const downloadInvoice = async (req, res, next) => {
     return res.status(400).send({
       success: false,
       data: error.message,
+      errorMessage : error,
       message: "Invoice not generated successfully",
     });
   }
