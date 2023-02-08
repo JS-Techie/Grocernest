@@ -177,7 +177,7 @@ const addSpecialWalletBalance = async (req, res, next) => {
                 // special_wallet_transactions.push(transaction);
               } else {
                 // console.log("YESSSSS");
-                let is_first_buy = true;
+                let is_first_buy = 0;
                 // if this is first buy
                 // check this is your first purchase in the time span or not
 
@@ -204,14 +204,14 @@ const addSpecialWalletBalance = async (req, res, next) => {
                     if (
                       prev_order_current_item.item_id == current_item.item_id
                     ) {
-                      is_first_buy = false;
+                      is_first_buy++;
                     }
                   });
                 });
 
                 // if this purchase is first buy then add balance
                 console.log("IS FIRST BUY", is_first_buy);
-                if (is_first_buy) {
+                if (is_first_buy == 0) {
                   wallet_amt =
                     current_item.quantity *
                     ((current_item.sale_price / 100) *
