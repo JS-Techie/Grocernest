@@ -200,7 +200,20 @@ const addSpecialWalletBalance = async (req, res, next) => {
                   // console.log(current_order.order_id + " => ");
                   // console.log(order_items);
 
-                  order_items.map((prev_order_current_item) => {
+                  // const promises = myArray.map(item => {
+                  //   return new Promise(resolve => {
+                  //     setTimeout(() => {
+                  //       console.log(item);
+                  //       resolve();
+                  //     }, 1000);
+                  //   });
+                  // });
+
+                  // Promise.all(promises).then(() => {
+                  //   console.log('All promises have resolved');
+                  // });
+
+                  await order_items.map((prev_order_current_item) => {
                     if (
                       prev_order_current_item.item_id == current_item.item_id
                     ) {
