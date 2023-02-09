@@ -161,7 +161,7 @@ const addSpecialWalletBalance = async () => {
                   // if this purchase is first buy then add balance
 
                   console.log("IS FIRST BUY", is_first_buy);
-                  if (is_first_buy == 0) {
+                  if (is_first_buy == 1) {
                     wallet_amt =
                       current_item.quantity *
                       ((current_item.sale_price / 100) *
@@ -223,14 +223,16 @@ const addSpecialWalletBalance = async () => {
   }
 };
 
-const special_wallet_job = async () => {
-  // schedule time is a utc time (11.30pm ist = 6:00pm utc/18:00)
-  cron.schedule("0 20 18 * * *", async () => {
-    console.log("Running scheduled CRON-JOB.....");
+// const special_wallet_job = async () => {
+//   // schedule time is a utc time (11.30pm ist = 6:00pm utc/18:00)
+//   cron.schedule("0 20 18 * * *", async () => {
+//     console.log("Running scheduled CRON-JOB.....");
 
-    // cashback task
-    await addSpecialWalletBalance();
-  });
-};
+//     // cashback task
+//     await addSpecialWalletBalance();
+//   });
+// };
 
-module.exports = special_wallet_job;
+// module.exports = special_wallet_job;
+
+addSpecialWalletBalance();

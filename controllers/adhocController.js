@@ -197,7 +197,7 @@ const addSpecialWalletBalance = async (req, res, next) => {
                   await Promise.all(
                     ordresInTheSpan.map(async (current_order) => {
                       const [order_items, metadata_3] = await sequelize.query(`
-                        select item_id from t_order_items toi where toi.order_id = ${current_order.order_id}
+                        select item_id from t_order_items toi where toi.order_id = ${current_order.order_id} 
                       `);
 
                       await Promise.all(
@@ -219,7 +219,7 @@ const addSpecialWalletBalance = async (req, res, next) => {
                   // if this purchase is first buy then add balance
 
                   console.log("IS FIRST BUY", is_first_buy);
-                  if (is_first_buy == 0) {
+                  if (is_first_buy == 1) {
                     wallet_amt =
                       current_item.quantity *
                       ((current_item.sale_price / 100) *
