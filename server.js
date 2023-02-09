@@ -1,8 +1,8 @@
 require("dotenv").config();
 
-const pos_refferal_job = require("./utils/CRON_REF_3"); //run first
-const special_wallet_cashback_job = require("./utils/CRON_REF_4"); //run 2nd
-const refferal_job = require("./utils/CRON_REF_1"); //run 3rd
+// const pos_refferal_job = require("./utils/CRON_REF_3"); //run first
+// const special_wallet_cashback_job = require("./utils/CRON_REF_4"); //run 2nd
+// const refferal_job = require("./utils/CRON_REF_1"); //run 3rd
 
 // Swagger UI Setup
 const swaggerUI = require("swagger-ui-express");
@@ -201,6 +201,6 @@ const start = async () => {
 start();
 
 // Cron Jobs
-refferal_job();
-pos_refferal_job();
-special_wallet_cashback_job();
+// refferal_job();
+// pos_refferal_job();
+// special_wallet_cashback_job();

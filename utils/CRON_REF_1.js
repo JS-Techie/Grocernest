@@ -187,5 +187,5 @@ const cashback_job = async () => {
 };
 
 // job();
-// cashback_job();
-module.exports = refferal_job;
+cashback_job();
+// module.exports = refferal_job;
