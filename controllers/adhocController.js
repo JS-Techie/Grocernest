@@ -177,6 +177,7 @@ const addSpecialWalletBalance = async (req, res, next) => {
                 // special_wallet_transactions.push(transaction);
               } else {
                 console.log("YESSSSS");
+
                 let is_first_buy = 0;
                 // if this is first buy
                 // check this is your first purchase in the time span or not
