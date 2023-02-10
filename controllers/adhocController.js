@@ -167,7 +167,19 @@ const addSpecialWalletBalance = async (req, res, next) => {
                   transaction
                 );
 
-                const updated_order = await Order.update(
+                const updated_order_items = OrderItems.update(
+                  {
+                    special_cashback_processed: 1,
+                    special_cashback_amount: wallet_amt,
+                  },
+                  {
+                    where: {
+                      order_id: order.order_id,
+                      item_id: current_item.item_id,
+                    },
+                  }
+                );
+                const updated_order = Order.update(
                   {
                     special_cashback_processed: 1,
                   },
@@ -251,14 +263,14 @@ const addSpecialWalletBalance = async (req, res, next) => {
                       transaction
                     );
 
-                    OrderItems.update(
+                    const updated_order_items = OrderItems.update(
                       {
                         special_cashback_processed: 1,
                         special_cashback_amount: wallet_amt,
                       },
                       {
                         where: {
-                          order_id: order_id,
+                          order_id: order.order_id,
                           item_id: current_item.item_id,
                         },
                       }
