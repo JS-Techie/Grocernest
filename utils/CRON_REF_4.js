@@ -61,161 +61,199 @@ const addSpecialWalletBalance = async () => {
       let special_wallet_balance = 0;
 
       order_details.map((current_item) => {
-        let this_item_id = current_item.item_id;
-        let this_item_qty = current_item.quantity;
+        if (current_item.special_cashback_processed != 1) {
+          let this_item_id = current_item.item_id;
+          let this_item_qty = current_item.quantity;
 
-        allStrategies
-          .map(async (currentStrategy) => {
-            let item_list = JSON.parse(currentStrategy.items_list);
+          allStrategies
+            .map(async (currentStrategy) => {
+              let item_list = JSON.parse(currentStrategy.items_list);
 
-            console.log("ABCD", this_item_id, item_list);
+              console.log("ABCD", this_item_id, item_list);
 
-            let isItemAvailable = item_list.indexOf(
-              JSON.stringify(this_item_id)
-            );
-            console.log("CHECK," + this_item_id + " " + item_list);
-            // check item exist in any strategy or not
-            if (isItemAvailable >= 0) {
-              console.log("YES ITEM AVAILABLE," + this_item_id);
-              // check if it is not first buy
-              // console.log("FIRST BUY????????");
-              if (!currentStrategy.first_buy) {
-                // console.log("NOOOOOO");
-                wallet_amt =
-                  current_item.quantity *
-                  ((current_item.sale_price / 100) *
-                    currentStrategy.amount_of_discount);
+              let isItemAvailable = item_list.indexOf(
+                JSON.stringify(this_item_id)
+              );
+              console.log("CHECK," + this_item_id + " " + item_list);
+              // check item exist in any strategy or not
+              if (isItemAvailable >= 0) {
+                console.log("YES ITEM AVAILABLE," + this_item_id);
+                // check if it is not first buy
+                // console.log("FIRST BUY????????");
+                if (!currentStrategy.first_buy) {
+                  // console.log("NOOOOOO");
+                  wallet_amt =
+                    current_item.quantity *
+                    ((current_item.sale_price / 100) *
+                      currentStrategy.amount_of_discount);
 
-                let transaction = [
-                  {
-                    wallet_amt: wallet_amt,
-                    item_id: current_item.item_id,
-                    item_qty: current_item.quantity,
-                    offer_name: currentStrategy.offer_name,
-                    order_id: order_id,
-                  },
-                ];
+                  let transaction = [
+                    {
+                      wallet_amt: wallet_amt,
+                      item_id: current_item.item_id,
+                      item_qty: current_item.quantity,
+                      offer_name: currentStrategy.offer_name,
+                      order_id: order_id,
+                    },
+                  ];
 
-                // credit amount
-                specialWalletService.creditAmount(
-                  wallet_amt,
-                  order.cust_no,
-                  "special wallet balance added"
-                );
+                  // credit amount
+                  specialWalletService.creditAmount(
+                    wallet_amt,
+                    order.cust_no,
+                    "special wallet balance added"
+                  );
 
-                // credit transaction
-                specialWalletService.creditAmountTransaction(
-                  order.cust_no,
-                  transaction
-                );
+                  // credit transaction
+                  specialWalletService.creditAmountTransaction(
+                    order.cust_no,
+                    transaction
+                  );
 
-                // mark special wallet balance processed as 1
-                // mark the order as spcl cashback processed
-                const updated_order = await Order.update(
-                  {
-                    special_cashback_processed: 1,
-                  },
-                  { where: { order_id: order_id } }
-                );
-              } else {
-                // console.log("YESSSSS");
-                let is_first_buy = true;
-                // if this is first buy
-                // check this is your first purchase in the time span or not
+                  // mark special wallet balance processed as 1
+                  // mark the order as spcl cashback processed
 
-                const startDate = new Date(
-                  currentStrategy.start_date
-                ).toISOString();
-                const endDate = new Date(
-                  currentStrategy.expiry_date
-                ).toISOString();
+                  OrderItems.update(
+                    {
+                      special_cashback_processed: 1,
+                      special_cashback_amount: wallet_amt,
+                    },
+                    {
+                      where: {
+                        order_id: order_id,
+                        item_id: current_item.item_id,
+                      },
+                    }
+                  );
 
-                const [ordresInTheSpan, metadata_2] =
-                  await sequelize.query(`select * from t_order where cust_no = "${order.cust_no}" and status='Delivered'
+                  const updated_order = await Order.update(
+                    {
+                      special_cashback_processed: 1,
+                    },
+                    { where: { order_id: order_id } }
+                  );
+                } else {
+                  // console.log("YESSSSS");
+                  let is_first_buy = true;
+                  // if this is first buy
+                  // check this is your first purchase in the time span or not
+
+                  const startDate = new Date(
+                    currentStrategy.start_date
+                  ).toISOString();
+                  const endDate = new Date(
+                    currentStrategy.expiry_date
+                  ).toISOString();
+
+                  const [ordresInTheSpan, metadata_2] =
+                    await sequelize.query(`select * from t_order where cust_no = "${order.cust_no}" and status='Delivered'
                   and created_at BETWEEN '${startDate}' and '${endDate}'`);
 
-                const cust_orders_in_the_span = async () => {
-                  is_first_buy = 0;
-                  await Promise.all(
-                    ordresInTheSpan.map(async (current_order) => {
-                      const [order_items, metadata_3] = await sequelize.query(`
+                  const cust_orders_in_the_span = async () => {
+                    is_first_buy = 0;
+                    await Promise.all(
+                      ordresInTheSpan.map(async (current_order) => {
+                        const [order_items, metadata_3] =
+                          await sequelize.query(`
                           select item_id from t_order_items toi where toi.order_id = ${current_order.order_id}
                         `);
 
-                      await Promise.all(
-                        order_items.map(async (prev_order_current_item) => {
-                          if (
-                            prev_order_current_item.item_id ==
-                            current_item.item_id
-                          ) {
-                            is_first_buy++;
-                            console.log("ADDD");
-                          }
-                        })
+                        await Promise.all(
+                          order_items.map(async (prev_order_current_item) => {
+                            if (
+                              prev_order_current_item.item_id ==
+                              current_item.item_id
+                            ) {
+                              is_first_buy++;
+                              console.log("ADDD");
+                            }
+                          })
+                        );
+                      })
+                    );
+                  };
+
+                  cust_orders_in_the_span().then(() => {
+                    // if this purchase is first buy then add balance
+
+                    console.log("IS FIRST BUY", is_first_buy);
+                    if (is_first_buy == 1) {
+                      wallet_amt =
+                        current_item.quantity *
+                        ((current_item.sale_price / 100) *
+                          currentStrategy.amount_of_discount);
+
+                      // special_wallet_balance = special_wallet_balance + wallet_amt;
+
+                      let transaction = [
+                        {
+                          wallet_amt: wallet_amt,
+                          item_id: current_item.item_id,
+                          item_qty: current_item.quantity,
+                          offer_name: currentStrategy.offer_name,
+                          order_id: order_id,
+                        },
+                      ];
+
+                      // credit amount
+                      specialWalletService.creditAmount(
+                        wallet_amt,
+                        order.cust_no,
+                        "special wallet balance added"
                       );
-                    })
-                  );
-                };
 
-                cust_orders_in_the_span().then(() => {
-                  // if this purchase is first buy then add balance
+                      // credit transaction
+                      specialWalletService.creditAmountTransaction(
+                        order.cust_no,
+                        transaction
+                      );
 
-                  console.log("IS FIRST BUY", is_first_buy);
-                  if (is_first_buy == 1) {
-                    wallet_amt =
-                      current_item.quantity *
-                      ((current_item.sale_price / 100) *
-                        currentStrategy.amount_of_discount);
+                      // const updated_order = Order.update(
+                      //   {
+                      //     special_cashback_processed: 1,
+                      //   },
+                      //   { where: { order_id: order_id } }
+                      // );
 
-                    // special_wallet_balance = special_wallet_balance + wallet_amt;
+                      OrderItems.update(
+                        {
+                          special_cashback_processed: 1,
+                          special_cashback_amount: wallet_amt,
+                        },
+                        {
+                          where: {
+                            order_id: order_id,
+                            item_id: current_item.item_id,
+                          },
+                        }
+                      );
 
-                    let transaction = [
-                      {
-                        wallet_amt: wallet_amt,
-                        item_id: current_item.item_id,
-                        item_qty: current_item.quantity,
-                        offer_name: currentStrategy.offer_name,
-                        order_id: order_id,
-                      },
-                    ];
-
-                    // credit amount
-                    specialWalletService.creditAmount(
-                      wallet_amt,
-                      order.cust_no,
-                      "special wallet balance added"
-                    );
-
-                    // credit transaction
-                    specialWalletService.creditAmountTransaction(
-                      order.cust_no,
-                      transaction
-                    );
-
-                    const updated_order = Order.update(
-                      {
-                        special_cashback_processed: 1,
-                      },
-                      { where: { order_id: order_id } }
-                    );
-                  } else {
-                    console.log(
-                      "Customer already purchased this item before.."
-                    );
-                  }
-                });
+                      const updated_order = Order.update(
+                        {
+                          special_cashback_processed: 1,
+                        },
+                        { where: { order_id: order_id } }
+                      );
+                    } else {
+                      console.log(
+                        "Customer already purchased this item before.."
+                      );
+                    }
+                  });
+                }
               }
-            }
-          })[0]
-          .then((res) => {
-            console.log("MAP COMPLETED");
-          });
+            })[0]
+            .then((res) => {
+              console.log("MAP COMPLETED");
+            });
+        }
       });
 
       console.log("VALUES TO BE ADDED");
       console.log(special_wallet_transactions);
       console.log(special_wallet_balance);
     });
+
     sendCronReport("cron_ref_4_S");
   } catch (error) {
     console.log(error.message);

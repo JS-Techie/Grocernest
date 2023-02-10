@@ -1,3 +1,5 @@
+// POS CASHBACK
+
 const { Op } = require("sequelize");
 const cron = require("node-cron");
 const uniqid = require("uniqid");
@@ -26,6 +28,7 @@ const pos_refferal_job = async () => {
   });
 };
 
+// THIS FUNCTION IS NOT WORKING ANYMORE
 const pos_cashback_job = async () => {
   console.log("POS CASHBACK CRONJOB STARTED..");
   let c = 0;
@@ -138,6 +141,7 @@ const pos_cashback_job = async () => {
     sendCronReport("cron_ref_3_F");
   }
 };
+
 //ONLY FOR POS,
 const pos_cashback_job_new = async () => {
   console.log("POS CASHBACK CRONJOB STARTED..");
