@@ -258,10 +258,8 @@ const addSpecialWalletBalance = async (req, res, next) => {
                       },
                       {
                         where: {
-                          where: {
-                            order_id: order_id,
-                            item_id: current_item.item_id,
-                          },
+                          order_id: order_id,
+                          item_id: current_item.item_id,
                         },
                       }
                     );
