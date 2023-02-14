@@ -4,7 +4,7 @@ require("dotenv").config();
 // const special_wallet_cashback_job = require("./utils/CRON_REF_4"); //run 2nd
 // const refferal_job = require("./utils/CRON_REF_1"); //run 3rd
 
-// Swagger UI Setup abc
+// Swagger UI Setup abcd
 const swaggerUI = require("swagger-ui-express");
 const endPoint = require("./services/swagger/swagger-output.json");
 
