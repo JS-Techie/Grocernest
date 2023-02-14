@@ -5,25 +5,23 @@
 
 //I have formatted the s3Config.js in a similar manner, check korenao
 
-
 module.exports = {
-    HOST: "localhost",
-    USER: "root",
-    PASSWORD: "root",
-    DB: "grocernest",
+  HOST: "grocernest-dev.cccojqtgiuzf.ap-south-1.rds.amazonaws.com",
+  USER: "admin",
+  PASSWORD: "grocernest2021#",
+  DB: "grocernest_pre_prod",
 
-    dialect: "mariadb",
-    define: {
-        timestamps: false
-    },
+  dialect: "mariadb",
+  define: {
     timestamps: false,
-    pool: {
-        max: 5,
-        min: 0,
-        acquire: 30000,
-        idle: 10000
-    }
+  },
+  timestamps: false,
+  pool: {
+    max: 5,
+    min: 0,
+    acquire: 30000,
+    idle: 10000,
+  },
 };
-
 
 // PORT : process.env.DB_PORT,
