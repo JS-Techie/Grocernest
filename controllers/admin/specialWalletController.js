@@ -104,8 +104,8 @@ const viewStrategy = async (req, res, next) => {
             };
           }
           return {
-            id: item?.id,
-            name: item?.name,
+            id: item.id,
+            name: item.name,
           };
         })
         .filter((current) => {
