@@ -6,7 +6,7 @@
 //I have formatted the s3Config.js in a similar manner, check korenao
 
 module.exports = {
-  HOST: "grocernest-dev.cccojqtgiuzf.ap-south-1.rds.amazonaws.com",
+  HOST: "grocernest-noec2dev.cccojqtgiuzf.ap-south-1.rds.amazonaws.com",
   USER: "admin",
   PASSWORD: "grocernest2021#",
   DB: "grocernest_pre_prod",

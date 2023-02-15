@@ -21,7 +21,7 @@
 // };
 
 module.exports = {
-  HOST: "grocernest-dev.cccojqtgiuzf.ap-south-1.rds.amazonaws.com",
+  HOST: "grocernest-noec2dev.cccojqtgiuzf.ap-south-1.rds.amazonaws.com",
   USER: "admin",
   PASSWORD: "grocernest2021#",
   DB: "grocernest_pre_prod",
