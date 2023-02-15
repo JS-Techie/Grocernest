@@ -4,7 +4,7 @@ require("dotenv").config();
 // const special_wallet_cashback_job = require("./utils/CRON_REF_4"); //run 2nd
 // const refferal_job = require("./utils/CRON_REF_1"); //run 3rd
 
-// Swagger UI Setup abcd
+// Swagger UI Setup abcde
 const swaggerUI = require("swagger-ui-express");
 const endPoint = require("./services/swagger/swagger-output.json");
 
@@ -186,7 +186,7 @@ app.use("/vendor", vendorRouter);
 
 //Start server and connect to DB
 const db = require("./services/dbSetupService.js");
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 8081;
 const start = async () => {
   try {
     app.listen(PORT, () => {
