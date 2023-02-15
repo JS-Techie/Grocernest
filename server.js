@@ -186,7 +186,7 @@ app.use("/vendor", vendorRouter);
 
 //Start server and connect to DB
 const db = require("./services/dbSetupService.js");
-const PORT = process.env.PORT || 8081;
+const PORT = process.env.PORT || 8080;
 const start = async () => {
   try {
     app.listen(PORT, () => {
