@@ -31,7 +31,7 @@ const uploadImageToS3 = async (base64, key) => {
   );
   //const type = base64.split(";")[0].split("/")[1];
   const params = {
-    Bucket: "ecomm-dev",
+    Bucket: process.env.AWS_BUCKET_NAME,
     Key: key,
     Body: base64Data,
     ContentEncoding: "base64",
