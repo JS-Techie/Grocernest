@@ -21,10 +21,10 @@
 // };
 
 module.exports = {
-  HOST: "grocernest-dev.cccojqtgiuzf.ap-south-1.rds.amazonaws.com",
-  USER: "admin",
-  PASSWORD: "grocernest2021#",
-  DB: "grocernest_pre_prod",
+  HOST: "localhost",
+  USER: "root",
+  PASSWORD: "root",
+  DB: "grocernest",
 
   dialect: "mariadb",
   define: {

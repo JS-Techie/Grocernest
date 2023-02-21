@@ -191,8 +191,7 @@ const createOffer = async (req, res, next) => {
         item_x_quantity
       },
     });
-  }
-  
+  } 
   if (offer) {
     return res.status(400).send({
       success: false,
@@ -200,14 +199,15 @@ const createOffer = async (req, res, next) => {
       message: "Offer already exists for this item",
     });
   }
-  
-
   if (!type_id) {
     return res.status(400).send({
       success: false,
       data: [],
       message: "Please enter the type of offer",
     });
+  }
+  if(type_id){
+
   }
 
   let testing = null;

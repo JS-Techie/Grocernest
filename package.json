@@ -42,7 +42,7 @@
     "referral-code-generator": "^1.0.8",
     "sequelize": "^6.20.1",
     "sequelize-automate": "^1.2.2",
-    "swagger-autogen": "^2.21.4",
+    "swagger-autogen": "^2.23.1",
     "swagger-jsdoc": "^6.2.1",
     "swagger-ui-express": "^4.4.0",
     "uniqid": "^5.4.0",
