@@ -1,3 +1,4 @@
+require("dotenv").config();
 // module.exports = {
 //   HOST: "grocernest-dev.cccojqtgiuzf.ap-south-1.rds.amazonaws.com",
 //   USER: "admin",
