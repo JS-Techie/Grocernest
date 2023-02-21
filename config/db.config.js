@@ -1,8 +1,8 @@
 module.exports = {
-  HOST: process.env.HOST,
-  USER: process.env.USER,
-  PASSWORD: process.env.PASSWORD,
-  DB: process.env.DB,
+  HOST: "grocernest-noec2dev.cccojqtgiuzf.ap-south-1.rds.amazonaws.com",
+  USER: "admin",
+  PASSWORD: "grocernest2021#",
+  DB: "grocernest_pre_prod",
 
   dialect: "mariadb",
   define: {
