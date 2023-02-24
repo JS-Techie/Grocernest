@@ -35,7 +35,8 @@ const downloadInvoice = async (req, res, next) => {
       return res.status(200).send({
         success: true,
         data: {
-          URL: `https://ecomm-dev.s3.ap-south-1.amazonaws.com/pdfs/invoices/invoice-${orderID}.pdf`,
+          // URL: `https://ecomm-dev.s3.ap-south-1.amazonaws.com/pdfs/invoices/invoice-${orderID}.pdf`,
+          URL: `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_BUCKET_REGION}.amazonaws.com/pdfs/invoices/invoice-${orderID}.pdf`
         },
         message: "Invoice generated successfully",
         devMessage: "Invoice already exists",
@@ -73,6 +74,10 @@ const downloadInvoice = async (req, res, next) => {
       const currentQuantity = await OrderItems.findOne({
         where: { quantity: current.quantity },
       });
+
+      // const oldestBatch = await Batch.findOne({
+      //   where: { item_id: current.item_id, mark_selected: 1 },
+      // });
 
       const oldestBatch = await Batch.findOne({
         where: { item_id: current.item_id, mark_selected: 1 },

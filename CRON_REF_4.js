@@ -2,18 +2,18 @@
 // THIS WILL RUN FIRST, THEN CASHBACK CRON WILL RUN
 require("dotenv").config();
 const cron = require("node-cron");
-const { sequelize } = require("../models");
+const { sequelize } = require("./models");
 const { Op } = require("sequelize");
-const db = require("../models");
-const db2 = require("../services/dbSetupService.js");
+const db = require("./models");
+const db2 = require("./services/dbSetupService.js");
 
-const SpecialWalletService = require("../services/specialWalletService");
+const SpecialWalletService = require("./services/specialWalletService");
 
 const Customer = db.CustomerModel;
 const Order = db.OrderModel;
 const OrderItems = db.OrderItemsModel;
 const WalletStrategyTable = db.SpecialWalletStrategy;
-const { sendCronReport } = require("../services/whatsapp/whatsappMessages");
+const { sendCronReport } = require("./services/whatsapp/whatsappMessages");
 
 const addSpecialWalletBalance = async () => {
   let sevenDaysAgo = new Date();
