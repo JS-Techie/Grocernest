@@ -315,7 +315,7 @@ const removeItemFromCart = async (req, res, next) => {
  // const itemID = req.params.itemId;
   const {itemId} = req.params;
 
-  const{item_x_quantity} = req.body;
+//  const{item_x_quantity} = req.body;
   try {
     const itemExists = await Cart.findOne({
       where: { cust_no: currentUser, item_id: itemId },
@@ -337,7 +337,6 @@ const removeItemFromCart = async (req, res, next) => {
         //[Op.or]: [{ item_id_1: itemID }, { item_id: itemID }],
         item_x:itemId ,
         [Op.or]: [{type_id:1}, {type_id:2}],
-        item_x_quantity,
         is_ecomm : 1
       }
     });
@@ -357,7 +356,7 @@ const removeItemFromCart = async (req, res, next) => {
 
     if (offerItemToBeRemoved) {
       offerItemDestroyed = await Cart.destroy({
-        where: { cust_no: currentUser, item_id: offerItemToBeRemoved,is_offer : 1 },
+        where: { cust_no: currentUser, item_id: offerItemToBeRemoved, is_offer : 1 },
       });
     }
 

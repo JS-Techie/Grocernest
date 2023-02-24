@@ -1,6 +1,12 @@
 const { Op } = require("sequelize");
 const db = require("../../models");
 
+// const services = require("../../services");
+// const offerService = services.offerService;
+
+const { validationForTypeId1,
+  checkForTypeId2 } = require("../../services/offerService")
+
 const lkp_offers = db.lkpOffersModel;
 const Offers = db.OffersModel;
 const Item = db.ItemModel;
@@ -30,14 +36,14 @@ const getAllOffers = async (req, res, next) => {
       const itemy = await Item.findOne({
         where: { id: current.item_y },
       });
-    
-    /*  const item = await Item.findOne({
-        where: { id: current.item_id },
-      });*/
+
+      /*  const item = await Item.findOne({
+          where: { id: current.item_id },
+        });*/
 
       const type = await lkp_offers.findOne(
         {
-          where: {id: current.type_id}
+          where: { id: current.type_id }
         }
       )
       return {
@@ -50,8 +56,8 @@ const getAllOffers = async (req, res, next) => {
         itemY: current.item_y ? current.item_y : "",
         secondItem: itemy ? itemy.name : "",
         quantityOfItemY: current.item_y_quantity ? current.item_y_quantity : "",
-      //  itemID: current.item_id ? current.item_id : "",
-       // itemName: item ? item.name : "",
+        //  itemID: current.item_id ? current.item_id : "",
+        // itemName: item ? item.name : "",
         amountOfDiscount: current.amount_of_discount
           ? current.amount_of_discount
           : "",
@@ -91,6 +97,7 @@ const getOfferById = async (req, res, next) => {
 
   //get offer id from params
   const offerID = req.params.id;
+  console.log("offerId from param "+offerID)
   try {
     const current = await Offers.findOne({
       where: { id: offerID },
@@ -110,10 +117,10 @@ const getOfferById = async (req, res, next) => {
     const itemY = await Item.findOne({
       where: { id: current.item_y },
     });
-   /* const item = await Item.findOne({
-      where: { id: current.item_id },
-    });
-*/
+    /* const item = await Item.findOne({
+       where: { id: current.item_id },
+     });
+ */
     return res.status(200).send({
       success: true,
       data: {
@@ -125,8 +132,8 @@ const getOfferById = async (req, res, next) => {
         itemY: current.item_y ? current.item_y : "",
         secondItem: itemY ? itemY.name : "",
         quantityOfItemY: current.item_y_quantity ? current.item_y_quantity : "",
-      //  itemID: current.item_id ? current.item_id : "",
-      //  itemName: item ? item.name : "",
+        //  itemID: current.item_id ? current.item_id : "",
+        //  itemName: item ? item.name : "",
         amountOfDiscount: current.amount_of_discount
           ? current.amount_of_discount
           : "",
@@ -182,25 +189,23 @@ const createOffer = async (req, res, next) => {
   /**
    * on each item with same quantity duplicate offer does not exists - in case of x-item
    */
-  let offer = null;
-  if (item_x) {
-    offer = await Offers.findOne({
-      where: {
-        item_x,
-        [Op.or]: [{ type_id: 1 }, { type_id: 2 }],
-        item_x_quantity
-      },
-    });
-  }
-  
-  if (offer) {
-    return res.status(400).send({
-      success: false,
-      data: offer,
-      message: "Offer already exists for this item",
-    });
-  }
-  
+  /* let offer = null;
+   if (item_x) {
+     offer = await Offers.findOne({
+       where: {
+         item_x,
+         [Op.or]: [{ type_id: 1 }, { type_id: 2 }],
+         item_x_quantity
+       },
+     });
+   }
+   if (offer) {
+     return res.status(400).send({
+       success: false,
+       data: offer,
+       message: "Offer already exists for this item",
+     });
+   }*/
 
   if (!type_id) {
     return res.status(400).send({
@@ -210,24 +215,48 @@ const createOffer = async (req, res, next) => {
     });
   }
 
-  let testing = null;
-  switch(type_id){
-    case 1 : 
+  if (type_id) {
+    const validateType = isTypePresent(type_id)
+    if (!validateType) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "Provide a appropriate type_id"
+      })
+    }
+  }
+
+  let existingOffer = null;
+  switch (type_id) {
+    case 1:
+      existingOffer = validationForTypeId1(item_x, item_x_quantity)
+      if (existingOffer) {
+        return res.status(400).send({
+          success: false,
+          data: [],
+          message: "Offer already exists"
+        })
+      }
       break;
-    case 2 : 
+    case 2:
       //checkForTypeId2(amount_of_discount, is_percentage, item_x)
-      const existingOffer = await Offers.findOne({
+        existingOffer = await Offers.findOne({
         where: { item_x, amount_of_discount, is_percentage }
       })
-      if(existingOffer){
+      if (existingOffer) {
         testing = true
       }
       break;
     default:
-      console.log("abcd")  
-  }    
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "Please provide a valid type_id"
+      })
+      console.log("incorrect type_id")
+  }
 
-  if(testing){
+  if (testing) {
     return res.status(400).send({
       success: false,
       data: [],
@@ -375,27 +404,28 @@ const updateOffer = async (req, res, next) => {
     }
 
     let testing = null;
-    switch(type_id){
-      case 1 : 
+    switch (type_id) {
+      case 1:
         break;
-      case 2 : 
+      case 2:
         //checkForTypeId2(amount_of_discount, is_percentage, item_x)
         const existingOffer = await Offers.findOne({
-          where: { item_x, 
-                   amount_of_discount, 
-                   is_percentage ,
-                   [Op.not]: [{ id: offerID }]
+          where: {
+            item_x,
+            amount_of_discount,
+            is_percentage,
+            [Op.not]: [{ id: offerID }]
           }
         })
-        if(existingOffer){
+        if (existingOffer) {
           testing = true
         }
         break;
       default:
-        console.log("abcd")  
-    }    
-  
-    if(testing){
+        console.log("abcd")
+    }
+
+    if (testing) {
       return res.status(400).send({
         success: false,
         data: [],
@@ -410,7 +440,7 @@ const updateOffer = async (req, res, next) => {
         item_y,
         item_x_quantity,
         item_y_quantity,
-       // item_id,
+        // item_id,
         amount_of_discount,
         is_percentage: is_percentage === true ? 1 : null,
         start_date,
@@ -444,7 +474,7 @@ const updateOffer = async (req, res, next) => {
           quantityOfItemY: current.item_y_quantity
             ? current.item_y_quantity
             : "",
-         // itemID: current.item_id ? current.item_id : "",
+          // itemID: current.item_id ? current.item_id : "",
           amountOfDiscount: current.amount_of_discount
             ? current.amount_of_discount
             : "",
@@ -550,7 +580,7 @@ const deleteOffer = async (req, res, next) => {
           quantityOfItemY: current.item_y_quantity
             ? current.item_y_quantity
             : "",
-         // itemID: current.item_id ? current.item_id : "",
+          // itemID: current.item_id ? current.item_id : "",
           amountOfDiscount: current.amount_of_discount
             ? current.amount_of_discount
             : "",
