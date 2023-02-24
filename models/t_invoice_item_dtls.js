@@ -178,6 +178,15 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "mdr_item_flag"
+    },
+    cashback_amount: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "cashback_amount"
     }
   };
   const options = {

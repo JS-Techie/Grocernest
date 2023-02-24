@@ -1,6 +1,8 @@
-const { DataTypes } = require("sequelize");
+const {
+  DataTypes
+} = require('sequelize');
 
-module.exports = (sequelize) => {
+module.exports = sequelize => {
   const attributes = {
     cust_no: {
       type: DataTypes.STRING(20),
@@ -9,7 +11,7 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "cust_no",
+      field: "cust_no"
     },
     order_id: {
       type: DataTypes.STRING(255),
@@ -18,32 +20,25 @@ module.exports = (sequelize) => {
       primaryKey: true,
       autoIncrement: false,
       comment: null,
-      field: "order_id",
+      field: "order_id"
     },
     status: {
-      type: DataTypes.ENUM(
-        "Placed",
-        "Accepted",
-        "Shipped",
-        "Delivered",
-        "Cancelled",
-        "Returned"
-      ),
+      type: DataTypes.ENUM('Placed', 'Accepted', 'Shipped', 'Delivered', 'Cancelled', 'Returned'),
       allowNull: false,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "status",
+      field: "status"
     },
     created_at: {
       type: DataTypes.DATE,
       allowNull: true,
-      defaultValue: sequelize.fn("current_timestamp"),
+      defaultValue: sequelize.fn('current_timestamp'),
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "created_at",
+      field: "created_at"
     },
     updated_at: {
       type: DataTypes.DATE,
@@ -52,7 +47,7 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "updated_at",
+      field: "updated_at"
     },
     created_by: {
       type: DataTypes.BIGINT,
@@ -61,7 +56,7 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "created_by",
+      field: "created_by"
     },
     updated_by: {
       type: DataTypes.BIGINT,
@@ -70,7 +65,7 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "updated_by",
+      field: "updated_by"
     },
     total: {
       type: DataTypes.FLOAT,
@@ -79,7 +74,7 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "total",
+      field: "total"
     },
     address: {
       type: DataTypes.STRING(255),
@@ -88,7 +83,7 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "address",
+      field: "address"
     },
     cancellation_reason: {
       type: DataTypes.STRING(255),
@@ -97,7 +92,7 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "cancellation_reason",
+      field: "cancellation_reason"
     },
     wallet_balance_used: {
       type: DataTypes.FLOAT,
@@ -106,7 +101,7 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "wallet_balance_used",
+      field: "wallet_balance_used"
     },
     applied_discount: {
       type: DataTypes.FLOAT,
@@ -115,7 +110,7 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "applied_discount",
+      field: "applied_discount"
     },
     final_payable_amount: {
       type: DataTypes.FLOAT,
@@ -124,7 +119,7 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "final_payable_amount",
+      field: "final_payable_amount"
     },
     cashback_processed: {
       type: DataTypes.STRING(20),
@@ -133,7 +128,7 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "cashback_processed",
+      field: "cashback_processed"
     },
     cashback_amount: {
       type: DataTypes.FLOAT,
@@ -142,7 +137,7 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "cashback_amount",
+      field: "cashback_amount"
     },
     coupon_id: {
       type: DataTypes.BIGINT,
@@ -151,7 +146,7 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "coupon_id",
+      field: "coupon_id"
     },
     delivery_boy: {
       type: DataTypes.BIGINT,
@@ -160,16 +155,16 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "delivery_boy",
+      field: "delivery_boy"
     },
     return_status: {
-      type: DataTypes.ENUM("a", "i", "r", "c"),
+      type: DataTypes.ENUM('a', 'c', 'r', 'i'),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "return_status",
+      field: "return_status"
     },
     reject_reason: {
       type: DataTypes.STRING(100),
@@ -178,7 +173,7 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "reject_reason",
+      field: "reject_reason"
     },
     delivery_date: {
       type: DataTypes.DATE,
@@ -187,7 +182,7 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "delivery_date",
+      field: "delivery_date"
     },
     pickup_date: {
       type: DataTypes.DATE,
@@ -196,7 +191,7 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "pickup_date",
+      field: "pickup_date"
     },
     pin: {
       type: DataTypes.BIGINT,
@@ -205,7 +200,7 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "pin",
+      field: "pin"
     },
     item_wallet_used: {
       type: DataTypes.DECIMAL,
@@ -214,7 +209,7 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "item_wallet_used",
+      field: "item_wallet_used"
     },
     special_cashback_processed: {
       type: DataTypes.STRING(20),
@@ -223,13 +218,13 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "special_cashback_processed",
-    },
+      field: "special_cashback_processed"
+    }
   };
   const options = {
     tableName: "t_order",
     comment: "",
-    indexes: [],
+    indexes: []
   };
   const TOrderModel = sequelize.define("t_order_model", attributes, options);
   return TOrderModel;
