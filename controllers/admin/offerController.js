@@ -97,6 +97,7 @@ const getOfferById = async (req, res, next) => {
 
   //get offer id from params
   const offerID = req.params.id;
+  console.log("offerId from param "+offerID)
   try {
     const current = await Offers.findOne({
       where: { id: offerID },
@@ -215,12 +216,7 @@ const createOffer = async (req, res, next) => {
   }
 
   if (type_id) {
-    const validateType = await lkp_offers.findOne({
-      where: {
-        id: type_id
-      }
-    })
-
+    const validateType = isTypePresent(type_id)
     if (!validateType) {
       return res.status(400).send({
         success: false,

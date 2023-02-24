@@ -7,7 +7,17 @@ const item = db.ItemModel;
 const customer = db.CustomerModel;
 
 
-const t_offers = require("../models/t_offers")
+const isTypePresent = async(type_id)=>{
+    const type = await lkp_offers.findOne({
+        where: {
+          id: type_id
+        }
+      })
+    if(type){
+        return true
+    } 
+    return false
+}
 
 const validationForTypeId1 = async (item_x, item_x_quantity) =>{
     const existingOffer = await offers.findAll({
@@ -32,6 +42,7 @@ const checkForTypeId2 = async (amount_of_discount, is_percentage, item_x) => {
 }
 
 module.exports = {
+    isTypePresent,
     validationForTypeId1,
     checkForTypeId2
 }
