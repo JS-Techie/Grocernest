@@ -484,18 +484,6 @@
             "name": "authorization",
             "in": "header",
             "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "item_x_quantity": {
-                  "example": "any"
-                }
-              }
-            }
           }
         ],
         "responses": {
