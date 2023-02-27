@@ -5,7 +5,7 @@ const db = require("../../models");
 // const offerService = services.offerService;
 
 const { isTypePresent, validationForExistingOffer, validationForYItem,
-   validationForDiscount } = require("../../services/offerService")
+   validationForDiscount, typeIdDetails } = require("../../services/offerService")
 
 const lkp_offers = db.lkpOffersModel;
 const Offers = db.OffersModel;
@@ -41,15 +41,12 @@ const getAllOffers = async (req, res, next) => {
           where: { id: current.item_id },
         });*/
 
-      const type = await lkp_offers.findOne(
-        {
-          where: { id: current.type_id }
-        }
-      )
+      const type = await typeIdDetails(current.type_id)
+       
       return {
         offerID: current.id,
         offerType: current.type_id,
-        offerName: type.offer_type,
+        offerName: (type!==null)?type.offer_type:null,
         itemX: current.item_x ? current.item_x : "",
         firstItem: itemx ? itemx.name : "",
         quantityOfItemX: current.item_x_quantity ? current.item_x_quantity : "",
@@ -121,11 +118,14 @@ const getOfferById = async (req, res, next) => {
        where: { id: current.item_id },
      });
  */
+
+    const type = await typeIdDetails(current.type_id)
     return res.status(200).send({
       success: true,
       data: {
         offerID: current.id,
-        offerType: current.type,
+        offerType: current.type_id,
+        offerName: (type!==null)?type.offer_type:null,
         itemX: current.item_x ? current.item_x : "",
         firstItem: itemX ? itemX.name : "",
         quantityOfItemX: current.item_x_quantity ? current.item_x_quantity : "",
