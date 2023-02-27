@@ -59,9 +59,20 @@ const validationForDiscount = async(item_x, amount_of_discount, is_percentage) =
     return false
 }
 
+const typeIdDetails = async (type_id)=>{
+    const details = await lkp_offers.findOne({
+        id:type_id
+    })
+    if(details){
+        return details
+    }
+    return false
+}
+
 module.exports = {
     isTypePresent,
     validationForExistingOffer,
     validationForYItem,
-    validationForDiscount
+    validationForDiscount,
+    typeIdDetails
 }
