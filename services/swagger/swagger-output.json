@@ -1114,9 +1114,54 @@
             "name": "authorization",
             "in": "header",
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "total": {
+                  "example": "any"
+                },
+                "address_id": {
+                  "example": "any"
+                },
+                "applied_discount": {
+                  "example": "any"
+                },
+                "final_payable_amount": {
+                  "example": "any"
+                },
+                "wallet_balance_used": {
+                  "example": "any"
+                },
+                "wallet_id": {
+                  "example": "any"
+                },
+                "cashback_amount": {
+                  "example": "any"
+                },
+                "cashback_dtls": {
+                  "example": "any"
+                },
+                "item_wallet_used": {
+                  "example": "any"
+                },
+                "coupon_id": {
+                  "example": "any"
+                }
+              }
+            }
           }
         ],
         "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "201": {
+            "description": "Created"
+          },
           "400": {
             "description": "Bad Request"
           },
@@ -1134,9 +1179,54 @@
             "name": "authorization",
             "in": "header",
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "itemID": {
+                  "example": "any"
+                },
+                "quantity": {
+                  "example": "any"
+                },
+                "total": {
+                  "example": "any"
+                },
+                "address_id": {
+                  "example": "any"
+                },
+                "applied_discount": {
+                  "example": "any"
+                },
+                "final_payable_amount": {
+                  "example": "any"
+                },
+                "wallet_balance_used": {
+                  "example": "any"
+                },
+                "wallet_id": {
+                  "example": "any"
+                },
+                "cashback_amount": {
+                  "example": "any"
+                },
+                "item_wallet_used": {
+                  "example": "any"
+                },
+                "coupon_id": {
+                  "example": "any"
+                }
+              }
+            }
           }
         ],
         "responses": {
+          "201": {
+            "description": "Created"
+          },
           "400": {
             "description": "Bad Request"
           },

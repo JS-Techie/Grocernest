@@ -156,7 +156,14 @@ function generateFooter(invoice, doc) {
       540
     )
     .text(`Applied coupon discount : ${invoice.appliedDiscount}`, 50, 560)
-    .text(`Payment Mode : Cash on Delivery`, 50, 580)
+    .text(
+      `Applied Coupon : ${
+        invoice.appliedCoupon ? invoice.appliedCoupon : "None"
+      }`,
+      50,
+      580
+    )
+    .text(`Payment Mode : Cash on Delivery`, 50, 600)
     .text(`Total CGST : ${invoice.totalCGST.toFixed(2)}`, 390, 500)
     .text(`Total SGST : ${invoice.totalSGST.toFixed(2)}`, 390, 520)
     .text(`Total IGST : ${invoice.totalIGST.toFixed(2)}`, 390, 540)
@@ -171,13 +178,7 @@ function generateFooter(invoice, doc) {
       390,
       580
     )
-    .text(
-      `Applied Coupon : ${
-        invoice.appliedCoupon ? invoice.appliedCoupon : "None"
-      }`,
-      390,
-      600
-    )
+
     .moveDown();
 }
 

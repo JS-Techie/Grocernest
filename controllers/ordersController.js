@@ -677,8 +677,8 @@ const getAllReturns = async (req, res, next) => {
         itemID: currentItem ? currentItem.id : "",
         itemName: currentItem ? currentItem.name : "",
         quantity: current.quantity,
-        salePrice: current ? current.sale_price : "",
-        MRP: current ? current.MRP : "",
+        salePrice: selectedBatch ? selectedBatch.sale_price : "",
+        MRP: selectedBatch ? selectedBatch.MRP : "",
       };
     });
 
