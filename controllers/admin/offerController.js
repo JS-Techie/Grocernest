@@ -4,8 +4,13 @@ const db = require("../../models");
 // const services = require("../../services");
 // const offerService = services.offerService;
 
-const { isTypePresent, validationForExistingOffer, validationForYItem,
-   validationForDiscount, typeIdDetails } = require("../../services/offerService")
+const {
+  isTypePresent,
+  validationForExistingOffer,
+  validationForYItem,
+  validationForDiscount,
+  typeIdDetails,
+} = require("../../services/offerService");
 
 const lkp_offers = db.lkpOffersModel;
 const Offers = db.OffersModel;
@@ -41,12 +46,12 @@ const getAllOffers = async (req, res, next) => {
           where: { id: current.item_id },
         });*/
 
-      const type = await typeIdDetails(current.type_id)
-       
+      const type = await typeIdDetails(current.type_id);
+
       return {
         offerID: current.id,
         offerType: current.type_id,
-        offerName: (type!==null)?type.offer_type:null,
+        offerName: type !== null ? type.offer_type : null,
         itemX: current.item_x ? current.item_x : "",
         firstItem: itemx ? itemx.name : "",
         quantityOfItemX: current.item_x_quantity ? current.item_x_quantity : "",
@@ -94,7 +99,7 @@ const getOfferById = async (req, res, next) => {
 
   //get offer id from params
   const offerID = req.params.id;
-  console.log("offerId from param " + offerID)
+  console.log("offerId from param " + offerID);
   try {
     const current = await Offers.findOne({
       where: { id: offerID },
@@ -119,13 +124,13 @@ const getOfferById = async (req, res, next) => {
      });
  */
 
-    const type = await typeIdDetails(current.type_id)
+    const type = await typeIdDetails(current.type_id);
     return res.status(200).send({
       success: true,
       data: {
         offerID: current.id,
         offerType: current.type_id,
-        offerName: (type!==null)?type.offer_type:null,
+        offerName: type !== null ? type.offer_type : null,
         itemX: current.item_x ? current.item_x : "",
         firstItem: itemX ? itemX.name : "",
         quantityOfItemX: current.item_x_quantity ? current.item_x_quantity : "",
@@ -180,10 +185,9 @@ const createOffer = async (req, res, next) => {
     end_time,
     is_pos,
     is_ecomm,
-    is_time
+    is_time,
   } = req.body;
   try {
-
     if (!type_id) {
       return res.status(400).send({
         success: false,
@@ -193,13 +197,13 @@ const createOffer = async (req, res, next) => {
     }
 
     if (type_id) {
-      const validateType = isTypePresent(type_id)
+      const validateType = isTypePresent(type_id);
       if (!validateType) {
         return res.status(400).send({
           success: false,
           data: [],
-          message: "Provide a appropriate type_id"
-        })
+          message: "Provide a appropriate type_id",
+        });
       }
     }
 
@@ -209,8 +213,10 @@ const createOffer = async (req, res, next) => {
 
     switch (type_id) {
       case 1:
-
-        existingOffer = await validationForExistingOffer(item_x, item_x_quantity)
+        existingOffer = await validationForExistingOffer(
+          item_x,
+          item_x_quantity
+        );
 
         console.log("existingOffer" + existingOffer);
         // const abc = existingOffer.map(async(obj)=>{
@@ -220,38 +226,47 @@ const createOffer = async (req, res, next) => {
           return res.status(400).send({
             success: false,
             data: [],
-            message: "Offer already exists on this item with mentioned quantity"
-          })
+            message:
+              "Offer already exists on this item with mentioned quantity",
+          });
         }
         if (!existingOffer) {
-          existingYItem = await validationForYItem(item_x, item_y)
-          console.log("existingYItem" + existingYItem)
+          existingYItem = await validationForYItem(item_x, item_y);
+          console.log("existingYItem" + existingYItem);
           if (existingYItem) {
             return res.status(400).send({
               success: false,
               data: [],
-              message: "Can't choose this item as offer-item"
-            })
+              message: "Can't choose this item as offer-item",
+            });
           }
         }
         break;
       case 2:
-        existingOffer = await validationForExistingOffer(item_x, item_x_quantity)
+        existingOffer = await validationForExistingOffer(
+          item_x,
+          item_x_quantity
+        );
         if (existingOffer) {
-         return res.status(400).send({
-           success: false,
-           data: [],
-           message: "Offer already exists on this item with mentioned quantity"
-         })
+          return res.status(400).send({
+            success: false,
+            data: [],
+            message:
+              "Offer already exists on this item with mentioned quantity",
+          });
         }
-        if(!existingOffer){
-          existingDiscount = await validationForDiscount(item_x, amount_of_discount, is_percentage)
-          if(existingDiscount){
+        if (!existingOffer) {
+          existingDiscount = await validationForDiscount(
+            item_x,
+            amount_of_discount,
+            is_percentage
+          );
+          if (existingDiscount) {
             return res.status(400).send({
               success: false,
-              data:[],
-              message: "Please change the amount of discount"
-            })
+              data: [],
+              message: "Please change the amount of discount",
+            });
           }
         }
         break;
@@ -259,8 +274,8 @@ const createOffer = async (req, res, next) => {
         return res.status(400).send({
           success: false,
           data: [],
-          message: "Please provide a valid type_id"
-        })
+          message: "Please provide a valid type_id",
+        });
       // console.log("incorrect type_id")
     }
 
@@ -299,7 +314,7 @@ const createOffer = async (req, res, next) => {
       end_time,
       is_pos,
       is_ecomm,
-      is_time
+      is_time,
     });
 
     console.log("after offer query");
@@ -411,23 +426,23 @@ const updateOffer = async (req, res, next) => {
             item_x,
             amount_of_discount,
             is_percentage,
-            [Op.not]: [{ id: offerID }]
-          }
-        })
+            [Op.not]: [{ id: offerID }],
+          },
+        });
         if (existingOffer) {
-          testing = true
+          testing = true;
         }
         break;
       default:
-        console.log("abcd")
+        console.log("abcd");
     }
 
     if (testing) {
       return res.status(400).send({
         success: false,
         data: [],
-        message: "Discount can't be same for same item"
-      })
+        message: "Discount can't be same for same item",
+      });
     }
 
     const update = await Offers.update(
@@ -650,4 +665,4 @@ module.exports = {
   updateOffer,
   deleteOffer,
   activateOffer,
-}
+};
