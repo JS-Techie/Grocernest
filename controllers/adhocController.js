@@ -282,9 +282,11 @@ const addSpecialWalletBalance = async (req, res, next) => {
                       { where: { order_id: order_id } }
                     );
                   } else {
+                    // if this is first buy but already bought.
                     console.log(
                       "Customer already purchased this item before.."
                     );
+                    // this time gen wallet balance will be added
                   }
                 });
               }
