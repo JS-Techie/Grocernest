@@ -209,6 +209,7 @@ const createOffer = async (req, res, next) => {
 
     switch (type_id) {
       case 1:
+       // validationForRequiredFields(item_x, item_y, item_x_quantity, item_y_quantity)
 
         existingOffer = await validationForExistingOffer(item_x, item_x_quantity)
 
