@@ -1,4 +1,4 @@
-const {op} = require("sequelize");
+const { op } = require("sequelize");
 const db = require("../models");
 
 const lkp_offers = db.lkpOffersModel;
@@ -7,42 +7,61 @@ const item = db.ItemModel;
 const customer = db.CustomerModel;
 
 
-const isTypePresent = async(type_id)=>{
+const isTypePresent = async (type_id) => {
     const type = await lkp_offers.findOne({
         where: {
-          id: type_id
+            id: type_id
         }
-      })
-    if(type){
+    })
+    if (type) {
         return true
-    } 
+    }
     return false
 }
 
-const validationForTypeId1 = async (item_x, item_x_quantity) =>{
-    const existingOffer = await offers.findAll({
+const validationForExistingOffer = async (item_x, item_x_quantity) => {
+    const existingOffer = await offers.findOne({
         where: {
-          item_x, item_x_quantity
+            item_x, item_x_quantity
         }
     })
-    if(existingOffer){
+    if (existingOffer) {
         return true
     }
     return false
 }
 
-const checkForTypeId2 = async (amount_of_discount, is_percentage, item_x) => {
-    const existingOffer = await t_offers.findOne({
-        where: { item_x, amount_of_discount, is_percentage }
+
+const validationForYItem = async (item_x, item_y) => {
+    const existingOfferItem = await offers.findOne({
+        where: {
+            item_x, item_y
+        }
     })
-    if(existingOffer){
+    if (existingOfferItem) {
         return true
     }
-    return true
+    return false
+}
+
+
+const validationForDiscount = async(item_x, amount_of_discount, is_percentage) =>{
+    const existingDiscount = await offers.findOne({
+        where:{
+            item_x,
+            amount_of_discount,
+            is_percentage: (is_percentage===true)?1:null
+        }
+    })
+    if(existingDiscount){
+        return true
+    }
+    return false
 }
 
 module.exports = {
     isTypePresent,
-    validationForTypeId1,
-    checkForTypeId2
+    validationForExistingOffer,
+    validationForYItem,
+    validationForDiscount
 }

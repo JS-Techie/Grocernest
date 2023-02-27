@@ -4,8 +4,8 @@ const db = require("../../models");
 // const services = require("../../services");
 // const offerService = services.offerService;
 
-const { validationForTypeId1,
-  checkForTypeId2 } = require("../../services/offerService")
+const { isTypePresent, validationForExistingOffer, validationForYItem,
+   validationForDiscount } = require("../../services/offerService")
 
 const lkp_offers = db.lkpOffersModel;
 const Offers = db.OffersModel;
@@ -97,7 +97,7 @@ const getOfferById = async (req, res, next) => {
 
   //get offer id from params
   const offerID = req.params.id;
-  console.log("offerId from param "+offerID)
+  console.log("offerId from param " + offerID)
   try {
     const current = await Offers.findOne({
       where: { id: offerID },
@@ -182,106 +182,105 @@ const createOffer = async (req, res, next) => {
     is_ecomm,
     is_time
   } = req.body;
-  /**
-   * TODO: check if x,y,z item exists in t_item
-   */
+  try {
 
-  /**
-   * on each item with same quantity duplicate offer does not exists - in case of x-item
-   */
-  /* let offer = null;
-   if (item_x) {
-     offer = await Offers.findOne({
-       where: {
-         item_x,
-         [Op.or]: [{ type_id: 1 }, { type_id: 2 }],
-         item_x_quantity
-       },
-     });
-   }
-   if (offer) {
-     return res.status(400).send({
-       success: false,
-       data: offer,
-       message: "Offer already exists for this item",
-     });
-   }*/
-
-  if (!type_id) {
-    return res.status(400).send({
-      success: false,
-      data: [],
-      message: "Please enter the type of offer",
-    });
-  }
-
-  if (type_id) {
-    const validateType = isTypePresent(type_id)
-    if (!validateType) {
+    if (!type_id) {
       return res.status(400).send({
         success: false,
         data: [],
-        message: "Provide a appropriate type_id"
-      })
+        message: "Please enter the type of offer",
+      });
     }
-  }
 
-  let existingOffer = null;
-  switch (type_id) {
-    case 1:
-      existingOffer = validationForTypeId1(item_x, item_x_quantity)
-      if (existingOffer) {
+    if (type_id) {
+      const validateType = isTypePresent(type_id)
+      if (!validateType) {
         return res.status(400).send({
           success: false,
           data: [],
-          message: "Offer already exists"
+          message: "Provide a appropriate type_id"
         })
       }
-      break;
-    case 2:
-      //checkForTypeId2(amount_of_discount, is_percentage, item_x)
-        existingOffer = await Offers.findOne({
-        where: { item_x, amount_of_discount, is_percentage }
-      })
-      if (existingOffer) {
-        testing = true
-      }
-      break;
-    default:
+    }
+
+    let existingOffer = null;
+    let existingYItem = null;
+    let existingDiscount = null;
+
+    switch (type_id) {
+      case 1:
+       // validationForRequiredFields(item_x, item_y, item_x_quantity, item_y_quantity)
+
+        existingOffer = await validationForExistingOffer(item_x, item_x_quantity)
+
+        console.log("existingOffer" + existingOffer);
+        // const abc = existingOffer.map(async(obj)=>{
+        //   console.log(obj)
+        // })
+        if (existingOffer) {
+          return res.status(400).send({
+            success: false,
+            data: [],
+            message: "Offer already exists on this item with mentioned quantity"
+          })
+        }
+        if (!existingOffer) {
+          existingYItem = await validationForYItem(item_x, item_y)
+          console.log("existingYItem" + existingYItem)
+          if (existingYItem) {
+            return res.status(400).send({
+              success: false,
+              data: [],
+              message: "Can't choose this item as offer-item"
+            })
+          }
+        }
+        break;
+      case 2:
+        existingOffer = await validationForExistingOffer(item_x, item_x_quantity)
+        if (existingOffer) {
+         return res.status(400).send({
+           success: false,
+           data: [],
+           message: "Offer already exists on this item with mentioned quantity"
+         })
+        }
+        if(!existingOffer){
+          existingDiscount = await validationForDiscount(item_x, amount_of_discount, is_percentage)
+          if(existingDiscount){
+            return res.status(400).send({
+              success: false,
+              data:[],
+              message: "Please change the amount of discount"
+            })
+          }
+        }
+        break;
+      default:
+        return res.status(400).send({
+          success: false,
+          data: [],
+          message: "Please provide a valid type_id"
+        })
+      // console.log("incorrect type_id")
+    }
+
+    if (is_time && (!start_date || !start_time || !end_date || !end_time)) {
       return res.status(400).send({
         success: false,
         data: [],
-        message: "Please provide a valid type_id"
-      })
-      console.log("incorrect type_id")
-  }
+        message: "Please enter correct details for time based offers",
+      });
+    }
 
-  if (testing) {
-    return res.status(400).send({
-      success: false,
-      data: [],
-      message: "Discount can't be same for same item"
-    })
-  }
+    if (!is_pos && !is_ecomm) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "Please specify if this offer is for POS or ecomm or both",
+      });
+    }
 
-
-  if (is_time && (!start_date || !start_time || !end_date || !end_time)) {
-    return res.status(400).send({
-      success: false,
-      data: [],
-      message: "Please enter correct details for time based offers",
-    });
-  }
-
-  if (!is_pos && !is_ecomm) {
-    return res.status(400).send({
-      success: false,
-      data: [],
-      message: "Please specify if this offer is for POS or ecomm or both",
-    });
-  }
-
-  try {
     console.log("before offer query");
     const newOffer = await Offers.create({
       type_id,
@@ -408,7 +407,6 @@ const updateOffer = async (req, res, next) => {
       case 1:
         break;
       case 2:
-        //checkForTypeId2(amount_of_discount, is_percentage, item_x)
         const existingOffer = await Offers.findOne({
           where: {
             item_x,
