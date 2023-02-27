@@ -1,17 +1,67 @@
-const t_offers = require("../models/t_offers")
+const { op } = require("sequelize");
+const db = require("../models");
 
-const checkForTypeId2 = async (amount_of_discount, is_percentage, item_x) => {
+const lkp_offers = db.lkpOffersModel;
+const offers = db.OffersModel;
+const item = db.ItemModel;
+const customer = db.CustomerModel;
 
 
-    const existingOffer = await t_offers.findOne({
-        where: { item_x, amount_of_discount, is_percentage }
+const isTypePresent = async (type_id) => {
+    const type = await lkp_offers.findOne({
+        where: {
+            id: type_id
+        }
     })
-
-
-    if(existingOffer){
+    if (type) {
         return true
     }
+    return false
+}
+
+const validationForExistingOffer = async (item_x, item_x_quantity) => {
+    const existingOffer = await offers.findOne({
+        where: {
+            item_x, item_x_quantity
+        }
+    })
+    if (existingOffer) {
+        return true
+    }
+    return false
+}
 
 
-    return true
+const validationForYItem = async (item_x, item_y) => {
+    const existingOfferItem = await offers.findOne({
+        where: {
+            item_x, item_y
+        }
+    })
+    if (existingOfferItem) {
+        return true
+    }
+    return false
+}
+
+
+const validationForDiscount = async(item_x, amount_of_discount, is_percentage) =>{
+    const existingDiscount = await offers.findOne({
+        where:{
+            item_x,
+            amount_of_discount,
+            is_percentage: (is_percentage===true)?1:null
+        }
+    })
+    if(existingDiscount){
+        return true
+    }
+    return false
+}
+
+module.exports = {
+    isTypePresent,
+    validationForExistingOffer,
+    validationForYItem,
+    validationForDiscount
 }

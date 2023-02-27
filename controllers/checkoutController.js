@@ -533,6 +533,7 @@ const buyNow = async (req, res, next) => {
       offer_price: offer ? newSalePrice : null,
       MRP: oldestBatch.MRP,
       sale_price: oldestBatch.sale_price,
+      cashback_amount: cashback_amount,
     });
 
     const offerItem = await OffersCache.findOne({
