@@ -163,10 +163,13 @@ const cashback_job = async () => {
         where: {
           order_id: current_order.order_id,
           special_cashback_processed: null,
+          cashback_processed: null,
           cashback_amount: { [Op.gt]: 0 },
           cashback_amount: { [Op.not]: null },
         },
       });
+
+      // console.log("order_items===>>", order_items);
 
       await order_items.map(async (current_item) => {
         await walletService.creditAmount(
@@ -174,6 +177,7 @@ const cashback_job = async () => {
           cust_no,
           "Cashback added for order-" + order_id
         );
+        console.log("Cashback added for order-" + order_id);
 
         await OrderItems.update(
           {
