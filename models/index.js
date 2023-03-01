@@ -103,9 +103,15 @@ db.WalletTransactionModel = require("./t_wallet_transaction")(
 
 db.WalletModel = require("./t_wallet")(db.sequelize, Sequelize);
 
-db.CouponToCustomerModel = require("./t_coupon_to_customer")(db.sequelize, Sequelize);
+db.CouponToCustomerModel = require("./t_coupon_to_customer")(
+  db.sequelize,
+  Sequelize
+);
 
-db.CustomerToCouponMappingModel = require("./t_customer_coupon_mapping")(db.sequelize, Sequelize);
+db.CustomerToCouponMappingModel = require("./t_customer_coupon_mapping")(
+  db.sequelize,
+  Sequelize
+);
 
 db.WishlistModel = require("./t_lkp_wishlist")(db.sequelize, Sequelize);
 
@@ -127,11 +133,15 @@ db.CouponsModel = require("./t_coupons")(db.sequelize, Sequelize);
 
 db.GiftStrategyModel = require("./t_gift_strategy")(db.sequelize, Sequelize);
 
+db.lkpOffersModel = require("./t_lkp_offer")(db.sequelize, Sequelize);
 db.OffersModel = require("./t_offers")(db.sequelize, Sequelize);
 
 db.OffersCacheModel = require("./t_offer_cache")(db.sequelize, Sequelize);
 
-db.SpecialWalletStrategy = require("./t_special_wallet_strategy")(db.sequelize, Sequelize);
+db.SpecialWalletStrategy = require("./t_special_wallet_strategy")(
+  db.sequelize,
+  Sequelize
+);
 
 db.MilkItemsModel = require("./t_milk_items")(db.sequelize, Sequelize);
 

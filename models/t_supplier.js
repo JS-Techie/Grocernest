@@ -1,5 +1,5 @@
 const {
-  DataTypes, literal
+  DataTypes
 } = require('sequelize');
 
 module.exports = sequelize => {
@@ -7,20 +7,56 @@ module.exports = sequelize => {
     id: {
       type: DataTypes.BIGINT,
       allowNull: false,
-      defaultValue: literal("nextval(supplier_seq)"),
+      defaultValue: null,
       primaryKey: true,
       autoIncrement: false,
       comment: null,
       field: "id"
     },
-    first_name: {
+    business_name: {
       type: DataTypes.STRING(250),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "first_name"
+      field: "business_name"
+    },
+    billing_address: {
+      type: DataTypes.STRING(500),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "billing_address"
+    },
+    phone_number: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "phone_number"
+    },
+    email: {
+      type: DataTypes.STRING(200),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "email"
+    },
+    active_ind: {
+      type: DataTypes.CHAR(1),
+      allowNull: false,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "active_ind"
     },
     created_by: {
       type: DataTypes.BIGINT,
@@ -67,15 +103,6 @@ module.exports = sequelize => {
       comment: null,
       field: "supplier_code"
     },
-    last_name: {
-      type: DataTypes.STRING(250),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "last_name"
-    },
     whatsapp_number: {
       type: DataTypes.STRING(100),
       allowNull: true,
@@ -85,14 +112,23 @@ module.exports = sequelize => {
       comment: null,
       field: "whatsapp_number"
     },
-    phone_number: {
-      type: DataTypes.STRING(100),
+    first_name: {
+      type: DataTypes.STRING(250),
       allowNull: true,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "phone_number"
+      field: "first_name"
+    },
+    last_name: {
+      type: DataTypes.STRING(250),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "last_name"
     },
     password: {
       type: DataTypes.STRING(500),
@@ -102,15 +138,6 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "password"
-    },
-    email: {
-      type: DataTypes.STRING(100),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "email"
     },
     type: {
       type: DataTypes.ENUM('g', 'c', 'b'),
@@ -138,15 +165,6 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "aadhar"
-    },
-    billing_address: {
-      type: DataTypes.STRING(500),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "billing_address"
     },
     current_address: {
       type: DataTypes.STRING(500),
@@ -201,24 +219,6 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "new_phone_number"
-    },
-    business_name: {
-      type: DataTypes.STRING(200),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "business_name"
-    },
-    active_ind: {
-      type: DataTypes.CHAR(1),
-      allowNull: true,
-      defaultValue: null,
-      primaryKey: false,
-      autoIncrement: false,
-      comment: null,
-      field: "active_ind"
     }
   };
   const options = {

@@ -1,6 +1,9 @@
-const { DataTypes } = require("sequelize");
+const {
+  DataTypes
+} = require('sequelize');
 
-module.exports = (sequelize) => {
+module.exports = sequelize => {
+
   const attributes = {
     id: {
       type: DataTypes.BIGINT,
@@ -9,7 +12,7 @@ module.exports = (sequelize) => {
       primaryKey: true,
       autoIncrement: true,
       comment: null,
-      field: "id",
+      field: "id"
     },
     item_id: {
       type: DataTypes.BIGINT,
@@ -18,7 +21,7 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "item_id",
+      field: "item_id"
     },
     source: {
       type: DataTypes.STRING(200),
@@ -27,7 +30,7 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "source",
+      field: "source"
     },
     sale_price: {
       type: DataTypes.DECIMAL,
@@ -36,7 +39,7 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "sale_price",
+      field: "sale_price"
     },
     MRP: {
       type: DataTypes.DECIMAL,
@@ -45,7 +48,7 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "MRP",
+      field: "MRP"
     },
     offer: {
       type: DataTypes.STRING(3000),
@@ -54,7 +57,7 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "offer",
+      field: "offer"
     },
     discount: {
       type: DataTypes.DECIMAL,
@@ -72,7 +75,7 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "created_by",
+      field: "created_by"
     },
     updated_by: {
       type: DataTypes.BIGINT,
@@ -99,18 +102,14 @@ module.exports = (sequelize) => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "updated_at",
-    },
+      field: "updated_at"
+    }
   };
   const options = {
     tableName: "t_market_survey",
     comment: "",
-    indexes: [],
+    indexes: []
   };
-  const TMarketSurveyModel = sequelize.define(
-    "t_market_survey_model",
-    attributes,
-    options
-  );
+  const TMarketSurveyModel = sequelize.define("t_market_survey_model", attributes, options);
   return TMarketSurveyModel;
 };

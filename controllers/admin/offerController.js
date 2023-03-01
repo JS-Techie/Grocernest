@@ -1,6 +1,18 @@
 const { Op } = require("sequelize");
 const db = require("../../models");
 
+// const services = require("../../services");
+// const offerService = services.offerService;
+
+const {
+  isTypePresent,
+  validationForExistingOffer,
+  validationForYItem,
+  validationForDiscount,
+  typeIdDetails,
+} = require("../../services/offerService");
+
+const lkp_offers = db.lkpOffersModel;
 const Offers = db.OffersModel;
 const Item = db.ItemModel;
 const Customer = db.CustomerModel;
@@ -23,28 +35,31 @@ const getAllOffers = async (req, res, next) => {
     }
 
     const promises = offers.map(async (current) => {
-      const item1 = await Item.findOne({
-        where: { id: current.item_id_1 },
+      const itemx = await Item.findOne({
+        where: { id: current.item_x },
       });
-      const item2 = await Item.findOne({
-        where: { id: current.item_id_2 },
+      const itemy = await Item.findOne({
+        where: { id: current.item_y },
       });
 
-      const item = await Item.findOne({
-        where: { id: current.item_id },
-      });
+      /*  const item = await Item.findOne({
+          where: { id: current.item_id },
+        });*/
+
+      const type = await typeIdDetails(current.type_id);
 
       return {
         offerID: current.id,
-        offerType: current.type,
-        itemX: current.item_id_1 ? current.item_id_1 : "",
-        firstItem: item1 ? item1.name : "",
-        quantityOfItemX: current.item_1_quantity ? current.item_1_quantity : "",
-        itemY: current.item_id_2 ? current.item_id_2 : "",
-        secondItem: item2 ? item2.name : "",
-        quantityOfItemY: current.item_2_quantity ? current.item_2_quantity : "",
-        itemID: current.item_id ? current.item_id : "",
-        itemName: item ? item.name : "",
+        offerType: current.type_id,
+        offerName: type !== null ? type.offer_type : null,
+        itemX: current.item_x ? current.item_x : "",
+        firstItem: itemx ? itemx.name : "",
+        quantityOfItemX: current.item_x_quantity ? current.item_x_quantity : "",
+        itemY: current.item_y ? current.item_y : "",
+        secondItem: itemy ? itemy.name : "",
+        quantityOfItemY: current.item_y_quantity ? current.item_y_quantity : "",
+        //  itemID: current.item_id ? current.item_id : "",
+        // itemName: item ? item.name : "",
         amountOfDiscount: current.amount_of_discount
           ? current.amount_of_discount
           : "",
@@ -84,6 +99,7 @@ const getOfferById = async (req, res, next) => {
 
   //get offer id from params
   const offerID = req.params.id;
+  console.log("offerId from param " + offerID);
   try {
     const current = await Offers.findOne({
       where: { id: offerID },
@@ -97,29 +113,32 @@ const getOfferById = async (req, res, next) => {
       });
     }
 
-    const item1 = await Item.findOne({
-      where: { id: current.item_id_1 },
+    const itemX = await Item.findOne({
+      where: { id: current.item_x },
     });
-    const item2 = await Item.findOne({
-      where: { id: current.item_id_2 },
+    const itemY = await Item.findOne({
+      where: { id: current.item_y },
     });
-    const item = await Item.findOne({
-      where: { id: current.item_id },
-    });
+    /* const item = await Item.findOne({
+       where: { id: current.item_id },
+     });
+ */
 
+    const type = await typeIdDetails(current.type_id);
     return res.status(200).send({
       success: true,
       data: {
         offerID: current.id,
-        offerType: current.type,
-        itemX: current.item_id_1 ? current.item_id_1 : "",
-        firstItem: item1 ? item1.name : "",
-        quantityOfItemX: current.item_1_quantity ? current.item_1_quantity : "",
-        itemY: current.item_id_2 ? current.item_id_2 : "",
-        secondItem: item2 ? item2.name : "",
-        quantityOfItemY: current.item_2_quantity ? current.item_2_quantity : "",
-        itemID: current.item_id ? current.item_id : "",
-        itemName: item ? item.name : "",
+        offerType: current.type_id,
+        offerName: type !== null ? type.offer_type : null,
+        itemX: current.item_x ? current.item_x : "",
+        firstItem: itemX ? itemX.name : "",
+        quantityOfItemX: current.item_x_quantity ? current.item_x_quantity : "",
+        itemY: current.item_y ? current.item_y : "",
+        secondItem: itemY ? itemY.name : "",
+        quantityOfItemY: current.item_y_quantity ? current.item_y_quantity : "",
+        //  itemID: current.item_id ? current.item_id : "",
+        //  itemName: item ? item.name : "",
         amountOfDiscount: current.amount_of_discount
           ? current.amount_of_discount
           : "",
@@ -152,12 +171,12 @@ const createOffer = async (req, res, next) => {
   //Get current user from JWT
 
   const {
-    type,
-    item_id_1,
-    item_id_2,
-    item_1_quantity,
-    item_2_quantity,
-    item_id,
+    type_id,
+    item_x,
+    item_y,
+    item_x_quantity,
+    item_y_quantity,
+    item_z,
     amount_of_discount,
     is_percentage,
     start_date,
@@ -168,60 +187,122 @@ const createOffer = async (req, res, next) => {
     is_ecomm,
     is_time,
   } = req.body;
-
-  let offer = null;
-
-  if (item_id) {
-    offer = await Offers.findOne({
-      where: { [Op.or]: [{ item_id_1: item_id }, { item_id }] },
-    });
-  } else {
-    offer = await Offers.findOne({
-      where: { [Op.or]: [{ item_id_1 }, { item_id_1: item_id }] },
-    });
-  }
-
-  if (offer) {
-    return res.status(400).send({
-      success: false,
-      data: offer,
-      message: "Offer already exists for this item",
-    });
-  }
-
-  if (!type) {
-    return res.status(400).send({
-      success: false,
-      data: [],
-      message: "Please enter the type of offer",
-    });
-  }
-
-  if (is_time && (!start_date || !start_time || !end_date || !end_time)) {
-    return res.status(400).send({
-      success: false,
-      data: [],
-      message: "Please enter correct details for time based offers",
-    });
-  }
-
-  if (!is_pos && !is_ecomm) {
-    return res.status(400).send({
-      success: false,
-      data: [],
-      message: "Please specify if this offer is for POS or ecomm or both",
-    });
-  }
-
   try {
+    if (!type_id) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "Please enter the type of offer",
+      });
+    }
+
+    if (type_id) {
+      const validateType = isTypePresent(type_id);
+      if (!validateType) {
+        return res.status(400).send({
+          success: false,
+          data: [],
+          message: "Provide a appropriate type_id",
+        });
+      }
+    }
+
+    let existingOffer = null;
+    let existingYItem = null;
+    let existingDiscount = null;
+
+    switch (type_id) {
+      case 1:
+        existingOffer = await validationForExistingOffer(
+          item_x,
+          item_x_quantity
+        );
+
+        console.log("existingOffer" + existingOffer);
+        // const abc = existingOffer.map(async(obj)=>{
+        //   console.log(obj)
+        // })
+        if (existingOffer) {
+          return res.status(400).send({
+            success: false,
+            data: [],
+            message:
+              "Offer already exists on this item with mentioned quantity",
+          });
+        }
+        if (!existingOffer) {
+          existingYItem = await validationForYItem(item_x, item_y);
+          console.log("existingYItem" + existingYItem);
+          if (existingYItem) {
+            return res.status(400).send({
+              success: false,
+              data: [],
+              message: "Can't choose this item as offer-item",
+            });
+          }
+        }
+        break;
+      case 2:
+        existingOffer = await validationForExistingOffer(
+          item_x,
+          item_x_quantity
+        );
+        if (existingOffer) {
+          return res.status(400).send({
+            success: false,
+            data: [],
+            message:
+              "Offer already exists on this item with mentioned quantity",
+          });
+        }
+        if (!existingOffer) {
+          existingDiscount = await validationForDiscount(
+            item_x,
+            amount_of_discount,
+            is_percentage
+          );
+          if (existingDiscount) {
+            return res.status(400).send({
+              success: false,
+              data: [],
+              message: "Please change the amount of discount",
+            });
+          }
+        }
+        break;
+      default:
+        return res.status(400).send({
+          success: false,
+          data: [],
+          message: "Please provide a valid type_id",
+        });
+      // console.log("incorrect type_id")
+    }
+
+    if (is_time && (!start_date || !start_time || !end_date || !end_time)) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "Please enter correct details for time based offers",
+      });
+    }
+
+    if (!is_pos && !is_ecomm) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "Please specify if this offer is for POS or ecomm or both",
+      });
+    }
+
     console.log("before offer query");
     const newOffer = await Offers.create({
-      type,
-      item_id_1,
-      item_id_2,
-      item_1_quantity,
-      item_2_quantity,
-      item_id,
+      type_id,
+      item_x,
+      item_y,
+      item_x_quantity,
+      item_y_quantity,
+      item_z,
       amount_of_discount,
       is_percentage:
         is_percentage !== null ? (is_percentage === true ? 1 : null) : null,
@@ -264,12 +345,11 @@ const updateOffer = async (req, res, next) => {
   const offerID = req.params.id;
 
   const {
-    type,
-    item_id_1,
-    item_id_2,
-    item_1_quantity,
-    item_2_quantity,
-    item_id,
+    type_id,
+    item_x,
+    item_y,
+    item_x_quantity,
+    item_y_quantity,
     amount_of_discount,
     is_percentage,
     start_date,
@@ -295,18 +375,11 @@ const updateOffer = async (req, res, next) => {
     }
 
     let offer = null;
-
-    if (item_id) {
+    if (item_x) {
       offer = await Offers.findOne({
         where: {
-          [Op.or]: [{ item_id_1: item_id }, { item_id }],
-          [Op.not]: [{ id: offerID }],
-        },
-      });
-    } else {
-      offer = await Offers.findOne({
-        where: {
-          [Op.or]: [{ item_id: item_id_1 }, { item_id_1 }],
+          item_x,
+          [Op.or]: [{ type_id: 1 }, { type_id: 2 }],
           [Op.not]: [{ id: offerID }],
         },
       });
@@ -335,7 +408,7 @@ const updateOffer = async (req, res, next) => {
       });
     }
 
-    if (!type) {
+    if (!type_id) {
       return res.status(400).send({
         success: false,
         data: [],
@@ -343,14 +416,43 @@ const updateOffer = async (req, res, next) => {
       });
     }
 
+    let testing = null;
+    switch (type_id) {
+      case 1:
+        break;
+      case 2:
+        const existingOffer = await Offers.findOne({
+          where: {
+            item_x,
+            amount_of_discount,
+            is_percentage,
+            [Op.not]: [{ id: offerID }],
+          },
+        });
+        if (existingOffer) {
+          testing = true;
+        }
+        break;
+      default:
+        console.log("abcd");
+    }
+
+    if (testing) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "Discount can't be same for same item",
+      });
+    }
+
     const update = await Offers.update(
       {
-        type,
-        item_id_1,
-        item_id_2,
-        item_1_quantity,
-        item_2_quantity,
-        item_id,
+        type_id,
+        item_x,
+        item_y,
+        item_x_quantity,
+        item_y_quantity,
+        // item_id,
         amount_of_discount,
         is_percentage: is_percentage === true ? 1 : null,
         start_date,
@@ -376,15 +478,15 @@ const updateOffer = async (req, res, next) => {
         oldOffer: {
           offerID: current.id,
           offerType: current.type,
-          itemX: current.item_id_1 ? current.item_id_1 : "",
-          quantityOfItemX: current.item_1_quantity
-            ? current.item_1_quantity
+          itemX: current.item_x ? current.item_x : "",
+          quantityOfItemX: current.item_x_quantity
+            ? current.item_x_quantity
             : "",
-          itemY: current.item_id_2 ? current.item_id_2 : "",
-          quantityOfItemY: current.item_2_quantity
-            ? current.item_2_quantity
+          itemY: current.item_y ? current.item_y : "",
+          quantityOfItemY: current.item_y_quantity
+            ? current.item_y_quantity
             : "",
-          itemID: current.item_id ? current.item_id : "",
+          // itemID: current.item_id ? current.item_id : "",
           amountOfDiscount: current.amount_of_discount
             ? current.amount_of_discount
             : "",
@@ -450,6 +552,7 @@ const updateOffer = async (req, res, next) => {
   }
 };
 
+/**problem in deleteOffer*/
 const deleteOffer = async (req, res, next) => {
   //Get current user from JWT
 
@@ -481,15 +584,15 @@ const deleteOffer = async (req, res, next) => {
         deletedOffer: {
           offerID: current.id,
           offerType: current.type,
-          itemX: current.item_id_1 ? current.item_id_1 : "",
-          quantityOfItemX: current.item_1_quantity
-            ? current.item_1_quantity
+          itemX: current.item_x ? current.item_x : "",
+          quantityOfItemX: current.item_x_quantity
+            ? current.item_x_quantity
             : "",
-          itemY: current.item_id_2 ? current.item_id_2 : "",
-          quantityOfItemY: current.item_2_quantity
-            ? current.item_2_quantity
+          itemY: current.item_y ? current.item_y : "",
+          quantityOfItemY: current.item_y_quantity
+            ? current.item_y_quantity
             : "",
-          itemID: current.item_id ? current.item_id : "",
+          // itemID: current.item_id ? current.item_id : "",
           amountOfDiscount: current.amount_of_discount
             ? current.amount_of_discount
             : "",

@@ -1,16 +1,20 @@
+// ECOMM CASHBACK
+
 const { Op } = require("sequelize");
 const cron = require("node-cron");
 const uniqid = require("uniqid");
 const db = require("../models");
 const Customers = db.CustomerModel;
 const Order = db.OrderModel;
+const OrderItems = db.OrderItemsModel;
 const Wallet = db.WalletModel;
 const Wallet_Transaction = db.WalletTransactionModel;
 const WalletService = require("../services/walletService");
+const { sendCronReport } = require("../services/whatsapp/whatsappMessages");
 
 const refferal_job = async () => {
   // schedule time is a utc time (11.30pm ist = 6:00pm utc/18:00)
-  cron.schedule("0 0 18 * * *", async () => {
+  cron.schedule("0 25 18 * * *", async () => {
     console.log("Running scheduled CRON-JOB.....");
 
     // referral task
@@ -136,49 +140,77 @@ const cashback_job = async () => {
         where: {
           cust_no: currentUser.cust_no,
           status: "Delivered",
-          cashback_processed: { [Op.ne]: null },
+          cashback_processed: { [Op.eq]: null },
+          // special_cashback_processed: { [Op.eq]: null },
         },
       });
 
       await all_orders.map(async (current_order) => {
-        if (current_order.dataValues.cashback_processed == null) {
-          // which cashback is not processed
-          console.log(
-            "Cashback amount credited=>",
-            current_order.dataValues.cust_no
-          );
+        // if (current_order.dataValues.cashback_processed == null) {
+        // which cashback is not processed
+        // console.log(
+        //   "Cashback amount credited=>",
+        //   current_order.dataValues.cust_no
+        // );
 
-          let cust_no = current_order.dataValues.cust_no;
-          let cashback_amount = current_order.dataValues.cashback_amount;
-          let order_id = current_order.dataValues.order_id;
+        let cust_no = current_order.dataValues.cust_no;
+        let cashback_amount = current_order.dataValues.cashback_amount;
+        let order_id = current_order.dataValues.order_id;
 
-          // credit cashback
+        // loop through current order items
+        let order_items = await OrderItems.findAll({
+          where: {
+            order_id: current_order.order_id,
+            special_cashback_processed: null,
+            cashback_amount: { [Op.gt]: 0 },
+            cashback_amount: { [Op.not]: null },
+          },
+        });
+
+        await order_items.map(async (current_item) => {
           await walletService.creditAmount(
-            cashback_amount,
+            current_item.cashback_amount,
             cust_no,
             "Cashback added for order-" + order_id
           );
 
-          // mark as cashback processed
-          await Order.update(
+          await OrderItems.update(
             {
               cashback_processed: 1,
             },
             {
               where: {
                 order_id: order_id,
-                cust_no: cust_no,
+                item_id: current_item.item_id,
               },
             }
           );
-        }
+        });
+        // credit cashback
+
+        // mark as cashback processed
+        // UNCOMMENT THISS........
+        await Order.update(
+          {
+            cashback_processed: 1,
+          },
+          {
+            where: {
+              order_id: order_id,
+              cust_no: cust_no,
+            },
+          }
+        );
+        // }
       });
     });
+    sendCronReport("cron_ref_1_S");
   } catch (err) {
     console.log("CASHBACK CRON JOB ERROR=>", err);
+    sendCronReport("cron_ref_1_F");
   }
 };
 
 // job();
-// cashback_job();
-module.exports = refferal_job;
+cashback_job();
+// module.exports = refferal_job;

@@ -2,18 +2,18 @@
 // THIS WILL RUN FIRST, THEN CASHBACK CRON WILL RUN
 require("dotenv").config();
 const cron = require("node-cron");
-const { sequelize } = require("../models");
+const { sequelize } = require("./models");
 const { Op } = require("sequelize");
-const db = require("../models");
-const db2 = require("../services/dbSetupService.js");
+const db = require("./models");
+const db2 = require("./services/dbSetupService.js");
 
-const SpecialWalletService = require("../services/specialWalletService");
+const SpecialWalletService = require("./services/specialWalletService");
 
 const Customer = db.CustomerModel;
 const Order = db.OrderModel;
 const OrderItems = db.OrderItemsModel;
 const WalletStrategyTable = db.SpecialWalletStrategy;
-const { sendCronReport } = require("../services/whatsapp/whatsappMessages");
+const { sendCronReport } = require("./services/whatsapp/whatsappMessages");
 
 const addSpecialWalletBalance = async () => {
   let sevenDaysAgo = new Date();
@@ -25,7 +25,7 @@ const addSpecialWalletBalance = async () => {
       status: "Delivered",
       special_cashback_processed: { [Op.eq]: null },
       cashback_processed: { [Op.eq]: null },
-      created_at: { [Op.lt]: sevenDaysAgo },
+      created_at: { [Op.gt]: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
     },
   });
 
@@ -262,16 +262,16 @@ const addSpecialWalletBalance = async () => {
   }
 };
 
-// const special_wallet_job = async () => {
-//   // schedule time is a utc time (11.30pm ist = 6:00pm utc/18:00)
-//   cron.schedule("0 20 18 * * *", async () => {
-//     console.log("Running scheduled CRON-JOB.....");
+const special_wallet_job = async () => {
+  // schedule time is 11:10pm
+  cron.schedule("10 23 * * *", async () => {
+    console.log("Running scheduled CRON-JOB.....");
 
-//     // cashback task
-//     await addSpecialWalletBalance();
-//   });
-// };
+    // cashback task
+    await addSpecialWalletBalance();
+  });
+};
 
-// module.exports = special_wallet_job;
+module.exports = special_wallet_job;
 
-addSpecialWalletBalance();
+// addSpecialWalletBalance();

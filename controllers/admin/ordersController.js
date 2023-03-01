@@ -250,9 +250,10 @@ const getOrderDetails = async (req, res, next) => {
         currentOffer = await Offers.findOne({
           where: {
             is_active: 1,
+            item_x: currentOrderItem.id,
             [Op.or]: [
-              { item_id_1: currentOrderItem.id },
-              { item_id: currentOrderItem.id },
+              { type_id: 1 },
+              { type_id: 2 },
             ],
             is_ecomm: 1
           },
@@ -301,15 +302,14 @@ const getOrderDetails = async (req, res, next) => {
             ? {
               offerID: currentOffer.id,
               offerType: currentOffer.type,
-              itemX: currentOffer.item_id_1 ? currentOffer.item_id_1 : "",
-              quantityOfItemX: currentOffer.item_1_quantity
-                ? currentOffer.item_1_quantity
+              itemX: currentOffer.item_x ? currentOffer.item_x : "",
+              quantityOfItemX: currentOffer.item_x_quantity
+                ? currentOffer.item_x_quantity
                 : "",
-              itemY: currentOffer.item_id_2 ? currentOffer.item_id_2 : "",
-              quantityOfItemY: currentOffer.item_2_quantity
-                ? currentOffer.item_2_quantity
+              itemY: currentOffer.item_y ? currentOffer.item_y : "",
+              quantityOfItemY: currentOffer.item_y_quantity
+                ? currentOffer.item_y_quantity
                 : "",
-              itemID: currentOffer.item_id ? currentOffer.item_id : "",
               amountOfDiscount: currentOffer.amount_of_discount
                 ? currentOffer.amount_of_discount
                 : "",
@@ -472,10 +472,10 @@ const getOrderDetails_unused = async (req, res, next) => {
               : false
             : "",
           offer_item_id: current.offer_item_id,
-          item_id_1: current.item_id_1,
-          item_id_2: current.item_id_2,
-          item_1_quantity: current.item_1_quantity,
-          item_2_quantity: current.item_2_quantity,
+          item_x: current.item_x,
+          item_y: current.item_y,
+          item_x_quantity: current.item_x_quantity,
+          item_y_quantity: current.item_y_quantity,
         };
       }
     });

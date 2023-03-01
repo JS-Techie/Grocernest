@@ -5,11 +5,11 @@ const {
 module.exports = sequelize => {
   const attributes = {
     id: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.STRING(100),
       allowNull: false,
       defaultValue: null,
       primaryKey: true,
-      autoIncrement: true,
+      autoIncrement: false,
       comment: null,
       field: "id"
     },
@@ -78,7 +78,7 @@ module.exports = sequelize => {
     },
     gst: {
       type: DataTypes.STRING(100),
-      allowNull: true,
+      allowNull: false,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,
@@ -87,7 +87,7 @@ module.exports = sequelize => {
     },
     aadhar: {
       type: DataTypes.STRING(100),
-      allowNull: true,
+      allowNull: false,
       defaultValue: null,
       primaryKey: false,
       autoIncrement: false,

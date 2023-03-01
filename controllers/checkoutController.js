@@ -40,8 +40,9 @@ const checkoutFromCart = async (req, res, next) => {
     wallet_balance_used,
     wallet_id,
     cashback_amount,
+    cashback_dtls,
     item_wallet_used,
-    coupon_id
+    coupon_id,
   } = req.body;
 
   if (!total) {
@@ -95,7 +96,7 @@ const checkoutFromCart = async (req, res, next) => {
       final_payable_amount: final_payable_amount,
       cashback_amount: cashback_amount,
       item_wallet_used,
-      coupon_id
+      coupon_id,
     });
 
     const user_wallet = await Wallet.findOne({
@@ -148,6 +149,13 @@ const checkoutFromCart = async (req, res, next) => {
         });
       }
 
+      let this_item_cashback = 0;
+      for (let i = 0; i < cashback_dtls.length; i++) {
+        if (cashback_dtls[i].itemID == currentItem.item_id) {
+          this_item_cashback = cashback_dtls[i].cashback;
+        }
+      }
+
       return {
         order_id: newOrder.order_id,
         item_id: currentItem.item_id,
@@ -160,6 +168,7 @@ const checkoutFromCart = async (req, res, next) => {
           : oldestBatch.sale_price,
         MRP: oldestBatch.MRP,
         sale_price: oldestBatch.sale_price,
+        cashback_amount: this_item_cashback,
       };
     });
 
@@ -186,6 +195,13 @@ const checkoutFromCart = async (req, res, next) => {
         where: { item_id: currentItem.item_id, mark_selected: 1 },
       });
 
+      let this_item_cashback = 0;
+      for (let i = 0; i < cashback_dtls.length; i++) {
+        if (cashback_dtls[i].itemID == currentItem.item_id) {
+          this_item_cashback = cashback_dtls[i].cashback;
+        }
+      }
+
       if (oldestBatch) {
         return {
           itemID: currentItem.item_id,
@@ -197,6 +213,7 @@ const checkoutFromCart = async (req, res, next) => {
               ? currentItem.offer_price
               : oldestBatch.sale_price,
           oldestBatch,
+          cashback_amount: this_item_cashback,
         };
       }
     });
@@ -364,7 +381,7 @@ const buyNow = async (req, res, next) => {
     wallet_id,
     cashback_amount,
     item_wallet_used,
-    coupon_id
+    coupon_id,
   } = req.body;
 
   if (!total) {
@@ -431,7 +448,7 @@ const buyNow = async (req, res, next) => {
       final_payable_amount: final_payable_amount,
       cashback_amount: cashback_amount,
       item_wallet_used,
-      coupon_id
+      coupon_id,
     });
 
     const user_wallet = await Wallet.findOne({
@@ -486,7 +503,7 @@ const buyNow = async (req, res, next) => {
     const orderItems = await Promise.all(promises);
 
     const offer = await Offers.findOne({
-      where: { is_active: 1, item_id: itemID, is_ecomm: 1 },
+      where: { is_active: 1, item_x: itemID, is_ecomm: 1 },
     });
 
     const oldestBatch = await Batch.findOne({
@@ -516,6 +533,7 @@ const buyNow = async (req, res, next) => {
       offer_price: offer ? newSalePrice : null,
       MRP: oldestBatch.MRP,
       sale_price: oldestBatch.sale_price,
+      cashback_amount: cashback_amount,
     });
 
     const offerItem = await OffersCache.findOne({

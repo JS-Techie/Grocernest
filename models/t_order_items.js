@@ -120,6 +120,42 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "sale_price"
+    },
+    cashback_amount: {
+      type: DataTypes.DECIMAL,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "cashback_amount"
+    },
+    cashback_processed: {
+      type: DataTypes.STRING(20),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "cashback_processed"
+    },
+    special_cashback_amount: {
+      type: DataTypes.DECIMAL,
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "special_cashback_amount"
+    },
+    special_cashback_processed: {
+      type: DataTypes.STRING(20),
+      allowNull: true,
+      defaultValue: null,
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "special_cashback_processed"
     }
   };
   const options = {

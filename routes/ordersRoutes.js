@@ -9,7 +9,8 @@ const {
   cancelOrder,
   returnOrder,
   trackOrder,
-  getAllReturns
+  getAllReturns,
+  repeatOrder
 } = require("../controllers/ordersController");
 
 
@@ -21,5 +22,6 @@ router.route("/cancel/:orderId").post(authenticate, cancelOrder);
 router.route("/return/:orderId").post(authenticate, returnOrder);
 router.route("/:orderId/tracking").get(authenticate, trackOrder);
 router.route("/return/view/all").post(authenticate, getAllReturns);
+router.route("/repeat").post(authenticate,repeatOrder)
 
 module.exports = router;
