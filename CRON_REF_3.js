@@ -17,16 +17,16 @@ const WalletService = require("./services/walletService");
 
 const { sendCronReport } = require("./services/whatsapp/whatsappMessages");
 
-// const pos_refferal_job = async () => {
-//   // schedule time is a utc time (11.55pm ist = 6:25pm utc/18:25)
-//   cron.schedule("0 15 18 * * *", async () => {
-//     console.log("Running scheduled CRON-JOB.....");
+const pos_refferal_job = async () => {
+  // schedule time 11pm every day
+  cron.schedule("0 23 * * *", async () => {
+    console.log("Running scheduled CRON-JOB.....");
 
-//     // cashback task
-//     // await pos_cashback_job();
-//     await pos_cashback_job_new();
-//   });
-// };
+    // cashback task
+    // await pos_cashback_job();
+    await pos_cashback_job_new();
+  });
+};
 
 // THIS FUNCTION IS NOT WORKING ANYMORE
 const pos_cashback_job = async () => {
@@ -211,7 +211,7 @@ const pos_cashback_job_new = async () => {
 // cashback_job();
 // job();
 
-// module.exports = pos_refferal_job;
+module.exports = pos_refferal_job;
 
 // pos_cashback_job();
-pos_cashback_job_new();
+// pos_cashback_job_new();
