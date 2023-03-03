@@ -57,18 +57,13 @@ const createStrategy = async (req, res, next) => {
 
     AlreadyPresentAllItemListsSearchOutput.map(getItemsFunc)
 
-    const itemsEntered = (items_list.substring(1, items_list.length - 1).replaceAll("'", "")).split(',')
-
+    console.log(typeof (items_list))
     var flag = 0
-    itemsEntered.forEach((ele) => {
-      if (AlreadyPresentItemListsArray.find((ele1) => ele1 === ele)) {
-        flag = 1
-      }
-      // console.log(flag)
-
+    items_list.forEach((ele) => {
+      AlreadyPresentItemListsArray.forEach((ele1) => { if (ele1 === ele) { flag = 1 } })
     })
+    console.log(flag)
 
-    // console.log("the final flag is thus",flag)
     if(flag===1){
       return res.status(404).json({
         success:false,
