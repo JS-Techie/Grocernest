@@ -33,7 +33,7 @@
         }
       }
     },
-    "/test/secure/user/admin/save": {
+    "/inventory/secure/user/admin/save": {
       "post": {
         "description": "",
         "parameters": [
@@ -98,7 +98,7 @@
         }
       }
     },
-    "/test/secure/user/admin/update/{userId}": {
+    "/inventory/secure/user/admin/update/{userId}": {
       "post": {
         "description": "",
         "parameters": [
@@ -163,7 +163,7 @@
         }
       }
     },
-    "/test/secure/user/users": {
+    "/inventory/secure/user/users": {
       "post": {
         "description": "",
         "parameters": [
@@ -186,7 +186,7 @@
         }
       }
     },
-    "/test/secure/user/getBasicUserDetails": {
+    "/inventory/secure/user/getBasicUserDetails": {
       "post": {
         "description": "",
         "parameters": [
@@ -209,59 +209,7 @@
         }
       }
     },
-    "/test/secure/user/details/{userId}": {
-      "post": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "userId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "404": {
-            "description": "Not Found"
-          }
-        }
-      }
-    },
-    "/test/secure/user/tellerList": {
-      "post": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "404": {
-            "description": "Not Found"
-          }
-        }
-      }
-    },
-    "/test/secure/user/admin/activate/{userId}": {
+    "/inventory/secure/user/details/{userId}": {
       "post": {
         "description": "",
         "parameters": [
@@ -290,7 +238,30 @@
         }
       }
     },
-    "/test/secure/user/admin/deactivate/{userId}": {
+    "/inventory/secure/user/tellerList": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/inventory/secure/user/admin/activate/{userId}": {
       "post": {
         "description": "",
         "parameters": [
@@ -319,7 +290,36 @@
         }
       }
     },
-    "/test/secure/user/users/active": {
+    "/inventory/secure/user/admin/deactivate/{userId}": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/inventory/secure/user/users/active": {
       "post": {
         "description": "",
         "parameters": [
@@ -342,7 +342,7 @@
         }
       }
     },
-    "/test/secure/user/users/deactive": {
+    "/inventory/secure/user/users/deactive": {
       "post": {
         "description": "",
         "parameters": [
