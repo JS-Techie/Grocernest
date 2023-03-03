@@ -104,6 +104,9 @@ const adminDailySalesRouter = require("./routes/admin/dailySalesRoutes");
 const couponToCustomer = require("./routes/admin/couponToCustomer");
 const specialWalletRouter = require("./routes/admin/specialWalletRoutes");
 
+// migration codes
+const userMasterRouter = require("./routes/inventory/masterData/userRoutes");
+
 //Vendor routes import
 
 const vendorRouter = require("./routes/vendor/profileRoutes");
@@ -112,6 +115,9 @@ const vendorRouter = require("./routes/vendor/profileRoutes");
 app.get("/responses", (req, res) => {
   res.send(endPoint);
 });
+
+// inventory master data routes
+app.use("/inventory", userMasterRouter);
 
 // customer routes
 app.use(authRouter);

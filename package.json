@@ -49,6 +49,7 @@
     "uniqueid": "^1.0.0",
     "utc-to-indiantime": "^1.0.7",
     "uuid": "^8.3.2",
+    "validate-date": "^2.0.0",
     "xlsx": "^0.18.5",
     "xss-clean": "^0.1.1"
   }
