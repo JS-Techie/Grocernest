@@ -103,6 +103,7 @@ const adminVendorItemRouter = require("./routes/admin/vendorItemRoutes");
 const adminDailySalesRouter = require("./routes/admin/dailySalesRoutes");
 const couponToCustomer = require("./routes/admin/couponToCustomer");
 const specialWalletRouter = require("./routes/admin/specialWalletRoutes");
+const grnDraftSaveRouter =require("./routes/admin/grnDraftSaveRoutes")
 
 //Vendor routes import
 
@@ -183,6 +184,8 @@ app.use("/deliveryboy/milk", deliveryBoyMilkRouter);
 //vendor routes
 
 app.use("/vendor", vendorRouter);
+
+app.use("/test", grnDraftSaveRouter )
 
 //Start server and connect to DB
 const db = require("./services/dbSetupService.js");
