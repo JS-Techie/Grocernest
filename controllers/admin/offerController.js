@@ -5,7 +5,7 @@ const db = require("../../models");
 // const offerService = services.offerService;
 
 const { isTypePresent, validationForExistingOffer, validationForYItem,
-   validationForDiscount, typeIdDetails } = require("../../services/offerService")
+   validationForDiscount, typeIdDetails, buyXGetAnyYCreation } = require("../../services/offerService")
 
 const lkp_offers = db.lkpOffersModel;
 const Offers = db.OffersModel;
@@ -206,6 +206,7 @@ const createOffer = async (req, res, next) => {
     let existingOffer = null;
     let existingYItem = null;
     let existingDiscount = null;
+    let ult_value = [];
 
     switch (type_id) {
       case 1:
@@ -255,6 +256,23 @@ const createOffer = async (req, res, next) => {
           }
         }
         break;
+      case 3:
+        console.log(req.body)
+        console.log("within block 3")
+          const offerBulk = await buyXGetAnyYCreation(req.body)
+          if(offerBulk){
+            return res.status(201).send({
+              success: true,
+              data: offerBulk,
+              message: "New offer successfully created"
+            })
+          }else{
+            return res.status(400).send({
+              success: false,
+              data: [],
+              message: "Offer failed to create"
+            })
+          }
       default:
         return res.status(400).send({
           success: false,
