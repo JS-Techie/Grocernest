@@ -191,7 +191,7 @@ app.use("/deliveryboy/milk", deliveryBoyMilkRouter);
 
 app.use("/vendor", vendorRouter);
 
-app.use("/test", grnDraftSaveRouter )
+app.use("/grn", grnDraftSaveRouter )
 
 //Start server and connect to DB
 const db = require("./services/dbSetupService.js");
