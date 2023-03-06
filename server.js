@@ -103,10 +103,11 @@ const adminVendorItemRouter = require("./routes/admin/vendorItemRoutes");
 const adminDailySalesRouter = require("./routes/admin/dailySalesRoutes");
 const couponToCustomer = require("./routes/admin/couponToCustomer");
 const specialWalletRouter = require("./routes/admin/specialWalletRoutes");
-const grnDraftSaveRouter =require("./routes/admin/grnDraftSaveRoutes")
 
 // migration codes
 const userMasterRouter = require("./routes/inventory/masterData/userRoutes");
+const grnDraftSaveRouter =require("./routes/inventory/grn/grnDraftSaveRoutes")
+
 
 //Vendor routes import
 
@@ -118,7 +119,10 @@ app.get("/responses", (req, res) => {
 });
 
 // inventory master data routes
-app.use("/inventory", userMasterRouter);
+app.use("/inventory/usermaster", userMasterRouter);
+app.use("/inventory/grn", grnDraftSaveRouter )
+
+
 
 // customer routes
 app.use(authRouter);
@@ -191,7 +195,6 @@ app.use("/deliveryboy/milk", deliveryBoyMilkRouter);
 
 app.use("/vendor", vendorRouter);
 
-app.use("/test", grnDraftSaveRouter )
 
 //Start server and connect to DB
 const db = require("./services/dbSetupService.js");

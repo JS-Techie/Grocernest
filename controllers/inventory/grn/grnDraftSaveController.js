@@ -1,4 +1,4 @@
-const db = require("../../models")
+const db = require("../../../models")
 
 const GrnDetailsModel = db.GrnDetailsModel
 const GrnModel = db.GrnModel
@@ -26,8 +26,6 @@ const grnDraftSaveController = async (req, res) => {
         !supplierId ||
         !invoiceNo ||
         !invoiceAmount ||
-        !supplierDisc ||
-        !grnStatus ||
         !grnDate
     ) {
         grnDedicatedNullCheckFlag = 1
