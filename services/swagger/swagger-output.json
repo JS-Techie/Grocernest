@@ -33,7 +33,7 @@
         }
       }
     },
-    "/inventory/secure/user/admin/save": {
+    "/inventory/usermaster/secure/user/admin/save": {
       "post": {
         "description": "",
         "parameters": [
@@ -98,7 +98,7 @@
         }
       }
     },
-    "/inventory/secure/user/admin/update/{userId}": {
+    "/inventory/usermaster/secure/user/admin/update/{userId}": {
       "post": {
         "description": "",
         "parameters": [
@@ -163,7 +163,7 @@
         }
       }
     },
-    "/inventory/secure/user/users": {
+    "/inventory/usermaster/secure/user/users": {
       "post": {
         "description": "",
         "parameters": [
@@ -186,7 +186,7 @@
         }
       }
     },
-    "/inventory/secure/user/getBasicUserDetails": {
+    "/inventory/usermaster/secure/user/getBasicUserDetails": {
       "post": {
         "description": "",
         "parameters": [
@@ -209,7 +209,7 @@
         }
       }
     },
-    "/inventory/secure/user/details/{userId}": {
+    "/inventory/usermaster/secure/user/details/{userId}": {
       "post": {
         "description": "",
         "parameters": [
@@ -238,7 +238,7 @@
         }
       }
     },
-    "/inventory/secure/user/tellerList": {
+    "/inventory/usermaster/secure/user/tellerList": {
       "post": {
         "description": "",
         "parameters": [
@@ -261,7 +261,7 @@
         }
       }
     },
-    "/inventory/secure/user/admin/activate/{userId}": {
+    "/inventory/usermaster/secure/user/admin/activate/{userId}": {
       "post": {
         "description": "",
         "parameters": [
@@ -290,7 +290,7 @@
         }
       }
     },
-    "/inventory/secure/user/admin/deactivate/{userId}": {
+    "/inventory/usermaster/secure/user/admin/deactivate/{userId}": {
       "post": {
         "description": "",
         "parameters": [
@@ -319,7 +319,7 @@
         }
       }
     },
-    "/inventory/secure/user/users/active": {
+    "/inventory/usermaster/secure/user/users/active": {
       "post": {
         "description": "",
         "parameters": [
@@ -342,7 +342,7 @@
         }
       }
     },
-    "/inventory/secure/user/users/deactive": {
+    "/inventory/usermaster/secure/user/users/deactive": {
       "post": {
         "description": "",
         "parameters": [
@@ -361,6 +361,60 @@
           },
           "404": {
             "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/inventory/grn/draft/save": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "grnId": {
+                  "example": "any"
+                },
+                "grnLocationId": {
+                  "example": "any"
+                },
+                "supplierId": {
+                  "example": "any"
+                },
+                "invoiceNo": {
+                  "example": "any"
+                },
+                "invoiceAmount": {
+                  "example": "any"
+                },
+                "supplierDisc": {
+                  "example": "any"
+                },
+                "grnStatus": {
+                  "example": "any"
+                },
+                "grnDate": {
+                  "example": "any"
+                },
+                "itemDetails": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       }

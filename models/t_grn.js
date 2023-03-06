@@ -1,17 +1,15 @@
-const {
-  DataTypes, literal
-} = require('sequelize');
+const { DataTypes, literal } = require("sequelize");
 
-module.exports = sequelize => {
+module.exports = (sequelize) => {
   const attributes = {
     id: {
       type: DataTypes.BIGINT,
       allowNull: false,
       defaultValue: literal("nextval(t_grn_seq)"),
       primaryKey: true,
-      autoIncrement: false,
+      autoIncrement: true,
       comment: null,
-      field: "id"
+      field: "id",
     },
     grn_location_id: {
       type: DataTypes.BIGINT,
@@ -23,8 +21,8 @@ module.exports = sequelize => {
       field: "grn_location_id",
       references: {
         key: "id",
-        model: "t_lkp_location_model"
-      }
+        model: "t_lkp_location_model",
+      },
     },
     supplier_id: {
       type: DataTypes.BIGINT,
@@ -36,8 +34,8 @@ module.exports = sequelize => {
       field: "supplier_id",
       references: {
         key: "id",
-        model: "t_supplier_model"
-      }
+        model: "t_supplier_model",
+      },
     },
     invoice_no: {
       type: DataTypes.STRING(100),
@@ -46,7 +44,7 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "invoice_no"
+      field: "invoice_no",
     },
     invoice_amt: {
       type: DataTypes.DECIMAL,
@@ -55,16 +53,16 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "invoice_amt"
+      field: "invoice_amt",
     },
     grn_date: {
       type: DataTypes.DATE,
       allowNull: false,
-      defaultValue: sequelize.fn('current_timestamp'),
+      defaultValue: sequelize.fn("current_timestamp"),
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "grn_date"
+      field: "grn_date",
     },
     status: {
       type: DataTypes.STRING(10),
@@ -73,7 +71,7 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "status"
+      field: "status",
     },
     active_ind: {
       type: DataTypes.CHAR(1),
@@ -82,7 +80,7 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "active_ind"
+      field: "active_ind",
     },
     created_by: {
       type: DataTypes.BIGINT,
@@ -91,7 +89,7 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "created_by"
+      field: "created_by",
     },
     updated_by: {
       type: DataTypes.BIGINT,
@@ -100,7 +98,7 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "updated_by"
+      field: "updated_by",
     },
     created_at: {
       type: DataTypes.DATE,
@@ -109,7 +107,7 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "created_at"
+      field: "created_at",
     },
     updated_at: {
       type: DataTypes.DATE,
@@ -118,7 +116,7 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "updated_at"
+      field: "updated_at",
     },
     supplier_disc: {
       type: DataTypes.DECIMAL,
@@ -127,23 +125,26 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "supplier_disc"
-    }
+      field: "supplier_disc",
+    },
   };
   const options = {
     tableName: "t_grn",
     comment: "",
-    indexes: [{
-      name: "grn_fkey1",
-      unique: false,
-      type: "BTREE",
-      fields: ["grn_location_id"]
-    }, {
-      name: "grn_fkey2",
-      unique: false,
-      type: "BTREE",
-      fields: ["supplier_id"]
-    }]
+    indexes: [
+      {
+        name: "grn_fkey1",
+        unique: false,
+        type: "BTREE",
+        fields: ["grn_location_id"],
+      },
+      {
+        name: "grn_fkey2",
+        unique: false,
+        type: "BTREE",
+        fields: ["supplier_id"],
+      },
+    ],
   };
   const TGrnModel = sequelize.define("t_grn_model", attributes, options);
   return TGrnModel;
