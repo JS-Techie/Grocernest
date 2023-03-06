@@ -3843,16 +3843,19 @@
                 "item_x": {
                   "example": "any"
                 },
-                "item_y": {
+                "item_x_quantity": {
                   "example": "any"
                 },
-                "item_x_quantity": {
+                "item_y": {
                   "example": "any"
                 },
                 "item_y_quantity": {
                   "example": "any"
                 },
                 "item_z": {
+                  "example": "any"
+                },
+                "item_z_quantity": {
                   "example": "any"
                 },
                 "amount_of_discount": {

@@ -6,6 +6,51 @@ const offers = db.OffersModel;
 const item = db.ItemModel;
 const customer = db.CustomerModel;
 
+/*
+const isItemExists = async(item_x, item_y) =>{
+    if(item_x!==null){
+        let count=0;
+        const xItem = item.findOne({
+            where:{
+                id: item_x
+            }
+        })
+        if(xItem){
+            if(item_y !== null){
+                if(item_y.isArray){
+                    item_y.map(async(object)=>{
+                        const yItem = await item.findOne({
+                            where:{
+                                id: item_y
+                            }
+                        })
+                        if(yItem) {
+                            count++;
+                        }else{
+                            return object
+                        }
+                    })
+                    if(count===item_y.size()){
+                       return true
+                    }
+                }else{
+                const yItem = await item.findOne({
+                    where:{
+                        id: item_y
+                    }
+                })
+                if(yItem) {
+                    return true
+                }else{
+                    return item_y
+                }
+                }
+            } 
+        }     
+    }else{
+        return item_x
+    }   
+}*/
 
 const isTypePresent = async (type_id) => {
     const type = await lkp_offers.findOne({
@@ -117,6 +162,22 @@ const fieldValidation =  (offerDetails)=>{
     }
 }
 
+const itemCombinationValidation = async (item_x, item_x_quantity, item_y, item_y_quantity)=>{
+    const combitation = await offers.findOne({
+        where:{
+           item_x,
+           item_x_quantity,
+           item_y,
+           item_y_quantity,
+        }
+    })
+    if(combitation){
+       return true
+    }else{
+       return false
+    }
+}
+
 
 
 module.exports = {
@@ -126,5 +187,7 @@ module.exports = {
     validationForDiscount,
     typeIdDetails,
     buyXGetAnyYCreation,
-    fieldValidation
+    fieldValidation,
+  //  isItemExists
+    itemCombinationValidation
 }

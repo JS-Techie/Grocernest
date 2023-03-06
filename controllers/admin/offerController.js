@@ -5,7 +5,7 @@ const db = require("../../models");
 // const offerService = services.offerService;
 
 const { isTypePresent, validationForExistingOffer, validationForYItem,
-   validationForDiscount, typeIdDetails, buyXGetAnyYCreation } = require("../../services/offerService")
+   validationForDiscount, typeIdDetails, buyXGetAnyYCreation, itemCombinationValidation } = require("../../services/offerService")
 
 const lkp_offers = db.lkpOffersModel;
 const Offers = db.OffersModel;
@@ -168,10 +168,11 @@ const createOffer = async (req, res, next) => {
   const {
     type_id,
     item_x,
-    item_y,
     item_x_quantity,
+    item_y,
     item_y_quantity,
     item_z,
+    item_z_quantity,
     amount_of_discount,
     is_percentage,
     start_date,
@@ -182,6 +183,7 @@ const createOffer = async (req, res, next) => {
     is_ecomm,
     is_time
   } = req.body;
+
   try {
 
     if (!type_id) {
@@ -191,7 +193,6 @@ const createOffer = async (req, res, next) => {
         message: "Please enter the type of offer",
       });
     }
-
     if (type_id) {
       const validateType = isTypePresent(type_id)
       if (!validateType) {
@@ -203,16 +204,25 @@ const createOffer = async (req, res, next) => {
       }
     }
 
+    let validItem = null;
     let existingOffer = null;
     let existingYItem = null;
     let existingDiscount = null;
     let ult_value = [];
+    let itemValidationTypeId4 = null;
 
     switch (type_id) {
       case 1:
-
+        /*
+        validItem = await isItemExists(item_x, item_y)
+        if(validItem !== true){
+          return res.status(400).send({
+            success: false,
+            data: validItem,
+            messsage: "Above item is not a existing item"
+          })
+        }*/
         existingOffer = await validationForExistingOffer(item_x, item_x_quantity)
-
         console.log("existingOffer" + existingOffer);
         // const abc = existingOffer.map(async(obj)=>{
         //   console.log(obj)
@@ -273,6 +283,15 @@ const createOffer = async (req, res, next) => {
               message: "Offer failed to create"
             })
           }
+      case 4:
+        itemCombValidation = await itemCombinationValidation(item_x, item_x_quantity, item_y, item_y_quantity)
+        if(itemCombValidation){
+          return res.status(400).send({
+            success: false,
+            data: [],
+            message: "item combination present, please change any of itemId or quantity"
+          })
+        }
       default:
         return res.status(400).send({
           success: false,
