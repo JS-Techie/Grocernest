@@ -5,7 +5,7 @@ const db = require("../../models");
 // const offerService = services.offerService;
 
 const { isTypePresent, validationForExistingOffer, validationForYItem,
-   validationForDiscount, typeIdDetails, buyXGetAnyYCreation, itemCombinationValidation } = require("../../services/offerService")
+   validationForDiscount, typeIdDetails, buyXGetAnyYCreation, itemCombinationValidation, offerItemValidationType4 } = require("../../services/offerService")
 
 const lkp_offers = db.lkpOffersModel;
 const Offers = db.OffersModel;
@@ -118,8 +118,17 @@ const getOfferById = async (req, res, next) => {
        where: { id: current.item_id },
      });
  */
-
+    console.log("Offer_type_id: "+current.type_id)
     const type = await typeIdDetails(current.type_id)
+    if(type){
+        console.log("Offer_type_details: "+type.id)
+        console.log("Offer_type_details: "+type.offer_type)
+      
+    }else{
+      console.log("Hello World")
+    }
+   
+    
     return res.status(200).send({
       success: true,
       data: {
@@ -209,7 +218,8 @@ const createOffer = async (req, res, next) => {
     let existingYItem = null;
     let existingDiscount = null;
     let ult_value = [];
-    let itemValidationTypeId4 = null;
+    let itemCombValidation = null;
+    let offerItemOfType4 = null;
 
     switch (type_id) {
       case 1:
@@ -284,14 +294,55 @@ const createOffer = async (req, res, next) => {
             })
           }
       case 4:
-        itemCombValidation = await itemCombinationValidation(item_x, item_x_quantity, item_y, item_y_quantity)
+        itemCombValidation = await itemCombinationValidation(item_x, item_y)
         if(itemCombValidation){
           return res.status(400).send({
             success: false,
             data: [],
-            message: "item combination present, please change any of itemId or quantity"
+            message: "item combination present, please change any of choosen item"
+          })
+        }else{
+          offerItemOfType4 = await offerItemValidationType4(item_z, type_id)
+          if(offerItemOfType4 === true){
+            return res.status(400).send({
+              success: false,
+              data: [],
+              message: "please change the offer item"
+            })
+          }
+        }
+        if(!item_x_quantity || !item_y_quantity || !item_z_quantity){
+          return res.status(400).send({
+            success: false,
+            data:[],
+            message:"choose a valid quantity for require items"
           })
         }
+        break;
+      case 5:
+        itemCombValidation = await itemCombinationValidation(item_x, item_y)
+        if(itemCombValidation){
+          return res.status(400).send({
+            success: false,
+            data: [],
+            message: "item combination present, please change any of choosen item"
+          })
+        }
+        if(!item_x_quantity || !item_y_quantity){
+          return res.status(400).send({
+            success: false,
+            data:[],
+            message:"choose a valid quantity for require items"
+          })
+        }
+        if(!amount_of_discount){
+          return res.status(400).send({
+            success: false,
+            data: [],
+            message: "please enter a discount amount"
+          })
+        }
+        break;
       default:
         return res.status(400).send({
           success: false,
@@ -301,7 +352,7 @@ const createOffer = async (req, res, next) => {
       // console.log("incorrect type_id")
     }
 
-    if (is_time && (!start_date || !start_time || !end_date || !end_time)) {
+    if (is_time &&(!start_date || !start_time || !end_date || !end_time)) {
       return res.status(400).send({
         success: false,
         data: [],
@@ -325,6 +376,7 @@ const createOffer = async (req, res, next) => {
       item_x_quantity,
       item_y_quantity,
       item_z,
+      item_z_quantity,
       amount_of_discount,
       is_percentage:
         is_percentage !== null ? (is_percentage === true ? 1 : null) : null,

@@ -1,4 +1,4 @@
-const { op } = require("sequelize");
+const { Op } = require("sequelize");
 const db = require("../models");
 
 const lkp_offers = db.lkpOffersModel;
@@ -106,7 +106,7 @@ const validationForDiscount = async(item_x, amount_of_discount, is_percentage) =
 
 const typeIdDetails = async (type_id)=>{
     const details = await lkp_offers.findOne({
-        id:type_id
+        where:{id:type_id}
     })
     if(details){
         return details
@@ -162,21 +162,40 @@ const fieldValidation =  (offerDetails)=>{
     }
 }
 
-const itemCombinationValidation = async (item_x, item_x_quantity, item_y, item_y_quantity)=>{
-    const combitation = await offers.findOne({
-        where:{
-           item_x,
-           item_x_quantity,
-           item_y,
-           item_y_quantity,
+const itemCombinationValidation = async (item_x, item_y)=>{
+    if(item_x!==null && item_y!==null){
+        const combitation = await offers.findOne({
+            where:{
+               item_x,
+               item_y,
+               [Op.or]:[{type_id:4},{type_id:5}]
+            }
+        })
+        if(combitation){
+           return combitation
         }
-    })
-    if(combitation){
-       return true
-    }else{
-       return false
-    }
+        return false  
+    }    
 }
+
+const offerItemValidationType4 = async (item_z, type_id)=>{
+    if(item_z!==null && type_id!==null){
+        const exists = await offers.findOne({
+            where:{
+                item_z,
+                type_id
+            }
+        })
+        if(exists){
+            return true
+        }
+        return false
+    }    
+}
+
+
+
+
 
 
 
@@ -189,5 +208,7 @@ module.exports = {
     buyXGetAnyYCreation,
     fieldValidation,
   //  isItemExists
-    itemCombinationValidation
+    itemCombinationValidation,
+    offerItemValidationType4
+    
 }
