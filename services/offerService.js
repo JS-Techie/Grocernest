@@ -61,7 +61,7 @@ const validationForDiscount = async(item_x, amount_of_discount, is_percentage) =
 
 const typeIdDetails = async (type_id)=>{
     const details = await lkp_offers.findOne({
-        id:type_id
+       where:{ id:type_id }
     })
     if(details){
         return details
