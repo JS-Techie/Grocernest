@@ -253,9 +253,10 @@ const activeBrand = async (req, res, next) => {
 };
 
 const deactiveBrand = async (req, res, next) => {
-  const { brandIdList } = req.body;
+  const brandIdList = req.body;
   const { user_id } = req;
   try {
+    console.log(req.body);
     if (brandIdList.length === 0) {
       return res.status(200).send({
         status: 500,
