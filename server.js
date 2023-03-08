@@ -106,8 +106,10 @@ const specialWalletRouter = require("./routes/admin/specialWalletRoutes");
 
 // migration codes
 const userMasterRouter = require("./routes/inventory/masterData/userRoutes");
-const grnDraftSaveRouter =require("./routes/inventory/grn/grnDraftSaveRoutes")
+const brandMasterRouter = require("./routes/inventory/masterData/brandRoutes");
 
+//grn
+const grnDraftSaveRouter = require("./routes/inventory/grn/grnDraftSaveRoutes");
 
 //Vendor routes import
 
@@ -120,9 +122,9 @@ app.get("/responses", (req, res) => {
 
 // inventory master data routes
 app.use("/inventory/usermaster", userMasterRouter);
-app.use("/inventory/grn", grnDraftSaveRouter )
+app.use("/inventory/brandmaster", brandMasterRouter);
 
-
+app.use("/inventory/grn", grnDraftSaveRouter);
 
 // customer routes
 app.use(authRouter);
@@ -194,7 +196,6 @@ app.use("/deliveryboy/milk", deliveryBoyMilkRouter);
 //vendor routes
 
 app.use("/vendor", vendorRouter);
-
 
 //Start server and connect to DB
 const db = require("./services/dbSetupService.js");
