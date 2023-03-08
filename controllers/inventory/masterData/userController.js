@@ -36,12 +36,12 @@ const saveUser = async (req, res, next) => {
       });
     }
     const userObject = await User.findOne({
-      where: { email },
+      where: { email , mobile_no:mobileNo},
     });
     if (userObject) {
       return res.status(200).send({
         status: 400,
-        message: "User object already exists",
+        message: "User already exists",
         data: [],
       });
     }
