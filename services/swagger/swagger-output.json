@@ -548,7 +548,7 @@
         }
       }
     },
-    "./inventory/colormaster/secure/color/saveColor": {
+    "/inventory/colormaster/secure/color/saveColor": {
       "post": {
         "description": "",
         "parameters": [
@@ -592,7 +592,7 @@
         }
       }
     },
-    "./inventory/colormaster/secure/color/getAllColor": {
+    "/inventory/colormaster/secure/color/getAllColor": {
       "post": {
         "description": "",
         "parameters": [
@@ -615,42 +615,7 @@
         }
       }
     },
-    "./inventory/colormaster/secure/color/activeColor": {
-      "post": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "example": "any"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "404": {
-            "description": "Not Found"
-          }
-        }
-      }
-    },
-    "./inventory/colormaster/secure/color/deactiveColor": {
+    "/inventory/colormaster/secure/color/activeColor": {
       "post": {
         "description": "",
         "parameters": [
@@ -685,7 +650,42 @@
         }
       }
     },
-    "./inventory/colormaster/secure/color/getActiveColor": {
+    "/inventory/colormaster/secure/color/deactiveColor": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/inventory/colormaster/secure/color/getActiveColor": {
       "post": {
         "description": "",
         "parameters": [
@@ -708,7 +708,7 @@
         }
       }
     },
-    "./inventory/colormaster/secure/color/getDeactiveColor": {
+    "/inventory/colormaster/secure/color/getDeactiveColor": {
       "post": {
         "description": "",
         "parameters": [
