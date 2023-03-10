@@ -42,6 +42,35 @@ const createStrategy = async (req, res, next) => {
 
     let strategy_id = uniqid();
 
+
+    const AlreadyPresentAllItemListsSearchOutput = await WalletStrategy.findAll({
+      attributes: ['items_list'],
+    })
+    var AlreadyPresentItemListsArray = []
+    const getItemsFunc = (item) => {
+      eachItemsList = JSON.parse(item.dataValues.items_list);
+
+      eachItemsList.forEach((ele) => {
+        AlreadyPresentItemListsArray.push(ele)
+      })
+    }
+
+    AlreadyPresentAllItemListsSearchOutput.map(getItemsFunc)
+
+    console.log(typeof (items_list))
+    var flag = 0
+    items_list.forEach((ele) => {
+      AlreadyPresentItemListsArray.forEach((ele1) => { if (ele1 === ele) { flag = 1 } })
+    })
+    console.log(flag)
+
+    if(flag===1){
+      return res.status(404).json({
+        success:false,
+        message: "Same Item cannot be provided with more than one offer strategy",
+      })
+    }
+
     const new_strategy = await WalletStrategy.create({
       id: strategy_id,
       offer_name,
@@ -131,7 +160,7 @@ const viewStrategy = async (req, res, next) => {
   }
 };
 
-const editStrategy = async (req, res, next) => {};
+const editStrategy = async (req, res, next) => { };
 
 const deleteStrategy = async (req, res, next) => {
   const { strategy_id } = req.body;
