@@ -76,7 +76,6 @@ const validationForExistingOffer = async (item_x, item_x_quantity) => {
     return false
 }
 
-
 const validationForYItem = async (item_x, item_y) => {
     const existingOfferItem = await offers.findOne({
         where: {
@@ -88,7 +87,6 @@ const validationForYItem = async (item_x, item_y) => {
     }
     return false
 }
-
 
 const validationForDiscount = async(item_x, amount_of_discount, is_percentage) =>{
     const existingDiscount = await offers.findOne({
@@ -114,14 +112,74 @@ const typeIdDetails = async (type_id)=>{
     return false
 }
 
+const offerItemDuplicacyCheckType3 = async(offerDetails)=>{
+    let duplicate = null
+    let result = []
+    let offerItems = []
+   if(offerDetails.item_y){
+    offerItems = offerDetails.item_y
+   }
+   
+   for(i=0; i<offerItems.length; i++){
+     for(j=0; j<offerItems.length; j++){
+        if(i!=j){
+           if(offerItems[i]==offerItems[j]){
+              result.push(offerItems[i])
+           }
+        }  
+     }
+   }
+   if(result.length>0){
+    return result
+   }
+   return false
+}
+
+const xSpecificYItemValidationType3 = async(offerDetails)=>{
+    let allYItems = null
+    let collectionOfY = []
+    const isExists = await offers.findAll({
+        where:{
+            type_id: offerDetails.type_id,
+            item_x: offerDetails.item_x,
+        }
+    })
+    //console.log("isExists "+isExists)
+    if(isExists){
+        isExists.map((each_obj)=>{
+            //console.log("each_obj "+each_obj.item_y)
+            collectionOfY.push(each_obj.item_y)
+        })
+    }
+    console.log("collectionOfY "+collectionOfY)
+    let result=[]
+    console.log("First Size "+result.length)
+    if(offerDetails.item_y){
+        console.log("yes, array")
+        offerDetails.item_y.map((y)=>{
+            const res = collectionOfY.includes(y)
+            console.log("isExists: "+res)
+            if(res){
+              result.push(y)
+            }
+        })
+    }
+    console.log("Result: "+result)
+    const val = result.length
+    console.log("The val "+val)
+    if(result.length>0){
+        return result
+    }
+    return false
+}
 
 const buyXGetAnyYCreation = async (offerDetails)=>{
     let ultimateValue = []
-    offerDetails.item_y.map((object)=>{
+    offerDetails.item_y.map((requestYItem)=>{
         const value = {
             type_id: offerDetails.type_id,
             item_x: offerDetails.item_x,
-            item_y: object,
+            item_y: requestYItem,
             item_x_quantity: offerDetails.item_x_quantity,
             item_y_quantity: offerDetails.item_y_quantity,
             item_z: offerDetails.item_z,
@@ -209,6 +267,10 @@ module.exports = {
     fieldValidation,
   //  isItemExists
     itemCombinationValidation,
-    offerItemValidationType4
+    offerItemValidationType4,
+    xSpecificYItemValidationType3,
+    offerItemDuplicacyCheckType3
+    
+
     
 }

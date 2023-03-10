@@ -5,7 +5,8 @@ const db = require("../../models");
 // const offerService = services.offerService;
 
 const { isTypePresent, validationForExistingOffer, validationForYItem,
-   validationForDiscount, typeIdDetails, buyXGetAnyYCreation, itemCombinationValidation, offerItemValidationType4 } = require("../../services/offerService")
+   validationForDiscount, typeIdDetails, buyXGetAnyYCreation, itemCombinationValidation, offerItemValidationType4,
+   xSpecificYItemValidationType3, offerItemDuplicacyCheckType3 } = require("../../services/offerService")
 
 const lkp_offers = db.lkpOffersModel;
 const Offers = db.OffersModel;
@@ -279,6 +280,24 @@ const createOffer = async (req, res, next) => {
       case 3:
         console.log(req.body)
         console.log("within block 3")
+          const offerItemDuplicacy = await offerItemDuplicacyCheckType3(req.body)
+          if(offerItemDuplicacy){
+            return res.status(400).send({
+              success: false,
+              data: offerItemDuplicacy,
+              message:"Duplicate item present in offer item list, please optimize"
+            })
+          }
+          const offerItemValidation = await xSpecificYItemValidationType3(req.body)
+          console.log("value "+offerItemValidation)
+          if(offerItemValidation){
+            return res.status(400).send({
+              success: false,
+              data: offerItemValidation,
+              message:"offer item previously present, please change the offer item"
+            })
+          }
+          console.log("offerItemValidation "+ offerItemValidation)
           const offerBulk = await buyXGetAnyYCreation(req.body)
           if(offerBulk){
             return res.status(201).send({
