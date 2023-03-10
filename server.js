@@ -130,7 +130,7 @@ app.use("/inventory/usermaster", userMasterRouter);
 app.use("/inventory/brandmaster", brandMasterRouter);
 app.use("/inventory/sizemaster", sizeMasterRouter); 
 // app.use("/inventory/stockTransfer", stockTransferRouter);
-app.use("./inventory/colormaster",colorMasterRouter);
+app.use("/inventory/colormaster",colorMasterRouter);
 
 // inventory grn routes
 app.use("/inventory/grn", grnDraftSaveRouter);
