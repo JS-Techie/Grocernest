@@ -107,6 +107,7 @@ const specialWalletRouter = require("./routes/admin/specialWalletRoutes");
 // migration codes
 const userMasterRouter = require("./routes/inventory/masterData/userRoutes");
 const brandMasterRouter = require("./routes/inventory/masterData/brandRoutes");
+const colorMasterRouter = require("./routes/inventory/masterData/colorRoutes");
 
 //grn
 const grnDraftSaveRouter = require("./routes/inventory/grn/grnDraftSaveRoutes");
@@ -123,7 +124,9 @@ app.get("/responses", (req, res) => {
 // inventory master data routes
 app.use("/inventory/usermaster", userMasterRouter);
 app.use("/inventory/brandmaster", brandMasterRouter);
+app.use("./inventory/colormaster",colorMasterRouter);
 
+// inventory grn routes
 app.use("/inventory/grn", grnDraftSaveRouter);
 
 // customer routes
