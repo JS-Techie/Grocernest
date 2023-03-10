@@ -128,7 +128,7 @@ const getAllColor = async (req, res, next) => {
     }
 }
 const activeColor = async (req, res, next) => {
-    const { id } = req.body;
+    const  id  = req.body;
     try {
         const currentColour = await Color.findOne({
             where: { id }
@@ -170,7 +170,7 @@ const activeColor = async (req, res, next) => {
     }
 }
 const deactiveColor = async (req, res, next) => {
-    const { id } = req.body;
+    const id = req.body;
     try {
         const currentColour = await Color.findOne({
             where: { id }
