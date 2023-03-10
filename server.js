@@ -124,7 +124,7 @@ app.get("/responses", (req, res) => {
 // inventory master data routes
 app.use("/inventory/usermaster", userMasterRouter);
 app.use("/inventory/brandmaster", brandMasterRouter);
-app.use("./inventory/colormaster",colorMasterRouter);
+app.use("/inventory/colormaster",colorMasterRouter);
 
 // inventory grn routes
 app.use("/inventory/grn", grnDraftSaveRouter);
