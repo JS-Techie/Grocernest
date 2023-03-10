@@ -33,6 +33,92 @@
         }
       }
     },
+    "/attendance/login": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/register": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "firstName": {
+                  "example": "any"
+                },
+                "lastName": {
+                  "example": "any"
+                },
+                "phoneNumber": {
+                  "example": "any"
+                },
+                "callingNumber": {
+                  "example": "any"
+                },
+                "email": {
+                  "example": "any"
+                },
+                "password": {
+                  "example": "any"
+                },
+                "referral_code": {
+                  "example": "any"
+                },
+                "opt_in": {
+                  "example": "any"
+                },
+                "recaptchaEnteredByUser": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "409": {
+            "description": "Conflict"
+          }
+        }
+      }
+    },
     "/inventory/usermaster/secure/user/admin/save": {
       "post": {
         "description": "",
@@ -493,7 +579,7 @@
             "schema": {
               "type": "object",
               "properties": {
-                "brandIdList": {
+                "length": {
                   "example": "any"
                 }
               }
@@ -528,11 +614,231 @@
             "schema": {
               "type": "object",
               "properties": {
-                "brandIdList": {
+                "length": {
                   "example": "any"
                 }
               }
             }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/inventory/stockTransfer/secure/stockTransfer/searchStockRequest": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "RAISE_STOCK_REQUEST": {
+                  "example": "any"
+                },
+                "STOCK_TRANSFER_DESPATCHED": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/inventory/stockTransfer/secure/stockTransfer/raiseStockRequest": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "requestType": {
+                  "example": "any"
+                },
+                "despatchRemarks": {
+                  "example": "any"
+                },
+                "deliveryPartner": {
+                  "example": "any"
+                },
+                "itemDetails": {
+                  "example": "any"
+                },
+                "fromLocationId": {
+                  "example": "any"
+                },
+                "toLocationId": {
+                  "example": "any"
+                },
+                "batchId": {
+                  "example": "any"
+                },
+                "itemId": {
+                  "example": "any"
+                },
+                "despatchedQuantity": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/inventory/stockTransfer/secure/stockTransfer/getStockRequestDetails": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "stockRequestIdList": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/inventory/stockTransfer/secure/stockTransfer/updateStockRequest": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "requestType": {
+                  "example": "any"
+                },
+                "stockTransferId": {
+                  "example": "any"
+                },
+                "acceptRemarks": {
+                  "example": "any"
+                },
+                "stockTransferDetailsId": {
+                  "example": "any"
+                },
+                "batchId": {
+                  "example": "any"
+                },
+                "itemId": {
+                  "example": "any"
+                },
+                "lostQuantity": {
+                  "example": "any"
+                },
+                "defectiveQuantity": {
+                  "example": "any"
+                },
+                "receivedQuantity": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/inventory/stockTransfer/secure/stockTransfer/getStockRequestDetails/{stockTransferId}": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "stockTransferId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
           }
         ],
         "responses": {
@@ -598,66 +904,6 @@
           },
           "500": {
             "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/register": {
-      "post": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "firstName": {
-                  "example": "any"
-                },
-                "lastName": {
-                  "example": "any"
-                },
-                "phoneNumber": {
-                  "example": "any"
-                },
-                "callingNumber": {
-                  "example": "any"
-                },
-                "email": {
-                  "example": "any"
-                },
-                "password": {
-                  "example": "any"
-                },
-                "referral_code": {
-                  "example": "any"
-                },
-                "opt_in": {
-                  "example": "any"
-                },
-                "recaptchaEnteredByUser": {
-                  "example": "any"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "404": {
-            "description": "Not Found"
-          },
-          "409": {
-            "description": "Conflict"
           }
         }
       }
@@ -2780,29 +3026,6 @@
           },
           "400": {
             "description": "Bad Request"
-          }
-        }
-      }
-    },
-    "/attendance/login": {
-      "post": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "404": {
-            "description": "Not Found"
           }
         }
       }
