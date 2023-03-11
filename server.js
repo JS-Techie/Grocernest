@@ -105,10 +105,17 @@ const couponToCustomer = require("./routes/admin/couponToCustomer");
 const specialWalletRouter = require("./routes/admin/specialWalletRoutes");
 
 // migration codes
+// const inventoryAuthRouter = require("./routes/inventory/authRoutes");
 const userMasterRouter = require("./routes/inventory/masterData/userRoutes");
 const brandMasterRouter = require("./routes/inventory/masterData/brandRoutes");
+<<<<<<< HEAD
 const updateSelfPasswordRouter = require("./routes/inventory/PasswordHandler/updateSelfPasswordRoutes")
 const userMasterUpdatePasswordRouter= require("./routes/inventory/PasswordHandler/userMasterUpdatePasswordRoutes")
+=======
+const sizeMasterRouter = require("./routes/inventory/masterData/sizeRoutes");
+// const stockTransferRouter = require("./routes/inventory/stockTransfer/stockMovementRoutes");
+const colorMasterRouter = require("./routes/inventory/masterData/colorRoutes");
+>>>>>>> c0d6b58880248ea93fc64efd9d57a15234416c9a
 
 //grn
 const grnDraftSaveRouter = require("./routes/inventory/grn/grnDraftSaveRoutes");
@@ -123,9 +130,16 @@ app.get("/responses", (req, res) => {
 });
 
 // inventory master data routes
+// app.use(inventoryAuthRouter)
 app.use("/inventory/usermaster", userMasterRouter);
 app.use("/inventory/brandmaster", brandMasterRouter);
+app.use("/inventory/sizemaster", sizeMasterRouter); 
+// app.use("/inventory/stockTransfer", stockTransferRouter);
 
+
+app.use("/inventory/colormaster",colorMasterRouter);
+
+// inventory grn routes
 app.use("/inventory/grn", grnDraftSaveRouter);
 app.use("/inventory/passwordhandler", updateSelfPasswordRouter)
 app.use("/inventory/passwordhandler", userMasterUpdatePasswordRouter)
