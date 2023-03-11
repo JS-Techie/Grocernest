@@ -108,7 +108,7 @@ const specialWalletRouter = require("./routes/admin/specialWalletRoutes");
 const userMasterRouter = require("./routes/inventory/masterData/userRoutes");
 const brandMasterRouter = require("./routes/inventory/masterData/brandRoutes");
 const updateSelfPasswordRouter = require("./routes/inventory/PasswordHandler/updateSelfPasswordRoutes")
-// const userMasterUpdatePasswordRouter= require("./routes/inventory/PasswordHandler/userMasterUpdatePasswordRoutes")
+const userMasterUpdatePasswordRouter= require("./routes/inventory/PasswordHandler/userMasterUpdatePasswordRoutes")
 
 //grn
 const grnDraftSaveRouter = require("./routes/inventory/grn/grnDraftSaveRoutes");
@@ -128,7 +128,7 @@ app.use("/inventory/brandmaster", brandMasterRouter);
 
 app.use("/inventory/grn", grnDraftSaveRouter);
 app.use("/inventory/passwordhandler", updateSelfPasswordRouter)
-// app.use("/inventory/passwordhandler", userMasterUpdatePasswordRouter)
+app.use("/inventory/passwordhandler", userMasterUpdatePasswordRouter)
 
 // customer routes
 app.use(authRouter);
