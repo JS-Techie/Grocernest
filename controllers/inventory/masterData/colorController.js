@@ -49,6 +49,7 @@ const saveColor = async (req, res, next) => {
         }
 
         else {
+            
             const currentColor = await Color.findOne({
                 where: { id: colorId }
             })
