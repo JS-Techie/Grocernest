@@ -31,12 +31,25 @@ const getAllOffers = async (req, res, next) => {
     }
 
     const promises = offers.map(async (current) => {
-      const itemx = await Item.findOne({
-        where: { id: current.item_x },
-      });
-      const itemy = await Item.findOne({
-        where: { id: current.item_y },
-      });
+
+      let itemX = null
+      let itemY = null
+      let itemZ = null
+      if(current.item_x ){
+        itemX = await Item.findOne({
+          where: { id: current.item_x },
+        });
+      }
+      if(current.item_y){
+        itemY = await Item.findOne({
+          where: { id: current.item_y },
+        });
+      } 
+      if(current.item_z){
+        itemZ = await Item.findOne({
+          where: { id: current.item_z },
+        });
+      }
 
       /*  const item = await Item.findOne({
           where: { id: current.item_id },
@@ -49,11 +62,14 @@ const getAllOffers = async (req, res, next) => {
         offerType: current.type_id,
         offerName: (type!==null)?type.offer_type:null,
         itemX: current.item_x ? current.item_x : "",
-        firstItem: itemx ? itemx.name : "",
+        xItemName: itemX ? itemX.name : "",
         quantityOfItemX: current.item_x_quantity ? current.item_x_quantity : "",
         itemY: current.item_y ? current.item_y : "",
-        secondItem: itemy ? itemy.name : "",
+        yItemName: itemY ? itemY.name : "",
         quantityOfItemY: current.item_y_quantity ? current.item_y_quantity : "",
+        itemZ: current.item_z ? current.item_z : "",
+        zItemName: itemZ ? itemZ.name : "",
+        quantityOfItemZ: current.item_z_quantity ? current.item_z_quantity : "",
         //  itemID: current.item_id ? current.item_id : "",
         // itemName: item ? item.name : "",
         amountOfDiscount: current.amount_of_discount
@@ -109,12 +125,24 @@ const getOfferById = async (req, res, next) => {
       });
     }
 
-    const itemX = await Item.findOne({
-      where: { id: current.item_x },
-    });
-    const itemY = await Item.findOne({
-      where: { id: current.item_y },
-    });
+    let itemX = null
+    let itemY = null
+    let itemZ = null
+    if(current.item_x ){
+      itemX = await Item.findOne({
+        where: { id: current.item_x },
+      });
+    }
+    if(current.item_y){
+      itemY = await Item.findOne({
+        where: { id: current.item_y },
+      });
+    } 
+    if(current.item_z){
+      itemZ = await Item.findOne({
+        where: { id: current.item_z },
+      });
+    }
     /* const item = await Item.findOne({
        where: { id: current.item_id },
      });
@@ -137,13 +165,16 @@ const getOfferById = async (req, res, next) => {
         offerType: current.type_id,
         offerName: (type!==null)?type.offer_type:null,
         itemX: current.item_x ? current.item_x : "",
-        firstItem: itemX ? itemX.name : "",
+        xItemName: itemX ? itemX.name : "",
         quantityOfItemX: current.item_x_quantity ? current.item_x_quantity : "",
         itemY: current.item_y ? current.item_y : "",
-        secondItem: itemY ? itemY.name : "",
+        yItemName: itemY ? itemY.name : "",
         quantityOfItemY: current.item_y_quantity ? current.item_y_quantity : "",
         //  itemID: current.item_id ? current.item_id : "",
         //  itemName: item ? item.name : "",
+        itemZ: current.item_z ? current.item_z : "",
+        zItemName: itemZ ? itemZ.name : "",
+        quantityOfItemZ: current.item_z_quantity ? current.item_z_quantity : "",
         amountOfDiscount: current.amount_of_discount
           ? current.amount_of_discount
           : "",
@@ -440,18 +471,20 @@ const updateOffer = async (req, res, next) => {
   const {
     type_id,
     item_x,
-    item_y,
     item_x_quantity,
+    item_y,
     item_y_quantity,
+    item_z,
+    item_z_quantity,
     amount_of_discount,
     is_percentage,
     start_date,
-    start_time,
     end_date,
+    start_time,
     end_time,
     is_pos,
     is_ecomm,
-    is_time,
+    is_time
   } = req.body;
 
   try {
