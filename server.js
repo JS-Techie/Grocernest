@@ -1,8 +1,8 @@
 require("dotenv").config();
 
-// const pos_refferal_job = require("./utils/CRON_REF_3"); //run first
-// const special_wallet_cashback_job = require("./utils/CRON_REF_4"); //run 2nd
-// const refferal_job = require("./utils/CRON_REF_1"); //run 3rd
+const pos_refferal_job = require("./CRON_REF_3"); //run first
+const special_wallet_cashback_job = require("./CRON_REF_4"); //run 2nd
+const refferal_job = require("./CRON_REF_1"); //run 3rd
 
 // Swagger UI Setup abcde
 const swaggerUI = require("swagger-ui-express");
@@ -104,6 +104,17 @@ const adminDailySalesRouter = require("./routes/admin/dailySalesRoutes");
 const couponToCustomer = require("./routes/admin/couponToCustomer");
 const specialWalletRouter = require("./routes/admin/specialWalletRoutes");
 
+// migration codes
+// const inventoryAuthRouter = require("./routes/inventory/authRoutes");
+const userMasterRouter = require("./routes/inventory/masterData/userRoutes");
+const brandMasterRouter = require("./routes/inventory/masterData/brandRoutes");
+const sizeMasterRouter = require("./routes/inventory/masterData/sizeRoutes");
+// const stockTransferRouter = require("./routes/inventory/stockTransfer/stockMovementRoutes");
+const colorMasterRouter = require("./routes/inventory/masterData/colorRoutes");
+
+//grn
+const grnDraftSaveRouter = require("./routes/inventory/grn/grnDraftSaveRoutes");
+
 //Vendor routes import
 
 const vendorRouter = require("./routes/vendor/profileRoutes");
@@ -112,6 +123,19 @@ const vendorRouter = require("./routes/vendor/profileRoutes");
 app.get("/responses", (req, res) => {
   res.send(endPoint);
 });
+
+// inventory master data routes
+// app.use(inventoryAuthRouter)
+app.use("/inventory/usermaster", userMasterRouter);
+app.use("/inventory/brandmaster", brandMasterRouter);
+app.use("/inventory/sizemaster", sizeMasterRouter); 
+// app.use("/inventory/stockTransfer", stockTransferRouter);
+
+
+app.use("/inventory/colormaster",colorMasterRouter);
+
+// inventory grn routes
+app.use("/inventory/grn", grnDraftSaveRouter);
 
 // customer routes
 app.use(authRouter);
@@ -200,7 +224,13 @@ const start = async () => {
 
 start();
 
-// Cron Jobs
-// refferal_job();
-// pos_refferal_job();
-// special_wallet_cashback_job();
+// ALL THE CRON JOBS
+
+// 3
+pos_refferal_job();
+
+// 4
+special_wallet_cashback_job();
+
+// 1
+refferal_job();

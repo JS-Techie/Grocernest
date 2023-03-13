@@ -25,7 +25,7 @@ const addSpecialWalletBalance = async () => {
       status: "Delivered",
       special_cashback_processed: { [Op.eq]: null },
       cashback_processed: { [Op.eq]: null },
-      created_at: { [Op.lt]: sevenDaysAgo },
+      created_at: { [Op.gt]: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
     },
   });
 
@@ -262,16 +262,16 @@ const addSpecialWalletBalance = async () => {
   }
 };
 
-// const special_wallet_job = async () => {
-//   // schedule time is a utc time (11.30pm ist = 6:00pm utc/18:00)
-//   cron.schedule("0 20 18 * * *", async () => {
-//     console.log("Running scheduled CRON-JOB.....");
+const special_wallet_job = async () => {
+  // schedule time is 11:10pm
+  cron.schedule("10 23 * * *", async () => {
+    console.log("Running scheduled CRON-JOB.....");
 
-//     // cashback task
-//     await addSpecialWalletBalance();
-//   });
-// };
+    // cashback task
+    await addSpecialWalletBalance();
+  });
+};
 
-// module.exports = special_wallet_job;
+module.exports = special_wallet_job;
 
-addSpecialWalletBalance();
+// addSpecialWalletBalance();
