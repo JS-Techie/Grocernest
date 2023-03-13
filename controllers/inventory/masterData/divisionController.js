@@ -212,7 +212,7 @@ const getDeactiveDivision = async (req, res, next) => {
 }
 
 const activeDivision = async (req, res, next) => {
-    const id  = req.body.id;
+    const id  = req.body;
     try {
         const currentDivision = await Division.findOne({
             where: { id }
@@ -256,7 +256,7 @@ console.log("object", currentDivision);
 }
 
 const deactiveDivision = async (req, res, next) => {
-    const id = req.body;
+    const id = req.body
     console.log("======>", id);
     try {
         const currentDivision = await Division.findOne({

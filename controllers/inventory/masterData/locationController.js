@@ -239,7 +239,7 @@ const getDeactiveLocation = async (req, res, next) => {
 }
 
 const activeLocation = async (req, res, next) => {
-    const {locationIdList} = req.body;
+    const locationIdList = req.body;
     try {
         if(locationIdList.length === 0){
             return res.status(200).send({
@@ -290,7 +290,7 @@ const updatedLocation = await Location.findOne({
 }
 
 const deactiveLocation = async (req, res, next) => {
-    const {locationIdList} = req.body;
+    const locationIdList = req.body;
     try {
         if(locationIdList.length === 0){
             return res.status(200).send({
