@@ -252,11 +252,6 @@ const offerItemValidationType4 = async (item_z, type_id)=>{
 }
 
 
-
-
-
-
-
 module.exports = {
     isTypePresent,
     validationForExistingOffer,
