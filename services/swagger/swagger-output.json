@@ -493,7 +493,7 @@
             "schema": {
               "type": "object",
               "properties": {
-                "length": {
+                "brandIdList": {
                   "example": "any"
                 }
               }
@@ -912,7 +912,10 @@
             "schema": {
               "type": "object",
               "properties": {
-                "locationIdList": {
+                "length": {
+                  "example": "any"
+                },
+                "map((current": {
                   "example": "any"
                 }
               }
@@ -1053,6 +1056,18 @@
             "name": "authorization",
             "in": "header",
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "example": "any"
+                }
+              }
+            }
           }
         ],
         "responses": {
