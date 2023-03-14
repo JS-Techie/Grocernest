@@ -114,6 +114,7 @@ const locationMaster = require("./routes/inventory/masterData/locationRoutes");
 const colorMasterRouter = require("./routes/inventory/masterData/colorRoutes");
 const divisionMasterRouter = require("./routes/inventory/masterData/divisionRoutes");
 const departmentMasterRouter = require("./routes/inventory/masterData/departmentRoutes");
+const categoryMasterRouter = require("./routes/inventory/masterData/categoryRoutes");
 
 //grn
 const grnDraftSaveRouter = require("./routes/inventory/grn/grnDraftSaveRoutes");
@@ -137,6 +138,7 @@ app.use("/inventory/sizemaster", sizeMasterRouter);
 app.use("/inventory/locationmaster", locationMaster);
 app.use("/inventory/divisionmaster", divisionMasterRouter);
 app.use("/inventory/departmentmaster", departmentMasterRouter);
+app.use("/inventory/categorymaster", categoryMasterRouter);
 // app.use("/inventory/stockTransfer", stockTransferRouter);
 
 

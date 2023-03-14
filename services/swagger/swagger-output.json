@@ -1384,7 +1384,10 @@
             "schema": {
               "type": "object",
               "properties": {
-                "deptIdList": {
+                "length": {
+                  "example": "any"
+                },
+                "map((current": {
                   "example": "any"
                 }
               }
@@ -1419,7 +1422,196 @@
             "schema": {
               "type": "object",
               "properties": {
-                "deptIdList": {
+                "length": {
+                  "example": "any"
+                },
+                "map((current": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/inventory/categorymaster/secure/category/saveCategory": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "groupName": {
+                  "example": "any"
+                },
+                "existingCategory": {
+                  "example": "any"
+                },
+                "availableForEcomm": {
+                  "example": "any"
+                },
+                "detailsChangedFlag": {
+                  "example": "any"
+                },
+                "Image": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/inventory/categorymaster/secure/category/getAllCategory": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/inventory/categorymaster/secure/category/getActiveCategory": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/inventory/categorymaster/secure/category/getDeactiveCategory": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/inventory/categorymaster/secure/category/activeCategory": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "categoryIdList": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/inventory/categorymaster/secure/category/deactiveCategory": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "categoryIdList": {
                   "example": "any"
                 }
               }
@@ -5389,13 +5581,19 @@
                 "item_x": {
                   "example": "any"
                 },
-                "item_y": {
-                  "example": "any"
-                },
                 "item_x_quantity": {
                   "example": "any"
                 },
+                "item_y": {
+                  "example": "any"
+                },
                 "item_y_quantity": {
+                  "example": "any"
+                },
+                "item_z": {
+                  "example": "any"
+                },
+                "item_z_quantity": {
                   "example": "any"
                 },
                 "amount_of_discount": {
@@ -5407,10 +5605,10 @@
                 "start_date": {
                   "example": "any"
                 },
-                "start_time": {
+                "end_date": {
                   "example": "any"
                 },
-                "end_date": {
+                "start_time": {
                   "example": "any"
                 },
                 "end_time": {
