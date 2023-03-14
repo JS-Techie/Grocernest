@@ -137,6 +137,6 @@ const getAccessToken = async (req, res, next) => {
 
 module.exports = {
     login,
-    // getAccessToken,
+    getAccessToken,
     // register
 }
