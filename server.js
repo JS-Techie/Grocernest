@@ -116,6 +116,7 @@ const divisionMasterRouter = require("./routes/inventory/masterData/divisionRout
 const departmentMasterRouter = require("./routes/inventory/masterData/departmentRoutes");
 const categoryMasterRouter = require("./routes/inventory/masterData/categoryRoutes");
 const subCategoryMasterRouter = require("./routes/inventory/masterData/subCategoryRoutes");
+const itemMasterRouter = require("./routes/inventory/masterData/itemRoutes");
 
 //grn
 const grnDraftSaveRouter = require("./routes/inventory/grn/grnDraftSaveRoutes");
@@ -141,6 +142,7 @@ app.use("/inventory/divisionmaster", divisionMasterRouter);
 app.use("/inventory/departmentmaster", departmentMasterRouter);
 app.use("/inventory/categorymaster", categoryMasterRouter);
 app.use("/inventory/subCategorymaster", subCategoryMasterRouter);
+app.use("/inventory/itemmaster", itemMasterRouter)
 // app.use("/inventory/stockTransfer", stockTransferRouter);
 
 // inventory grn routes
