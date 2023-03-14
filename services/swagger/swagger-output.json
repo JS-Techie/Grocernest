@@ -33,6 +33,119 @@
         }
       }
     },
+    "/attendance/login": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/secure/login/getAccessToken": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "example": "any"
+                },
+                "password": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/register": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "firstName": {
+                  "example": "any"
+                },
+                "lastName": {
+                  "example": "any"
+                },
+                "phoneNumber": {
+                  "example": "any"
+                },
+                "callingNumber": {
+                  "example": "any"
+                },
+                "email": {
+                  "example": "any"
+                },
+                "password": {
+                  "example": "any"
+                },
+                "referral_code": {
+                  "example": "any"
+                },
+                "opt_in": {
+                  "example": "any"
+                },
+                "recaptchaEnteredByUser": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "409": {
+            "description": "Conflict"
+          }
+        }
+      }
+    },
     "/inventory/colormaster/secure/color/saveColor": {
       "post": {
         "description": "",
@@ -893,7 +1006,7 @@
         }
       }
     },
-    "/inventory/locationmaster/secure/Location/saveLocation": {
+    "/inventory/locationmaster/secure/location/saveLocation": {
       "post": {
         "description": "",
         "parameters": [
@@ -952,7 +1065,7 @@
         }
       }
     },
-    "/inventory/locationmaster/secure/Location/getAllLocation": {
+    "/inventory/locationmaster/secure/location/getAllLocation": {
       "post": {
         "description": "",
         "parameters": [
@@ -975,7 +1088,7 @@
         }
       }
     },
-    "/inventory/locationmaster/secure/Location/getActiveLocation": {
+    "/inventory/locationmaster/secure/location/getActiveLocation": {
       "post": {
         "description": "",
         "parameters": [
@@ -998,7 +1111,7 @@
         }
       }
     },
-    "/inventory/locationmaster/secure/Location/getDeactiveLocation": {
+    "/inventory/locationmaster/secure/location/getDeactiveLocation": {
       "post": {
         "description": "",
         "parameters": [
@@ -1021,7 +1134,7 @@
         }
       }
     },
-    "/inventory/locationmaster/secure/Location/activeLocation": {
+    "/inventory/locationmaster/secure/location/activeLocation": {
       "post": {
         "description": "",
         "parameters": [
@@ -1059,7 +1172,7 @@
         }
       }
     },
-    "/inventory/locationmaster/secure/Location/deactiveLocation": {
+    "/inventory/locationmaster/secure/location/deactiveLocation": {
       "post": {
         "description": "",
         "parameters": [
@@ -1445,6 +1558,262 @@
         }
       }
     },
+
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "subCatCode": {
+                  "example": "any"
+                },
+                "subCatName": {
+                  "example": "any"
+                },
+                "Image": {
+                  "example": "any"
+                },
+                "categoryId": {
+                  "example": "any"
+                },
+                "isAvailableForEcomm": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/inventory/subCategorymaster/secure/subCategory/all": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/inventory/subCategorymaster/secure/subCategory/{categoryId}": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "categoryId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/inventory/subCategorymaster/secure/subCategory/update/{subCategoryId}": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "subCategoryId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "categoryId": {
+                  "example": "any"
+                },
+                "subCatCode": {
+                  "example": "any"
+                },
+                "subCatName": {
+                  "example": "any"
+                },
+                "isAvailableForEcomm": {
+                  "example": "any"
+                },
+                "Image": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/inventory/subCategorymaster/secure/subCategory/all/active": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/inventory/subCategorymaster/secure/subCategory/all/inactive": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/inventory/subCategorymaster/secure/subCategory/activate/{subCategoryId}": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "subCategoryId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/inventory/subCategorymaster/secure/subCategory/deactivate/{subCategoryId}": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "subCategoryId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
     "/inventory/grn/draft/save": {
       "post": {
         "description": "",
@@ -1495,66 +1864,6 @@
           },
           "500": {
             "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/register": {
-      "post": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "firstName": {
-                  "example": "any"
-                },
-                "lastName": {
-                  "example": "any"
-                },
-                "phoneNumber": {
-                  "example": "any"
-                },
-                "callingNumber": {
-                  "example": "any"
-                },
-                "email": {
-                  "example": "any"
-                },
-                "password": {
-                  "example": "any"
-                },
-                "referral_code": {
-                  "example": "any"
-                },
-                "opt_in": {
-                  "example": "any"
-                },
-                "recaptchaEnteredByUser": {
-                  "example": "any"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "404": {
-            "description": "Not Found"
-          },
-          "409": {
-            "description": "Conflict"
           }
         }
       }
@@ -3677,29 +3986,6 @@
           },
           "400": {
             "description": "Bad Request"
-          }
-        }
-      }
-    },
-    "/attendance/login": {
-      "post": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "404": {
-            "description": "Not Found"
           }
         }
       }
