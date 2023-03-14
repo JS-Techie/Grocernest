@@ -108,17 +108,16 @@ const specialWalletRouter = require("./routes/admin/specialWalletRoutes");
 // const inventoryAuthRouter = require("./routes/inventory/authRoutes");
 const userMasterRouter = require("./routes/inventory/masterData/userRoutes");
 const brandMasterRouter = require("./routes/inventory/masterData/brandRoutes");
-<<<<<<< HEAD
+
 const updateSelfPasswordRouter = require("./routes/inventory/PasswordHandler/updateSelfPasswordRoutes")
 const userMasterUpdatePasswordRouter= require("./routes/inventory/PasswordHandler/userMasterUpdatePasswordRoutes")
-=======
 const sizeMasterRouter = require("./routes/inventory/masterData/sizeRoutes");
 // const stockTransferRouter = require("./routes/inventory/stockTransfer/stockMovementRoutes");
 const colorMasterRouter = require("./routes/inventory/masterData/colorRoutes");
->>>>>>> c0d6b58880248ea93fc64efd9d57a15234416c9a
 
 //grn
 const grnDraftSaveRouter = require("./routes/inventory/grn/grnDraftSaveRoutes");
+
 
 //Vendor routes import
 
