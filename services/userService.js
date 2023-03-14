@@ -20,7 +20,7 @@ const getUserRoles = async (user_id) => {
 const getModuleList = async (user_id) => {
 
     const roleArrayOutput = await fetchRoleArray(user_id)
-    console.log("flfsdlfdsljfsd", roleArrayOutput)
+    console.log("The Role Array Output", roleArrayOutput)
 
 
     const dataArrayPromises = roleArrayOutput.map(async (roleArrayIndividualOutput) => {
@@ -62,7 +62,7 @@ const getModuleList = async (user_id) => {
 
     const moduleModelResponse= await Promise.all(moduleModelReturnPromises)
 
-    console.log("jjhkjfhsdfhs")
+    console.log("========================== DUMMY LINE =========================")
     console.log(moduleModelResponse)
     return moduleModelResponse;
 }
