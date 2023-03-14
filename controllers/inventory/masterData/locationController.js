@@ -104,6 +104,7 @@ const saveLocation = async (req, res, next) => {
 }
 
 const getAllLocation = async (req, res, next) => {
+    console.log("coming")
     try {
         const allLocation = await Location.findAll({})
 

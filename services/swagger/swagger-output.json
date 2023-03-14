@@ -1006,7 +1006,7 @@
         }
       }
     },
-    "/inventory/locationmaster/secure/Location/saveLocation": {
+    "/inventory/locationmaster/secure/location/saveLocation": {
       "post": {
         "description": "",
         "parameters": [
@@ -1065,7 +1065,7 @@
         }
       }
     },
-    "/inventory/locationmaster/secure/Location/getAllLocation": {
+    "/inventory/locationmaster/secure/location/getAllLocation": {
       "post": {
         "description": "",
         "parameters": [
@@ -1088,7 +1088,7 @@
         }
       }
     },
-    "/inventory/locationmaster/secure/Location/getActiveLocation": {
+    "/inventory/locationmaster/secure/location/getActiveLocation": {
       "post": {
         "description": "",
         "parameters": [
@@ -1111,7 +1111,7 @@
         }
       }
     },
-    "/inventory/locationmaster/secure/Location/getDeactiveLocation": {
+    "/inventory/locationmaster/secure/location/getDeactiveLocation": {
       "post": {
         "description": "",
         "parameters": [
@@ -1134,7 +1134,7 @@
         }
       }
     },
-    "/inventory/locationmaster/secure/Location/activeLocation": {
+    "/inventory/locationmaster/secure/location/activeLocation": {
       "post": {
         "description": "",
         "parameters": [
@@ -1172,7 +1172,7 @@
         }
       }
     },
-    "/inventory/locationmaster/secure/Location/deactiveLocation": {
+    "/inventory/locationmaster/secure/location/deactiveLocation": {
       "post": {
         "description": "",
         "parameters": [
@@ -1738,6 +1738,262 @@
                 }
               }
             }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/inventory/subCategorymaster/secure/subCategory/save": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "subCatCode": {
+                  "example": "any"
+                },
+                "subCatName": {
+                  "example": "any"
+                },
+                "Image": {
+                  "example": "any"
+                },
+                "categoryId": {
+                  "example": "any"
+                },
+                "isAvailableForEcomm": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/inventory/subCategorymaster/secure/subCategory/all": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/inventory/subCategorymaster/secure/subCategory/{categoryId}": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "categoryId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/inventory/subCategorymaster/secure/subCategory/update/{subCategoryId}": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "subCategoryId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "categoryId": {
+                  "example": "any"
+                },
+                "subCatCode": {
+                  "example": "any"
+                },
+                "subCatName": {
+                  "example": "any"
+                },
+                "isAvailableForEcomm": {
+                  "example": "any"
+                },
+                "Image": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/inventory/subCategorymaster/secure/subCategory/all/active": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/inventory/subCategorymaster/secure/subCategory/all/inactive": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/inventory/subCategorymaster/secure/subCategory/activate/{subCategoryId}": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "subCategoryId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/inventory/subCategorymaster/secure/subCategory/deactivate/{subCategoryId}": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "subCategoryId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
           }
         ],
         "responses": {
