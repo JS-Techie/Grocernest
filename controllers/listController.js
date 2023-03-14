@@ -7,6 +7,7 @@ const Subcategory = db.LkpSubCategoryModel;
 const Item = db.ItemModel;
 const Brand = db.LkpBrandModel;
 const Offer = db.OffersModel;
+const lkpOffers = db.lkpOffersModel
 
 const getAllCategories = async (req, res, next) => {
   //Fetch all categories and subcategories within them
@@ -183,6 +184,11 @@ const getAllBrands = async (req, res, next) => {
 };
 
 const getAllOffers = async (req, res, next) => {
+  let type_details = null
+  let x_item_details = null
+  let y_item_details = null
+  let z_item_details = null
+
   try {
     const offers = await Offer.findAll({
       where: { is_active: 1, is_ecomm: 1 },
@@ -201,46 +207,64 @@ const getAllOffers = async (req, res, next) => {
     }
 
     const promises = offers.map(async (currentOffer) => {
-      if (currentOffer.item_x) {
-        const discountItem = await Item.findOne({
-          where: { id: currentOffer.item_x},
-        });
-
+      if(currentOffer.type_id){
+        type_details = await lkpOffers.findOne({
+          where:{ id: currentOffer.type_id}
+        })
+      }
+      console.log("type_details:id "+type_details.id)
+      console.log("type_details:name "+type_details.offer_type)
+      const offer_name = type_details.offer_type
+      if(currentOffer.item_x) {
+        x_item_details = await Item.findOne({
+          where:{
+            id: currentOffer.item_x
+          }
+        })
+      } 
+      console.log("x_item_details "+x_item_details)
+      if(currentOffer.item_y) { 
+        y_item_details = await Item.findOne({
+          where:{
+            id: currentOffer.item_y
+          }
+        })
+      }  
+      if(currentOffer.item_z) { 
+        z_item_details = await Item.findOne({
+          where:{
+            id: currentOffer.item_z
+          }
+        })
+      }  
         return {
-          type: "discount",
-          discountItem,
+          offerID: currentOffer.id,
+          offerType: currentOffer.type_id,
+          offerName: offer_name,
+          itemX: currentOffer.item_x,
+          xItemName: (x_item_details!==null)?x_item_details.name:null,
+          quantityOfItemX: currentOffer.item_x_quantity,
+          itemY: currentOffer.item_y,
+          yItemName:(y_item_details!==null)?y_item_details.name:null,
+          quantityOfItemY: currentOffer.item_y_quantity,
+          itemZ: currentOffer.item_z,
+          zItemName: (z_item_details!==null)?z_item_details.name:null,
+          quantityOfItemZ: currentOffer.item_z_quantity,
           amountOfDiscount: currentOffer.amount_of_discount,
           isPercentage: currentOffer.is_percentage,
-          isTime: currentOffer.is_time ? true : false,
-          startTime: currentOffer.start_time,
-          endTime: currentOffer.end_time,
+          isActive: true,
           startDate: currentOffer.start_date,
-          endDate: currentOffer.end_date,
-        };
-      } else {
-        const xItem = await Item.findOne({
-          where: { id: currentOffer.item_x },
-        });
-        const yItem = await Item.findOne({
-          where: { id: currentOffer.item_y},
-        });
-
-        return {
-          type: "offer",
-          xItem,
-          yItem,
-          xItemQuantity: currentOffer.item_x_quantity,
-          yItemQuantity: currentOffer.item_y_quantity,
-          isTime: currentOffer.is_time ? true : false,
           startTime: currentOffer.start_time,
-          endTime: currentOffer.end_time,
-          startDate: currentOffer.start_date,
           endDate: currentOffer.end_date,
-        };
-      }
+          endTime: currentOffer.end_time,
+          isEcomm: currentOffer.is_ecomm,
+          isPos: currentOffer.is_pos,
+          isTime: currentOffer.is_time
+        }
+        console.log("Hello world");
     });
 
-    console.log(promises);
+    //console.log(promises);
 
     const resolved = await Promise.all(promises);
     console.log(resolved);

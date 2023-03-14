@@ -105,10 +105,26 @@ const couponToCustomer = require("./routes/admin/couponToCustomer");
 const specialWalletRouter = require("./routes/admin/specialWalletRoutes");
 
 // migration codes
+const inventoryAuthRouter = require("./routes/inventory/authRoutes");
 const userMasterRouter = require("./routes/inventory/masterData/userRoutes");
 const brandMasterRouter = require("./routes/inventory/masterData/brandRoutes");
+
+
 const updateSelfPasswordRouter = require("./routes/inventory/PasswordHandler/updateSelfPasswordRoutes")
 // const userMasterUpdatePasswordRouter= require("./routes/inventory/PasswordHandler/userMasterUpdatePasswordRoutes")
+
+
+const sizeMasterRouter = require("./routes/inventory/masterData/sizeRoutes");
+const locationMaster = require("./routes/inventory/masterData/locationRoutes");
+// const stockTransferRouter = require("./routes/inventory/stockTransfer/stockMovementRoutes");
+const colorMasterRouter = require("./routes/inventory/masterData/colorRoutes");
+const divisionMasterRouter = require("./routes/inventory/masterData/divisionRoutes");
+const departmentMasterRouter = require("./routes/inventory/masterData/departmentRoutes");
+const categoryMasterRouter = require("./routes/inventory/masterData/categoryRoutes");
+const subCategoryMasterRouter = require("./routes/inventory/masterData/subCategoryRoutes");
+const itemMasterRouter = require("./routes/inventory/masterData/itemRoutes");
+
+
 
 //grn
 const grnDraftSaveRouter = require("./routes/inventory/grn/grnDraftSaveRoutes");
@@ -123,9 +139,21 @@ app.get("/responses", (req, res) => {
 });
 
 // inventory master data routes
+app.use(inventoryAuthRouter);
+
+app.use("/inventory/colormaster", colorMasterRouter);
 app.use("/inventory/usermaster", userMasterRouter);
 app.use("/inventory/brandmaster", brandMasterRouter);
+app.use("/inventory/sizemaster", sizeMasterRouter);
+app.use("/inventory/locationmaster", locationMaster);
+app.use("/inventory/divisionmaster", divisionMasterRouter);
+app.use("/inventory/departmentmaster", departmentMasterRouter);
+app.use("/inventory/categorymaster", categoryMasterRouter);
+app.use("/inventory/subCategorymaster", subCategoryMasterRouter);
+app.use("/inventory/itemmaster", itemMasterRouter)
+// app.use("/inventory/stockTransfer", stockTransferRouter);
 
+// inventory grn routes
 app.use("/inventory/grn", grnDraftSaveRouter);
 app.use("/inventory/passwordhandler", updateSelfPasswordRouter)
 // app.use("/inventory/passwordhandler", userMasterUpdatePasswordRouter)
