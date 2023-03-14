@@ -487,19 +487,31 @@ const getItemById = async (req, res, next) => {
         case 3:
           yItem = []
           yItemName = []
-          if(offer.item_y){
-            offer.item_y.map((y)=>{
-              yItem.push(p)
-              yItemDetails = Item.findOne({
-                where: { id: offer.item_y, active_ind: 'Y'},
-              });
-              if(yItemDetails){
-                if(yItemDetails.name){
-                 yItemName.push(yItemDetails.name)
+          const allOffers = await Offers.findAll({
+            where: {
+              is_active: 1,
+              item_x: item.id,
+              is_ecomm : 1,
+              type_id: 3
+            },
+          });
+          if(allOffers){
+            allOffers.map(async(eachOffer)=>{
+              if(eachOffer.item_y){
+                yItem.push(eachOffer.item_y)
+                yItemDetails = await Item.findOne({
+                  where: { id: eachOffer.item_y, active_ind: 'Y'},
+                });
+                console.log("yItemDetails "+yItemDetails)
+                console.log("yItemDetails "+yItemDetails.name)
+                if(yItemDetails){
+                  if(yItemDetails.name){
+                   yItemName.push(yItemDetails.name)
+                  }
                 }
               }
-
             })
+            
           }
           break;
         case 4:
