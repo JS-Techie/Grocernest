@@ -67,7 +67,7 @@ const homePageRouter = require("./routes/homepageRoutes");
 const adhocRouter = require("./routes/adhocRoutes");
 
 const authControllerRouter =require('./routes/authControllerRoutes')
-app.use("/auth", authControllerRouter)
+app.use("/inventory", authControllerRouter)
 
 // admin routers import
 const adminOrderRouter = require("./routes/admin/orderRoutes");
