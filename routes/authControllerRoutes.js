@@ -6,6 +6,6 @@ const {
 } = require("../controllers/inventory/authController");
 
 
-router.route("/login").post(login);
+router.route("/secure/login/getAccessToken").post(login);
 
 module.exports = router;
