@@ -33,6 +33,165 @@
         }
       }
     },
+    "/inventory/colormaster/secure/color/saveColor": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "colorId": {
+                  "example": "any"
+                },
+                "colorCode": {
+                  "example": "any"
+                },
+                "colorName": {
+                  "example": "any"
+                },
+                "existingColor": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/inventory/colormaster/secure/color/getAllColor": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/inventory/colormaster/secure/color/activeColor": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/inventory/colormaster/secure/color/deactiveColor": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/inventory/colormaster/secure/color/getActiveColor": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/inventory/colormaster/secure/color/getDeactiveColor": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
     "/inventory/usermaster/secure/user/admin/save": {
       "post": {
         "description": "",
@@ -877,7 +1036,10 @@
             "schema": {
               "type": "object",
               "properties": {
-                "locationIdList": {
+                "length": {
+                  "example": "any"
+                },
+                "map((current": {
                   "example": "any"
                 }
               }
@@ -1056,18 +1218,6 @@
             "name": "authorization",
             "in": "header",
             "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "example": "any"
-                }
-              }
-            }
           }
         ],
         "responses": {
@@ -1106,7 +1256,7 @@
         }
       }
     },
-    "/inventory/colormaster/secure/color/saveColor": {
+    "/inventory/departmentmaster/secure/department/saveDepartment": {
       "post": {
         "description": "",
         "parameters": [
@@ -1121,16 +1271,16 @@
             "schema": {
               "type": "object",
               "properties": {
-                "colorId": {
+                "deptCode": {
                   "example": "any"
                 },
-                "colorCode": {
+                "deptName": {
                   "example": "any"
                 },
-                "colorName": {
+                "existingDepartment": {
                   "example": "any"
                 },
-                "existingColor": {
+                "id": {
                   "example": "any"
                 }
               }
@@ -1150,7 +1300,7 @@
         }
       }
     },
-    "/inventory/colormaster/secure/color/getAllColor": {
+    "/inventory/departmentmaster/secure/department/getAllDepartment": {
       "post": {
         "description": "",
         "parameters": [
@@ -1173,7 +1323,7 @@
         }
       }
     },
-    "/inventory/colormaster/secure/color/activeColor": {
+    "/inventory/departmentmaster/secure/department/getActiveDepartment": {
       "post": {
         "description": "",
         "parameters": [
@@ -1196,7 +1346,7 @@
         }
       }
     },
-    "/inventory/colormaster/secure/color/deactiveColor": {
+    "/inventory/departmentmaster/secure/department/getDeactiveDepartment": {
       "post": {
         "description": "",
         "parameters": [
@@ -1219,7 +1369,7 @@
         }
       }
     },
-    "/inventory/colormaster/secure/color/getActiveColor": {
+    "/inventory/departmentmaster/secure/department/activeDepartment": {
       "post": {
         "description": "",
         "parameters": [
@@ -1227,6 +1377,18 @@
             "name": "authorization",
             "in": "header",
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "deptIdList": {
+                  "example": "any"
+                }
+              }
+            }
           }
         ],
         "responses": {
@@ -1242,7 +1404,7 @@
         }
       }
     },
-    "/inventory/colormaster/secure/color/getDeactiveColor": {
+    "/inventory/departmentmaster/secure/department/deactiveDepartment": {
       "post": {
         "description": "",
         "parameters": [
@@ -1250,6 +1412,18 @@
             "name": "authorization",
             "in": "header",
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "deptIdList": {
+                  "example": "any"
+                }
+              }
+            }
           }
         ],
         "responses": {
