@@ -1576,7 +1576,10 @@
             "schema": {
               "type": "object",
               "properties": {
-                "categoryIdList": {
+                "length": {
+                  "example": "any"
+                },
+                "map((current": {
                   "example": "any"
                 }
               }
@@ -1611,7 +1614,7 @@
             "schema": {
               "type": "object",
               "properties": {
-                "categoryIdList": {
+                "length": {
                   "example": "any"
                 }
               }

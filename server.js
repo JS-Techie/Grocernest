@@ -105,7 +105,7 @@ const couponToCustomer = require("./routes/admin/couponToCustomer");
 const specialWalletRouter = require("./routes/admin/specialWalletRoutes");
 
 // migration codes
-// const inventoryAuthRouter = require("./routes/inventory/authRoutes");
+const inventoryAuthRouter = require("./routes/inventory/authRoutes");
 const userMasterRouter = require("./routes/inventory/masterData/userRoutes");
 const brandMasterRouter = require("./routes/inventory/masterData/brandRoutes");
 const sizeMasterRouter = require("./routes/inventory/masterData/sizeRoutes");
@@ -129,7 +129,7 @@ app.get("/responses", (req, res) => {
 });
 
 // inventory master data routes
-// app.use(inventoryAuthRouter)
+app.use(inventoryAuthRouter)
 
 app.use("/inventory/colormaster", colorMasterRouter);
 app.use("/inventory/usermaster", userMasterRouter);

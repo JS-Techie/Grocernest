@@ -6,7 +6,7 @@ const {uploadImageToS3} = require("../../../services/s3Service");
 const Category = db.LkpCategoryModel;
 
 const saveCategory = async (req, res, next) => {
-    const { groupName, existingCategory, availableForEcomm, detailsChangedFlag, Image } = req.body;
+    const { groupName, existingCategory, availableForEcomm, detailsChangedFlag, Image, id } = req.body;
     const { user_id } = req;
     try {
         if (existingCategory === "N") {
@@ -61,7 +61,7 @@ const saveCategory = async (req, res, next) => {
         }
         else {
             const currentCategory = await Category.findOne({
-                where: { categoryId : id }
+                where: { id }
             })
             if (!currentCategory) {
                 return res.status(200).send({
@@ -73,10 +73,10 @@ const saveCategory = async (req, res, next) => {
             const updateCategory = await Category.update({
                 group_name: groupName,
                 image: Image
-            }, { where: { categoryId: id } }
+            }, { where: { id } }
             )
             const updatedCategory = await Category.findOne({
-                where: { categoryId: id }
+                where: {id }
             })
             const response = {
                 categoryId: updatedCategory.id,
@@ -270,44 +270,49 @@ const activeCategory = async (req, res, next) => {
 }
 
 const deactiveCategory = async (req, res, next) => {
-    const  categoryIdList = req.body;
-    try {
-        if (categoryIdList.length === 0) {
-            return res.status(200).send({
-                status: 404,
-                message: "category id list not found",
-                data: []
-            })
-        }
-        const promises = categoryIdList.map(async (current) => {
-            const currentCat = await Category.findOne({
-                where: { id: current }
-            })
-            if (currentCat) {
-                const updateCat = await Category.update({
-                    active_ind: "N"
-                }, { where: { id: current } })
-                return ({
-                    categoryId: currentCat.id,
-                    createdBy: currentCat.created_by,
-                    createdAt: currentCat.created_at,
-                    updatedBy: currentCat.updated_by,
-                    updatedAt: currentCat.updated_at,
-                    isActive: "N",
-                    groupName: currentCat.group_name,
-                    hsnCode: currentCat.HSN_CODE,
-                    image: currentCat.image,
-                    availableForEcomm: currentCat.available_for_ecomm
-                })
-            }
-        })
-        const resolved = await Promise.all(promises)
+    const categoryIdList = req.body;
+   try{
+    if(categoryIdList.length === 0){
         return res.status(200).send({
-            status: 200,
-            message: "Successfully deactivated the category",
-            data: resolved
+            status: 400,
+            message: "Category id list not found",
+            data: []
         })
     }
+    const promises = categoryIdList.map(async(current) => {
+        const currentCategory = await Category.findOne({
+            where : {id: categoryIdList}
+        })
+        const updateCategory = await Category.update({
+            active_ind: "N"},{where : {
+                id: categoryIdList
+            }
+        })
+        const updatedCategory = await Category.findOne({
+            where : {
+                id:categoryIdList
+            }
+        })
+        return ({
+            categoryId: updatedCategory.id,
+                    createdBy: updatedCategory.created_by,
+                    createdAt: updatedCategory.created_at,
+                    updatedBy: updatedCategory.updated_by,
+                    updatedAt: updatedCategory.updated_at,
+                    isActive: "N",
+                    groupName: updatedCategory.group_name,
+                    hsnCode: updatedCategory.HSN_CODE,
+                    image: updatedCategory.image,
+                    availableForEcomm: updatedCategory.available_for_ecomm
+        })
+    })
+    const resolved = await Promise.all(promises)
+    return res.status(200).send({
+        status: 200,
+        message: "Successfully deactivated the category",
+        data: resolved
+    })
+   }
     catch (error) {
         return res.status(200).send({
             status: 500,
