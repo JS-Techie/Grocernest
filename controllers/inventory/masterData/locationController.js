@@ -104,6 +104,7 @@ const saveLocation = async (req, res, next) => {
 }
 
 const getAllLocation = async (req, res, next) => {
+    console.log("coming")
     try {
         const allLocation = await Location.findAll({})
 
@@ -339,62 +340,6 @@ const updatedLocation = await Location.findOne({
         })
     }
 }
-// const deactiveLocation = async (req, res, next) => {
-//     const  locationIdList  = req.body;
-//     try {
-
-//         if (locationIdList.length === 0) {
-//             return res.status(200).send({
-//                 status: 500,
-//                 message: "Location ID list not found",
-//                 data: []
-//             })
-//         }
-
-
-//         const promises = locationIdList.map(async (currentLocation) => {
-//             const current = await Location.findOne({ where: { id: currentLocation } })
-
-//             if (current) {
-
-//                 const update = await Location.update({
-//                     active_ind: "N"
-//                 }, {
-//                     where: { id: currentLocation }
-//                 })
-
-//                 return ({
-//                     "id": current.id,
-//                     "locationName": current.loc_name,
-//                     "locationDesc": current.loc_desc,
-//                     "address": current.address,
-//                     "contactNo": current.contact_no,
-//                     "contactEmail": current.contact_email,
-//                     "isActive": "N",
-//                     "locationType": current.type,
-//                     "invoicePrefix": current.invoice_prefix
-//                 })
-//             }
-//         })
-
-//         const resolved = await Promise.all(promises);
-
-//         return res.status(200).send({
-//             status: 200,
-//             message: "Deactivated requested locations successfully",
-//             data: resolved
-//         })
-
-//     }
-//     catch (error) {
-//         return res.status(200).send({
-//             status: 500,
-//             message: "Didn't get any data",
-//             data: error.message
-//         })
-//     }
-// }
-
 
 module.exports = {
     saveLocation,

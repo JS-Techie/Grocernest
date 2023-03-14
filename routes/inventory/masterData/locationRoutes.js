@@ -12,11 +12,11 @@ const {
     deactiveLocation
 } = require ("../../../controllers/inventory/masterData/locationController");
 
-router.route("/secure/Location/saveLocation").post(authenticate, saveLocation);
-router.route("/secure/Location/getAllLocation").post(authenticate,getAllLocation);
-router.route("/secure/Location/getActiveLocation").post(authenticate,getActiveLocation);
-router.route("/secure/Location/getDeactiveLocation").post(authenticate,getDeactiveLocation);
-router.route("/secure/Location/activeLocation").post(authenticate,activeLocation);
-router.route("/secure/Location/deactiveLocation").post(authenticate,deactiveLocation);
+router.route("/secure/location/saveLocation").post(authenticate, saveLocation);
+router.route("/secure/location/getAllLocation").post(authenticate, getAllLocation);
+router.route("/secure/location/getActiveLocation").post(authenticate, getActiveLocation);
+router.route("/secure/location/getDeactiveLocation").post(authenticate, getDeactiveLocation);
+router.route("/secure/location/activeLocation").post(authenticate, activeLocation);
+router.route("/secure/location/deactiveLocation").post(authenticate, deactiveLocation);
 
 module.exports = router;

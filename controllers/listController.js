@@ -212,7 +212,9 @@ const getAllOffers = async (req, res, next) => {
           where:{ id: currentOffer.type_id}
         })
       }
-      console.log("type_details "+type_details)
+      console.log("type_details:id "+type_details.id)
+      console.log("type_details:name "+type_details.offer_type)
+      const offer_name = type_details.offer_type
       if(currentOffer.item_x) {
         x_item_details = await Item.findOne({
           where:{
@@ -238,7 +240,7 @@ const getAllOffers = async (req, res, next) => {
         return {
           offerID: currentOffer.id,
           offerType: currentOffer.type_id,
-          offerName: (type_details!==null)?type_details.offer_type:null,
+          offerName: offer_name,
           itemX: currentOffer.item_x,
           xItemName: (x_item_details!==null)?x_item_details.name:null,
           quantityOfItemX: currentOffer.item_x_quantity,
