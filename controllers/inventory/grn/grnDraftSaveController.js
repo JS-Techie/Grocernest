@@ -7,7 +7,6 @@ const GrnModel = db.GrnModel;
 const grnDraftSaveController = async (req, res) => {
   console.log("hello hello");
   const {
-    grnId,
     grnLocationId,
     supplierId,
     invoiceNo,
@@ -22,7 +21,6 @@ const grnDraftSaveController = async (req, res) => {
   var itemDetailsDedicatedNullCheckFlag = 0;
 
   if (
-    !grnId ||
     !grnLocationId ||
     !supplierId ||
     !invoiceNo ||
@@ -108,6 +106,7 @@ const grnDraftSaveController = async (req, res) => {
     });
 
     dataItems = await Promise.all(dataArrayPromises);
+    console.log(dataItems)
 
     res.status(200).json({
       message: "Successfully saved Grn data",

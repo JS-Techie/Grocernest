@@ -22,6 +22,7 @@ const updatePassword = async (req, res,next) => {
 
 
 
+
     if (!passChangeFlag === "self") {
         userId = req.body.userId
         console.log("userID for non self:", userId)
@@ -62,6 +63,7 @@ const updatePassword = async (req, res,next) => {
                 })
             }
         }
+
 
         if (passChangeFlag === "self") {
             const oldPassword = req.body.oldPassword
