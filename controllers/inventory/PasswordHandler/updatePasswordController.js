@@ -21,6 +21,7 @@ const updatePassword = async (req, res,next) => {
     console.log("new password: ", newPassword)
 
 
+
     if (!passChangeFlag === "self") {
         userId = req.body.userId
         console.log("userID for non self:", userId)
@@ -33,6 +34,7 @@ const updatePassword = async (req, res,next) => {
         }
 
     }
+
     if (!newPassword) {
         return res.json({
             status: 400,
@@ -48,6 +50,19 @@ const updatePassword = async (req, res,next) => {
         })
     }
     try {
+        console.log("lalalalalala")
+        if (passChangeFlag === "user") {
+            userId = req.body.userId
+            console.log("userID for non self:", userId)
+            if (!userId) {
+                return res.json({
+                    status: 400,
+                    success: false,
+                    message: "User ID is a mandatory field and must not be empty"
+                })
+            }
+        }
+
         if (passChangeFlag === "self") {
             const oldPassword = req.body.oldPassword
             userId = req.user_id

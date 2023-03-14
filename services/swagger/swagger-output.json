@@ -1980,20 +1980,39 @@
         }
       }
     },
-    "/inventory/subCategorymaster/secure/subCategory/deactivate/{subCategoryId}": {
+
       "post": {
         "description": "",
         "parameters": [
           {
-            "name": "subCategoryId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
             "name": "authorization",
             "in": "header",
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "userId": {
+                  "example": "any"
+                },
+                "oldPassword": {
+                  "example": "any"
+                },
+                "passChangeFlag": {
+                  "example": "any"
+                },
+                "newPassword": {
+                  "example": "any"
+                },
+                "newPasswordConfirm": {
+                  "example": "any"
+                }
+              }
+            }
+
           }
         ],
         "responses": {
@@ -2005,11 +2024,16 @@
           },
           "404": {
             "description": "Not Found"
+
+          },
+          "500": {
+            "description": "Internal Server Error"
+
           }
         }
       }
     },
-    "/inventory/grn/draft/save": {
+
       "post": {
         "description": "",
         "parameters": [
