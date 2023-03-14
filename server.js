@@ -66,8 +66,7 @@ const feedbackRouter = require("./routes/feedbackRoutes");
 const homePageRouter = require("./routes/homepageRoutes");
 const adhocRouter = require("./routes/adhocRoutes");
 
-const authControllerRouter =require('./routes/authControllerRoutes')
-app.use("/inventory", authControllerRouter)
+
 
 // admin routers import
 const adminOrderRouter = require("./routes/admin/orderRoutes");
@@ -112,13 +111,11 @@ const inventoryAuthRouter = require("./routes/inventory/authRoutes");
 const userMasterRouter = require("./routes/inventory/masterData/userRoutes");
 const brandMasterRouter = require("./routes/inventory/masterData/brandRoutes");
 
+
 const updateSelfPasswordRouter = require("./routes/inventory/PasswordHandler/updateSelfPasswordRoutes")
 const userMasterUpdatePasswordRouter= require("./routes/inventory/PasswordHandler/userMasterUpdatePasswordRoutes")
+const authControllerRouter =require('./routes/authControllerRoutes')
 
-
-
-const updateSelfPasswordRouter = require("./routes/inventory/PasswordHandler/updateSelfPasswordRoutes")
-// const userMasterUpdatePasswordRouter= require("./routes/inventory/PasswordHandler/userMasterUpdatePasswordRoutes")
 
 
 
@@ -164,8 +161,9 @@ app.use("/inventory/itemmaster", itemMasterRouter)
 // inventory grn routes
 app.use("/inventory/grn", grnDraftSaveRouter);
 app.use("/inventory/passwordhandler", updateSelfPasswordRouter)
-
 app.use("/inventory/passwordhandler", userMasterUpdatePasswordRouter)
+app.use("/inventory", authControllerRouter)
+
 
 
 

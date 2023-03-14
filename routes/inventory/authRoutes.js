@@ -3,12 +3,11 @@ const router = express.Router();
 
 const {
     login ,
-    getAccessToken,
-    register
+    // getAccessToken,
 } = require("../../controllers/inventory/authController")
+const getAccessToken=()=>{}
 
 router.route("/attendance/login").post(login);
 router.route("/secure/login/getAccessToken").post(getAccessToken);
-router.route("/register").post(register)
 
 module.exports = router; 
