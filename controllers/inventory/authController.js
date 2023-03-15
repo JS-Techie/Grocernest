@@ -8,12 +8,13 @@ const {
 
 const login = async (req, res, next) => {
 
-    const { userName, password } = req.body;
-    console.log(userName)
+    const { email, password } = req.body;
+    console.log("jjfldshfkdshkfhdskfjhsdkj")
+    console.log(email)
 
     try {
         const currentUser = await User.findOne({
-            where: { email: userName }
+            where: { email }
         })
         console.log(currentUser)
 
@@ -31,7 +32,7 @@ const login = async (req, res, next) => {
                 data: []
             })
         }
-        const { full_name, email, mobile_no } = currentUser;
+        const { full_name, mobile_no } = currentUser;
         const userRoles = await getUserRoles(currentUser.id);
         const moduleList = await getModuleList(currentUser.id);
 
