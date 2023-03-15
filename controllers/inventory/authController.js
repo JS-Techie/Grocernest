@@ -63,7 +63,7 @@ const login = async (req, res, next) => {
         moduleListSelectedOutputArr =await Promise.all(moduleListSelectedOutputArrPromises)
 
 
-        const token = jwt.sign({
+        const token = 'Bearer ' + jwt.sign({
             "iss": currentUser.full_name,
             "sub": currentUser.email,
             "aud": currentUser.location_id,
