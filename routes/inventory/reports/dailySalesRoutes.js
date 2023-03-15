@@ -6,6 +6,7 @@ const authenticate = require("../../../middleware/authenticateAdmin");
 const {
   invoiceRaised,
   paymentSummary,
+  generateSalesReport,
 } = require("../../../controllers/inventory/reports/dailySalesController");
 
 router
@@ -14,5 +15,8 @@ router
 router
   .route("/secure/report/fetchPaymentSummary")
   .post(authenticate, paymentSummary);
+router
+  .route("/secure/report/generateSalesReport")
+  .post(authenticate, generateSalesReport);
 
 module.exports = router;
