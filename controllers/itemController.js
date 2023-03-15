@@ -478,7 +478,10 @@ const getItemById = async (req, res, next) => {
             yItemDetails = await Item.findOne({
               where: { id: offer.item_y, active_ind: 'Y'},
             });
-            console.log("yItemDetails "+yItemDetails)
+            console.log("yItemDetails "+yItemDetails.name)
+            if(yItemDetails){
+              yItemName = yItemDetails.name
+            }
           }
           break;
         case 2:
@@ -521,6 +524,9 @@ const getItemById = async (req, res, next) => {
               where: { id: offer.item_y, active_ind: 'Y'},
             });
             console.log("yItemDetails "+yItemDetails)
+            if(yItemDetails){
+              yItemName = yItemDetails.name
+            }
           }
           break;
         case 5:
@@ -530,6 +536,9 @@ const getItemById = async (req, res, next) => {
               where: { id: offer.item_y, active_ind: 'Y'},
             });
             console.log("yItemDetails "+yItemDetails)
+            if(yItemDetails){
+              yItemName = yItemDetails.name
+            }
           }
           break;
         default:
