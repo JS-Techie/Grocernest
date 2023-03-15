@@ -953,7 +953,7 @@ const fetchItembyItemCode = async (req, res, next) => {
     if (getItemss.length === 0) {
       return res.status(200).send({
         status: 400,
-        message: "Requested item code doesnot exist",
+        message: "Requested item code doesnot exist1  ",
         data: [],
       });
     }
