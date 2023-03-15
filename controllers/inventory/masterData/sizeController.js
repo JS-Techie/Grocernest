@@ -202,7 +202,7 @@ const getDeactiveSize= async(req,res,next) => {
     } 
 
 const activeSize= async(req,res,next) => {
-    const {sizeIdList} = req.body;
+    const sizeIdList = req.body;
         try{
             if(sizeIdList.length === 0){
                 return res.status(200).send({
@@ -249,7 +249,7 @@ const activeSize= async(req,res,next) => {
     } 
 
 const deactiveSize= async(req,res,next) => {
-    const {sizeIdList} = req.body;
+    const sizeIdList = req.body;
     try{
         if(sizeIdList.length === 0){
             return res.status(200).send({
