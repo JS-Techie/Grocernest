@@ -34,7 +34,7 @@ const getAllItem = async (req, res, next) => {
     //   });
     // }
 
-    const offset = parseInt((pageNo - 1) * pageSize);
+    const offset = parseInt((pageNo) * pageSize);
     const limit = parseInt(pageSize);
 
     const [allItems, metadata] =

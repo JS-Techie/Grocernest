@@ -33,37 +33,31 @@
         }
       }
     },
-    "/attendance/login": {
+    "/secure/login/getAccessToken": {
       "post": {
         "description": "",
         "parameters": [
           {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "example": "any"
+                },
+                "password": {
+                  "example": "any"
+                }
+              }
+            }
           }
         ],
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "201": {
-            "description": "Created"
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "404": {
-            "description": "Not Found"
           }
         }
-      }
-    },
-    "/secure/login/getAccessToken": {
-      "post": {
-        "description": "",
-        "parameters": [],
-        "responses": {}
       }
     },
     "/inventory/colormaster/secure/color/saveColor": {
@@ -4834,6 +4828,29 @@
           },
           "400": {
             "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/attendance/login": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
           }
         }
       }
