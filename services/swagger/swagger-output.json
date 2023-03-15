@@ -2557,7 +2557,7 @@
             "schema": {
               "type": "object",
               "properties": {
-                "userName": {
+                "email": {
                   "example": "any"
                 },
                 "password": {
