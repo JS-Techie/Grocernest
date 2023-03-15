@@ -71,7 +71,8 @@ const login = async (req, res, next) => {
             "CURRENTLOCALE": null,
             "USERTYPEID": null,
             "USERROLELIST": userRoleSelectedOutputArr,
-            "USERMODULELIST": moduleListSelectedOutputArr
+            "USERMODULELIST": moduleListSelectedOutputArr,
+            "jti": currentUser.id
         }, "cosmetixkey",
             { expiresIn: "365d" }
         )
