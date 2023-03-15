@@ -176,4 +176,6 @@ module.exports = {
 module.exports = {
   invoiceRaised,
   paymentSummary,
+  generateSalesReport
+  
 };
