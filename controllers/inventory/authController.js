@@ -2,18 +2,21 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const db = require("../../models");
 const User = db.UserModel;
+const LkpLocationModel = db.LkpLocationModel;
+
 const {
     getModuleList,
     getUserRoles } = require("../../services/userService")
 
 const login = async (req, res, next) => {
 
-    const { userName, password } = req.body;
-    console.log(userName)
+    const { email, password } = req.body;
+    console.log("jjfldshfkdshkfhdskfjhsdkj")
+    console.log(email)
 
     try {
         const currentUser = await User.findOne({
-            where: { email: userName }
+            where: { email }
         })
         console.log(currentUser)
 
@@ -31,14 +34,44 @@ const login = async (req, res, next) => {
                 data: []
             })
         }
-        const { full_name, email, mobile_no } = currentUser;
+        const { full_name, mobile_no } = currentUser;
         const userRoles = await getUserRoles(currentUser.id);
         const moduleList = await getModuleList(currentUser.id);
 
-        const token = jwt.sign({
-            mobile_no,
-            full_name,
-            email
+        // const loc_name= await LkpLocationModel.create({
+        //     attributes: ['loc_name'],
+        //     where:{id: currentUser.location_name}
+        // })
+        const userRoleSelectedOutputArrPromises = userRoles.map(async (individualObj) => {
+            const rolelistInd = {
+                "roleName": individualObj.roleName,
+                "roleDesc": individualObj.roleDesc,
+                "roleId": individualObj.roleId
+            }
+            return (rolelistInd)
+        })
+
+        const moduleListSelectedOutputArrPromises = moduleList.map(async(individualObj)=>{
+            const moduleListInd ={
+                "moduleName": individualObj.moduleName ,
+                "moduleDesc": individualObj.moduleDesc,
+            }
+            return moduleListInd
+        })
+
+        userRoleSelectedOutputArr = await Promise.all(userRoleSelectedOutputArrPromises)
+        moduleListSelectedOutputArr =await Promise.all(moduleListSelectedOutputArrPromises)
+
+
+        const token = 'Bearer ' + jwt.sign({
+            "iss": currentUser.full_name,
+            "sub": currentUser.email,
+            "aud": currentUser.location_id,
+            "USERID": currentUser.id,
+            "CURRENTLOCALE": null,
+            "USERTYPEID": null,
+            "USERROLELIST": userRoleSelectedOutputArr,
+            "USERMODULELIST": moduleListSelectedOutputArr
         }, "cosmetixkey",
             { expiresIn: "365d" }
         )
