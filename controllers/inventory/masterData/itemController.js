@@ -36,7 +36,7 @@ const getAllItem = async (req, res, next) => {
 
     const offset = parseInt((pageNo) * pageSize);
     const limit = parseInt(pageSize);
-
+const [countItems, metadata1] =  await sequelize.query(`select count(*) as count from t_item `)
     const [allItems, metadata] =
       await sequelize.query(`select  t_item.created_by , t_item.created_at , t_item.updated_by, t_item.updated_at , t_item.id ,t_item.name ,t_item.item_cd ,t_item.UOM ,t_item.units ,t_item.brand_id ,t_lkp_brand.brand_name ,t_item.div_id ,t_lkp_division.div_name ,t_item.category_id ,t_lkp_category.group_name ,t_lkp_category.HSN_CODE ,t_item.sub_category_id ,t_lkp_sub_category.sub_cat_name ,t_item.department_id ,t_lkp_department.dept_name ,t_item.color_id ,t_lkp_color.color_name ,t_item.size_id ,t_lkp_size.size_cd ,t_item.active_ind ,t_item.image ,t_item.description ,t_item.how_to_use ,t_item.country_of_origin ,t_item.manufacturer_name ,t_item.ingredients ,t_item.available_for_ecomm ,t_item.is_gift ,t_item.is_grocernest ,t_item.show_discount 
       from (((((((t_item 
@@ -100,7 +100,7 @@ const getAllItem = async (req, res, next) => {
       status: 200,
       message: "Successfully retrieved all item data",
       data: {
-        totalItems: allItems.length,
+        totalItems: countItems[0].count,
         totalPages: Math.ceil(allItems.length / parseInt(pageSize)),
         currentPage: pageNo,
         items: resolved,
