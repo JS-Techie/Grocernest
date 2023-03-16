@@ -465,6 +465,7 @@ const getItemById = async (req, res, next) => {
     let yItemDetails;
     let zItemDetails
     let yItemName
+    let yItemImage
     if (offer) {
       typeDetails = await lkp_offers.findOne({
         where:{
@@ -481,6 +482,7 @@ const getItemById = async (req, res, next) => {
             console.log("yItemDetails "+yItemDetails.name)
             if(yItemDetails){
               yItemName = yItemDetails.name
+              yItemImage = yItemDetails.image
             }
           }
           break;
@@ -644,6 +646,7 @@ const getItemById = async (req, res, next) => {
                   offer.item_x ? offer.item_x : null
                  : null ,
         xItemName: xItemDetails ? xItemDetails.name? xItemDetails.name : null : null,         
+        xItemImage: xItemDetails ? xItemDetails.image : null,  
         xItemQuantity: offer
           ? offer.item_x_quantity
             ? offer.item_x_quantity
@@ -651,6 +654,7 @@ const getItemById = async (req, res, next) => {
           : null,
         yItemId: yItem ,
         yItemName:yItemName, 
+        yItemImage: yItemImage,
         yItemQuantity: offer
           ? offer.item_y_quantity
             ? offer.item_y_quantity
