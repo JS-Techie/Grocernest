@@ -479,13 +479,13 @@ const updateOffer = async (req, res, next) => {
     item_z_quantity,
     amount_of_discount,
     is_percentage,
+    is_time,
     start_date,
     end_date,
     start_time,
     end_time,
     is_pos,
     is_ecomm,
-    is_time
   } = req.body;
 
   try {
@@ -587,7 +587,7 @@ const updateOffer = async (req, res, next) => {
           break;    
 
       }
-      offer = await Offers.findOne({
+      /*offer = await Offers.findOne({
         where: {
           item_x,
           [Op.or]: [{type_id: 1}, {type_id: 2}, {type_id: 3}, {type_id: 4}, {type_id: 5}],
@@ -602,7 +602,7 @@ const updateOffer = async (req, res, next) => {
         data: offer,
         message: "Offer already exists for this item",
       });
-    }
+    }*/
 
     if (is_time && (!start_date || !start_time || !end_date || !end_time)) {
       return res.status(400).send({
@@ -754,6 +754,7 @@ const updateOffer = async (req, res, next) => {
       },
       message: "Offer updated successfully",
     });
+  }
   } catch (error) {
     return res.status(400).send({
       success: false,

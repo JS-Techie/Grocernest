@@ -112,7 +112,6 @@ const validationForYItemUpdate = async (item_x, item_y, offerId) => {
         return true
     }
     return false
-
 }
 
 const validationForDiscount = async(item_x, amount_of_discount, is_percentage) =>{
