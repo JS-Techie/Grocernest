@@ -205,7 +205,6 @@ const getAllOffers = async (req, res, next) => {
         message: "There are no offers",
       });
     }
-
     const promises = offers.map(async (currentOffer) => {
       if(currentOffer.type_id){
         type_details = await lkpOffers.findOne({
@@ -243,12 +242,15 @@ const getAllOffers = async (req, res, next) => {
           offerName: offer_name,
           itemX: currentOffer.item_x,
           xItemName: (x_item_details!==null)?x_item_details.name:null,
+          xItemImage: x_item_details ? x_item_details.image : null,
           quantityOfItemX: currentOffer.item_x_quantity,
           itemY: currentOffer.item_y,
           yItemName:(y_item_details!==null)?y_item_details.name:null,
+          yItemImage: y_item_details ? y_item_details.image : null,
           quantityOfItemY: currentOffer.item_y_quantity,
           itemZ: currentOffer.item_z,
           zItemName: (z_item_details!==null)?z_item_details.name:null,
+          zItemImage: z_item_details ? z_item_details.image : null,
           quantityOfItemZ: currentOffer.item_z_quantity,
           amountOfDiscount: currentOffer.amount_of_discount,
           isPercentage: currentOffer.is_percentage,
