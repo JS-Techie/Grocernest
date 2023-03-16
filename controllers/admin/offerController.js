@@ -487,12 +487,26 @@ const updateOffer = async (req, res, next) => {
     is_pos,
     is_ecomm,
   } = req.body;
-
+  
   try {
+    if (!type_id) {
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "Please enter the type of offer",
+      });
+    }
+    const validateType = isTypePresent(type_id)
+      if (!validateType) {
+        return res.status(400).send({
+          success: false,
+          data: [],
+          message: "Provide a appropriate type_id"
+        })
+      }
     const current = await Offers.findOne({
       where: { id: offerID },
     });
-
     if (!current) {
       return res.status(404).send({
         success: false,
@@ -504,6 +518,7 @@ const updateOffer = async (req, res, next) => {
     let existingOffer = null;
     let existingYItem = null;
     let existingDiscount = null;
+
     if (type_id) {
       switch(type_id){
         case 1:
@@ -515,7 +530,7 @@ const updateOffer = async (req, res, next) => {
               message: "Offer already exists on this item with mentioned quantity"
             })
           }
-          if (!existingOffer) {
+        /* if (!existingOffer) {
             existingYItem = await validationForYItemUpdate(item_x, item_y, offerID)
             console.log("existingYItem" + existingYItem)
             if (existingYItem) {
@@ -525,7 +540,7 @@ const updateOffer = async (req, res, next) => {
                 message: "Can't choose this item as offer-item"
               })
             }
-          }
+          }*/
           break;
         case 2:
           existingOffer = await validationForExistingOfferUpdate(item_x, item_x_quantity, offerID)
@@ -542,7 +557,7 @@ const updateOffer = async (req, res, next) => {
               return res.status(400).send({
                 success: false,
                 data:[],
-                message: "Please change the amount of discount"
+                message: "Please modify your discount"
               })
             }
           }
@@ -619,14 +634,6 @@ const updateOffer = async (req, res, next) => {
       });
     }
 
-    if (!type_id) {
-      return res.status(400).send({
-        success: false,
-        data: [],
-        message: "Please enter the type of offer",
-      });
-    }
-
     let testing = null;
     switch (type_id) {
       case 1:
@@ -663,16 +670,20 @@ const updateOffer = async (req, res, next) => {
         item_y,
         item_x_quantity,
         item_y_quantity,
-        // item_id,
+        item_z,
+        item_z_quantity,
         amount_of_discount,
-        is_percentage: is_percentage === true ? 1 : null,
+        is_percentage:
+        is_percentage !== null ? (is_percentage === true ? 1 : null) : null,
+        created_by: 1,
+        is_active: 1,
         start_date,
-        start_time,
         end_date,
+        start_time,
         end_time,
         is_pos,
         is_ecomm,
-        is_time,
+        is_time
       },
       {
         where: { id: offerID },
@@ -688,24 +699,24 @@ const updateOffer = async (req, res, next) => {
       data: {
         oldOffer: {
           offerID: current.id,
-          offerType: current.type,
-          itemX: current.item_x ? current.item_x : "",
-          quantityOfItemX: current.item_x_quantity
+          typeID: current.type_id,
+          typeName: validateType ? validateType.offer_type : null,
+          itemX: current.item_x ? current.item_x : null,
+          itemXQuantity: current.item_x_quantity
             ? current.item_x_quantity
-            : "",
-          itemY: current.item_y ? current.item_y : "",
-          quantityOfItemY: current.item_y_quantity
+            : null,
+          itemY: current.item_y ? current.item_y : null,
+          itemYQuantity: current.item_y_quantity
             ? current.item_y_quantity
-            : "",
-          // itemID: current.item_id ? current.item_id : "",
+            : null,
           amountOfDiscount: current.amount_of_discount
             ? current.amount_of_discount
-            : "",
+            : null,
           isPercentage: current.is_percentage
             ? current.is_percentage === 1
               ? true
               : false
-            : "",
+            : null,
           isActive: current.is_active ? true : false,
           startDate: current.start_date,
           startTime: current.start_time,
@@ -715,40 +726,41 @@ const updateOffer = async (req, res, next) => {
             ? current.is_ecomm === 1
               ? true
               : false
-            : "",
-          isPos: current.is_pos ? (current.is_pos === 1 ? true : false) : "",
+            : null,
+          isPos: current.is_pos ? (current.is_pos === 1 ? true : false) : null,
         },
         newOffer: {
           offerID: updatedOffer.id,
-          offerType: updatedOffer.type,
-          itemX: updatedOffer.item_id_1 ? updatedOffer.item_id_1 : "",
-          quantityOfItemX: updatedOffer.item_1_quantity
-            ? updatedOffer.item_1_quantity
-            : "",
-          itemY: updatedOffer.item_id_2 ? updatedOffer.item_id_2 : "",
-          quantityOfItemY: updatedOffer.item_2_quantity
-            ? updatedOffer.item_2_quantity
-            : "",
-          itemID: updatedOffer.item_id ? updatedOffer.item_id : "",
+          typeID: updatedOffer.type,
+          typeName: validateType ? validateType.offer_type : null,
+          itemX: updatedOffer.item_x ? updatedOffer.item_x : null,
+          itemXQuantity: updatedOffer.item_x_quantity
+            ? updatedOffer.item_x_quantity
+            : null,
+          itemY: updatedOffer.item_y ? updatedOffer.item_y : null,
+          itemYQuantity: updatedOffer.item_y_quantity
+            ? updatedOffer.item_y_quantity
+            : null,
+         // itemID: updatedOffer.item_id ? updatedOffer.item_id : "",
           amountOfDiscount: updatedOffer.amount_of_discount
             ? updatedOffer.amount_of_discount
-            : "",
+            : null,
           isPercentage: updatedOffer.is_percentage
             ? updatedOffer.is_percentage === 1
               ? true
               : false
-            : "",
-          isActive: current.is_active ? true : false,
-          startDate: current.start_date,
-          startTime: current.start_time,
-          endDate: current.end_date,
-          endTime: current.end_time,
-          isEcomm: current.is_ecomm
-            ? current.is_ecomm === 1
+            : null,
+          isActive: updatedOffer.is_active ? true : false,
+          startDate: updatedOffer.start_date,
+          startTime: updatedOffer.start_time,
+          endDate: updatedOffer.end_date,
+          endTime: updatedOffer.end_time,
+          isEcomm: updatedOffer.is_ecomm
+            ? updatedOffer.is_ecomm === 1
               ? true
               : false
-            : "",
-          isPos: current.is_pos ? (current.is_pos === 1 ? true : false) : "",
+            : null,
+          isPos: updatedOffer.is_pos ? (updatedOffer.is_pos === 1 ? true : false) : null,
         },
         numberOfOffersUpdated: update,
       },
