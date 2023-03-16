@@ -11,19 +11,20 @@ const saveDivision = async (req, res, next) => {
         existingDivision } = req.body;
 
     try {
-        if(existingDivision== "N"){
+        const sameDivision = await Division.findOne({
+            where: {[Op.or] : [{div_cd : divisionCode},{div_name : divisionName}]}
+        })
 
-            const sameDvision = await Division.findOne({
-                where: {[Op.or] : [{div_cd : divisionCode},{div_name : divisionName}]}
+        if(sameDivision){
+            return res.status(200).send({
+                status:403,
+                message:"Division code or division name already exists",
+                data:sameDivision
             })
+        }
 
-            if(sameDvision){
-                return res.status(200).send({
-                    status:403,
-                    message:"Division code or division name already exists",
-                    data:sameDvision
-                })
-            }
+
+        if(existingDivision== "N"){       
 
             const newDivision = await Division.create({
                 div_cd: divisionCode,
