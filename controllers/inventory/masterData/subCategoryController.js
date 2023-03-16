@@ -11,7 +11,7 @@ const SubCategory = db.LkpSubCategoryModel;
 const Category = db.LkpCategoryModel;
 
 const saveSubCategory = async (req, res, next) => {
-    const { subCatCode, subCatName, Image, categoryId, isAvailableForEcomm } = req.body;
+    const { subCatCode, subCatName, image, categoryId, isAvailableForEcomm } = req.body;
     const { user_id } = req;
     try {
         const sameSubCat = await SubCategory.findOne({
@@ -26,9 +26,9 @@ const saveSubCategory = async (req, res, next) => {
         }
 
         let url
-        if (Image) {
+        if (image) {
             const key = `subcategory/${uniq()}.jpeg`
-            url = await uploadImageToS3(Image, key);
+            url = await uploadImageToS3(image, key);
         }
 
 
@@ -67,7 +67,7 @@ const saveSubCategory = async (req, res, next) => {
             isActive: CategoryName[0].active_ind,
             categoryName: CategoryName[0].group_name,
             isAvailableForEcomm: CategoryName[0].available_for_ecomm,
-            Image: CategoryName[0].image
+            image: CategoryName[0].image
         }
         return res.status(200).send({
             status: 200,
@@ -85,12 +85,13 @@ const saveSubCategory = async (req, res, next) => {
 }
 
 const updateSubCategory = async (req, res, next) => {
-    const { categoryId, subCatCode, subCatName, isAvailableForEcomm, Image } = req.body;
-    const { subCategoryId } = req.params;
+    const { categoryId, subCatCode, subCatName, isAvailableForEcomm, image, subCategoryId } = req.body;
+    // const { subCategoryId } = req.params;
     try {
         const currentCategory = await Category.findOne({
             where: { id: categoryId }
         })
+
         if (!currentCategory) {
             return res.status(200).send({
                 status: 404,
@@ -98,6 +99,7 @@ const updateSubCategory = async (req, res, next) => {
                 data: []
             })
         }
+        console.log("hello", currentCategory);
         const currentSubCategories = await SubCategory.findOne({
             where: { id: subCategoryId }
         })
@@ -108,6 +110,7 @@ const updateSubCategory = async (req, res, next) => {
                 data: []
             })
         }
+        console.log("lalalala",currentSubCategories);
         const currentSubCategory = await SubCategory.findOne({
             where: { [Op.or]: [{ sub_cat_cd: subCatCode }, { sub_cat_name: subCatName }] }
         })
@@ -118,6 +121,7 @@ const updateSubCategory = async (req, res, next) => {
                 data: []
             })
         }
+        console.log("===========>>>>>>>>>>>",currentSubCategory);
         // let abc = currentSubCategory;
         // console.log(parseInt(abc))
 
@@ -130,7 +134,7 @@ const updateSubCategory = async (req, res, next) => {
         }
 
         const key = `subcategory/${uniq()}.jpeg`
-        const url = await uploadImageToS3(Image, key);
+        const url = await uploadImageToS3(image, key);
 
         const update = await SubCategory.update({
             sub_cat_cd: subCatCode,

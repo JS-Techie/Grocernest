@@ -1676,7 +1676,7 @@
                 "subCatName": {
                   "example": "any"
                 },
-                "Image": {
+                "image": {
                   "example": "any"
                 },
                 "categoryId": {
@@ -1754,16 +1754,10 @@
         }
       }
     },
-    "/inventory/subCategorymaster/secure/subCategory/update/{subCategoryId}": {
+    "/inventory/subCategorymaster/secure/subCategory/update/subCategoryId": {
       "post": {
         "description": "",
         "parameters": [
-          {
-            "name": "subCategoryId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
           {
             "name": "authorization",
             "in": "header",
@@ -1787,7 +1781,10 @@
                 "isAvailableForEcomm": {
                   "example": "any"
                 },
-                "Image": {
+                "image": {
+                  "example": "any"
+                },
+                "subCategoryId": {
                   "example": "any"
                 }
               }
