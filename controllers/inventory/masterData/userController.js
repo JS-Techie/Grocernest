@@ -459,7 +459,7 @@ const tellerList = async (req, res, next) => {
 };
 
 const activateUser = async (req, res, next) => {
-  const { userId } = req.params;
+  const  userId  = req.params;
   try {
     if (!userId) {
       return res.status(200).send({
@@ -506,7 +506,7 @@ const activateUser = async (req, res, next) => {
 };
 
 const deactivateUser = async (req, res, next) => {
-  const { userId } = req.params;
+  const userId  = req.params;
   try {
     if (!userId) {
       return res.status(200).send({
