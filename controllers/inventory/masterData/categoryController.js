@@ -12,7 +12,7 @@ const saveCategory = async (req, res, next) => {
     availableForEcomm,
     detailsChangedFlag,
     image,
-    id,
+    categoryId
   } = req.body;
   const { user_id } = req;
   try {
@@ -63,10 +63,12 @@ const saveCategory = async (req, res, next) => {
         message: "Successfully saved new Category",
         data: responses,
       });
-    } else {
+    } 
+    else {
       const currentCategory = await Category.findOne({
-        where: { id },
+        where: { id: categoryId },
       });
+      console.log("=======>",currentCategory);
       if (!currentCategory) {
         return res.status(200).send({
           status: 404,
@@ -79,10 +81,10 @@ const saveCategory = async (req, res, next) => {
           group_name: groupName,
           image: image,
         },
-        { where: { id } }
+        { where: { id:categoryId } }
       );
       const updatedCategory = await Category.findOne({
-        where: { id },
+        where: { id: categoryId },
       });
       const response = {
         categoryId: updatedCategory.id,

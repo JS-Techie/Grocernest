@@ -1754,10 +1754,16 @@
         }
       }
     },
-    "/inventory/subCategorymaster/secure/subCategory/update/subCategoryId": {
+    "/inventory/subCategorymaster/secure/subCategory/update/{subCategoryId}": {
       "post": {
         "description": "",
         "parameters": [
+          {
+            "name": "subCategoryId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
           {
             "name": "authorization",
             "in": "header",
