@@ -17,7 +17,7 @@ const {
 router.route("/secure/subCategory/save").post(authenticate, saveSubCategory);
 router.route("/secure/subCategory/all").post(authenticate,getAllSubCategory);
 router.route("/secure/subCategory/:categoryId").post(authenticate,getSubCategoryByCategoryId);
-router.route("/secure/subCategory/update/:subCategoryId").post(authenticate,updateSubCategory);
+router.route("/secure/subCategory/update/subCategoryId").post(authenticate,updateSubCategory);
 router.route("/secure/subCategory/all/active").post(authenticate,getActiveSubCategory);
 router.route("/secure/subCategory/all/inactive").post(authenticate,getInactiveSubCategory);
 router.route("/secure/subCategory/activate/:subCategoryId").post(authenticate,activeSubCategory);
