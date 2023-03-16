@@ -8,21 +8,24 @@ const saveBrand = async (req, res, next) => {
   const { user_id } = req;
   try {
 
-    const sameBrand = await Brand.findOne({
-      where: {
-        [Op.or]: [{ brand_cd: brandCode }, { brand_name: brandName }],
-      },
-    });
-    if (sameBrand) {
-      return res.status(200).send({
-        status: 403,
-        message: "Brand Name or Brand code already exists",
-        data: [],
-      });
-    }
+
 
 
     if (existingBrand === "N") {
+      const sameBrand = await Brand.findOne({
+        where: {
+          [Op.or]: [{ brand_cd: brandCode }, { brand_name: brandName }],
+        },
+      });
+      if (sameBrand) {
+        return res.status(200).send({
+          status: 403,
+          message: "Brand Name or Brand code already exists",
+          data: [],
+        });
+      }
+
+
       const newBrand = await Brand.create({
         brand_name: brandName,
         brand_cd: brandCode,
@@ -67,6 +70,41 @@ const saveBrand = async (req, res, next) => {
         data: [],
       });
     }
+
+
+    const sameBrandArray = await Brand.findAll({
+      attributes: ["id"],
+      where: {
+        [Op.or]: [{ brand_cd: brandCode }, { brand_name: brandName }],
+      },
+    });
+    let idCheckflag = false
+    // console.log("the same brand Array ::::",sameBrandArray)
+    for (var i = 0; i < sameBrandArray.length; i++) {
+      var item = sameBrandArray[i];
+      // console.log("the item is :",item.id)
+      // console.log("the requested item id is : ", id)
+      if (item.id !== id) {
+        idCheckflag = true
+      }
+    }
+    // console.log("the check flag:::",idCheckflag)
+    if (idCheckflag) {
+      return res.status(200).send({
+        status: 403,
+        message: "Brand Name or Brand code already exists",
+        data: [],
+      });
+    }
+
+    if (idCheckflag) {
+      return res.status(200).send({
+        status: 403,
+        message: "Brand Name or Brand code already exists",
+        data: [],
+      });
+    }
+
     const updateBrand = await Brand.update(
       {
         brand_name: brandName,
@@ -202,7 +240,7 @@ const getDeactiveBrand = async (req, res, next) => {
 };
 
 const activeBrand = async (req, res, next) => {
-  const  brandIdList  = req.body;
+  const brandIdList = req.body;
   try {
     if (brandIdList.length === 0) {
       return res.status(200).send({

@@ -8,25 +8,21 @@ const saveSize = async (req, res, next) => {
     const { user_id } = req;
 
     try {
-
-        const sameSize = await Size.findOne({
-            where: {
-                [Op.or]: [{ size_cd: sizeCode }, {
-                    size_of_item: sizeOfItem,
-                }]
-            }
-        })
-        if (sameSize) {
-            return res.status(200).send({
-                status: 403,
-                message: "Size code already exists",
-                data: []
-            })
-        }
-
-
-
         if (existingSize === "N" && !id) {
+            const sameSize = await Size.findOne({
+                where: {
+                    [Op.or]: [{ size_cd: sizeCode }, {
+                        size_of_item: sizeOfItem,
+                    }]
+                }
+            })
+            if (sameSize) {
+                return res.status(200).send({
+                    status: 403,
+                    message: "Size code already exists",
+                    data: []
+                })
+            }
 
             console.log("lalalalallalallal")
 
@@ -75,6 +71,30 @@ const saveSize = async (req, res, next) => {
                 data: []
             })
         }
+
+        const sameSizeArray = await Size.findAll({
+            attributes: ["id"],
+            where: {
+                [Op.or]: [{ size_cd: brandCode }, { size_of_item: brandName }],
+            },
+        });
+        let idCheckflag = false
+        for (var i = 0; i < sameSizeArray.length; i++) {
+            var item = sameSizeArray[i];
+
+            if (item.id !== id) {
+                idCheckflag = true
+            }
+        }
+        if (idCheckflag) {
+            return res.status(200).send({
+                status: 403,
+                message: "Size Name or Size code already exists",
+                data: [],
+            });
+        }
+
+
         const updateSize = await Size.update({
             size_cd: sizeCode,
             size_of_item: sizeOfItem

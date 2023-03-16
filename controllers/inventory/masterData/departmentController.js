@@ -8,18 +8,19 @@ const saveDepartment = async (req, res, next) => {
     const { user_id } = req;
     try {
 
-        const sameDept = await Department.findOne({
-            where: { [Op.or]: [{ dept_cd: deptCode }, { dept_name: deptName }] }
-        })
-        if (sameDept) {
-            return res.status(200).send({
-                status: 403,
-                message: "Department code or department name already exists",
-                data: []
-            })
-        }
-
         if (existingDepartment === "N") {
+
+            const sameDept = await Department.findOne({
+                where: { [Op.or]: [{ dept_cd: deptCode }, { dept_name: deptName }] }
+            })
+            if (sameDept) {
+                return res.status(200).send({
+                    status: 403,
+                    message: "Department code or department name already exists",
+                    data: []
+                })
+            }
+
 
             const newDepartment = await Department.create({
                 dept_name: deptName,
@@ -70,6 +71,28 @@ const saveDepartment = async (req, res, next) => {
                 message: " The requested department doesnt exist",
                 data: []
             })
+        }
+
+        const sameDepartmentArray = await Department.findAll({
+            attributes: ["id"],
+            where: {
+                [Op.or]: [{ dept_cd: deptCode }, { dept_name: deptName }],
+            },
+        });
+        let idCheckflag = false
+        for (var i = 0; i < sameDepartmentArray.length; i++) {
+            var item = sameDepartmentArray[i];
+
+            if (item.id !== id) {
+                idCheckflag = true
+            }
+        }
+        if (idCheckflag) {
+            return res.status(200).send({
+                status: 403,
+                message: "Department Name or Department code already exists",
+                data: [],
+            });
         }
         const updateDepartment = await Department.update({
             dept_name: deptName,
