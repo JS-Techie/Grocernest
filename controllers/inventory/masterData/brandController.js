@@ -7,20 +7,22 @@ const saveBrand = async (req, res, next) => {
   const { brandName, brandCode, existingBrand, id } = req.body;
   const { user_id } = req;
   try {
-    if (existingBrand === "N") {
-      const sameBrand = await Brand.findOne({
-        where: {
-          [Op.or]: [{ brand_cd: brandCode }, { brand_name: brandName }],
-        },
-      });
-      if (sameBrand) {
-        return res.status(200).send({
-          status: 403,
-          message: "Brand Name or Brand code already exists",
-          data: [],
-        });
-      }
 
+    const sameBrand = await Brand.findOne({
+      where: {
+        [Op.or]: [{ brand_cd: brandCode }, { brand_name: brandName }],
+      },
+    });
+    if (sameBrand) {
+      return res.status(200).send({
+        status: 403,
+        message: "Brand Name or Brand code already exists",
+        data: [],
+      });
+    }
+
+
+    if (existingBrand === "N") {      
       const newBrand = await Brand.create({
         brand_name: brandName,
         brand_cd: brandCode,
