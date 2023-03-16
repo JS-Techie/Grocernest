@@ -15,12 +15,34 @@ const invoiceRaised = async (req, res, next) => {
         data: [],
       });
     }
+  
+
+    const fromdate2= fromDate.split('/')
+    const fromdate3 = new Date(fromdate2[2],fromdate2[1],fromdate2[0])
+    const fromdate4= JSON.stringify(fromdate3).replaceAll('T', ' ')
+    const from_date=fromdate4.replaceAll('Z','')
+
+
+
+    const todate2= toDate.split('/')
+    const todate3 = new Date(todate2[2],todate2[1],todate2[0])
+    const todate4= JSON.stringify(todate3).replaceAll('T', ' ')
+    const to_date= todate4.replaceAll('Z','')
+
+    const abc=new Date(from_date)
+
+
+    console.log("================================================",typeof(abc) , new Date(to_date));
+
+
+
     const [getInvoices, metadata] =
       await sequelize.query(`select t_customer.comments ,t_customer.address ,t_customer.contact_no ,t_customer.email ,t_customer.cust_name ,t_invoice.created_at ,t_invoice.id ,t_invoice.invoice_no ,t_invoice.invoice_type ,t_invoice.location_id ,t_invoice.original_invoice_id ,t_invoice.payment_type ,t_invoice.total_quantity ,t_invoice.return_flag ,t_invoice.store_name ,t_invoice.teller_name ,t_invoice.total_amount ,t_invoice.total_discount 
     from (t_invoice 
     inner join t_customer on t_customer.id = t_invoice.cust_id )
-    where t_invoice.created_at between "${fromDate}" and "${toDate}" and t_invoice.location_id = "${locationIdList}"
+    where t_invoice.created_at between "${from_date}" and "${to_date}" and t_invoice.location_id = "${locationIdList[0]}"
     `);
+    console.log("hiiiiiiiiiiii", getInvoices);
     if (getInvoices.length === 0) {
       return res.status(200).send({
         status: 400,
