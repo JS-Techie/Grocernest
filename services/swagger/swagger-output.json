@@ -867,9 +867,6 @@
               "properties": {
                 "length": {
                   "example": "any"
-                },
-                "map((current": {
-                  "example": "any"
                 }
               }
             }
@@ -904,9 +901,6 @@
               "type": "object",
               "properties": {
                 "length": {
-                  "example": "any"
-                },
-                "map((current": {
                   "example": "any"
                 }
               }
@@ -1419,9 +1413,6 @@
               "properties": {
                 "length": {
                   "example": "any"
-                },
-                "map((current": {
-                  "example": "any"
                 }
               }
             }
@@ -1456,9 +1447,6 @@
               "type": "object",
               "properties": {
                 "length": {
-                  "example": "any"
-                },
-                "map((current": {
                   "example": "any"
                 }
               }
@@ -2314,35 +2302,6 @@
         }
       }
     },
-    "/inventory/itemmaster/secure/item/{itemCode}": {
-      "post": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "itemCode",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "404": {
-            "description": "Not Found"
-          }
-        }
-      }
-    },
     "/inventory/itemmaster/secure/item/getItemData": {
       "post": {
         "description": "",
@@ -2453,6 +2412,59 @@
                   "example": "any"
                 },
                 "toDate": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/inventory/dailySalesReport/secure/report/generateSalesReport": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "brandId": {
+                  "example": "any"
+                },
+                "endDate": {
+                  "example": "any"
+                },
+                "brandName": {
+                  "example": "any"
+                },
+                "pageNo": {
+                  "example": "any"
+                },
+                "pageSize": {
+                  "example": "any"
+                },
+                "startDate": {
+                  "example": "any"
+                },
+                "tellerId": {
                   "example": "any"
                 }
               }
