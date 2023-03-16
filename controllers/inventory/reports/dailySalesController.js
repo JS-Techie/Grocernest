@@ -169,9 +169,6 @@ const generateSalesReport = async (req, res, next) => {
   }
 };
 
-module.exports = {
-  generateSalesReport,
-};
 
 module.exports = {
   invoiceRaised,
