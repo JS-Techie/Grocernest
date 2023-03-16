@@ -66,6 +66,8 @@ const feedbackRouter = require("./routes/feedbackRoutes");
 const homePageRouter = require("./routes/homepageRoutes");
 const adhocRouter = require("./routes/adhocRoutes");
 
+
+
 // admin routers import
 const adminOrderRouter = require("./routes/admin/orderRoutes");
 const adminWalletRouter = require("./routes/admin/walletRoutes");
@@ -105,15 +107,38 @@ const couponToCustomer = require("./routes/admin/couponToCustomer");
 const specialWalletRouter = require("./routes/admin/specialWalletRoutes");
 
 // migration codes
-// const inventoryAuthRouter = require("./routes/inventory/authRoutes");
+const inventoryAuthRouter = require("./routes/inventory/authRoutes");
 const userMasterRouter = require("./routes/inventory/masterData/userRoutes");
 const brandMasterRouter = require("./routes/inventory/masterData/brandRoutes");
+
+
+const updateSelfPasswordRouter = require("./routes/inventory/PasswordHandler/updateSelfPasswordRoutes")
+const userMasterUpdatePasswordRouter= require("./routes/inventory/PasswordHandler/userMasterUpdatePasswordRoutes")
+const authControllerRouter =require('./routes/authControllerRoutes')
+
+
+
+
 const sizeMasterRouter = require("./routes/inventory/masterData/sizeRoutes");
-// const stockTransferRouter = require("./routes/inventory/stockTransfer/stockMovementRoutes");
+const locationMaster = require("./routes/inventory/masterData/locationRoutes");
 const colorMasterRouter = require("./routes/inventory/masterData/colorRoutes");
+
+const divisionMasterRouter = require("./routes/inventory/masterData/divisionRoutes");
+const departmentMasterRouter = require("./routes/inventory/masterData/departmentRoutes");
+const categoryMasterRouter = require("./routes/inventory/masterData/categoryRoutes");
+const subCategoryMasterRouter = require("./routes/inventory/masterData/subCategoryRoutes");
+const itemMasterRouter = require("./routes/inventory/masterData/itemRoutes");
+
+//reports import
+const dailySalesReportRouter = require("./routes/inventory/reports/dailySalesRoutes")
+
+//stockTransfer import
+// const stockTransferRouter = require("./routes/inventory/stockTransfer/stockMovementRoutes");
+
 
 //grn
 const grnDraftSaveRouter = require("./routes/inventory/grn/grnDraftSaveRoutes");
+
 
 //Vendor routes import
 
@@ -125,17 +150,33 @@ app.get("/responses", (req, res) => {
 });
 
 // inventory master data routes
-// app.use(inventoryAuthRouter)
+app.use(inventoryAuthRouter);
+
+app.use("/inventory/colormaster", colorMasterRouter);
 app.use("/inventory/usermaster", userMasterRouter);
 app.use("/inventory/brandmaster", brandMasterRouter);
-app.use("/inventory/sizemaster", sizeMasterRouter); 
-// app.use("/inventory/stockTransfer", stockTransferRouter);
+app.use("/inventory/sizemaster", sizeMasterRouter);
+app.use("/inventory/locationmaster", locationMaster);
+app.use("/inventory/divisionmaster", divisionMasterRouter);
+app.use("/inventory/departmentmaster", departmentMasterRouter);
+app.use("/inventory/categorymaster", categoryMasterRouter);
+app.use("/inventory/subCategorymaster", subCategoryMasterRouter);
+app.use("/inventory/itemmaster", itemMasterRouter)
 
-
-app.use("/inventory/colormaster",colorMasterRouter);
+//report routes
+app.use("/inventory/dailySalesReport", dailySalesReportRouter)
 
 // inventory grn routes
 app.use("/inventory/grn", grnDraftSaveRouter);
+app.use("/inventory/passwordhandler", updateSelfPasswordRouter)
+app.use("/inventory/passwordhandler", userMasterUpdatePasswordRouter)
+app.use("/inventory", authControllerRouter)
+
+
+//stockTransfer routes
+// app.use("/inventory/stockTransfer", stockTransferRouter);
+
+
 
 // customer routes
 app.use(authRouter);
