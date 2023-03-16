@@ -1496,7 +1496,7 @@
                 "image": {
                   "example": "any"
                 },
-                "id": {
+                "categoryId": {
                   "example": "any"
                 }
               }
