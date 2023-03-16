@@ -48,7 +48,7 @@ const saveSize = async (req, res, next) => {
                 }
             })
 
-            console.log("the resonse of CURRENT SIZE:",currentSize)
+            console.log("the resonse of CURRENT SIZE:", currentSize)
             const responses = {
                 id: currentSize.id,
                 sizeCode: newSize.size_cd,
