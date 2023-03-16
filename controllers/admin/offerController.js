@@ -6,7 +6,8 @@ const db = require("../../models");
 
 const { isTypePresent, validationForExistingOffer, validationForYItem,
    validationForDiscount, typeIdDetails, buyXGetAnyYCreation, itemCombinationValidation, offerItemValidationType4,
-   xSpecificYItemValidationType3, offerItemDuplicacyCheckType3 } = require("../../services/offerService")
+   xSpecificYItemValidationType3, offerItemDuplicacyCheckType3, validationForExistingOfferUpdate, validationForYItemUpdate, validationForDiscountUpdate,
+   xSpecificYItemValidationType3Update } = require("../../services/offerService")
 
 const lkp_offers = db.lkpOffersModel;
 const Offers = db.OffersModel;
@@ -500,13 +501,97 @@ const updateOffer = async (req, res, next) => {
       });
     }
 
-    let offer = null;
-    if (item_x) {
+    let existingOffer = null;
+    let existingYItem = null;
+    let existingDiscount = null;
+    if (type_id) {
+      switch(type_id){
+        case 1:
+          existingOffer = await validationForExistingOfferUpdate(item_x, item_x_quantity, offerID)
+          if (existingOffer) {
+            return res.status(400).send({
+              success: false,
+              data: [],
+              message: "Offer already exists on this item with mentioned quantity"
+            })
+          }
+          if (!existingOffer) {
+            existingYItem = await validationForYItemUpdate(item_x, item_y, offerID)
+            console.log("existingYItem" + existingYItem)
+            if (existingYItem) {
+              return res.status(400).send({
+                success: false,
+                data: [],
+                message: "Can't choose this item as offer-item"
+              })
+            }
+          }
+          break;
+        case 2:
+          existingOffer = await validationForExistingOfferUpdate(item_x, item_x_quantity, offerID)
+          if (existingOffer) {
+            return res.status(400).send({
+              success: false,
+              data: [],
+              message: "Offer already exists on this item with mentioned quantity"
+            })
+          }
+          if(!existingOffer){
+            existingDiscount = await validationForDiscountUpdate(item_x, amount_of_discount, is_percentage, offerID)
+            if(existingDiscount){
+              return res.status(400).send({
+                success: false,
+                data:[],
+                message: "Please change the amount of discount"
+              })
+            }
+          }
+          break;
+        case 3:
+         /* const offerItemDuplicacy = await offerItemDuplicacyCheckType3(req.body)
+          if(offerItemDuplicacy){
+            return res.status(400).send({
+              success: false,
+              data: offerItemDuplicacy,
+              message:"Duplicate item present in offer item list, please optimize"
+            })
+          }
+          const offerItemValidation = await xSpecificYItemValidationType3Update(req.body, offerID)
+          console.log("value "+offerItemValidation)
+          if(offerItemValidation){
+            return res.status(400).send({
+              success: false,
+              data: offerItemValidation,
+              message:"offer item previously present, please change the offer item"
+            })
+          }
+          console.log("offerItemValidation "+ offerItemValidation)
+          const offerBulk = await buyXGetAnyYUpdate(req.body, offerID)
+          if(offerBulk){
+            return res.status(201).send({
+              success: true,
+              data: offerBulk,
+              message: "New offer successfully created"
+            })
+          }else{
+            return res.status(400).send({
+              success: false,
+              data: [],
+              message: "Offer failed to create"
+            })
+          }*/
+          break;
+        case 4:
+          break;
+        case 5:
+          break;    
+
+      }
       offer = await Offers.findOne({
         where: {
           item_x,
-          [Op.or]: [{ type_id: 1 }, { type_id: 2 }],
-          [Op.not]: [{ id: offerID }],
+          [Op.or]: [{type_id: 1}, {type_id: 2}, {type_id: 3}, {type_id: 4}, {type_id: 5}],
+          [Op.not]: [{id: offerID}],
         },
       });
     }

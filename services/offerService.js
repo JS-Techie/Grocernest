@@ -76,6 +76,20 @@ const validationForExistingOffer = async (item_x, item_x_quantity) => {
     return false
 }
 
+const validationForExistingOfferUpdate = async (item_x, item_x_quantity, offerID) =>{
+    const existingOffer = await offers.findOne({
+        where: {
+            item_x, item_x_quantity,
+            [Op.not]: [{id: offerID}]
+        }
+    })
+    if (existingOffer) {
+        return true
+    }
+    return false
+}
+
+
 const validationForYItem = async (item_x, item_y) => {
     const existingOfferItem = await offers.findOne({
         where: {
@@ -87,6 +101,19 @@ const validationForYItem = async (item_x, item_y) => {
     }
     return false
 }
+const validationForYItemUpdate = async (item_x, item_y, offerId) => {
+    const existingOfferItem = await offers.findOne({
+        where: {
+            item_x, item_y,
+            [Op.not]: [{id: offerId}]
+        }
+    })
+    if (existingOfferItem) {
+        return true
+    }
+    return false
+
+}
 
 const validationForDiscount = async(item_x, amount_of_discount, is_percentage) =>{
     const existingDiscount = await offers.findOne({
@@ -94,6 +121,21 @@ const validationForDiscount = async(item_x, amount_of_discount, is_percentage) =
             item_x,
             amount_of_discount,
             is_percentage: (is_percentage===true)?1:null
+        }
+    })
+    if(existingDiscount){
+        return true
+    }
+    return false
+}
+
+const validationForDiscountUpdate = async (item_x, amount_of_discount, is_percentage, offerID) =>{
+    const existingDiscount = await offers.findOne({
+        where:{
+            item_x,
+            amount_of_discount,
+            is_percentage: (is_percentage===true)?1:null,
+            [Op.not]: [{id:offerID}]
         }
     })
     if(existingDiscount){
@@ -173,6 +215,44 @@ const xSpecificYItemValidationType3 = async(offerDetails)=>{
     return false
 }
 
+const xSpecificYItemValidationType3Update = async(offerDetails, offerID)=>{
+    let collectionOfY = []
+    const isExists = await offers.findAll({
+        where:{
+            type_id: offerDetails.type_id,
+            item_x: offerDetails.item_x,
+            [Op.not]: [{id:offerID}]
+        }
+    })
+    if(isExists){
+        isExists.map((each_obj)=>{
+            //console.log("each_obj "+each_obj.item_y)
+            collectionOfY.push(each_obj.item_y)
+        })
+    }
+    console.log("collectionOfY "+collectionOfY)
+    let result=[]
+    console.log("First Size "+result.length)
+    if(offerDetails.item_y){
+        console.log("yes, array")
+        offerDetails.item_y.map((y)=>{
+            const res = collectionOfY.includes(y)
+            console.log("isExists: "+res)
+            if(res){
+              result.push(y)
+            }
+        })
+    }
+    console.log("Result: "+result)
+    const val = result.length
+    console.log("The val "+val)
+    if(result.length>0){
+        return result
+    }
+    return false
+}
+
+
 const buyXGetAnyYCreation = async (offerDetails)=>{
     let ultimateValue = []
     offerDetails.item_y.map((requestYItem)=>{
@@ -201,6 +281,34 @@ const buyXGetAnyYCreation = async (offerDetails)=>{
         fieldValidation(offerDetails)
         const offerBulk = offers.bulkCreate(ultimateValue) 
         return  offerBulk
+}
+
+const buyXGetAnyYUpdate = async (offerDetails, offerID)=>{
+    let ultimateValue = []
+    offerDetails.item_y.map((requestYItem)=>{
+        const value = {
+            type_id: offerDetails.type_id,
+            item_x: offerDetails.item_x,
+            item_y: requestYItem,
+            item_x_quantity: offerDetails.item_x_quantity,
+            item_y_quantity: offerDetails.item_y_quantity,
+            item_z: offerDetails.item_z,
+            amount_of_discount: offerDetails.amount_of_discount,
+            is_percentage: offerDetails.is_percentage !== null ? (offerDetails.is_percentage === true ? 1 : null) : null,
+            created_by: 1,
+            is_active: 1,
+            is_percentage: offerDetails.is_percentage,
+            start_date: offerDetails.start_date,
+            end_date: offerDetails.end_date,
+            start_time: offerDetails.start_time,
+            end_time: offerDetails.end_time,
+            is_pos: offerDetails.is_pos,
+            is_ecomm: offerDetails.is_ecomm,
+            is_time: offerDetails.is_time,
+          } 
+          ultimateValue.push(value)
+        })
+
 }
 
 const fieldValidation =  (offerDetails)=>{
@@ -264,8 +372,9 @@ module.exports = {
     itemCombinationValidation,
     offerItemValidationType4,
     xSpecificYItemValidationType3,
-    offerItemDuplicacyCheckType3
-    
-
-    
+    offerItemDuplicacyCheckType3,
+    validationForExistingOfferUpdate,
+    validationForYItemUpdate,
+    validationForDiscountUpdate,
+    xSpecificYItemValidationType3Update
 }
