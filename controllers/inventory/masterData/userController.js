@@ -36,7 +36,7 @@ const saveUser = async (req, res, next) => {
       });
     }
     const userObject = await User.findOne({
-      where: { email , mobile_no:mobileNo},
+      where: { email},
     });
     if (userObject) {
       return res.status(200).send({
@@ -86,7 +86,7 @@ const saveUser = async (req, res, next) => {
 
     const currentUser = await User.findOne({
       where: {
-        mobile_no: mobileNo,
+        email: email,
       },
     });
 
@@ -176,7 +176,7 @@ const updateUser = async (req, res, next) => {
     }
 
     const sameCred = await User.findOne({
-      where: { [Op.or]: [{ mobile_no: mobileNo }, { email: email }] },
+      where: { [Op.or]: [{ email: email }] },
     });
     if (sameCred) {
       return res.status(200).send({
