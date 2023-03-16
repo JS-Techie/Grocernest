@@ -71,6 +71,7 @@ const grnDraftSaveController = async (req, res) => {
       `select id from t_grn order by id desc limit 1`
     );
     console.log("************the grn id is************* ", grn_ID[0][0].id);
+
     let dataItems = [];
 
     const dataArrayPromises = itemDetails.map(async (ele) => {
@@ -108,10 +109,78 @@ const grnDraftSaveController = async (req, res) => {
     dataItems = await Promise.all(dataArrayPromises);
     console.log(dataItems)
 
+
+
+
+
+    const grnDetailsID=  await GrnDetailsModel.findAll({
+      attributes:["id"],
+      where:{grn_id: grn_ID[0][0].id}
+    })
+
+    const ItemDetailResponsePromise = dataItems.map(async (obj,ind) => {
+
+      
+      const formattedData = {
+        "createdBy": obj.created_by,
+        "createdAt": obj.created_at,
+        "updatedBy": obj.updated_by,
+        "updatedAt": obj.updated_at,
+        "isActive": obj.active_ind,
+        "id": grnDetailsID[ind].id,
+        "grnId": obj.grn_id,
+        "itemId": obj.item_id,
+        "batchNo": obj.BATCH_NO,
+        "batchName": obj.batch_name,
+        "orderedQuantity": parseInt(obj.ordered_quantity),
+        "receivedQuantity":parseInt(obj.received_quantity),
+        "ecommQuantity": obj.ecomm_quantity,
+        "shelfNo": obj.shelf_no,
+        "costPrice": parseFloat(obj.COST_PRICE),
+        "salePrice": parseFloat(obj.SALE_PRICE),
+        "discount": parseFloat(obj.DISCOUNT),
+        "cgst": parseFloat(obj.cgst),
+        "sgst": parseFloat(obj.sgst),
+        "igst": parseFloat(obj.igst),
+        "otherTax": parseFloat(obj.other_tax),
+        "mfgDate": obj.mfg_date,
+        "expiryDate": obj.expiry_date,
+        "basePrice": parseFloat(obj.base_price),
+        "supplierDisc": parseFloat(obj.supplier_disc),
+        "cashBack": parseFloat(obj.cashback),
+        "isCashBackInPercentage": obj.cashBack_is_percentage,
+        "mrp": parseFloat(obj.MRP)
+      }
+      return formattedData
+    })
+
+    const ItemDetailResponse = await Promise.all(ItemDetailResponsePromise)
+
+    const response = {
+        "createdBy": grnData.created_by,
+        "createdAt": grnData.created_at,
+        "updatedBy": grnData.updated_by,
+        "updatedAt": grnData.updated_at,
+        "isActive": grnData.active_ind,
+        "id": grn_ID[0][0].id,
+        "grn_id":grn_ID[0][0].id,
+        "grnLocationId": parseInt(grnData.grn_location_id),
+        "supplierId": grnData.supplier_id,
+        "invoiceNo": grnData.invoice_no,
+        "invoiceAmount": grnData.invoice_amt,
+        "grnDate": grnData.grn_date,
+        "grnStatus": grnData.status,
+        "supplierDisc": parseInt(grnData.supplier_disc),
+        "itemDetails": ItemDetailResponse
+    }
+
+
+
+
     res.status(200).json({
-      message: "Successfully saved Grn data",
-      status: 200,
-      data: dataItems,
+      message:"Successfully saved Grn data",
+      status:200,
+      data: response,
     });
   } catch (error) {
     res.status(500).json({
