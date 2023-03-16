@@ -1783,9 +1783,6 @@
                 },
                 "image": {
                   "example": "any"
-                },
-                "subCategoryId": {
-                  "example": "any"
                 }
               }
             }
@@ -6570,6 +6567,9 @@
                 "is_percentage": {
                   "example": "any"
                 },
+                "is_time": {
+                  "example": "any"
+                },
                 "start_date": {
                   "example": "any"
                 },
@@ -6586,9 +6586,6 @@
                   "example": "any"
                 },
                 "is_ecomm": {
-                  "example": "any"
-                },
-                "is_time": {
                   "example": "any"
                 }
               }

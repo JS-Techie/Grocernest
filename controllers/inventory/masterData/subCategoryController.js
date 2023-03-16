@@ -85,8 +85,8 @@ const saveSubCategory = async (req, res, next) => {
 }
 
 const updateSubCategory = async (req, res, next) => {
-    const { categoryId, subCatCode, subCatName, isAvailableForEcomm, image, subCategoryId } = req.body;
-    // const { subCategoryId } = req.params;
+    const { categoryId, subCatCode, subCatName, isAvailableForEcomm, image } = req.body;
+    const { subCategoryId } = req.params;
     try {
         const currentCategory = await Category.findOne({
             where: { id: categoryId }
