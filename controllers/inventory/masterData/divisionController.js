@@ -1,10 +1,10 @@
-const{Op} = require("sequelize");
+const { Op } = require("sequelize");
 const db = require("../../../models");
 
 const Division = db.LkpDivisionModel;
 
 const saveDivision = async (req, res, next) => {
-    const {user_id} = req;
+    const { user_id } = req;
     const {
         divisionCode,
         divisionName,
@@ -12,86 +12,89 @@ const saveDivision = async (req, res, next) => {
 
     try {
         const sameDivision = await Division.findOne({
-            where: {[Op.or] : [{div_cd : divisionCode},{div_name : divisionName}]}
+            where: { [Op.or]: [{ div_cd: divisionCode }, { div_name: divisionName }] }
         })
 
-        if(sameDivision){
+        if (sameDivision) {
             return res.status(200).send({
-                status:403,
-                message:"Division code or division name already exists",
-                data:sameDivision
+                status: 403,
+                message: "Division code or division name already exists",
+                data: sameDivision
             })
         }
 
 
-        if(existingDivision== "N"){       
+        if (existingDivision == "N") {
 
             const newDivision = await Division.create({
                 div_cd: divisionCode,
-                div_name:divisionName,
+                div_name: divisionName,
                 active_ind: "Y",
-                created_by:user_id,
-                created_at:Date.now(),
+                created_by: user_id,
+                created_at: Date.now(),
                 // updated_at,
                 // updated_by
             })
 
             const currentDivision = await Division.findOne({
-                where: {div_cd: divisionCode,
-                    div_name:divisionName,
+                where: {
+                    div_cd: divisionCode,
+                    div_name: divisionName,
                     active_ind: "Y",
-                    created_by:user_id}
+                    created_by: user_id
+                }
             })
             const response = {
                 id: currentDivision.id,
                 divisionCode: newDivision.div_cd,
-                divisionName:newDivision.div_name,
-                isActive:newDivision.active_ind,
-                createdBy:newDivision.created_by,
-                createdAt:newDivision.created_at,
-                updatedAt:newDivision.updated_at,
-                updatedBy:newDivision.updated_by
-                
+                divisionName: newDivision.div_name,
+                isActive: newDivision.active_ind,
+                createdBy: newDivision.created_by,
+                createdAt: newDivision.created_at,
+                updatedAt: newDivision.updated_at,
+                updatedBy: newDivision.updated_by
+
             }
 
             return res.status(200).send({
-                status:200,
+                status: 200,
                 message: "Successfully saved the division",
                 data: response
             })
         }
         else {
-            const {id,detailsChangedFlag}=req.body;
+            const { id, detailsChangedFlag } = req.body;
             const currentDivision = await Division.findOne({
-                where: {id}
+                where: { id }
             })
-            if(!currentDivision){
+            if (!currentDivision) {
                 return res.status(200).send({
                     status: 404,
                     message: "Division doesnt exist",
                     data: []
                 })
             }
-            
+
             const updateDivision = await Division.update({
-                div_cd :divisionCode,
-                div_name : divisionName} , {where : {id}}
+                div_cd: divisionCode,
+                div_name: divisionName
+            }, { where: { id } }
             )
             const updatedDivision = await Division.findOne({
-                where: {id}
+                where: { id }
             })
             const response = {
                 id: updatedDivision.id,
                 divisionCode: updatedDivision.div_cd,
-                divisionName:updatedDivision.div_name,
-                isActive:updatedDivision.active_ind,
-                createdBy:updatedDivision.created_by,
-                createdAt:updatedDivision.created_at,
-                updatedBy:updatedDivision.updated_by,
-                updatedAt:updatedDivision.updated_at,
+                divisionName: updatedDivision.div_name,
+                isActive: updatedDivision.active_ind,
+                createdBy: updatedDivision.created_by,
+                createdAt: updatedDivision.created_at,
+                updatedBy: updatedDivision.updated_by,
+                updatedAt: updatedDivision.updated_at,
             }
             return res.status(200).send({
-                status:200,
+                status: 200,
                 message: "Updated successfully",
                 data: response
             })
@@ -117,12 +120,12 @@ const getAllDivision = async (req, res, next) => {
             })
         }
         console.log("lalalalala", allDivision);
-        const promises= allDivision.map((current)=> {
-            return({
-                id:current.id,
-                divisionCode:current.div_cd,
-                divisionName:current.div_name,
-                isActive:current.active_ind
+        const promises = allDivision.map((current) => {
+            return ({
+                id: current.id,
+                divisionCode: current.div_cd,
+                divisionName: current.div_name,
+                isActive: current.active_ind
             })
         })
         const response = await Promise.all(promises)
@@ -145,21 +148,20 @@ const getAllDivision = async (req, res, next) => {
 const getActiveDivision = async (req, res, next) => {
     try {
         const allActiveDivision = await Division.findAll({
-            where : { active_ind: "Y"}
+            where: { active_ind: "Y" }
         })
-        if(allActiveDivision.length ===0)
-        {
+        if (allActiveDivision.length === 0) {
             return res.status(200).send({
                 status: 404,
                 message: "The requested division doesnot exist"
             })
         }
-        const promises= allActiveDivision.map((current)=> {
-            return({
-                id:current.id,
-                divisionCode:current.div_cd,
-                divisionName:current.div_name,
-                isActive:current.active_ind
+        const promises = allActiveDivision.map((current) => {
+            return ({
+                id: current.id,
+                divisionCode: current.div_cd,
+                divisionName: current.div_name,
+                isActive: current.active_ind
             })
         })
         const response = await Promise.all(promises)
@@ -180,26 +182,26 @@ const getActiveDivision = async (req, res, next) => {
 const getDeactiveDivision = async (req, res, next) => {
     try {
         const allDeactivateDivision = await Division.findAll({
-            where: {active_ind:"N"}
+            where: { active_ind: "N" }
         })
-        if (allDeactivateDivision.length === 0){
+        if (allDeactivateDivision.length === 0) {
             return res.status(200).send({
                 status: 404,
                 message: "The requested division doesnt exist",
                 data: []
             })
         }
-        const promises= allDeactivateDivision.map((current)=> {
-            return({
-                id:current.id,
-                divisionCode:current.div_cd,
-                divisionName:current.div_name,
-                isActive:current.active_ind
+        const promises = allDeactivateDivision.map((current) => {
+            return ({
+                id: current.id,
+                divisionCode: current.div_cd,
+                divisionName: current.div_name,
+                isActive: current.active_ind
             })
         })
         const response = await Promise.all(promises)
         return res.status(200).send({
-            status:200,
+            status: 200,
             message: "Successfully fetched all the deactivated divisions",
             data: response
         })
@@ -213,12 +215,12 @@ const getDeactiveDivision = async (req, res, next) => {
 }
 
 const activeDivision = async (req, res, next) => {
-    const id  = req.body;
+    const id = req.body;
     try {
         const currentDivision = await Division.findOne({
             where: { id }
         })
-console.log("object", currentDivision);
+        console.log("object", currentDivision);
         if (!currentDivision) {
             return res.status(200).send({
                 status: 404,
@@ -237,8 +239,8 @@ console.log("object", currentDivision);
         const response = {
             id: updatedDivision.id,
             divisionCode: updatedDivision.div_cd,
-            divisionName:updatedDivision.div_name,
-            isActive:updatedDivision.active_ind
+            divisionName: updatedDivision.div_name,
+            isActive: updatedDivision.active_ind
         }
 
         return res.status(200).send({
@@ -261,7 +263,7 @@ const deactiveDivision = async (req, res, next) => {
     console.log("======>", id);
     try {
         const currentDivision = await Division.findOne({
-            where : {id}
+            where: { id }
         })
         console.log("hello", currentDivision);
         if (!currentDivision) {
@@ -273,22 +275,22 @@ const deactiveDivision = async (req, res, next) => {
         }
         const deactivate = await Division.update({
             active_ind: "N"
-        },{ where : {id}}
+        }, { where: { id } }
         )
         const updatedDivision = await Division.findOne({
-          where : {id}
-      })
-      const response = {
-        id: updatedDivision.id,
-        divisionCode: updatedDivision.div_cd,
-        divisionName:updatedDivision.div_name,
-        isActive:updatedDivision.active_ind
-    }
-      return res.status(200).send({
-          status:200,
-          message:"Requested division has been successfully deactivated",
-          data: response
-      })
+            where: { id }
+        })
+        const response = {
+            id: updatedDivision.id,
+            divisionCode: updatedDivision.div_cd,
+            divisionName: updatedDivision.div_name,
+            isActive: updatedDivision.active_ind
+        }
+        return res.status(200).send({
+            status: 200,
+            message: "Requested division has been successfully deactivated",
+            data: response
+        })
     } catch (error) {
         return res.status(200).send({
             status: 500,
