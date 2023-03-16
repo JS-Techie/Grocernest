@@ -679,7 +679,7 @@
             "schema": {
               "type": "object",
               "properties": {
-                "brandIdList": {
+                "length": {
                   "example": "any"
                 }
               }
