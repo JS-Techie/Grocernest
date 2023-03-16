@@ -1493,7 +1493,7 @@
                 "detailsChangedFlag": {
                   "example": "any"
                 },
-                "Image": {
+                "image": {
                   "example": "any"
                 },
                 "id": {
@@ -1602,9 +1602,6 @@
               "properties": {
                 "length": {
                   "example": "any"
-                },
-                "map((current": {
-                  "example": "any"
                 }
               }
             }
@@ -1639,9 +1636,6 @@
               "type": "object",
               "properties": {
                 "length": {
-                  "example": "any"
-                },
-                "map((current": {
                   "example": "any"
                 }
               }

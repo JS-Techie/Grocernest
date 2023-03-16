@@ -459,7 +459,7 @@ const tellerList = async (req, res, next) => {
 };
 
 const activateUser = async (req, res, next) => {
-  const  userId  = req.params;
+  const userId   = req.params.userId;
   try {
     if (!userId) {
       return res.status(200).send({
@@ -472,6 +472,7 @@ const activateUser = async (req, res, next) => {
     const userObject = await User.findOne({
       where: { id: userId },
     });
+    console.log("========>", userObject);
     if (!userObject) {
       return res.status(200).send({
         status: 400,
@@ -506,7 +507,7 @@ const activateUser = async (req, res, next) => {
 };
 
 const deactivateUser = async (req, res, next) => {
-  const userId  = req.params;
+  const userId  = req.params.userId;
   try {
     if (!userId) {
       return res.status(200).send({
