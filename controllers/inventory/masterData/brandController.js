@@ -22,7 +22,7 @@ const saveBrand = async (req, res, next) => {
     }
 
 
-    if (existingBrand === "N") {      
+    if (existingBrand === "N") {
       const newBrand = await Brand.create({
         brand_name: brandName,
         brand_cd: brandCode,
@@ -202,7 +202,7 @@ const getDeactiveBrand = async (req, res, next) => {
 };
 
 const activeBrand = async (req, res, next) => {
-const {brandIdList} = req.body;
+  const { brandIdList } = req.body;
   try {
     if (brandIdList.length === 0) {
       return res.status(200).send({
