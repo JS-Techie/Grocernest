@@ -10,19 +10,20 @@ const saveColor = async (req, res, next) => {
         // const existingColor = await Color.findOne({
         //     where: { id:colorId }
         // })
-        const sameColor = await Color.findOne({
-            where: { [Op.or]: [{ color_cd: colorCode }, { color_name: colorName }] }
-        })
-        if (sameColor) {
-            return res.status(200).send({
-                status: 403,
-                message: "The color code or color name alreary exists",
-                data: []
-            })
-        }
+
 
 
         if (existingColor === "N") {
+            const sameColor = await Color.findOne({
+                where: { [Op.or]: [{ color_cd: colorCode }, { color_name: colorName }] }
+            })
+            if (sameColor) {
+                return res.status(200).send({
+                    status: 403,
+                    message: "The color code or color name alreary exists",
+                    data: []
+                })
+            }
 
             const newColor = await Color.create({
                 color_cd: colorCode,
@@ -62,6 +63,31 @@ const saveColor = async (req, res, next) => {
                     data: []
                 })
             }
+
+            const sameColorArray = await Color.findAll({
+                attributes: ["colorId"],
+                where: {
+                    [Op.or]: [{ color_cd: brandCode }, { color_name: brandName }],
+                },
+            });
+            let idCheckflag = false
+            for (var i = 0; i < sameColorArray.length; i++) {
+                var item = sameColorArray[i];
+
+                if (item.colorId !== colorId) {
+                    idCheckflag = true
+                }
+            }
+            if (idCheckflag) {
+                return res.status(200).send({
+                    status: 403,
+                    message: "Color Name or Color code already exists",
+                    data: [],
+                });
+            }
+
+
+
 
             const updateColor = await Color.update({
                 color_cd: colorCode,

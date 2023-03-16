@@ -10,21 +10,21 @@ const saveDivision = async (req, res, next) => {
         divisionName,
         existingDivision } = req.body;
 
-    try {
-        const sameDivision = await Division.findOne({
-            where: { [Op.or]: [{ div_cd: divisionCode }, { div_name: divisionName }] }
-        })
-
-        if (sameDivision) {
-            return res.status(200).send({
-                status: 403,
-                message: "Division code or division name already exists",
-                data: sameDivision
-            })
-        }
+    try {       
 
 
         if (existingDivision == "N") {
+            const sameDivision = await Division.findOne({
+                where: { [Op.or]: [{ div_cd: divisionCode }, { div_name: divisionName }] }
+            })
+    
+            if (sameDivision) {
+                return res.status(200).send({
+                    status: 403,
+                    message: "Division code or division name already exists",
+                    data: sameDivision
+                })
+            }
 
             const newDivision = await Division.create({
                 div_cd: divisionCode,
@@ -73,6 +73,28 @@ const saveDivision = async (req, res, next) => {
                     message: "Division doesnt exist",
                     data: []
                 })
+            }
+
+            const sameDivisionArray = await Division.findAll({
+                attributes: ["id"],
+                where: {
+                    [Op.or]: [{ div_cd: divisionCode }, { div_name: divisionName }],
+                },
+            });
+            let idCheckflag = false
+            for (var i = 0; i < sameDivisionArray.length; i++) {
+                var item = sameDivisionArray[i];
+
+                if (item.id !== id) {
+                    idCheckflag = true
+                }
+            }
+            if (idCheckflag) {
+                return res.status(200).send({
+                    status: 403,
+                    message: "Division Name or Division code already exists",
+                    data: [],
+                });
             }
 
             const updateDivision = await Division.update({
