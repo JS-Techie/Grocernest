@@ -679,7 +679,7 @@
             "schema": {
               "type": "object",
               "properties": {
-                "brandIdList": {
+                "length": {
                   "example": "any"
                 }
               }
@@ -2390,9 +2390,7 @@
         }
       }
     },
-
     "/inventory/dailySalesReport/secure/report/fetchPaymentSummary": {
-
       "post": {
         "description": "",
         "parameters": [
@@ -2407,21 +2405,6 @@
             "schema": {
               "type": "object",
               "properties": {
-
-                "sizeCode": {
-                  "example": "any"
-                },
-                "sizeOfItem": {
-                  "example": "any"
-                },
-                "existingSize": {
-                  "example": "any"
-                },
-                "detailsChangedFlag": {
-                  "example": "any"
-                },
-                "id": {
-
                 "fromDate": {
                   "example": "any"
                 },
@@ -2429,7 +2412,6 @@
                   "example": "any"
                 },
                 "toDate": {
-
                   "example": "any"
                 }
               }
@@ -2449,9 +2431,7 @@
         }
       }
     },
-
     "/inventory/dailySalesReport/secure/report/generateSalesReport": {
-
       "post": {
         "description": "",
         "parameters": [
@@ -2504,54 +2484,7 @@
         }
       }
     },
-
-    "/inventory/sizemaster/secure/size/getActiveSize": {
-      "post": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "404": {
-            "description": "Not Found"
-          }
-        }
-      }
-    },
-    "/inventory/sizemaster/secure/size/getDeactiveSize": {
-      "post": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "404": {
-            "description": "Not Found"
-          }
-        }
-      }
-    },
-    "/inventory/sizemaster/secure/size/activeSize": {
+    "/inventory/grn/draft/save": {
       "post": {
         "description": "",
         "parameters": [
@@ -2602,8 +2535,7 @@
         }
       }
     },
-    "/inventory/sizemaster/secure/size/deactiveSize": {
-
+    "/inventory/passwordhandler/update/self": {
       "post": {
         "description": "",
         "parameters": [
@@ -2618,7 +2550,6 @@
             "schema": {
               "type": "object",
               "properties": {
-                "sizeIdList": {
                 "userId": {
                   "example": "any"
                 },
@@ -2654,120 +2585,7 @@
         }
       }
     },
-    "/inventory/colormaster/secure/color/saveColor": {
-      "post": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "colorId": {
-                  "example": "any"
-                },
-                "colorCode": {
-                  "example": "any"
-                },
-                "colorName": {
-                  "example": "any"
-                },
-                "existingColor": {
-                  "example": "any"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "404": {
-            "description": "Not Found"
-          }
-        }
-      }
-    },
-    "/inventory/colormaster/secure/color/getAllColor": {
-      "post": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "404": {
-            "description": "Not Found"
-          }
-        }
-      }
-    },
-    "/inventory/colormaster/secure/color/activeColor": {
-      "post": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "404": {
-            "description": "Not Found"
-          }
-        }
-      }
-    },
-    "/inventory/colormaster/secure/color/deactiveColor": {
-      "post": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "404": {
-            "description": "Not Found"
-          }
-        }
-      }
-    },
-    "/inventory/colormaster/secure/color/getActiveColor": {
+    "/inventory/passwordhandler/update/user": {
       "post": {
         "description": "",
         "parameters": [
@@ -6789,9 +6607,6 @@
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "201": {
-            "description": "Created"
           },
           "400": {
             "description": "Bad Request"
