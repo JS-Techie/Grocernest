@@ -754,7 +754,7 @@ const updateOffer = async (req, res, next) => {
       },
       message: "Offer updated successfully",
     });
-   }
+  }
   } catch (error) {
     return res.status(400).send({
       success: false,
