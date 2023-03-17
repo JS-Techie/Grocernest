@@ -175,16 +175,6 @@ const updateUser = async (req, res, next) => {
       });
     }
 
-    const sameCred = await User.findOne({
-      where: { [Op.or]: [{ email: email }] },
-    });
-    if (sameCred) {
-      return res.status(200).send({
-        status: 400,
-        message: "same mobile number or email address already exist",
-        data: [],
-      });
-    }
 
     const locationObject = await User.findOne({
       where: { location_id: locationId },
@@ -200,6 +190,32 @@ const updateUser = async (req, res, next) => {
     let dateOfBirth = `${dob.split("/")[2]}-${dob.split("/")[1]}-${
       dob.split("/")[0]
     }`;
+
+
+    //update with same email address
+    const sameUserArray = await User.findAll({
+      attributes: ["id: userId"],
+      where: {
+        email: email
+      },
+    });
+    let idCheckflag = false
+    
+    for (var i = 0; i < sameUserArray.length; i++) {
+      var item = sameUserArray[i];
+      if (item.id !== id) {
+        idCheckflag = true
+      }
+    }
+    if (idCheckflag) {
+      return res.status(200).send({
+        status: 400,
+        message: "User email is not same",
+        data: [],
+      });
+    }
+
+
 
     const updateUser = await User.update(
       {

@@ -20,15 +20,17 @@ const invoiceRaised = async (req, res, next) => {
 
     const fromdateSplit= fromDate.split('/')
     const fromdateSplitArray = new Date(fromdateSplit[2],fromdateSplit[1],fromdateSplit[0])
-    const fromdateString= JSON.stringify(fromdateSplitArray).replaceAll('T', ' ')
-    const from_date=fromdateString.replaceAll('Z','')
+    const fromdateString= JSON.stringify(fromdateSplitArray)
+    const fromdateRemoveT=fromdateString.replace('T', ' ')
+    const from_date=fromdateRemoveT.replace('Z','')
 
 
 
     const todateSplit= toDate.split('/')
     const todateSplitArray = new Date(todateSplit[2],todateSplit[1],todateSplit[0])
-    const todateString= JSON.stringify(todateSplitArray).replaceAll('T', ' ')
-    const to_date= todateString.replaceAll('Z','')
+    const todateString= JSON.stringify(todateSplitArray)
+    const todateRemoveT= todateString.replace('T', ' ')
+    const to_date= todateRemoveT.replace('Z','')
 
     // const abc=new Date(from_date)
 
@@ -40,7 +42,7 @@ const invoiceRaised = async (req, res, next) => {
     inner join t_customer on t_customer.id = t_invoice.cust_id )
     where t_invoice.created_at between ${from_date} and ${to_date} and t_invoice.location_id = ${locationIdList[0]}`);
     console.log("hiiiiiiiiiiii", getInvoices);
-    
+
     if (getInvoices.length === 0) {
       return res.status(200).send({
         status: 400,
@@ -164,7 +166,7 @@ const paymentSummary = async (req, res, next) => {
   }
 };
 
-const generateSalesReport = async (req, res, next) => {
+const generateSalesReport = async (req, res, next) => { 
   const { brandId, endDate, brandName, pageNo, pageSize, startDate, tellerId } =
     req.body;
   try {
@@ -178,7 +180,7 @@ const generateSalesReport = async (req, res, next) => {
     inner join t_lkp_brand on t_lkp_brand.id = t_item.brand_id )
     inner join t_invoice on t_invoice.id = t_invoice_item_dtls.invoice_id)
     inner join t_batch on t_batch.item_id = t_invoice_item_dtls.item_id )
-    where t_invoice.created_at between '${startDate}' and '${endDate}' and t_item.brand_id= '${brandId}' and t_lkp_brand.brand_name= '${brandName}' and t_invoice.teller_name='${tellerId}' limit ${limit} offset ${offset} `);
+    where t_invoice.created_at between ${startDate} and ${endDate} and t_item.brand_id= ${brandId} and t_lkp_brand.brand_name= ${brandName} and t_invoice.teller_name=${tellerId} limit ${limit} offset ${offset} `);
 
     const promise = getSalesReport.map(async (currentPrice) => {
       return {

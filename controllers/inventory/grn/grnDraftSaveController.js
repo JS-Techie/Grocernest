@@ -5,7 +5,7 @@ const GrnDetailsModel = db.GrnDetailsModel;
 const GrnModel = db.GrnModel;
 
 const grnDraftSaveController = async (req, res) => {
-  console.log("hello hello");
+  // console.log("hello hello");
   const {
     grnLocationId,
     supplierId,
@@ -17,30 +17,31 @@ const grnDraftSaveController = async (req, res) => {
     itemDetails,
   } = req.body;
 
-  var grnDedicatedNullCheckFlag = 0;
-  var itemDetailsDedicatedNullCheckFlag = 0;
+  let grnDedicatedNullCheckFlag = 0;
+  let itemDetailsDedicatedNullCheckFlag = 0;
 
   if (
     !grnLocationId ||
     !supplierId ||
     !invoiceNo ||
     !invoiceAmount ||
-    !grnDate
+    !grnDate ||
+    !itemDetails
   ) {
     grnDedicatedNullCheckFlag = 1;
   }
-  itemDetails.forEach((ele) => {
+  itemDetails.forEach((eachItemDetailList) => {
     if (
-      !ele.batchNo ||
-      !ele.batchName ||
-      !ele.itemId ||
-      !ele.orderedQuantity ||
-      !ele.receivedQuantity ||
-      !ele.shelfNo ||
-      !ele.mfgDate ||
-      !ele.mrp ||
-      !ele.basePrice ||
-      !ele.costPrice
+      !eachItemDetailList.batchNo ||
+      !eachItemDetailList.batchName ||
+      !eachItemDetailList.itemId ||
+      !eachItemDetailList.orderedQuantity ||
+      !eachItemDetailList.receivedQuantity ||
+      !eachItemDetailList.shelfNo ||
+      !eachItemDetailList.mfgDate ||
+      !eachItemDetailList.mrp ||
+      !eachItemDetailList.basePrice ||
+      !eachItemDetailList.costPrice
     ) {
       itemDetailsDedicatedNullCheckFlag = 1;
     }
