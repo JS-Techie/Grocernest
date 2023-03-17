@@ -4864,6 +4864,9 @@
                 "is_percentage": {
                   "example": "any"
                 },
+                "is_time": {
+                  "example": "any"
+                },
                 "start_date": {
                   "example": "any"
                 },
@@ -4881,9 +4884,6 @@
                 },
                 "is_ecomm": {
                   "example": "any"
-                },
-                "is_time": {
-                  "example": "any"
                 }
               }
             }
@@ -4892,9 +4892,6 @@
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "201": {
-            "description": "Created"
           },
           "400": {
             "description": "Bad Request"
