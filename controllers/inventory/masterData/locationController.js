@@ -1,4 +1,5 @@
 
+const { Op } = require("sequelize");
 const db = require("../../../models");
 
 const Location = db.LkpLocationModel;
@@ -9,6 +10,18 @@ const saveLocation = async (req, res, next) => {
     try {
         if (existingLocation === "N") {
 
+            const sameLocation = await Location.findOne({
+                where: {
+                    [Op.or]: [{loc_name: locationName}]
+                }
+            })
+            if(sameLocation){
+                return res.status(200).send({
+                    status: 400,
+                    message: "Location already exists",
+                    data: []
+                })
+            }
             const newLocation = await Location.create({
                 loc_name: locationName,
                 address,
@@ -65,6 +78,26 @@ const saveLocation = async (req, res, next) => {
             return res.status(200).send({
                 status: 203,
                 message: " The requested location doesnt exist",
+                data: []
+            })
+        }
+        const sameLocationArray = await Location.findAll({
+            attributes: ['id'],
+            where: {
+                [Op.or]: [{loc_name: locationName}]
+            }
+        })
+        let nameCheckFlag = false
+        for (var i=0; i<sameLocationArray.length; i++){
+            var location = sameLocationArray[i];
+            if(!location.id===id){
+                nameCheckFlag = true
+            }
+        }
+        if(nameCheckFlag){
+            return res.status(200).send({
+                status:400,
+                message: "Location name already exists",
                 data: []
             })
         }
