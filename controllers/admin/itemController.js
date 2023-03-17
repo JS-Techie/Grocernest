@@ -415,6 +415,7 @@ const getLastThreeItemBatches = async (req, res, next) => {
     });
   }
 };
+
 module.exports = {
   uploadMultipleImages,
   editUploadedImages,

@@ -3,6 +3,7 @@ const {
 } = require('sequelize');
 
 module.exports = sequelize => {
+
   const attributes = {
     id: {
       type: DataTypes.BIGINT,
@@ -65,7 +66,7 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "discount"
+      field: "discount",
     },
     created_by: {
       type: DataTypes.BIGINT,
@@ -83,16 +84,16 @@ module.exports = sequelize => {
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "updated_by"
+      field: "updated_by",
     },
     created_at: {
       type: DataTypes.DATE,
       allowNull: true,
-      defaultValue: sequelize.fn('current_timestamp'),
+      defaultValue: sequelize.fn("current_timestamp"),
       primaryKey: false,
       autoIncrement: false,
       comment: null,
-      field: "created_at"
+      field: "created_at",
     },
     updated_at: {
       type: DataTypes.DATE,

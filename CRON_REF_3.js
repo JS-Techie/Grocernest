@@ -3,8 +3,8 @@
 const { Op } = require("sequelize");
 const cron = require("node-cron");
 const uniqid = require("uniqid");
-const { sequelize } = require("../models");
-const db = require("../models");
+const { sequelize } = require("./models");
+const db = require("./models");
 
 const Customers = db.CustomerModel;
 const Order = db.OrderModel;
@@ -13,13 +13,13 @@ const invoice_item_dtls = db.InvoiceItemDtlsModel;
 const inventory = db.InventoryModel;
 const Wallet = db.WalletModel;
 const Wallet_Transaction = db.WalletTransactionModel;
-const WalletService = require("../services/walletService");
+const WalletService = require("./services/walletService");
 
-const { sendCronReport } = require("../services/whatsapp/whatsappMessages");
+const { sendCronReport } = require("./services/whatsapp/whatsappMessages");
 
 const pos_refferal_job = async () => {
-  // schedule time is a utc time (11.55pm ist = 6:25pm utc/18:25)
-  cron.schedule("0 15 18 * * *", async () => {
+  // schedule time 11pm every day
+  cron.schedule("0 23 * * *", async () => {
     console.log("Running scheduled CRON-JOB.....");
 
     // cashback task

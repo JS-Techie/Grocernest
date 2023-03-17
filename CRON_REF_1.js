@@ -13,8 +13,8 @@ const WalletService = require("./services/walletService");
 const { sendCronReport } = require("./services/whatsapp/whatsappMessages");
 
 const refferal_job = async () => {
-  // schedule time is a utc time (11.30pm ist = 6:00pm utc/18:00)
-  cron.schedule("0 25 18 * * *", async () => {
+  // schedule time is 11:20pm
+  cron.schedule("20 23 * * *", async () => {
     console.log("Running scheduled CRON-JOB.....");
 
     // referral task
@@ -139,6 +139,7 @@ const cashback_job = async () => {
       where: {
         status: "Delivered",
         cashback_processed: { [Op.eq]: null },
+        created_at: { [Op.gt]: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
       },
     });
 
@@ -163,10 +164,13 @@ const cashback_job = async () => {
         where: {
           order_id: current_order.order_id,
           special_cashback_processed: null,
+          cashback_processed: null,
           cashback_amount: { [Op.gt]: 0 },
           cashback_amount: { [Op.not]: null },
         },
       });
+
+      // console.log("order_items===>>", order_items);
 
       await order_items.map(async (current_item) => {
         await walletService.creditAmount(
@@ -174,6 +178,7 @@ const cashback_job = async () => {
           cust_no,
           "Cashback added for order-" + order_id
         );
+        console.log("Cashback added for order-" + order_id);
 
         await OrderItems.update(
           {
@@ -285,5 +290,5 @@ const cashback_job = async () => {
 };
 
 // job();
-cashback_job();
-// module.exports = refferal_job;
+// cashback_job();
+module.exports = refferal_job;
