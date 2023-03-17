@@ -11,24 +11,20 @@ const OffersCache = db.OffersCacheModel;
 const offerForItem = async (req, res, next) => {
   //Get current user from jwt
   const currentUser = req.cust_no;
-
   let { itemID, quantity } = req.body;
 
   try {
     const cart = await Cart.findOne({
       where: { cust_no: currentUser, item_id: itemID },
     });
-
-    if (cart) {
+    if(cart) {
       quantity = cart.quantity + quantity;
     }
-
-    const offer = await Offers.findOne({
+    const offer = await Offers.findAll({
       where: {
         is_active: 1,
         item_x: itemID,
-        [Op.or]: [{ type_id: 1 }, { type_id: 2 }],
-        is_ecomm: 1,
+        is_ecomm: 1
       },
     });
     if (!offer) {
@@ -38,9 +34,7 @@ const offerForItem = async (req, res, next) => {
         message: "No offers exist for this item",
       });
     }
-
     //add item check
-
     let itemToBeAdded = null;
     let quantityToBeAdded = null;
     let discount = null;
@@ -48,53 +42,56 @@ const offerForItem = async (req, res, next) => {
     let response = null;
     let newSalePrice = null;
 
-    if (offer.item_x) {
-      itemToBeAdded = offer.item_y;
-      if (quantity >= offer.item_x_quantity) {
-        quantityToBeAdded =
-          Math.floor(quantity / offer.item_x_quantity) * offer.item_y_quantity;
-        console.log("New quantity of item in cart ====>", quantity);
-        console.log(
-          "New quantity of offer item in cart ====>",
-          quantityToBeAdded
-        );
-        console.log("Xquantity ===>", offer.item_x_quantity);
-        console.log("Yquantity====>", offer.item_y_quantity);
-      } else {
-        return res.status(200).send({
-          success: true,
-          data: [],
-          message: "More items need to be added to avail offer",
-        });
-      }
-
-      let offerItemInCart = await Cart.findOne({
-        where: { cust_no: currentUser, item_id: itemToBeAdded, is_offer: 1 },
-      });
-
-      if (offerItemInCart) {
-        response = await Cart.update(
-          {
-            quantity: quantityToBeAdded,
-          },
-          {
-            where: {
-              cust_no: currentUser,
-              item_id: itemToBeAdded,
-              is_offer: 1,
-            },
+    offer.map((eachOffer)=>{
+      if(quantity === eachOffer.item_x_quantity){
+        let type_id = eachOffer.type_id
+          switch(type_id){
+            case 1:
+              itemToBeAdded = offer.item_y;
+              if(quantity >= offer.item_x_quantity){
+                quantityToBeAdded = Math.floor(quantity / offer.item_x_quantity) * offer.item_y_quantity;
+                console.log("New quantity of item in cart ====>", quantity);
+                console.log("New quantity of offer item in cart ====>",quantityToBeAdded );
+                console.log("Xquantity ===>", offer.item_x_quantity);
+                console.log("Yquantity====>", offer.item_y_quantity);   
+              }
+              break;
+            case 2:
+              itemToBeAdded = offer.item_x;
+              discount = eachOffer.amount_of_discount
+              isPercentage = eachOffer.is_percentage
+              break;  
           }
-        );
-      } else {
-        response = await Cart.create({
-          cust_no: currentUser,
-          item_id: itemToBeAdded,
+        }
+    })
+    
+    let offerItemInCart = await Cart.findOne({
+      where: { cust_no: currentUser, item_id: itemToBeAdded, is_offer: 1 },
+    });
+
+    if (offerItemInCart) {
+      response = await Cart.update(
+        {
           quantity: quantityToBeAdded,
-          created_by: 1,
-          is_offer: 1,
-          offer_item_price: 0,
-        });
-      }
+        },
+        {
+          where: {
+            cust_no: currentUser,
+            item_id: itemToBeAdded,
+            is_offer: 1,
+          },
+        }
+      );
+    } else {
+      response = await Cart.create({
+        cust_no: currentUser,
+        item_id: itemToBeAdded,
+        quantity: quantityToBeAdded,
+        created_by: 1,
+        is_offer: 1,
+        offer_item_price: 0,
+      });
+    }
 
       return res.status(201).send({
         success: true,
@@ -103,7 +100,7 @@ const offerForItem = async (req, res, next) => {
       });
     }
 
-    const oldestBatch = await Batch.findOne({
+    let oldestBatch = await Batch.findOne({
       where: { item_id: itemID, mark_selected: 1 },
     });
 
