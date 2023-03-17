@@ -230,7 +230,7 @@ const createOffer = async (req, res, next) => {
               "Offer already exists on this item with mentioned quantity",
           });
         }
-        if (!existingOffer) {
+       /* if (!existingOffer) {
           existingYItem = await validationForYItem(item_x, item_y);
           console.log("existingYItem" + existingYItem);
           if (existingYItem) {
@@ -240,7 +240,7 @@ const createOffer = async (req, res, next) => {
               message: "Can't choose this item as offer-item",
             });
           }
-        }
+        }*/
         break;
       case 2:
         existingOffer = await validationForExistingOffer(
