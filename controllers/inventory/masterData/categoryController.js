@@ -15,6 +15,7 @@ const saveCategory = async (req, res, next) => {
     categoryId
   } = req.body;
   const { user_id } = req;
+  console.log("the user id from the request body:::::::::::::::::::",user_id, categoryId)
   try {
     if (existingCategory === "N") {
       const currentCat = await Category.findOne({
@@ -96,12 +97,14 @@ const saveCategory = async (req, res, next) => {
             data: []
         })
     }
+    console.log("alallalalalalaladlkfjsdoisadoi")
     const key = `category/${uniq()}.jpeg`;
       const url = await uploadImageToS3(image, key);
       const updateCategory = await Category.update(
         {
           group_name: groupName,
           image: url,
+          available_for_ecomm: availableForEcomm,
         },
         { where: { id:categoryId } }
       );
