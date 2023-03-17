@@ -30,7 +30,7 @@ const invoiceRaised = async (req, res, next) => {
     const todateString= JSON.stringify(todateSplitArray).replaceAll('T', ' ')
     const to_date= todateString.replaceAll('Z','')
 
-    const abc=new Date(from_date)
+    // const abc=new Date(from_date)
 
 
 
