@@ -77,7 +77,7 @@ const saveCategory = async (req, res, next) => {
         });
       }
       const sameCategoryArray = await Category.findAll({
-        attributes: ['id'],
+        attributes: ["id"],
         where: {
             [Op.or]: [{group_name: groupName}]
         }
@@ -85,7 +85,7 @@ const saveCategory = async (req, res, next) => {
     let nameCheckFlag = false
     for (var i=0; i<sameCategoryArray.length; i++){
         var category = sameCategoryArray[i];
-        if(!category.id===id){
+        if(!category.id===categoryId){
             nameCheckFlag = true
         }
     }
@@ -96,10 +96,12 @@ const saveCategory = async (req, res, next) => {
             data: []
         })
     }
+    const key = `category/${uniq()}.jpeg`;
+      const url = await uploadImageToS3(image, key);
       const updateCategory = await Category.update(
         {
           group_name: groupName,
-          image: image,
+          image: url,
         },
         { where: { id:categoryId } }
       );
