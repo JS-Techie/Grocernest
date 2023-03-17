@@ -18,14 +18,29 @@ const invoiceRaised = async (req, res, next) => {
     }
 
 
+    const fromdateSplit= fromDate.split('/')
+    const fromdateSplitArray = new Date(fromdateSplit[2],fromdateSplit[1],fromdateSplit[0])
+    const fromdateString= JSON.stringify(fromdateSplitArray).replaceAll('T', ' ')
+    const from_date=fromdateString.replaceAll('Z','')
+
+
+
+    const todateSplit= toDate.split('/')
+    const todateSplitArray = new Date(todateSplit[2],todateSplit[1],todateSplit[0])
+    const todateString= JSON.stringify(todateSplitArray).replaceAll('T', ' ')
+    const to_date= todateString.replaceAll('Z','')
+
+    const abc=new Date(from_date)
+
+
 
     const [getInvoices, metadata] =
       await sequelize.query(`select t_customer.comments ,t_customer.address ,t_customer.contact_no ,t_customer.email ,t_customer.cust_name ,t_invoice.created_at ,t_invoice.id ,t_invoice.invoice_no ,t_invoice.invoice_type ,t_invoice.location_id ,t_invoice.original_invoice_id ,t_invoice.payment_type ,t_invoice.total_quantity ,t_invoice.return_flag ,t_invoice.store_name ,t_invoice.teller_name ,t_invoice.total_amount ,t_invoice.total_discount 
     from (t_invoice 
     inner join t_customer on t_customer.id = t_invoice.cust_id )
-    where t_invoice.created_at between "${from_date}" and "${to_date}" and t_invoice.location_id = "${locationIdList[0]}"
-    `);
+    where t_invoice.created_at between ${from_date} and ${to_date} and t_invoice.location_id = ${locationIdList[0]}`);
     console.log("hiiiiiiiiiiii", getInvoices);
+    
     if (getInvoices.length === 0) {
       return res.status(200).send({
         status: 400,
