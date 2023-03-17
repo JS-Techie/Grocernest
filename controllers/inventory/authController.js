@@ -22,14 +22,14 @@ const getAccessToken = async (req, res, next) => {
 
         if (!currentUser) {
             return res.status(200).send({
-                status: 400,
+                status: 404,
                 message: "User doesn't exist , please register",
                 data: []
             })
         }
         if (!bcrypt.compareSync(password, currentUser.password)) {
             return res.status(200).send({
-                status: 400,
+                status: 404,
                 message: "Please enter the correct password",
                 data: []
             })
