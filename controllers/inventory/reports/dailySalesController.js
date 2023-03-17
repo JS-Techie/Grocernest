@@ -8,6 +8,7 @@ const invoiceRaised = async (req, res, next) => {
   const { fromDate, toDate, locationIdList } = req.body;
 
   try {
+    console.log("lalalalalaaalal")
     if (locationIdList.length === 0) {
       return res.status(200).send({
         status: 400,
@@ -15,24 +16,6 @@ const invoiceRaised = async (req, res, next) => {
         data: [],
       });
     }
-  
-
-    const fromdate2= fromDate.split('/')
-    const fromdate3 = new Date(fromdate2[2],fromdate2[1],fromdate2[0])
-    const fromdate4= JSON.stringify(fromdate3).replaceAll('T', ' ')
-    const from_date=fromdate4.replaceAll('Z','')
-
-
-
-    const todate2= toDate.split('/')
-    const todate3 = new Date(todate2[2],todate2[1],todate2[0])
-    const todate4= JSON.stringify(todate3).replaceAll('T', ' ')
-    const to_date= todate4.replaceAll('Z','')
-
-    const abc=new Date(from_date)
-
-
-    console.log("================================================",typeof(abc) , new Date(to_date));
 
 
 
@@ -98,9 +81,34 @@ const paymentSummary = async (req, res, next) => {
     //     data: [],
     //   });
     // }
+
+
+    
+
+    const fromdateSplit= fromDate.split('/')
+    const fromdateSplitArray = new Date(fromdateSplit[2],fromdateSplit[1],fromdateSplit[0])
+    const fromdateString= JSON.stringify(fromdateSplitArray).replaceAll('T', ' ')
+    const from_date=fromdateString.replaceAll('Z','')
+
+
+
+    const todateSplit= toDate.split('/')
+    const todateSplitArray = new Date(todateSplit[2],todateSplit[1],todateSplit[0])
+    const todateString= JSON.stringify(todateSplitArray).replaceAll('T', ' ')
+    const to_date= todateString.replaceAll('Z','')
+
+    const abc=new Date(from_date)
+
+
+    console.log("================================================",typeof(abc) , to_date);
+
+
+
+
+
     const [paymentDetails, metadata] = await sequelize.query(`select * 
       from t_invoice
-      where t_invoice.created_at BETWEEN "${fromDate}" and "${toDate}" and t_invoice.location_id = "${locationIdList}"`);
+      where t_invoice.created_at BETWEEN ${from_date} and ${to_date} and t_invoice.location_id = ${locationIdList[0]}`);
 
     if (paymentDetails.length === 0) {
       return res.status(200).send({
