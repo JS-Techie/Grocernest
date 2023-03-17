@@ -5,7 +5,8 @@ const GrnDetailsModel = db.GrnDetailsModel;
 const GrnModel = db.GrnModel;
 
 const grnDraftSaveController = async (req, res) => {
-  // console.log("hello hello");
+
+  // console.log("========= API Call Detection FLAG ==========")
   const {
     grnLocationId,
     supplierId,
@@ -71,36 +72,36 @@ const grnDraftSaveController = async (req, res) => {
     const grn_ID = await sequelize.query(
       `select id from t_grn order by id desc limit 1`
     );
-    console.log("************the grn id is************* ", grn_ID[0][0].id);
+    // console.log("************the grn id is************* ", grn_ID[0][0].id);
 
     let dataItems = [];
 
-    const dataArrayPromises = itemDetails.map(async (ele) => {
+    const dataArrayPromises = itemDetails.map(async (itemDetailsEachList) => {
       const data = await GrnDetailsModel.create({
         grn_id: grn_ID[0][0].id,
-        item_id: ele.itemId,
-        BATCH_NO: ele.batchNo,
-        batch_name: ele.batchName,
-        ordered_quantity: ele.orderedQuantity,
-        received_quantity: ele.receivedQuantity,
-        MRP: ele.mrp,
-        DISCOUNT: ele.discount,
-        COST_PRICE: ele.costPrice,
-        SALE_PRICE: ele.salePrice,
-        shelf_no: ele.shelfNo,
+        item_id: itemDetailsEachList.itemId,
+        BATCH_NO: itemDetailsEachList.batchNo,
+        batch_name: itemDetailsEachList.batchName,
+        ordered_quantity: itemDetailsEachList.orderedQuantity,
+        received_quantity: itemDetailsEachList.receivedQuantity,
+        MRP: itemDetailsEachList.mrp,
+        DISCOUNT: itemDetailsEachList.discount,
+        COST_PRICE: itemDetailsEachList.costPrice,
+        SALE_PRICE: itemDetailsEachList.salePrice,
+        shelf_no: itemDetailsEachList.shelfNo,
         active_ind: "Y",
         created_by: 1,
         created_at: Date.now(),
-        mfg_date: ele.mfgDate,
-        cgst: ele.cgst,
-        sgst: ele.sgst,
-        igst: ele.igst,
-        other_tax: ele.otherTax,
-        base_price: ele.basePrice,
+        mfg_date: itemDetailsEachList.mfgDate,
+        cgst: itemDetailsEachList.cgst,
+        sgst: itemDetailsEachList.sgst,
+        igst: itemDetailsEachList.igst,
+        other_tax: itemDetailsEachList.otherTax,
+        base_price: itemDetailsEachList.basePrice,
         supplier_disc: supplierDisc,
-        expiry_date: ele.expiryDate,
-        cashBack_is_percentage: ele.isCashBackInPercentage,
-        cashback: ele.cashBack,
+        expiry_date: itemDetailsEachList.expiryDate,
+        cashBack_is_percentage: itemDetailsEachList.isCashBackInPercentage,
+        cashback: itemDetailsEachList.cashBack,
         ecomm_quantity: 0,
       });
 
@@ -108,7 +109,7 @@ const grnDraftSaveController = async (req, res) => {
     });
 
     dataItems = await Promise.all(dataArrayPromises);
-    console.log(dataItems)
+    // console.log("the whole data item array that is created in the table ::::",dataItems)
 
 
 

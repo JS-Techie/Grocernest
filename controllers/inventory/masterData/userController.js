@@ -64,10 +64,10 @@ const saveUser = async (req, res, next) => {
     let dateOfBirth = `${dob.split("/")[2]}-${dob.split("/")[1]}-${
       dob.split("/")[0]
     }`;
-    console.log(
-      "When we split a string we get an ",
-      typeof dateOfBirth.split("/")
-    );
+    // console.log(
+    //   "When we split a string we get an ",
+    //   typeof dateOfBirth.split("/")
+    // );
     const createUser = await User.create({
       full_name: fullName,
       email: email,
@@ -124,7 +124,7 @@ const updateUser = async (req, res, next) => {
     userType,
   } = req.body;
   const  userId  = req.params.userId;
-  console.log("heeeeey", userId, typeof(userId));
+  // console.log("checking the fetched data by printing it :::=", userId, typeof(userId));
   // const { user_id } = req;
   try {
     if (
@@ -168,7 +168,7 @@ const updateUser = async (req, res, next) => {
     const userObject = await User.findOne({
       where: { id: userId },
     });
-    console.log("helloooooo1", userObject);
+    // console.log("user object after the query of the user table:===:", userObject);
     if (!userObject) {
       return res.status(200).send({
         status: 400,
@@ -182,7 +182,7 @@ const updateUser = async (req, res, next) => {
       where: { location_id: locationId },
     });
 
-    console.log("lalalaladlalalal",locationObject);
+    // console.log("the location object of the user table ====-->",locationObject);
 
     if (!locationObject) {
       return res.status(200).send({
@@ -209,14 +209,14 @@ const updateUser = async (req, res, next) => {
       var user = sameUserArray[i];
       if (!user.id === userId) {
 
-        console.log("the array item user id: ", user.id);
-        console.log("the req body id: ", userId);
+        // console.log("the array item user id: ", user.id);
+        // console.log("the req body id: ", userId);
         idCheckflag = true
-        console.log("the flag within loop : ", idCheckflag);
+        // console.log("the flag within loop : ", idCheckflag);
       }
     }
 
-    console.log("the flag finally: ",idCheckflag);
+    // console.log("the flag finally: ",idCheckflag);
 
     if (idCheckflag) {
       return res.status(200).send({
@@ -241,7 +241,7 @@ const updateUser = async (req, res, next) => {
     );
 
 
-    console.log("jajajajajajajajaja: ", updateUser);
+    // console.log("the returned object of the updated user from the query : ", updateUser);
     const updatedUser = await User.findOne({
       where: { id: userId },
     });
@@ -502,7 +502,7 @@ const activateUser = async (req, res, next) => {
     const userObject = await User.findOne({
       where: { id: userId },
     });
-    console.log("========>", userObject);
+    // console.log("the object user from the user table ========>", userObject);
     if (!userObject) {
       return res.status(200).send({
         status: 400,

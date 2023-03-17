@@ -8,7 +8,6 @@ const invoiceRaised = async (req, res, next) => {
   const { fromDate, toDate, locationIdList } = req.body;
 
   try {
-    console.log("lalalalalaaalal")
     if (locationIdList.length === 0) {
       return res.status(200).send({
         status: 400,
@@ -41,7 +40,7 @@ const invoiceRaised = async (req, res, next) => {
     from (t_invoice 
     inner join t_customer on t_customer.id = t_invoice.cust_id )
     where t_invoice.created_at between ${from_date} and ${to_date} and t_invoice.location_id = ${locationIdList[0]}`);
-    console.log("hiiiiiiiiiiii", getInvoices);
+    // console.log("hiiiiiiiiiiii", getInvoices);
 
     if (getInvoices.length === 0) {
       return res.status(200).send({
@@ -104,20 +103,22 @@ const paymentSummary = async (req, res, next) => {
 
     const fromdateSplit= fromDate.split('/')
     const fromdateSplitArray = new Date(fromdateSplit[2],fromdateSplit[1],fromdateSplit[0])
-    const fromdateString= JSON.stringify(fromdateSplitArray).replaceAll('T', ' ')
-    const from_date=fromdateString.replaceAll('Z','')
+    const fromdateString= JSON.stringify(fromdateSplitArray)
+    const fromdateRemoveT=fromdateString.replace('T', ' ')
+    const from_date=fromdateRemoveT.replace('Z','')
 
 
 
     const todateSplit= toDate.split('/')
     const todateSplitArray = new Date(todateSplit[2],todateSplit[1],todateSplit[0])
-    const todateString= JSON.stringify(todateSplitArray).replaceAll('T', ' ')
-    const to_date= todateString.replaceAll('Z','')
+    const todateString= JSON.stringify(todateSplitArray)
+    const todateRemoveT= todateString.replace('T', ' ')
+    const to_date= todateRemoveT.replace('Z','')
 
     const abc=new Date(from_date)
 
 
-    console.log("================================================",typeof(abc) , to_date);
+    // console.log("================================================",typeof(abc) , to_date);
 
 
 

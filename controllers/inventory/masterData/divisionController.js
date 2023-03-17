@@ -141,7 +141,7 @@ const getAllDivision = async (req, res, next) => {
                 data: []
             })
         }
-        console.log("lalalalala", allDivision);
+        // console.log("All the divisions are::::::::::::::::: ", allDivision);
         const promises = allDivision.map((current) => {
             return ({
                 id: current.id,
@@ -242,7 +242,7 @@ const activeDivision = async (req, res, next) => {
         const currentDivision = await Division.findOne({
             where: { id }
         })
-        console.log("object", currentDivision);
+        // console.log("the current division from the query :::::::::::::::", currentDivision);
         if (!currentDivision) {
             return res.status(200).send({
                 status: 404,
@@ -282,12 +282,12 @@ const activeDivision = async (req, res, next) => {
 
 const deactiveDivision = async (req, res, next) => {
     const id = req.body
-    console.log("======>", id);
+    // console.log("the id from the request body  ::::======>", id);
     try {
         const currentDivision = await Division.findOne({
             where: { id }
         })
-        console.log("hello", currentDivision);
+        // console.log("The 2nd print from the query of the division table ::::::", currentDivision);
         if (!currentDivision) {
             return res.status(200).send({
                 status: 404,
