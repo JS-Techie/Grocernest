@@ -4,6 +4,7 @@ const db = require("../../../models");
 const Color = db.LkpColorModel;
 
 const saveColor = async (req, res, next) => {
+    console.log("save color");
     const { user_id } = req;
     const { colorId, colorCode, colorName, existingColor } = req.body;
     try {
@@ -11,7 +12,7 @@ const saveColor = async (req, res, next) => {
         //     where: { id:colorId }
         // })
 
-
+        console.log("jhgjhfjhgjkgkkjlj")
 
         if (existingColor === "N") {
             const sameColor = await Color.findOne({
@@ -73,8 +74,9 @@ const saveColor = async (req, res, next) => {
             let idCheckflag = false
             for (var i = 0; i < sameColorArray.length; i++) {
                 var color = sameColorArray[i];
-
-                if (!color.id === colorId) {
+                console.log("the color id ::::::", color.id)
+                console.log("the id :::::: ", colorId)
+                if (color.id !== colorId) {
                     idCheckflag = true
                 }
             }
