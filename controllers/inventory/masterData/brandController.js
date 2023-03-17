@@ -97,13 +97,6 @@ const saveBrand = async (req, res, next) => {
       });
     }
 
-    if (idCheckflag) {
-      return res.status(200).send({
-        status: 403,
-        message: "Brand Name or Brand code already exists",
-        data: [],
-      });
-    }
 
     const updateBrand = await Brand.update(
       {
