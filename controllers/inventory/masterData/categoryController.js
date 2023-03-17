@@ -76,6 +76,26 @@ const saveCategory = async (req, res, next) => {
           data: [],
         });
       }
+      const sameCategoryArray = await Category.findAll({
+        attributes: ['id'],
+        where: {
+            [Op.or]: [{group_name: groupName}]
+        }
+    })
+    let nameCheckFlag = false
+    for (var i=0; i<sameCategoryArray.length; i++){
+        var category = sameCategoryArray[i];
+        if(!category.id===id){
+            nameCheckFlag = true
+        }
+    }
+    if(nameCheckFlag){
+        return res.status(200).send({
+            status:400,
+            message: "Category name already exists",
+            data: []
+        })
+    }
       const updateCategory = await Category.update(
         {
           group_name: groupName,

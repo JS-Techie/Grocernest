@@ -75,7 +75,7 @@ const saveSize = async (req, res, next) => {
         const sameSizeArray = await Size.findAll({
             attributes: ["id"],
             where: {
-                [Op.or]: [{ size_cd: brandCode }, { size_of_item: brandName }],
+                [Op.or]: [{ size_cd: sizeCode }, { size_of_item: sizeOfItem }],
             },
         });
         let idCheckflag = false

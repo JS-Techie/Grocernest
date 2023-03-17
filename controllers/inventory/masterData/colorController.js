@@ -65,16 +65,16 @@ const saveColor = async (req, res, next) => {
             }
 
             const sameColorArray = await Color.findAll({
-                attributes: ["colorId"],
+                attributes: ["id"],
                 where: {
-                    [Op.or]: [{ color_cd: brandCode }, { color_name: brandName }],
+                    [Op.or]: [{ color_cd: colorCode }, { color_name: colorName }],
                 },
             });
             let idCheckflag = false
             for (var i = 0; i < sameColorArray.length; i++) {
-                var item = sameColorArray[i];
+                var color = sameColorArray[i];
 
-                if (item.colorId !== colorId) {
+                if (!color.id === colorId) {
                     idCheckflag = true
                 }
             }
