@@ -123,7 +123,8 @@ const updateUser = async (req, res, next) => {
     email,
     userType,
   } = req.body;
-  const { userId } = req.params;
+  const  userId  = req.params.userId;
+  console.log("heeeeey", userId, typeof(userId));
   // const { user_id } = req;
   try {
     if (
@@ -167,6 +168,7 @@ const updateUser = async (req, res, next) => {
     const userObject = await User.findOne({
       where: { id: userId },
     });
+    console.log("helloooooo1", userObject);
     if (!userObject) {
       return res.status(200).send({
         status: 400,
@@ -179,6 +181,8 @@ const updateUser = async (req, res, next) => {
     const locationObject = await User.findOne({
       where: { location_id: locationId },
     });
+
+    console.log("lalalaladlalalal",locationObject);
 
     if (!locationObject) {
       return res.status(200).send({
@@ -194,7 +198,7 @@ const updateUser = async (req, res, next) => {
 
     //update with same email address
     const sameUserArray = await User.findAll({
-      attributes: ["id: userId"],
+      attributes: ['id'],
       where: {
         email: email
       },
@@ -202,11 +206,18 @@ const updateUser = async (req, res, next) => {
     let idCheckflag = false
     
     for (var i = 0; i < sameUserArray.length; i++) {
-      var item = sameUserArray[i];
-      if (item.id !== id) {
+      var user = sameUserArray[i];
+      if (!user.id === userId) {
+
+        console.log("the array item user id: ", user.id);
+        console.log("the req body id: ", userId);
         idCheckflag = true
+        console.log("the flag within loop : ", idCheckflag);
       }
     }
+
+    console.log("the flag finally: ",idCheckflag);
+
     if (idCheckflag) {
       return res.status(200).send({
         status: 400,
@@ -228,6 +239,9 @@ const updateUser = async (req, res, next) => {
       },
       { where: { id: userId } }
     );
+
+
+    console.log("jajajajajajajajaja: ", updateUser);
     const updatedUser = await User.findOne({
       where: { id: userId },
     });
