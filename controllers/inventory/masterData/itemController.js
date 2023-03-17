@@ -948,7 +948,7 @@ const fetchItembyItemCode = async (req, res, next) => {
     `);
     // console.log(typeof getItems);
 
-    console.log("Items array", getItemss);
+    // console.log(" ================ Items array ================", getItemss);
 
     if (getItemss.length === 0) {
       return res.status(200).send({
@@ -1309,11 +1309,11 @@ const saveItem = async (req, res, next) => {
           ingredients,
           show_discount: showDiscount,
         });
-        console.log("Hellooooooo", newItem);
+        // console.log("the new item from the creation query :::::::::::::", newItem);
         const currentItem = await Item.findOne({
           where: { item_cd: itemCode, name },
         });
-        console.log("========>", currentItem);
+        // console.log("the current item from the Item query Find ONE =======>", currentItem);
 
         const taxItemInfoArray = makeTaxInfoArray(
           igst,
@@ -1323,7 +1323,7 @@ const saveItem = async (req, res, next) => {
           user_id,
           currentItem.id
         );
-        console.log("<<<<<<<<<<<=====>>>>>>>>>>>", taxItemInfoArray);
+        // console.log("<<<<<<<<<<<==the tax info array is ==>>>>>>>>>>>", taxItemInfoArray);
         const newTaxItemInfo = await ItemTaxInfo.bulkCreate(taxItemInfoArray);
       }
     }
@@ -1355,12 +1355,12 @@ const saveItem = async (req, res, next) => {
       created_at: Date.now(),
       updated_at: Date.now(),
     });
-    console.log("first", newItem);
+    // console.log("the new item from the create query from the item table ::::::===>", newItem);
     const newItemFromDB = await Item.findOne({
       where: { item_cd: itemCode, name },
     });
 
-    console.log("NEW ITEM", newItemFromDB);
+    // console.log("NEW ITEM FROM DB AFTER FIND ONE QUERY: ----->>> :", newItemFromDB);
     const taxItemInfoArray = await makeTaxInfoArray(
       igst,
       cgst,
