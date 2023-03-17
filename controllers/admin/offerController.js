@@ -13,6 +13,7 @@ const lkp_offers = db.lkpOffersModel;
 const Offers = db.OffersModel;
 const Item = db.ItemModel;
 const Customer = db.CustomerModel;
+const LkpCategory =db.LkpCategoryModel
 
 // const { sendOfferToUser } = require("../../services/whatsapp/whatsappMessages");
 
@@ -449,6 +450,17 @@ const createOffer = async (req, res, next) => {
     // allCustomers.map((currentCustomer)=>{
     //   sendOfferToUser(currentCustomer.cust_name.split(" ")[0], newOffer.item_id_1,)
     // })
+
+    const lkpCategoryObj= await LkpCategory.findOne({
+      where: {id:item_x }
+    })
+    if(!lkpCategoryObj.available_for_ecomm){
+      return res.status(400).send({
+        success: false,
+        data: [],
+        message: "Item Marked as Unvailable for Ecomm",
+      });
+    }
 
     return res.status(201).send({
       success: true,
