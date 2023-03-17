@@ -541,7 +541,7 @@ const deactivateUser = async (req, res, next) => {
     return res.status(200).send({
       status: 200,
       message: "Successfully activated the requested user",
-      data: userObject.id,
+      data: updatedUser.id,
     });
   } catch (error) {
     return res.status(200).send({
