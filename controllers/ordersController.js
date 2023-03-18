@@ -40,6 +40,12 @@ const getAllOrders = async (req, res, next) => {
     }
 
     const orderPromises = allOrders.map(async (currentOrder) => {
+
+      const deliveryDate = new Date(currentOrder.delivery_date)
+      const dayCount = (new Date() - deliveryDate) / (1000 * 3600 * 24)
+
+
+
       const orderItems = await OrderItems.findAll({
         where: { order_id: currentOrder.order_id },
       });
@@ -55,9 +61,9 @@ const getAllOrders = async (req, res, next) => {
               { item_id_1: currentOrderItem.item_id },
               { item_id: currentOrderItem.item_id },
             ]*/
-            [Op.or]:[
-              {type_id: 1},
-              {type_id: 2}
+            [Op.or]: [
+              { type_id: 1 },
+              { type_id: 2 }
             ],
             is_ecomm: 1,
           },
@@ -121,22 +127,22 @@ const getAllOrders = async (req, res, next) => {
             canReturn,
             offerDetails: currentOffer
               ? {
-                  offerID: currentOffer.id,
-                  offerType: currentOffer.type,
-                  itemX: currentOffer.item_x ? currentOffer.item_x : "",
-                  quantityOfItemX: currentOffer.item_x_quantity
-                    ? currentOffer.item_x_quantity
-                    : "",
-                  itemY: currentOffer.item_y? currentOffer.item_y : "",
-                  quantityOfItemY: currentOffer.item_y_quantity
-                    ? currentOffer.item_y_quantity
-                    : "",
-                  amountOfDiscount: currentOffer.amount_of_discount
-                    ? currentOffer.amount_of_discount
-                    : "",
-                  isPercentage: currentOffer.is_percentage ? true : false,
-                  isActive: currentOffer.is_active ? true : false,
-                }
+                offerID: currentOffer.id,
+                offerType: currentOffer.type,
+                itemX: currentOffer.item_x ? currentOffer.item_x : "",
+                quantityOfItemX: currentOffer.item_x_quantity
+                  ? currentOffer.item_x_quantity
+                  : "",
+                itemY: currentOffer.item_y ? currentOffer.item_y : "",
+                quantityOfItemY: currentOffer.item_y_quantity
+                  ? currentOffer.item_y_quantity
+                  : "",
+                amountOfDiscount: currentOffer.amount_of_discount
+                  ? currentOffer.amount_of_discount
+                  : "",
+                isPercentage: currentOffer.is_percentage ? true : false,
+                isActive: currentOffer.is_active ? true : false,
+              }
               : "",
           };
         }
@@ -153,7 +159,7 @@ const getAllOrders = async (req, res, next) => {
       // });
 
       const gifts = await getGifts(currentOrder.order_id);
-
+      // console.log("the daycount of each item is : ", dayCount)
       return {
         orderID: currentOrder.order_id,
         Date: currentOrder.created_at,
@@ -167,10 +173,13 @@ const getAllOrders = async (req, res, next) => {
         reject_reason: currentOrder.reject_reason,
         pin: currentOrder.pin ? currentOrder.pin : "",
         gifts,
+        dayCount:dayCount
       };
     });
 
     const orders = await Promise.all(orderPromises);
+
+
 
     return res.status(200).send({
       success: true,
@@ -226,13 +235,13 @@ const getOrderByOrderId = async (req, res, next) => {
           is_active: 1,
           item_x: currentOrderItem.id,
           [Op.or]: [
-            {type_id: 1},
-            {type_id: 2}
+            { type_id: 1 },
+            { type_id: 2 }
           ],
-         /* [Op.or]: [
-            { item_id_1: currentOrderItem.id },
-            { item_id: currentOrderItem.id },
-          ],*/
+          /* [Op.or]: [
+             { item_id_1: currentOrderItem.id },
+             { item_id: currentOrderItem.id },
+           ],*/
           is_ecomm: 1,
         },
       });
@@ -280,23 +289,23 @@ const getOrderByOrderId = async (req, res, next) => {
             currentOrderItem.is_offer === 1 ? (isEdit ? true : false) : "",
           offerDetails: currentOffer
             ? {
-                offerID: currentOffer.id,
-                offerType: currentOffer.type,
-                itemX: currentOffer.item_x ? currentOffer.item_x: "",
-                quantityOfItemX: currentOffer.item_x_quantity
-                  ? currentOffer.item_x_quantity
-                  : "",
-                itemY: currentOffer.item_y ? currentOffer.item_y: "",
-                quantityOfItemY: currentOffer.item_y_quantity
-                  ? currentOffer.item_y_quantity
-                  : "",
-                itemID: currentOffer.item_x ? currentOffer.item_x : "",
-                amountOfDiscount: currentOffer.amount_of_discount
-                  ? currentOffer.amount_of_discount
-                  : "",
-                isPercentage: currentOffer.is_percentage ? true : false,
-                isActive: currentOffer.is_active ? true : false,
-              }
+              offerID: currentOffer.id,
+              offerType: currentOffer.type,
+              itemX: currentOffer.item_x ? currentOffer.item_x : "",
+              quantityOfItemX: currentOffer.item_x_quantity
+                ? currentOffer.item_x_quantity
+                : "",
+              itemY: currentOffer.item_y ? currentOffer.item_y : "",
+              quantityOfItemY: currentOffer.item_y_quantity
+                ? currentOffer.item_y_quantity
+                : "",
+              itemID: currentOffer.item_x ? currentOffer.item_x : "",
+              amountOfDiscount: currentOffer.amount_of_discount
+                ? currentOffer.amount_of_discount
+                : "",
+              isPercentage: currentOffer.is_percentage ? true : false,
+              isActive: currentOffer.is_active ? true : false,
+            }
             : "",
           canReturn,
         };
@@ -672,6 +681,7 @@ const getAllReturns = async (req, res, next) => {
       const selectedBatch = await Batch.findOne({
         where: { item_id: currentItem.id, mark_selected: 1 },
       });
+
 
       return {
         itemID: currentItem ? currentItem.id : "",

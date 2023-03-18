@@ -6466,19 +6466,16 @@
                 "item_x": {
                   "example": "any"
                 },
-                "item_x_quantity": {
+                "item_y": {
                   "example": "any"
                 },
-                "item_y": {
+                "item_x_quantity": {
                   "example": "any"
                 },
                 "item_y_quantity": {
                   "example": "any"
                 },
                 "item_z": {
-                  "example": "any"
-                },
-                "item_z_quantity": {
                   "example": "any"
                 },
                 "amount_of_discount": {
@@ -6552,19 +6549,13 @@
                 "item_x": {
                   "example": "any"
                 },
-                "item_x_quantity": {
-                  "example": "any"
-                },
                 "item_y": {
                   "example": "any"
                 },
+                "item_x_quantity": {
+                  "example": "any"
+                },
                 "item_y_quantity": {
-                  "example": "any"
-                },
-                "item_z": {
-                  "example": "any"
-                },
-                "item_z_quantity": {
                   "example": "any"
                 },
                 "amount_of_discount": {
@@ -6573,16 +6564,13 @@
                 "is_percentage": {
                   "example": "any"
                 },
-                "is_time": {
-                  "example": "any"
-                },
                 "start_date": {
                   "example": "any"
                 },
-                "end_date": {
+                "start_time": {
                   "example": "any"
                 },
-                "start_time": {
+                "end_date": {
                   "example": "any"
                 },
                 "end_time": {
@@ -6592,6 +6580,9 @@
                   "example": "any"
                 },
                 "is_ecomm": {
+                  "example": "any"
+                },
+                "is_time": {
                   "example": "any"
                 }
               }
