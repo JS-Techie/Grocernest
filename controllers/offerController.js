@@ -317,11 +317,10 @@ const offerForItemBuyNow = async (req, res, next) => {
   }
 
   try {
-    const offer = await Offers.findOne({
+    const offer = await Offers.findAll({
       where: {
         is_active: 1,
         item_x: itemID,
-        [Op.or]: [{ type_id: 1 }, { type_id: 2 }],
         is_ecomm: 1,
       },
     });
@@ -354,88 +353,158 @@ const offerForItemBuyNow = async (req, res, next) => {
         message: "No offers exist for this item",
       });
     }
+
+    /**
+     * TODO: offer exits block started below
+     */
     let newSalePrice = null;
     let offerItemID = null;
 
-    if (offer.item_x) {
-      offerItemID = offer.item_y;
+    /**
+     * TODO: collecting each_offer occurence on item 
+     */
 
-      const oldestBatch = await Batch.findOne({
-        where: { item_id: itemID, mark_selected: 1 },
-      });
+    let all_offer_qty = []
+    offer.map((each_offer)=>{
+      all_offer_qty.push(each_offer.item_x_quantity)
+    })
+    all_offer_qty.sort((a,b)=>b-a)
 
-      const Xitem = await Item.findOne({
-        where: { id: offer.item_x },
-      });
-
-      const Yitem = await Item.findOne({
-        where: { id: offerItemID },
-      });
-
-      let quantityOfOfferItem = null;
-      if (quantity >= offer.item_x_quantity) {
-        quantityOfOfferItem =
-          Math.floor(quantity / offer.item_x_quantity) * offer.item_y_quantity;
+    let quantityWithOccurence = new Map();
+    let n = quantity
+    while(n >= Math.min(...all_offer_qty)){
+      for(let i = 0; i < all_offer_qty.length; i++){
+        const divisor = all_offer_qty[i];
+        if(divisor <= n){
+          const quotient = Math.floor(n / divisor);
+          //const remainder = n % divisor;  
+          quantityWithOccurence.set(divisor, quotient)
+          n = n % divisor;
+          break;
+        }
       }
+    }
+    /**
+     * TODO: collecting all offer items with their quantities
+     */
+    let yItem = []
+    let yItemQtyToBeAdded = []
+    let yItemResponse 
+    let saveAllOfferItemInCache
+    if(quantityWithOccurence.size !== 0){
 
-      const saveOfferItemInCache = await OffersCache.create({
-        cust_no: currentUser,
-        item_id: offerItemID,
-        quantity: quantityOfOfferItem,
-        created_by: 1,
-      });
+      for(let [offerCreationQTYOfX, occurenceOfOffer] of quantityWithOccurence){
+
+        offer.map((eachOfferOnX)=>{
+
+          if(eachOfferOnX.item_x_quantity === offerCreationQTYOfX){
+
+            offerItemDetails = eachOfferOnX
+            
+            switch(offerItemDetails.type_id){
+              case 1:
+                
+                if(yItem.length > 0 && yItem.includes(offerItemDetails.item_y) ){
+                      let index = yItem.indexOf(offerItemDetails.item_y)
+                      let yItemQty = yItemQtyToBeAdded[index]
+                      yItemQty = yItemQty + (occurenceOfOffer * offerItemDetails.item_y_quantity)
+                      yItemQtyToBeAdded[index] = yItemQty
+                      //itemToBeAdded = offerItemDetails.item_y
+
+                }else{
+                  yItem.push(offerItemDetails.item_y)
+                 // let yItemQty = Math.floor(quantity/offerItemDetails.item_x_quantity) * offerItemDetails.item_y_quantity
+                  let yItemQty  = occurenceOfOffer * offerItemDetails.item_y_quantity
+                  yItemQtyToBeAdded.push(yItemQty)
+                 // itemToBeAdded = offerItemDetails.item_y
+                }
+                break;
+
+              case 2:
+              /*  let amountOfDiscount = eachOfferOnX.amount_of_discount * occurenceOfOffer 
+                amountOfDiscounts.push(amountOfDiscount)
+                if(eachOfferOnX.is_percentage === 1){
+                  isPercentage.push(true)
+                }else{
+                  isPercentage.push(false)
+                }*/
+                break;  
+            }
+            console.log(offerItemDetails)    
+          }     
+        })
+      }
+    }
+
+     if(yItem.length >0){
+
+      yItemResponse = await Promise.all(yItem.map(async(y, index)=>{
+
+        const Yitem = await Item.findOne({
+          where: {id: y},
+        });
+        if (Yitem) {
+          return {
+            itemName : Yitem.name,
+            quantity : yItemQtyToBeAdded[index] 
+          }
+        }
+      }));
+
+        saveAllOfferItemInCache = await Promise.all(yItem.map(async(y, index) => {
+        return OffersCache.create({
+          cust_no: currentUser,
+          item_id: y,
+          quantity: yItemQtyToBeAdded[index] ,
+          created_by: 1,
+        });
+
+      }))
+
+
+
+     }
+     
+    /*if(yItem.length > 0){
+      let response
+      for(const y of yItem){
+        const index = yItem.indexOf(y)
+        const Yitem = await Item.findOne({
+          where: { id: y },
+        });
+        if(Yitem){
+           response = {
+            itemName: Yitem.name,
+            quantity: yItemQtyToBeAdded[index] 
+          }
+        }
+        yItemResponse.push(response)
+      }
+    }*/
+
+
+   /*   */
+
+    
       return res.status(200).send({
         success: true,
         data: {
           normalItem: {
-            itemName: Xitem.name,
+            itemName: currentItem.name,
             quantity,
           },
           offerItem:
-            quantityOfOfferItem === null
+            yItemResponse === null
               ? "Not enough items to avail offer"
-              : {
-                  itemName: Yitem.name,
-                  quantity: Math.floor(quantityOfOfferItem),
-                },
+              : yItemResponse,
           total: oldestBatch.sale_price * quantity,
-          DBresponse: saveOfferItemInCache,
+          DBresponse: saveAllOfferItemInCache,
         },
-        message: "Offer successfully applied for current item",
+        message: (yItem.length>0) ? "Offer successfully applied for current item" : "Not enough items to avail offer",
       });
-    }
+    
 
-    const offerItemFromDB = await Item.findOne({
-      where: { id: offer.item_x },
-    });
-
-    let oldestBatchForOfferItem = await Batch.findOne({
-      where: { item_id: offer.item_x, mark_selected: 1 },
-    });
-
-    if (offer.is_percentage) {
-      newSalePrice =
-        oldestBatchForOfferItem.sale_price -
-        (offer.amount_of_discount / 100) * oldestBatchForOfferItem.sale_price;
-    } else {
-      newSalePrice =
-        oldestBatchForOfferItem.sale_price - offer.amount_of_discount;
-    }
-
-    newSalePrice = newSalePrice * quantity;
-    //console.log(newSalePrice, quantity, offer)
-
-    return res.status(200).send({
-      success: true,
-      data: {
-        itemName: offerItemFromDB.name,
-        total: newSalePrice,
-        quantity,
-        discountAmount: offer.amount_of_discount,
-        isPercentage: offer.is_percentage === 1 ? true : false,
-      },
-      message: "Successfully applied offer for current item",
-    });
+    
   } catch (error) {
     return res.status(400).send({
       success: false,
