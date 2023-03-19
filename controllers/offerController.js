@@ -1,4 +1,5 @@
 const { Op } = require("sequelize");
+const { max } = require("sequelize/lib/model");
 const { sequelize } = require("../models");
 const db = require("../models");
 
@@ -7,6 +8,9 @@ const Item = db.ItemModel;
 const Batch = db.BatchModel;
 const Cart = db.CartModel;
 const OffersCache = db.OffersCacheModel;
+
+
+const { cartCreation } = require("../services/offerService")
 
 const offerForItem = async (req, res, next) => {
   //Get current user from jwt
@@ -24,7 +28,6 @@ const offerForItem = async (req, res, next) => {
       where: {
         is_active: 1,
         item_x: itemID,
-        is_ecomm: 1
       },
     });
     if (!offer) {
@@ -35,41 +38,178 @@ const offerForItem = async (req, res, next) => {
       });
     }
     //add item check
-    let itemToBeAdded = null;
-    let quantityToBeAdded = null;
-    let discount = null;
-    let isPercentage = null;
-    let response = null;
-    let newSalePrice = null;
+  //  let itemToBeAdded = null;
+   // let quantityToBeAdded = null;
+    //let discount = null;
+    //let isPercentage = null;
+    //let response = null;
+    //let newSalePrice = null;
 
-    offer.map((eachOffer)=>{
-      if(quantity === eachOffer.item_x_quantity){
-        let type_id = eachOffer.type_id
-          switch(type_id){
-            case 1:
-              itemToBeAdded = offer.item_y;
-              if(quantity >= offer.item_x_quantity){
-                quantityToBeAdded = Math.floor(quantity / offer.item_x_quantity) * offer.item_y_quantity;
-                console.log("New quantity of item in cart ====>", quantity);
-                console.log("New quantity of offer item in cart ====>",quantityToBeAdded );
-                console.log("Xquantity ===>", offer.item_x_quantity);
-                console.log("Yquantity====>", offer.item_y_quantity);   
-              }
-              break;
-            case 2:
-              itemToBeAdded = offer.item_x;
-              discount = eachOffer.amount_of_discount
-              isPercentage = eachOffer.is_percentage
-              break;  
-          }
-        }
+    /**
+     * TODO: collect the occurence applicable offer's quantities
+     */
+    let all_offer_qty = []
+    offer.map((each_offer)=>{
+      all_offer_qty.push(each_offer.item_x_quantity)
     })
+    /**
+     * TODO: sorting the array in descending order
+     */
+    all_offer_qty.sort((a,b)=>b-a)
+
+    let quantityWithOccurence = new Map();
+    let n = quantity
+    while(n >= Math.min(...all_offer_qty)){
+      for(let i = 0; i < all_offer_qty.length; i++){
+        const divisor = all_offer_qty[i];
+        if(divisor <= n){
+          const quotient = Math.floor(n / divisor);
+          //const remainder = n % divisor;  
+          quantityWithOccurence.set(divisor, quotient)
+          n = n % divisor;
+          break;
+        }
+      }
+    }
     
-    let offerItemInCart = await Cart.findOne({
-      where: { cust_no: currentUser, item_id: itemToBeAdded, is_offer: 1 },
+    for (let [key, value] of quantityWithOccurence) {
+      console.log(key, value);
+    }
+    
+    let offerItemDetails
+    let allYItemDetails = []
+    let yItem = []
+    let yItemQtyToBeAdded =[]
+    let amountOfDiscounts =[]
+    let isPercentage =[]
+    let itemToBeAdded
+    if(quantityWithOccurence.size !== 0){
+
+      for(let [offerCreationQTYOfX, occurenceOfOffer] of quantityWithOccurence){
+
+        offer.map((eachOfferOnX)=>{
+
+          if(eachOfferOnX.item_x_quantity === offerCreationQTYOfX){
+
+            offerItemDetails = eachOfferOnX
+            
+            switch(offerItemDetails.type_id){
+              case 1:
+                
+                if(yItem.length > 0 && yItem.includes(offerItemDetails.item_y) ){
+                      let index = yItem.indexOf(offerItemDetails.item_y)
+                      let yItemQty = yItemQtyToBeAdded[index]
+                      yItemQty = yItemQty + (occurenceOfOffer * offerItemDetails.item_y_quantity)
+                      yItemQtyToBeAdded[index] = yItemQty
+                      //itemToBeAdded = offerItemDetails.item_y
+
+                }else{
+                  yItem.push(offerItemDetails.item_y)
+                 // let yItemQty = Math.floor(quantity/offerItemDetails.item_x_quantity) * offerItemDetails.item_y_quantity
+                  let yItemQty  = occurenceOfOffer * offerItemDetails.item_y_quantity
+                  yItemQtyToBeAdded.push(yItemQty)
+                 // itemToBeAdded = offerItemDetails.item_y
+                }
+                break;
+
+              case 2:
+              /*  let amountOfDiscount = eachOfferOnX.amount_of_discount * occurenceOfOffer 
+                amountOfDiscounts.push(amountOfDiscount)
+                if(eachOfferOnX.is_percentage === 1){
+                  isPercentage.push(true)
+                }else{
+                  isPercentage.push(false)
+                }*/
+                break;  
+            }
+            console.log(offerItemDetails)    
+          }     
+        })
+      }
+    }
+
+
+
+  /*  let result = {
+      yItem,
+      yItemQtyToBeAdded,
+      amountOfDiscounts,
+      isPercentage
+    }
+    return res.status(200).send({
+      data: result
+    }) */
+
+    let ultimateResponse = []
+
+    if(yItem.length>0){
+      for(const y of yItem){
+        const index = yItem.indexOf(y)
+        const offerItemInCart = await Cart.findOne({
+          where: { cust_no: currentUser, item_id : y, is_offer: 1 }
+        });
+        let response
+        if (offerItemInCart) {
+          response = await offerItemInCart.update(
+            {
+              quantity: yItemQtyToBeAdded[index]
+            });
+        } else {
+          response = await Cart.create({
+            cust_no: currentUser,
+            item_id: y,
+            quantity: yItemQtyToBeAdded[index],
+            created_by: 1,
+            is_offer: 1,
+            offer_item_price: 0,
+          });
+          
+        }
+        ultimateResponse.push(response)
+      }
+    }
+    return res.status(201).send({
+      success: true,
+      data: ultimateResponse,
+      message: "Offer successfully applied and items added to cart",
     });
 
-    if (offerItemInCart) {
+/*    let cartResult
+    let cartPresentOfferItems = []
+    let allOfferItemInCart = await Cart.findAll({
+      where: { cust_no: currentUser, is_offer: 1 }
+    });
+    if(allOfferItemInCart){
+      allOfferItemInCart.map((eachCart)=>{
+        if(eachCart.item_id){
+          cartPresentOfferItems.push(eachCart.item_id)
+        }
+      })
+
+    }
+
+    if(allOfferItemInCart && cartPresentOfferItems){
+      let count =0
+      yItemQtyToBeAdded.map( async (yItem)=> {
+       if( cartPresentOfferItems.includes(yItem) ){
+        count++
+        cartResult = await cartUpdate(currentUser, yItem, yItemQtyToBeAdded)
+        return;
+       }
+      })
+      if(count>0){
+        cartResult = await cartUpdate(currentUser, yItem, yItemQtyToBeAdded)
+      }
+    }else{
+       cartResult = await cartCreation(currentUser, yItem, yItemQtyToBeAdded)
+     }
+     return res.status(201).send({
+      success: true,
+      data: cartResult,
+      message: "Offer successfully applied and items added to cart",
+    });
+*/
+  /*  if (offerItemInCart) {
       response = await Cart.update(
         {
           quantity: quantityToBeAdded,
@@ -150,7 +290,7 @@ const offerForItem = async (req, res, next) => {
       success: true,
       data: response,
       message: "Offer successfully applied and items added to cart",
-    });
+    });*/
   } catch (error) {
     return res.status(400).send({
       success: false,

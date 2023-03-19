@@ -6,6 +6,8 @@ const offers = db.OffersModel;
 const item = db.ItemModel;
 const customer = db.CustomerModel;
 
+const Cart = db.CartModel;
+
 /*
 const isItemExists = async(item_x, item_y) =>{
     if(item_x!==null){
@@ -359,6 +361,27 @@ const offerItemValidationType4 = async (item_z, type_id)=>{
 }
 
 
+
+const cartCreation = async (currentUser, yItemQty, yItemQtyToBeAdded)=>{
+    let ultimateValue = []
+    yItemQty.map((requestYItem)=>{
+        let index = yItemQty.indexOf(requestYItem)
+        const value = {
+            cust_no: currentUser,
+            item_id: requestYItem,
+            quantity: yItemQtyToBeAdded[index],
+            created_by: 1,
+            is_offer: 1,
+            offer_item_price: 0
+          } 
+          ultimateValue.push(value)
+        })
+        const cartBulk = Cart.bulkCreate(ultimateValue) 
+        return  cartBulk
+}
+
+
+
 module.exports = {
     isTypePresent,
     validationForExistingOffer,
@@ -375,5 +398,6 @@ module.exports = {
     validationForExistingOfferUpdate,
     validationForYItemUpdate,
     validationForDiscountUpdate,
-    xSpecificYItemValidationType3Update
+    xSpecificYItemValidationType3Update,
+    cartCreation
 }
