@@ -19,7 +19,7 @@ const offerForItem = async (req, res, next) => {
 
   try {
     const cart = await Cart.findOne({
-      where: { cust_no: currentUser, item_id: itemID },
+      where: { cust_no: currentUser, item_id: itemID, is_offer:null},
     });
     if(cart) {
       quantity = cart.quantity + quantity;
