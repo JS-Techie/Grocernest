@@ -265,13 +265,15 @@ const subtractItemFromCart = async (req, res, next) => {
       });
     }else{
       updateExistingItem = await Cart.update({
-        where: {
+        quantity: finalQty,
+      },
+      { where: {
           cust_no: currentUser, 
           item_id: itemID, 
-          quantity: finalQty,
           is_offer: null 
         }
-      })
+      }
+      )
     } 
 
     let ultimateResponse = []
