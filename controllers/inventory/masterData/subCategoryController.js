@@ -99,7 +99,7 @@ const updateSubCategory = async (req, res, next) => {
                 data: []
             })
         }
-        console.log("hello", currentCategory);
+        // console.log("hello", currentCategory);
         const currentSubCategories = await SubCategory.findOne({
             where: { id: subCategoryId }
         })
@@ -110,7 +110,7 @@ const updateSubCategory = async (req, res, next) => {
                 data: []
             })
         }
-        console.log("lalalala",currentSubCategories);
+        // console.log("lalalala",currentSubCategories);
         const currentSubCategory = await SubCategory.findOne({
             where: { [Op.or]: [{ sub_cat_cd: subCatCode }, { sub_cat_name: subCatName }] }
         })
@@ -121,7 +121,7 @@ const updateSubCategory = async (req, res, next) => {
                 data: []
             })
         }
-        console.log("===========>>>>>>>>>>>",currentSubCategory);
+        // console.log("===========>>>>>>>>>>>",currentSubCategory);
         // let abc = currentSubCategory;
         // console.log(parseInt(abc))
 
@@ -143,6 +143,33 @@ const updateSubCategory = async (req, res, next) => {
             image: url
         }, { where: { id: subCategoryId } }
         )
+
+        const sameSubCategoryArray = await SubCategory.findAll({
+            attributes: ["id"],
+            where: {
+                [Op.or]: [{sub_cat_cd: subCatCode, sub_cat_name:subCatName}]
+            }
+        })
+        let sameCheckFlag = false
+        for (var i=0; i<sameSubCategoryArray.length; i++){
+            var subcategory = sameSubCategoryArray[i];
+            console.log("the category id from array",subcategory.id)
+            console.log("the category id from request",subCategoryId)
+            if(subcategory.id!==subCategoryId){
+                sameCheckFlag = true
+            }
+            console.log("the flag within loop is", sameCheckFlag)
+        }
+        if(sameCheckFlag){
+            return res.status(200).send({
+                status:404,
+                message: "SubCategory name or code already exists",
+                data: []
+            })
+        }
+
+
+
         const [updatedSubCat, metadata] = await sequelize.query(`select t_lkp_sub_category.id ,t_lkp_sub_category.sub_cat_cd,t_lkp_sub_category.sub_cat_name,t_lkp_sub_category.category_id,t_lkp_sub_category.image,
         t_lkp_sub_category.active_ind,t_lkp_sub_category.available_for_ecomm,t_lkp_category.group_name
         from t_lkp_sub_category

@@ -86,12 +86,12 @@ const saveCategory = async (req, res, next) => {
     let nameCheckFlag = false
     for (var i=0; i<sameCategoryArray.length; i++){
         var category = sameCategoryArray[i];
-        console.log("the category id from array",category.id)
-        console.log("the category id from request",categoryId)
+        // console.log("the category id from array",category.id)
+        // console.log("the category id from request",categoryId)
         if(category.id!==categoryId){
             nameCheckFlag = true
         }
-        console.log("the flag within loop is", nameCheckFlag)
+        // console.log("the flag within loop is", nameCheckFlag)
     }
     if(nameCheckFlag){
         return res.status(200).send({
