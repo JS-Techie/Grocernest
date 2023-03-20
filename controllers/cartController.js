@@ -256,6 +256,18 @@ const subtractItemFromCart = async (req, res, next) => {
         })
       }
     }
+
+
+    let cartOfferId = []
+    const userSpecificCart = await Cart.findAll({
+      where: { cust_no: currentUser, is_offer: 1},
+    });
+
+    if(userSpecificCart){
+      cartOfferId = userSpecificCart.map((cart)=>{
+          return cart.item_id
+      })
+    }
     
     let offerItemToBeRemoved = [];
     let removedItemFromCart = null;
@@ -264,6 +276,7 @@ const subtractItemFromCart = async (req, res, next) => {
       removedItemFromCart = await Cart.destroy({
         where: { cust_no: currentUser, item_id: itemID, is_offer : null },
       });
+
     }else{
       /**
        * update the quantity of original item
@@ -284,17 +297,7 @@ const subtractItemFromCart = async (req, res, next) => {
 
       if(yItem.length>0){
         let ultimateResponse = []
-        let cartOfferId = []
-    
-        const userSpecificCart = await Cart.findAll({
-          where: { cust_no: currentUser, is_offer: 1},
-        });
-    
-        if(userSpecificCart){
-          cartOfferId = userSpecificCart.map((cart)=>{
-              return cart.item_id
-          })
-        }
+        
 
         if(cartOfferId.length > 0){
           for(const itemId of cartOfferId){
@@ -322,9 +325,21 @@ const subtractItemFromCart = async (req, res, next) => {
               offer_item_price: 0,
           });
         }
+      }else{
+        
+        if(cartOfferId.length > 0){
+          for(const itemId of cartOfferId){
+            if(all_offer_item.includes(itemId)){
+              offerItemToBeRemoved.push(itemId)
+              let deleteExistingOfferInCart = await Cart.destroy({
+                where: {
+                  cust_no: currentUser, item_id: itemId, is_offer: 1 
+                }
+              });
+            }
+          }
+        }
       }
-
-
       
     } 
 
