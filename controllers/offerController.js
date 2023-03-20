@@ -142,16 +142,28 @@ const offerForItem = async (req, res, next) => {
 
     let ultimateResponse = []
 
-    if(yItem.length>0){
+    const userSpecificCart = await Cart.findAll({
+      where: { cust_no: currentUser, is_offer: 1},
+    });
+    let cartOfferId = []
+    if(userSpecificCart){
+      cartOfferId = userSpecificCart.map((cart)=>{
+          return cart.item_id
+      })
+    }
 
-      /**
-       * TODO: delete all existing offer items for user 
-       */
-      let deleteExistingOfferInCart = await Cart.destroy({
-        where: {
-          cust_no: currentUser,  is_offer: 1 
+    if(yItem.length>0){
+      if(cartOfferId.length > 0){
+        for(const itemId of cartOfferId){
+          if(offer.includes(itemId)){
+            let deleteExistingOfferInCart = await Cart.destroy({
+              where: {
+                cust_no: currentUser, item_id: itemId, is_offer: 1 
+              }
+            });
+          }
         }
-      });
+      }
 
       for(const y of yItem){
         const index = yItem.indexOf(y)
