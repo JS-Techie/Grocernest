@@ -38,7 +38,7 @@ const offerForItem = async (req, res, next) => {
       });
     }
     //add item check
-  //  let itemToBeAdded = null;
+   // let itemToBeAdded = null;
    // let quantityToBeAdded = null;
     //let discount = null;
     //let isPercentage = null;
@@ -48,8 +48,10 @@ const offerForItem = async (req, res, next) => {
     /**
      * TODO: collect the occurence applicable offer's quantities
      */
+    let all_offer_item = []
     let all_offer_qty = []
     offer.map((each_offer)=>{
+      all_offer_item.push(each_offer.item_y)
       all_offer_qty.push(each_offer.item_x_quantity)
     })
     /**
@@ -128,24 +130,13 @@ const offerForItem = async (req, res, next) => {
       }
     }
 
-
-
-  /*  let result = {
-      yItem,
-      yItemQtyToBeAdded,
-      amountOfDiscounts,
-      isPercentage
-    }
-    return res.status(200).send({
-      data: result
-    }) */
-
     let ultimateResponse = []
+    let cartOfferId = []
 
     const userSpecificCart = await Cart.findAll({
       where: { cust_no: currentUser, is_offer: 1},
     });
-    let cartOfferId = []
+
     if(userSpecificCart){
       cartOfferId = userSpecificCart.map((cart)=>{
           return cart.item_id
@@ -155,7 +146,7 @@ const offerForItem = async (req, res, next) => {
     if(yItem.length>0){
       if(cartOfferId.length > 0){
         for(const itemId of cartOfferId){
-          if(offer.includes(itemId)){
+          if(all_offer_item.includes(itemId)){
             let deleteExistingOfferInCart = await Cart.destroy({
               where: {
                 cust_no: currentUser, item_id: itemId, is_offer: 1 
@@ -167,17 +158,6 @@ const offerForItem = async (req, res, next) => {
 
       for(const y of yItem){
         const index = yItem.indexOf(y)
-        
-     /*   const offerItemInCart = await Cart.findOne({
-          where: { cust_no: currentUser, item_id : y, is_offer: 1 }
-        });
-        
-        if (offerItemInCart) {
-          response = await offerItemInCart.update(
-            {
-              quantity: yItemQtyToBeAdded[index]
-            });
-        } else {*/
         let response
         
         response = await Cart.create({
