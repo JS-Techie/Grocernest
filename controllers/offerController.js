@@ -145,35 +145,49 @@ const offerForItem = async (req, res, next) => {
     let ultimateResponse = []
 
     if(yItem.length>0){
+
+      /**
+       * TODO: delete all existing offer items for user 
+       */
+      let deleteExistingOfferInCart = await Cart.destroy({
+        where: {
+          cust_no: currentUser,  is_offer: 1 
+        }
+      });
+
       for(const y of yItem){
         const index = yItem.indexOf(y)
-        const offerItemInCart = await Cart.findOne({
+        
+     /*   const offerItemInCart = await Cart.findOne({
           where: { cust_no: currentUser, item_id : y, is_offer: 1 }
         });
-        let response
+        
         if (offerItemInCart) {
           response = await offerItemInCart.update(
             {
               quantity: yItemQtyToBeAdded[index]
             });
-        } else {
-          response = await Cart.create({
+        } else {*/
+        let response
+        
+        response = await Cart.create({
             cust_no: currentUser,
             item_id: y,
             quantity: yItemQtyToBeAdded[index],
             created_by: 1,
             is_offer: 1,
             offer_item_price: 0,
-          });
+        });
+        
           
-        }
+       // }
         ultimateResponse.push(response)
       }
     }
     return res.status(201).send({
       success: true,
       data: ultimateResponse,
-      message: "Offer successfully applied and items added to cart",
+      message: yItem.length > 0 ? "Offer successfully applied and items added to cart" : "Not offer applicable" 
     });
 
 /*    let cartResult
