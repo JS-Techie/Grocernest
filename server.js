@@ -71,7 +71,9 @@ const adhocRouter = require("./routes/adhocRoutes");
 // admin routers import
 const adminOrderRouter = require("./routes/admin/orderRoutes");
 const adminWalletRouter = require("./routes/admin/walletRoutes");
+const adminSpecialWalletRouter=require("./routes/admin/walletSpecialRoutes")
 const adminCustomerRouter = require("./routes/admin/customerRoutes");
+const adminSpecialWalletCustomerRouter= require("./routes/admin/customerSpecialWalletRoutes")
 const adminGiftRouter = require("./routes/admin/giftRoutes");
 const adminCouponsRouter = require("./routes/admin/couponRoutes");
 const adminOffersRouter = require("./routes/admin/offerRoutes");
@@ -209,7 +211,9 @@ app.use("/adhoc", adhocRouter);
 app.use("/admin/orders", adminOrderRouter);
 app.use("/admin/coupon/to/customer", couponToCustomer);
 app.use("/admin/wallet", adminWalletRouter);
+app.use("/admin/specialwallet", adminSpecialWalletRouter);
 app.use("/admin/customer", adminCustomerRouter);
+app.use("/admin/customer", adminSpecialWalletCustomerRouter);
 app.use("/admin/gift", adminGiftRouter);
 app.use("/admin/coupons", adminCouponsRouter);
 app.use("/admin/offers", adminOffersRouter);

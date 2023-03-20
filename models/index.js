@@ -100,6 +100,11 @@ db.WalletTransactionModel = require("./t_wallet_transaction")(
   db.sequelize,
   Sequelize
 );
+db.SpecialWalletTransactionModel = require("./t_special_wallet_transaction")(
+  db.sequelize,
+  Sequelize
+);
+
 
 db.WalletModel = require("./t_wallet")(db.sequelize, Sequelize);
 
