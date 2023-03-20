@@ -416,6 +416,10 @@ const getLastThreeItemBatches = async (req, res, next) => {
   }
 };
 
+const offerItem = async (req, res, next) =>{
+  
+}
+
 module.exports = {
   uploadMultipleImages,
   editUploadedImages,
