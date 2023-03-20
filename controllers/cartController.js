@@ -256,7 +256,8 @@ const subtractItemFromCart = async (req, res, next) => {
         })
       }
     }
-
+    
+    let offerItemToBeRemoved = [];
     let removedItemFromCart = null;
     let updateExistingItem = null;
     if (itemExistsInCart.quantity === 1) {
@@ -264,6 +265,9 @@ const subtractItemFromCart = async (req, res, next) => {
         where: { cust_no: currentUser, item_id: itemID, is_offer : null },
       });
     }else{
+      /**
+       * update the quantity of original item
+       */
       updateExistingItem = await Cart.update({
         quantity: finalQty,
       },
@@ -272,59 +276,66 @@ const subtractItemFromCart = async (req, res, next) => {
           item_id: itemID, 
           is_offer: null 
         }
-      }
-      )
-    } 
+      });
 
-    let ultimateResponse = []
-    let cartOfferId = []
+      /**
+       * update the offerItem in cart table
+       */
 
-    const userSpecificCart = await Cart.findAll({
-      where: { cust_no: currentUser, is_offer: 1},
-    });
+      if(yItem.length>0){
+        let ultimateResponse = []
+        let cartOfferId = []
+    
+        const userSpecificCart = await Cart.findAll({
+          where: { cust_no: currentUser, is_offer: 1},
+        });
+    
+        if(userSpecificCart){
+          cartOfferId = userSpecificCart.map((cart)=>{
+              return cart.item_id
+          })
+        }
 
-    if(userSpecificCart){
-      cartOfferId = userSpecificCart.map((cart)=>{
-          return cart.item_id
-      })
-    }
-
-    if(yItem.length>0){
-      if(cartOfferId.length > 0){
-        for(const itemId of cartOfferId){
-          if(all_offer_item.includes(itemId)){
-            let deleteExistingOfferInCart = await Cart.destroy({
-              where: {
-                cust_no: currentUser, item_id: itemId, is_offer: 1 
-              }
-            });
+        if(cartOfferId.length > 0){
+          for(const itemId of cartOfferId){
+            if(all_offer_item.includes(itemId)){
+              offerItemToBeRemoved.push(itemId)
+              let deleteExistingOfferInCart = await Cart.destroy({
+                where: {
+                  cust_no: currentUser, item_id: itemId, is_offer: 1 
+                }
+              });
+            }
           }
         }
+  
+        for(const y of yItem){
+          const index = yItem.indexOf(y)
+          let response
+          
+          response = await Cart.create({
+              cust_no: currentUser,
+              item_id: y,
+              quantity: yItemQtyToBeAdded[index],
+              created_by: 1,
+              is_offer: 1,
+              offer_item_price: 0,
+          });
+        }
       }
-      for(const y of yItem){
-        const index = yItem.indexOf(y)
-        let response = await Cart.create({
-            cust_no: currentUser,
-            item_id: y,
-            quantity: yItemQtyToBeAdded[index],
-            created_by: 1,
-            is_offer: 1,
-            offer_item_price: 0,
-        });
-        ultimateResponse.push(response)
-      }
-    }
 
+
+      
+    } 
 
     return res.status(200).send({
       success: true,
-      data: {newQuantityOfNormalItem: finalQty},
+      data: {
+        newQuantityOfNormalItem: finalQty,
+        offerItemRemoved: offerItemToBeRemoved
+      },
       message: "Successfully updated quantity of item and its offer in cart" 
     });
-
-
-
-
 
   /*
     let offerItemToBeRemoved = null;
