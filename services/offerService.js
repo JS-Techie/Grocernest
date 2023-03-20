@@ -380,6 +380,23 @@ const cartCreation = async (currentUser, yItemQty, yItemQtyToBeAdded)=>{
         return  cartBulk
 }
 
+const collectAllYItem = async (itemX)=>{
+    let all_offer_qty = []
+    const offer = await offers.findAll({
+        where: {
+          is_active: 1,
+          item_x: itemX,
+        },
+      });
+    if(offer){
+        offers.map((each_offer)=>{
+            all_offer_qty.push(each_offer.item_x_quantity)
+          })
+    }  
+    return all_offer_qty
+   
+}
+
 
 
 module.exports = {
@@ -399,5 +416,6 @@ module.exports = {
     validationForYItemUpdate,
     validationForDiscountUpdate,
     xSpecificYItemValidationType3Update,
-    cartCreation
+    cartCreation,
+    collectAllYItem
 }
