@@ -19,7 +19,7 @@ const checkSpecialWalletDetails = async (req, res, next) => {
         
         //Check for the length of the array and send apt responses
 
-        if(transactions.length()===0){
+        if(transactions.length===0){
             return res.status(201).send({
                 success: true,
                 data:[],
