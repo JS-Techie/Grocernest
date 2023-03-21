@@ -8,7 +8,7 @@ const saveLocation = async (req, res, next) => {
     const { user_id } = req;
     const { locationName, address, locationDesc, contactNo, contactEmail, locationType, invoicePrefix, existingLocation, id } = req.body;
     try {
-        if (existingLocation === "N") {
+        if (!id) {
 
             const sameLocation = await Location.findOne({
                 where: {
