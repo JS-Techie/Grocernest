@@ -128,6 +128,7 @@ const departmentMasterRouter = require("./routes/inventory/masterData/department
 const categoryMasterRouter = require("./routes/inventory/masterData/categoryRoutes");
 const subCategoryMasterRouter = require("./routes/inventory/masterData/subCategoryRoutes");
 const itemMasterRouter = require("./routes/inventory/masterData/itemRoutes");
+const masterDataRouter = require("./routes/inventory/masterData/masterDataRoutes")
 
 //reports import
 const dailySalesReportRouter = require("./routes/inventory/reports/dailySalesRoutes")
@@ -162,7 +163,7 @@ app.use("/inventory/departmentmaster", departmentMasterRouter);
 app.use("/inventory/categorymaster", categoryMasterRouter);
 app.use("/inventory/subCategorymaster", subCategoryMasterRouter);
 app.use("/inventory/itemmaster", itemMasterRouter)
-
+app.use("/master", masterDataRouter)
 //report routes
 app.use("/inventory/dailySalesReport", dailySalesReportRouter)
 
