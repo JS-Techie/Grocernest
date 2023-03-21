@@ -273,10 +273,29 @@ const subtractItemFromCart = async (req, res, next) => {
     let removedItemFromCart = null;
     let updateExistingItem = null;
     if (itemExistsInCart.quantity === 1) {
-      removedItemFromCart = await Cart.destroy({
-        where: { cust_no: currentUser, item_id: itemID, is_offer : null },
+      
+      const offerExists = await Offers.findOne({
+        where: { is_active: 1, item_x: itemID, item_x_quantity: itemExistsInCart.quantity, is_ecomm : 1 },
       });
 
+      if(offerExists){
+        const offerItemExistsInCart = await Cart.findOne({
+          where: { cust_no: currentUser, item_id: offerExists.item_y, is_offer: 1 },
+        });
+        
+        if(offerItemExistsInCart){
+          offerItemToBeRemoved.push(offerExists.item_y)
+          let itemExistsInCart = await Cart.destroy({
+            where: { cust_no: currentUser, item_id: offerExists.item_y, is_offer: 1 },
+          });
+        }
+
+        removedItemFromCart = await Cart.destroy({
+          where: { cust_no: currentUser, item_id: itemID, is_offer : null },
+        });    
+        
+      }
+      
     }else{
       /**
        * update the quantity of original item
@@ -326,7 +345,7 @@ const subtractItemFromCart = async (req, res, next) => {
           });
         }
       }else{
-        
+
         if(cartOfferId.length > 0){
           for(const itemId of cartOfferId){
             if(all_offer_item.includes(itemId)){
