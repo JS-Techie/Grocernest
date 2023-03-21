@@ -415,7 +415,7 @@ const createOffer = async (req, res, next) => {
       return res.status(400).send({
         success: false,
         data: [],
-        message: "Please specify if this offer is for POS or ecomm or both",
+        message: "Please specify if this offer is for ecomm ",
       });
     }
 
