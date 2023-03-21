@@ -207,7 +207,7 @@ const updateUser = async (req, res, next) => {
     
     for (var i = 0; i < sameUserArray.length; i++) {
       var user = sameUserArray[i];
-      if (!user.id === userId) {
+      if (user.id !== userId) {
 
         // console.log("the array item user id: ", user.id);
         // console.log("the req body id: ", userId);

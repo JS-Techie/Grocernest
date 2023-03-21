@@ -20,21 +20,21 @@ const checkSpecialWalletDetails = async (req, res, next) => {
         //Check for the length of the array and send apt responses
 
         if(transactions.length()===0){
-            return res.status(201).json({
+            return res.status(201).send({
                 success: true,
                 data:[],
                 message:"No Transactions yet."
             })
         }
 
-        return res.status(201).json({
+        return res.status(201).send({
             success: true,
             data: transactions,
             message: "Successfully fetched Special Wallet Transaction Data",
         });
     }
     catch (err) {
-        return res.status(400).json({
+        return res.status(400).send({
             success: false,
             data: err.message,
             message: "Error while fetching wallet and transaction from database",

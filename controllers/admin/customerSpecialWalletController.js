@@ -21,14 +21,14 @@ const getSpecialWalletCustomerList = async (req, res, next) => {
         const [customerResponse, metadata] = await sequelize.query(customerQuery)
 
         // console.log("the response data: ", resData)
-        return res.status(201).json({
+        return res.status(201).send({
             success: true,
             data: customerResponse,
             message: "Successfully fetched all Customer Data Regarding Special Wallet",
         });
     }
     catch (error) {
-        return res.status(400).json({
+        return res.status(400).send({
             success: false,
             data: error.message,
             message: "Error while fetching Customers",

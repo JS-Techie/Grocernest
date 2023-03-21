@@ -7,6 +7,8 @@ const {
 } = require("../services/mail/mailService");
 const validator = require("email-validator");
 
+const SpecialWalletStrategy = db.SpecialWalletStrategy
+
 const Order = db.OrderModel;
 const OrderItems = db.OrderItemsModel;
 const Item = db.ItemModel;
@@ -146,6 +148,16 @@ const getAllOrders = async (req, res, next) => {
               : "",
           };
         }
+
+        const specialwalletItemList= await SpecialWalletStrategy.findAll({
+          attributes: ['items_list'],
+          raw:true
+        })
+        console.log("the returned item list : ",specialwalletItemList)
+
+
+
+
       });
 
       const orderItemsArray = await Promise.all(orderItemPromises);
