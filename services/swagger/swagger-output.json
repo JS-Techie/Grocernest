@@ -5991,6 +5991,35 @@
         }
       }
     },
+    "/admin/specialwallet/check/details/{cust_no}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "cust_no",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
     "/admin/customer/get/customer/list/{phno}": {
       "get": {
         "description": "",
@@ -6021,6 +6050,46 @@
       }
     },
     "/admin/customer/get/customer/list": {
+      "get": {
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      }
+    },
+    "/admin/customer/get/specialwallet/customer/list/{phno}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "phno",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/admin/customer/get/specialwallet/customer/list": {
       "get": {
         "description": "",
         "parameters": [
