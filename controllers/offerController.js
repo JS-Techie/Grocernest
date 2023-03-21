@@ -17,6 +17,8 @@ const offerForItem = async (req, res, next) => {
   const currentUser = req.cust_no;
   let { itemID, quantity } = req.body;
 
+  console.log("the item ID of this shit is:",itemID)
+
   try {
     const cart = await Cart.findOne({
       where: { cust_no: currentUser, item_id: itemID, is_offer:null},
