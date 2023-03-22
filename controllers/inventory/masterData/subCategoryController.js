@@ -87,11 +87,12 @@ const saveSubCategory = async (req, res, next) => {
 const updateSubCategory = async (req, res, next) => {
     const { categoryId, subCatCode, subCatName, isAvailableForEcomm, image } = req.body;
     const { subCategoryId } = req.params;
+    console.log("hello1", subCategoryId);
     try {
         const currentCategory = await Category.findOne({
             where: { id: categoryId }
         })
-
+console.log("hello2", currentCategory.id);
         if (!currentCategory) {
             return res.status(200).send({
                 status: 404,
@@ -103,6 +104,7 @@ const updateSubCategory = async (req, res, next) => {
         const currentSubCategories = await SubCategory.findOne({
             where: { id: subCategoryId }
         })
+        console.log("hello3",currentSubCategories.id);
         if (!currentSubCategories) {
             return res.status(200).send({
                 status: 404,
@@ -111,21 +113,22 @@ const updateSubCategory = async (req, res, next) => {
             })
         }
         // console.log("lalalala",currentSubCategories);
-        const currentSubCategory = await SubCategory.findOne({
-            where: { [Op.or]: [{ sub_cat_cd: subCatCode }, { sub_cat_name: subCatName }] }
-        })
-        if (!currentSubCategory) {
-            return res.status(200).send({
-                status: 404,
-                message: "Current Sub Category not found",
-                data: []
-            })
-        }
+        // const currentSubCategory = await SubCategory.findOne({
+        //     where: { [Op.or]: [{ sub_cat_cd: subCatCode }, { sub_cat_name: subCatName }] }
+        // })
+        // console.log("hello4", currentSubCategory.id);
+        // if (!currentSubCategory) {
+        //     return res.status(200).send({
+        //         status: 404,
+        //         message: "Current Sub Category not found",
+        //         data: []
+        //     })
+        // }
         // console.log("===========>>>>>>>>>>>",currentSubCategory);
         // let abc = currentSubCategory;
         // console.log(parseInt(abc))
 
-        if (currentSubCategory.id !== parseInt(subCategoryId)) {
+        if (currentSubCategories.id !== parseInt(subCategoryId)) {
             return res.status(200).send({
                 status: 404,
                 message: "Id of the currentSubCategory is not equal to subCategoryId",
@@ -135,15 +138,6 @@ const updateSubCategory = async (req, res, next) => {
 
         const key = `subcategory/${uniq()}.jpeg`
         const url = await uploadImageToS3(image, key);
-
-        const update = await SubCategory.update({
-            sub_cat_cd: subCatCode,
-            sub_cat_name: subCatName,
-            available_for_ecomm: isAvailableForEcomm,
-            image: url
-        }, { where: { id: subCategoryId } }
-        )
-
         const sameSubCategoryArray = await SubCategory.findAll({
             attributes: ["id"],
             where: {
@@ -153,8 +147,8 @@ const updateSubCategory = async (req, res, next) => {
         let sameCheckFlag = false
         for (var i=0; i<sameSubCategoryArray.length; i++){
             var subcategory = sameSubCategoryArray[i];
-            console.log("the category id from array",subcategory.id)
-            console.log("the category id from request",subCategoryId)
+            // console.log("the category id from array",subcategory.id)
+            // console.log("the category id from request",subCategoryId)
             if(subcategory.id!==subCategoryId){
                 sameCheckFlag = true
             }
@@ -167,6 +161,16 @@ const updateSubCategory = async (req, res, next) => {
                 data: []
             })
         }
+
+        const update = await SubCategory.update({
+            sub_cat_cd: subCatCode,
+            sub_cat_name: subCatName,
+            available_for_ecomm: isAvailableForEcomm,
+            image: url
+        }, { where: { id: subCategoryId } }
+        )
+
+        
 
 
 
