@@ -40,13 +40,7 @@ const getMasterData = async (req, res, next) => {
         };
       });
       brandResolved = await Promise.all(brandPromises);
-      // return res.status(200).send({
-      //   status: 200,
-      //   message: "Successfully retrieved the masterData",
-      //   data: {
-      //     BRAND:brandResolved,
-      //   }
-      // })
+  
     }
     if (masterDataTypeList.includes("COLOR")) {
       const getColorData = await Color.findAll({ where: { active_ind: "Y" } });
@@ -63,13 +57,7 @@ const getMasterData = async (req, res, next) => {
         };
       });
       colorResolved = await Promise.all(colorPromises);
-      // return res.status(200).send({
-      //   status: 200,
-      //   message: "Successfully retrieved the masterData",
-      //   data: {
-      //     COLOR:colorResolved,
-      //   }
-      // })
+   
     }
     if (masterDataTypeList.includes("DEPARTMENT")) {
       const getDepartmentData = await Department.findAll({
@@ -90,13 +78,7 @@ const getMasterData = async (req, res, next) => {
         };
       });
       departmentResolved = await Promise.all(departmentPromises);
-      // return res.status(200).send({
-      //   status: 200,
-      //   message: "Successfully retrieved the masterData",
-      //   data: {
-      //     DEPARTMENT: departmentResolved,
-      //   }
-      // })
+    
     }
     if (masterDataTypeList.includes("CATEGORY")) {
       const getCategoryData = await Category.findAll({
@@ -173,23 +155,7 @@ const getMasterData = async (req, res, next) => {
 if(masterDataTypeList.includes("SUBCATEGORY")){
   const getSubCategoryData = await SubCategory.findAll({where: {active_ind: "Y"}})
   const subCatPromises = getSubCategoryData.map(async(current) => {
-  //   const [getCategory , metadata] = await sequelize.query(`select * from (t_lkp_category 
-  //     inner join t_lkp_sub_category on t_lkp_sub_category.category_id  = t_lkp_category.id )`)
-  //     const categoryPromises = getCategory.map(async(currentCat) => {
-  //       return ({
-  //         availableForEcomm: current.available_for_ecomm,
-  //         categoryId: current.id,
-  //         createdAt: current.created_at,
-  //         createdBy: current.created_by,
-  //         groupName: current.group_name,
-  //         hsnCode: current.HSN_CODE,
-  //         image: current.image,
-  //         isActive: current.active_ind,
-  //         updatedAt: current.updated_at,
-  //         updatedBy: current.updated_by
-  //       })
-  //     })
-  //     const categoryResolved = await Promise.all(categoryPromises)
+
     return {
       createdAt: current.created_at,
           createdBy: current.created_by,
