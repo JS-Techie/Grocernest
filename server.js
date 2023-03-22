@@ -165,7 +165,7 @@ app.use("/inventory/departmentmaster", departmentMasterRouter);
 app.use("/inventory/categorymaster", categoryMasterRouter);
 app.use("/inventory/subCategorymaster", subCategoryMasterRouter);
 app.use("/inventory/itemmaster", itemMasterRouter)
-app.use("/master", masterDataRouter)
+app.use(masterDataRouter)
 //report routes
 app.use("/inventory/dailySalesReport", dailySalesReportRouter)
 
