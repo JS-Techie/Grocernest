@@ -145,7 +145,7 @@ const getMasterData = async (req, res, next) => {
           id: current.id,
           isActive: current.active_ind,
           sizeCode: current.size_cd,
-          sizeOfItem: current.sizeOfItem,
+          sizeOfItem: current.size_of_item,
           updatedAt: current.updated_at,
           updatedBy: current.updated_by,
         };
