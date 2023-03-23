@@ -51,6 +51,7 @@ const addressRouter = require("./routes/addressRoutes");
 const profileRouter = require("./routes/profileRoutes");
 const checkoutRouter = require("./routes/checkoutRoutes");
 const orderRouter = require("./routes/ordersRoutes");
+const returnItemShowRouter= require('./routes/returnItemShowRoutes');
 const couponRouter = require("./routes/couponsRoutes");
 const referralRouter = require("./routes/referralRoutes");
 const giftRouter = require("./routes/giftRoutes");
@@ -193,6 +194,7 @@ app.use("/address", addressRouter);
 app.use("/profile", profileRouter);
 app.use("/checkout", checkoutRouter);
 app.use("/orders", orderRouter);
+app.use("/orders", returnItemShowRouter)
 app.use("/coupons", couponRouter);
 app.use("/referral/view", referralRouter);
 app.use("/gift", giftRouter);
@@ -256,6 +258,7 @@ app.use("/vendor", vendorRouter);
 
 //Start server and connect to DB
 const db = require("./services/dbSetupService.js");
+const returnItemShowController = require("./controllers/returnItemShowController");
 const PORT = process.env.PORT || 8080;
 const start = async () => {
   try {
