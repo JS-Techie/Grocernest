@@ -59,6 +59,7 @@ const grnDraftSaveController = async (req, res) => {
   }
 
   try {
+    
     let grnData
     console.log("hello1", grnId)
     if (grnId === "") {
