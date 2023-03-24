@@ -121,7 +121,7 @@ const updateUser = async (req, res, next) => {
     fullName,
     mobileNo,
     email,
-    userType,
+    userType
   } = req.body;
   const userId = req.params.userId;
   // console.log("checking the fetched data by printing it :::=", userId, typeof(userId));
@@ -205,11 +205,11 @@ const updateUser = async (req, res, next) => {
 
     for (var i = 0; i < sameUserArray.length; i++) {
       var user = sameUserArray[i];
-      if (user.id !== userId) {
-        // console.log("the array item user id: ", user.id);
-        // console.log("the req body id: ", userId);
+      if (!user.id === userId) {
+        console.log("the array item user id: ", user.id);
+        console.log("the req body id: ", userId);
         idCheckflag = true;
-        // console.log("the flag within loop : ", idCheckflag);
+        console.log("the flag within loop : ", idCheckflag);
       }
     }
 
