@@ -6,6 +6,7 @@ const db = require("../models");
 
 const WishlistItems = db.WishlistItemsModel;
 const Offers = db.OffersModel;
+const lkp_offers = db.lkpOffersModel;
 const Item = db.ItemModel;
 const Inventory = db.InventoryModel;
 const Coupons = db.CouponsModel;
@@ -410,8 +411,8 @@ const getItemById = async (req, res, next) => {
   try {
     //Find all the details of the item pertaining to current item id
     const [itemResults, metadata] =
-      await sequelize.query(`select distinct t_item.id, t_item.name,t_item.show_discount ,t_item.brand_id,t_item.UOM ,t_item.category_id, t_item.is_grocernest,t_lkp_category.group_name,t_item.sub_category_id , t_lkp_sub_category.sub_cat_name 
-      ,t_item.image ,t_item.description ,t_item.available_for_ecomm ,t_batch.batch_no ,t_item.how_to_use, t_item.ingredients, t_item.country_of_origin,t_item.manufacturer_name,
+      await sequelize.query(`select distinct t_item.id, t_item.name, t_item.show_discount ,t_item.brand_id, t_item.UOM ,t_item.category_id, t_item.is_grocernest,t_lkp_category.group_name,t_item.sub_category_id , t_lkp_sub_category.sub_cat_name 
+      ,t_item.image ,t_item.description ,t_item.available_for_ecomm , t_batch.batch_no ,t_item.how_to_use, t_item.ingredients, t_item.country_of_origin,t_item.manufacturer_name,
       t_batch.location_id ,t_batch.MRP ,t_batch.discount ,t_batch.cost_price ,t_batch.mfg_date ,t_batch.sale_price ,
       t_batch.expiry_date,
       t_inventory.cashback, t_inventory.cashback_is_percentage,
@@ -453,22 +454,112 @@ const getItemById = async (req, res, next) => {
       where: {
         is_active: 1,
         item_x: item.id,
-        [Op.or]: [{ type_id: 1 }, { type_id: 2 }],
         is_ecomm : 1
       },
     });
-   console.log(offer);
+   console.log("offer:  "+offer);
     let itemIDOfOfferItem;
-    let offerItem;
+    let yItem;
+    let typeDetails;
+    let xItemDetails;
+    let yItemDetails;
+    let zItemDetails
+    let yItemName
+    let yItemImage
     if (offer) {
-      if (offer.type_id==2) {
-        itemIDOfOfferItem = offer.item_x;
-      } else if (offer.type_id==1) {
-        itemIDOfOfferItem = offer.item_y;
+      typeDetails = await lkp_offers.findOne({
+        where:{
+          id: offer.type_id
+        }
+      })
+      switch(offer.type_id){
+        case 1:
+          yItem = offer.item_y? offer.item_y : null
+          if(offer.item_y){
+            yItemDetails = await Item.findOne({
+              where: { id: offer.item_y, active_ind: 'Y'},
+            });
+            console.log("yItemDetails "+yItemDetails.name)
+            if(yItemDetails){
+              yItemName = yItemDetails.name
+              yItemImage = yItemDetails.image
+            }
+          }
+          break;
+        case 2:
+          yItem = offer.item_y? offer.item_y : null
+          break;
+        case 3:
+          yItem = []
+          yItemName = []
+          const allOffers = await Offers.findAll({
+            where: {
+              is_active: 1,
+              item_x: item.id,
+              is_ecomm : 1,
+              type_id: 3
+            },
+          });
+          if(allOffers){
+            allOffers.map(async(eachOffer)=>{
+              if(eachOffer.item_y){
+                yItem.push(eachOffer.item_y)
+                yItemDetails = await Item.findOne({
+                  where: { id: eachOffer.item_y, active_ind: 'Y'},
+                });
+                console.log("yItemDetails "+yItemDetails)
+                console.log("yItemDetails "+yItemDetails.name)
+                if(yItemDetails){
+                  if(yItemDetails.name){
+                   yItemName.push(yItemDetails.name)
+                  }
+                }
+              }
+            })
+            
+          }
+          break;
+        case 4:
+          yItem = offer.item_y? offer.item_y : null
+          if(offer.item_y){
+            yItemDetails = await Item.findOne({
+              where: { id: offer.item_y, active_ind: 'Y'},
+            });
+            console.log("yItemDetails "+yItemDetails)
+            if(yItemDetails){
+              yItemName = yItemDetails.name
+            }
+          }
+          break;
+        case 5:
+          yItem = offer.item_y? offer.item_y : null
+          if(offer.item_y){
+            yItemDetails = await Item.findOne({
+              where: { id: offer.item_y, active_ind: 'Y'},
+            });
+            console.log("yItemDetails "+yItemDetails)
+            if(yItemDetails){
+              yItemName = yItemDetails.name
+            }
+          }
+          break;
+        default:
+          console.log("GOD")          
       }
-      offerItem = await Item.findOne({
-        where: { id: itemIDOfOfferItem },
-      });
+      
+      if(offer.item_x){
+        xItemDetails = await Item.findOne({
+          where: { id: offer.item_x, active_ind: 'Y'},
+        });
+        console.log("xItemDetails "+xItemDetails)
+      }
+      if(offer.item_z){
+        zItemDetails = await Item.findOne({
+          where: { id: offer.item_z, active_ind: 'Y'},
+        });
+        console.log("zItemDetails "+zItemDetails)
+      }  
+      
     }
 
     // const coupons = await Coupons.findAll({
@@ -520,7 +611,8 @@ const getItemById = async (req, res, next) => {
     const couponForCurrentItem = resolved.filter((current) => {
       return current != undefined;
     });
-
+    
+    
     return res.status(200).send({
       success: true,
       data: {
@@ -537,7 +629,7 @@ const getItemById = async (req, res, next) => {
         description: item.description,
         MRP: item.MRP,
         discount: item.discount,
-        sale_price: item.sale_price,
+        salePrice: item.sale_price,
         mfg_date: item.mfg_date,
         exp_date: item.expiry_date,
         color: item.color_name,
@@ -548,25 +640,42 @@ const getItemById = async (req, res, next) => {
           : false,
         inWishlist: currentUser ? (itemInWishlist ? true : false) : "",
         isOffer: offer ? true : false,
-        offerType: offer ? offer.type : "",
-        itemIDOfOfferItem,
-        XQuantity: offer
-          ? offer.item_1_quantity
-            ? offer.item_1_quantity
-            : ""
-          : "",
-        YQuantity: offer
-          ? offer.item_2_quantity
-            ? offer.item_2_quantity
-            : ""
-          : "",
-        YItemName: offerItem ? offerItem.name : "",
+        offerTypeId: offer ? offer.type_id : null,
+        offerTypeName: typeDetails ? typeDetails.offer_type : null,
+        xItemId: offer ? 
+                  offer.item_x ? offer.item_x : null
+                 : null ,
+        xItemName: xItemDetails ? xItemDetails.name? xItemDetails.name : null : null,         
+        xItemImage: xItemDetails ? xItemDetails.image : null,  
+        xItemQuantity: offer
+          ? offer.item_x_quantity
+            ? offer.item_x_quantity
+            : null
+          : null,
+        yItemId: yItem ,
+        yItemName:yItemName, 
+        yItemImage: yItemImage,
+        yItemQuantity: offer
+          ? offer.item_y_quantity
+            ? offer.item_y_quantity
+            : null
+          : null,
+        zItemId: offer ? 
+          offer.item_z ? offer.item_z : null
+         : null ,
+        zItemName: "", 
+        zItemName:zItemDetails ? zItemDetails.name? zItemDetails.name : null : null,
+        zItemQuantity: offer
+          ? offer.item_z_quantity
+            ? offer.item_z_quantity
+            : null
+          : null,  
         amountOfDiscount: offer
           ? offer.amount_of_discount
             ? offer.amount_of_discount
-            : ""
-          : "",
-        isPercentage: offer ? (offer.is_percentage ? true : false) : "",
+            : null
+          : null,
+        isPercentage: offer ? (offer.is_percentage ? true : false) : null,
         createdBy: offer ? (offer.created_by ? offer.created_by : "") : "",
         coupon: couponForCurrentItem ? couponForCurrentItem : "",
         howToUse: item.how_to_use ? item.how_to_use : "",

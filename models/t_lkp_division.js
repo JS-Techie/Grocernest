@@ -1,5 +1,5 @@
 const {
-  DataTypes
+  DataTypes , literal
 } = require('sequelize');
 
 module.exports = sequelize => {
@@ -7,7 +7,7 @@ module.exports = sequelize => {
     id: {
       type: DataTypes.BIGINT,
       allowNull: false,
-      defaultValue: null,
+      defaultValue: literal("nextval(division_seq)"),
       primaryKey: true,
       autoIncrement: false,
       comment: null,

@@ -36,7 +36,7 @@ const saveUser = async (req, res, next) => {
       });
     }
     const userObject = await User.findOne({
-      where: { email , mobile_no:mobileNo},
+      where: { email },
     });
     if (userObject) {
       return res.status(200).send({
@@ -46,8 +46,8 @@ const saveUser = async (req, res, next) => {
       });
     }
 
-    const locationObject = await User.findOne({
-      where: { location_id: locationId },
+    const locationObject = await Location.findOne({
+      where: { id: locationId },
     });
     if (!locationObject) {
       return res.status(200).send({
@@ -64,10 +64,10 @@ const saveUser = async (req, res, next) => {
     let dateOfBirth = `${dob.split("/")[2]}-${dob.split("/")[1]}-${
       dob.split("/")[0]
     }`;
-    console.log(
-      "When we split a string we get an ",
-      typeof dateOfBirth.split("/")
-    );
+    // console.log(
+    //   "When we split a string we get an ",
+    //   typeof dateOfBirth.split("/")
+    // );
     const createUser = await User.create({
       full_name: fullName,
       email: email,
@@ -86,7 +86,7 @@ const saveUser = async (req, res, next) => {
 
     const currentUser = await User.findOne({
       where: {
-        mobile_no: mobileNo,
+        email: email,
       },
     });
 
@@ -121,9 +121,10 @@ const updateUser = async (req, res, next) => {
     fullName,
     mobileNo,
     email,
-    userType,
+    userType
   } = req.body;
-  const { userId } = req.params;
+  const userId = req.params.userId;
+  // console.log("checking the fetched data by printing it :::=", userId, typeof(userId));
   // const { user_id } = req;
   try {
     if (
@@ -167,6 +168,7 @@ const updateUser = async (req, res, next) => {
     const userObject = await User.findOne({
       where: { id: userId },
     });
+    // console.log("user object after the query of the user table:===:", userObject);
     if (!userObject) {
       return res.status(200).send({
         status: 400,
@@ -175,20 +177,11 @@ const updateUser = async (req, res, next) => {
       });
     }
 
-    const sameCred = await User.findOne({
-      where: { [Op.or]: [{ mobile_no: mobileNo }, { email: email }] },
-    });
-    if (sameCred) {
-      return res.status(200).send({
-        status: 400,
-        message: "same mobile number or email address already exist",
-        data: [],
-      });
-    }
-
     const locationObject = await User.findOne({
       where: { location_id: locationId },
     });
+
+    // console.log("the location object of the user table ====-->",locationObject);
 
     if (!locationObject) {
       return res.status(200).send({
@@ -201,6 +194,35 @@ const updateUser = async (req, res, next) => {
       dob.split("/")[0]
     }`;
 
+    //update with same email address
+    const sameUserArray = await User.findAll({
+      attributes: ["id"],
+      where: {
+        email: email,
+      },
+    });
+    let idCheckflag = false;
+
+    for (var i = 0; i < sameUserArray.length; i++) {
+      var user = sameUserArray[i];
+      if (!user.id === userId) {
+        console.log("the array item user id: ", user.id);
+        console.log("the req body id: ", userId);
+        idCheckflag = true;
+        console.log("the flag within loop : ", idCheckflag);
+      }
+    }
+
+    // console.log("the flag finally: ",idCheckflag);
+
+    if (idCheckflag) {
+      return res.status(200).send({
+        status: 400,
+        message: "User email is not same",
+        data: [],
+      });
+    }
+
     const updateUser = await User.update(
       {
         gender: gender,
@@ -212,6 +234,8 @@ const updateUser = async (req, res, next) => {
       },
       { where: { id: userId } }
     );
+
+    // console.log("the returned object of the updated user from the query : ", updateUser);
     const updatedUser = await User.findOne({
       where: { id: userId },
     });
@@ -459,7 +483,7 @@ const tellerList = async (req, res, next) => {
 };
 
 const activateUser = async (req, res, next) => {
-  const { userId } = req.params;
+  const userId = req.params.userId;
   try {
     if (!userId) {
       return res.status(200).send({
@@ -472,6 +496,7 @@ const activateUser = async (req, res, next) => {
     const userObject = await User.findOne({
       where: { id: userId },
     });
+    // console.log("the object user from the user table ========>", userObject);
     if (!userObject) {
       return res.status(200).send({
         status: 400,
@@ -506,7 +531,7 @@ const activateUser = async (req, res, next) => {
 };
 
 const deactivateUser = async (req, res, next) => {
-  const { userId } = req.params;
+  const userId = req.params.userId;
   try {
     if (!userId) {
       return res.status(200).send({
@@ -540,7 +565,7 @@ const deactivateUser = async (req, res, next) => {
     return res.status(200).send({
       status: 200,
       message: "Successfully activated the requested user",
-      data: userObject.id,
+      data: updatedUser.id,
     });
   } catch (error) {
     return res.status(200).send({

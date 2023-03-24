@@ -1,45 +1,47 @@
-const{Op} = require("sequelize");
-const db = require("../models");
+const { Op } = require("sequelize");
+const db = require("../../../models");
 
 const Color = db.LkpColorModel;
 
 const saveColor = async (req, res, next) => {
+
     const { user_id } = req;
     const { colorId, colorCode, colorName, existingColor } = req.body;
     try {
         // const existingColor = await Color.findOne({
         //     where: { id:colorId }
         // })
-        if (existingColor === "N") {
 
+        if (existingColor === "N") {
             const sameColor = await Color.findOne({
-                where: {[Op.or] :[{color_cd:colorCode}, {color_name: colorName}]}
+                where: { [Op.or]: [{ color_cd: colorCode }, { color_name: colorName }] }
             })
-            if(sameColor){
+            if (sameColor) {
                 return res.status(200).send({
-                        status: 403,
-                        message: "The color code or color name alreary exists",
-                        data:[]
-                    })
+                    status: 403,
+                    message: "The color code or color name alreary exists",
+                    data: []
+                })
             }
+
             const newColor = await Color.create({
                 color_cd: colorCode,
                 color_name: colorName,
                 active_ind: "Y",
                 created_by: user_id,
                 created_at: Date.now(),
-                updated_by:user_id,
-                updated_at:Date.now()
+                updated_by: user_id,
+                updated_at: Date.now()
             })
-            const response =  {
-                    colorId,
-                    colorCode:newColor.color_cd,
-                    colorName:newColor.color_name,
-                    isActive:newColor.active_ind,
-                    createdBy:newColor.created_by,
-                    createdAt:newColor.created_at,
-                    updatedBy:newColor.updated_by,
-                    updatedAt:newColor.updated_by
+            const response = {
+                colorId,
+                colorCode: newColor.color_cd,
+                colorName: newColor.color_name,
+                isActive: newColor.active_ind,
+                createdBy: newColor.created_by,
+                createdAt: newColor.created_at,
+                updatedBy: newColor.updated_by,
+                updatedAt: newColor.updated_by
             }
             return res.status(200).send({
                 status: 200,
@@ -49,6 +51,7 @@ const saveColor = async (req, res, next) => {
         }
 
         else {
+
             const currentColor = await Color.findOne({
                 where: { id: colorId }
             })
@@ -60,6 +63,30 @@ const saveColor = async (req, res, next) => {
                 })
             }
 
+            const sameColorArray = await Color.findAll({
+                attributes: ["id"],
+                where: {
+                    [Op.or]: [{ color_cd: colorCode }, { color_name: colorName }],
+                },
+            });
+            let idCheckflag = false
+            for (var i = 0; i < sameColorArray.length; i++) {
+                var color = sameColorArray[i];
+                if (color.id !== colorId) {
+                    idCheckflag = true
+                }
+            }
+            if (idCheckflag) {
+                return res.status(200).send({
+                    status: 403,
+                    message: "Color Name or Color code already exists",
+                    data: [],
+                });
+            }
+
+
+
+
             const updateColor = await Color.update({
                 color_cd: colorCode,
                 color_name: colorName
@@ -69,11 +96,11 @@ const saveColor = async (req, res, next) => {
             const updatedColour = await Color.findOne({
                 where: { id: colorId }
             })
-            const response =  {
-                colorId:updatedColour.id,
-                    colorCode:updatedColour.color_cd,
-                    colorName:updatedColour.color_name,
-                    isActive:updatedColour.active_ind
+            const response = {
+                colorId: updatedColour.id,
+                colorCode: updatedColour.color_cd,
+                colorName: updatedColour.color_name,
+                isActive: updatedColour.active_ind
             }
             return res.status(200).send({
                 status: 200,
@@ -94,7 +121,7 @@ const saveColor = async (req, res, next) => {
 const getAllColor = async (req, res, next) => {
     try {
         const allColors = await Color.findAll({
-           
+
         });
         if (allColors.length === 0) {
             return res.status(200).send({
@@ -103,12 +130,12 @@ const getAllColor = async (req, res, next) => {
                 data: []
             })
         }
-        const promises = allColors.map((current)=> {
-            return({
-                colorId:current.id,
-                colorCode:current.color_cd,
-                colorName:current.color_name,
-                isActive:current.active_ind
+        const promises = allColors.map((current) => {
+            return ({
+                colorId: current.id,
+                colorCode: current.color_cd,
+                colorName: current.color_name,
+                isActive: current.active_ind
 
             })
         })
@@ -128,7 +155,7 @@ const getAllColor = async (req, res, next) => {
     }
 }
 const activeColor = async (req, res, next) => {
-    const { id } = req.body;
+    const id = req.body;
     try {
         const currentColour = await Color.findOne({
             where: { id }
@@ -150,11 +177,11 @@ const activeColor = async (req, res, next) => {
         const updatedColour = await Color.findOne({
             where: { id }
         })
-        const response =  {
-            colorId:updatedColour.id,
-                colorCode:updatedColour.color_cd,
-                colorName:updatedColour.color_name,
-                isActive:updatedColour.active_ind
+        const response = {
+            colorId: updatedColour.id,
+            colorCode: updatedColour.color_cd,
+            colorName: updatedColour.color_name,
+            isActive: updatedColour.active_ind
         }
         return res.status(200).send({
             status: 200,
@@ -170,7 +197,7 @@ const activeColor = async (req, res, next) => {
     }
 }
 const deactiveColor = async (req, res, next) => {
-    const { id } = req.body;
+    const id = req.body;
     try {
         const currentColour = await Color.findOne({
             where: { id }
@@ -191,20 +218,20 @@ const deactiveColor = async (req, res, next) => {
         const updatedColour = await Color.findOne({
             where: { id }
         })
-      
 
-        const response =  {
-            colorId:updatedColour.id,
-                colorCode:updatedColour.color_cd,
-                colorName:updatedColour.color_name,
-                isActive:updatedColour.active_ind
+
+        const response = {
+            colorId: updatedColour.id,
+            colorCode: updatedColour.color_cd,
+            colorName: updatedColour.color_name,
+            isActive: updatedColour.active_ind
         }
-        
+
         return res.status(200).send({
             status: 200,
             message: "Deactivated the requested colors",
-            data: 
-            response
+            data:
+                response
         })
 
     } catch (error) {
@@ -227,12 +254,12 @@ const getActiveColor = async (req, res, next) => {
                 data: []
             })
         }
-        const promises = activeColors.map((current)=>{
-            return({
-                colorId:current.id,
-                colorCode:current.color_cd,
-                colorName:current.color_name,
-                isActive:current.active_ind
+        const promises = activeColors.map((current) => {
+            return ({
+                colorId: current.id,
+                colorCode: current.color_cd,
+                colorName: current.color_name,
+                isActive: current.active_ind
             })
         })
         const response = await Promise.all(promises)
@@ -262,12 +289,12 @@ const getDeactiveColor = async (req, res, next) => {
                 data: []
             })
         }
-        const promises = deactivateColors.map((current)=>{
-            return({
-                colorId:current.id,
-                colorCode:current.color_cd,
-                colorName:current.color_name,
-                isActive:current.active_ind
+        const promises = deactivateColors.map((current) => {
+            return ({
+                colorId: current.id,
+                colorCode: current.color_cd,
+                colorName: current.color_name,
+                isActive: current.active_ind
             })
         })
         const response = await Promise.all(promises)

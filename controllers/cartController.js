@@ -14,6 +14,8 @@ const {
   sendAdminCancelledOrderStatusToWhatsapp,
 } = require("../services/whatsapp/whatsapp");
 
+const { collectAllYItem } = require("../services/offerService")
+
 const {
   sendCouponToUser,
   sendOfferToUser,
@@ -167,11 +169,11 @@ const subtractItemFromCart = async (req, res, next) => {
   const itemID = req.params.itemId;
 
   try {
-    const itemExists = await Cart.findOne({
-      where: { cust_no: currentUser, item_id: itemID,is_offer:null },
+    const itemExistsInCart = await Cart.findOne({
+      where: { cust_no: currentUser, item_id: itemID, is_offer:null },
     });
 
-    if (!itemExists) {
+    if (!itemExistsInCart) {
       return res.status(404).send({
         success: false,
         data: [],
@@ -179,10 +181,197 @@ const subtractItemFromCart = async (req, res, next) => {
       });
     }
 
-    const offerExists = await Offers.findOne({
-      where: { is_active: 1, item_x: itemID,is_ecomm : 1 },
+    const finalQty = itemExistsInCart.quantity - 1;
+    const offerExists = await Offers.findAll({
+      where: { is_active: 1, item_x: itemID, is_ecomm : 1 },
     });
 
+    let all_offer_item = []
+    let all_offer_qty = []
+    if(offerExists){
+      offerExists.map( (each_offer) => {
+          all_offer_item.push(each_offer.item_y)
+          all_offer_qty.push(each_offer.item_x_quantity)
+      })
+    }  
+    all_offer_qty.sort((a,b)=>b-a)
+    let quantityWithOccurence = new Map();
+    let n = finalQty
+    let offerItemDetails
+    let yItem = []
+    let yItemQtyToBeAdded =[]
+    while(n >= Math.min(...all_offer_qty)){
+      for(let i = 0; i < all_offer_qty.length; i++){
+        const divisor = all_offer_qty[i];
+        if(divisor <= n){
+          const quotient = Math.floor(n / divisor);
+          //const remainder = n % divisor;  
+          quantityWithOccurence.set(divisor, quotient)
+          n = n % divisor;
+          break;
+        }
+      }
+    }
+
+    if(quantityWithOccurence.size !== 0){
+      for(let [offerCreationQTYOfX, occurenceOfOffer] of quantityWithOccurence){
+
+        offerExists.map((eachOfferOnX)=>{
+
+          if(eachOfferOnX.item_x_quantity === offerCreationQTYOfX){
+
+            offerItemDetails = eachOfferOnX
+            
+            switch(offerItemDetails.type_id){
+              case 1:
+                
+                if(yItem.length > 0 && yItem.includes(offerItemDetails.item_y) ){
+                      let index = yItem.indexOf(offerItemDetails.item_y)
+                      let yItemQty = yItemQtyToBeAdded[index]
+                      yItemQty = yItemQty + (occurenceOfOffer * offerItemDetails.item_y_quantity)
+                      yItemQtyToBeAdded[index] = yItemQty
+                      //itemToBeAdded = offerItemDetails.item_y
+
+                }else{
+                  yItem.push(offerItemDetails.item_y)
+                 // let yItemQty = Math.floor(quantity/offerItemDetails.item_x_quantity) * offerItemDetails.item_y_quantity
+                  let yItemQty  = occurenceOfOffer * offerItemDetails.item_y_quantity
+                  yItemQtyToBeAdded.push(yItemQty)
+                 // itemToBeAdded = offerItemDetails.item_y
+                }
+                break;
+
+              case 2:
+              /*  let amountOfDiscount = eachOfferOnX.amount_of_discount * occurenceOfOffer 
+                amountOfDiscounts.push(amountOfDiscount)
+                if(eachOfferOnX.is_percentage === 1){
+                  isPercentage.push(true)
+                }else{
+                  isPercentage.push(false)
+                }*/
+                break;  
+            }
+            console.log(offerItemDetails)    
+          }     
+        })
+      }
+    }
+
+
+    let cartOfferId = []
+    const userSpecificCart = await Cart.findAll({
+      where: { cust_no: currentUser, is_offer: 1},
+    });
+
+    if(userSpecificCart){
+      cartOfferId = userSpecificCart.map((cart)=>{
+          return cart.item_id
+      })
+    }
+    
+    let offerItemToBeRemoved = [];
+    let removedItemFromCart = null;
+    let updateExistingItem = null;
+    if (itemExistsInCart.quantity === 1) {
+      
+      const offerExists = await Offers.findOne({
+        where: { is_active: 1, item_x: itemID, item_x_quantity: itemExistsInCart.quantity, is_ecomm : 1 },
+      });
+
+      if(offerExists){
+        const offerItemExistsInCart = await Cart.findOne({
+          where: { cust_no: currentUser, item_id: offerExists.item_y, is_offer: 1 },
+        });
+        
+        if(offerItemExistsInCart){
+          offerItemToBeRemoved.push(offerExists.item_y)
+          let itemExistsInCart = await Cart.destroy({
+            where: { cust_no: currentUser, item_id: offerExists.item_y, is_offer: 1 },
+          });
+        }
+
+        removedItemFromCart = await Cart.destroy({
+          where: { cust_no: currentUser, item_id: itemID, is_offer : null },
+        });    
+        
+      }
+      
+    }else{
+      /**
+       * update the quantity of original item
+       */
+      updateExistingItem = await Cart.update({
+        quantity: finalQty,
+      },
+      { where: {
+          cust_no: currentUser, 
+          item_id: itemID, 
+          is_offer: null 
+        }
+      });
+
+      /**
+       * update the offerItem in cart table
+       */
+
+      if(yItem.length>0){
+        let ultimateResponse = []
+        
+
+        if(cartOfferId.length > 0){
+          for(const itemId of cartOfferId){
+            if(all_offer_item.includes(itemId)){
+              offerItemToBeRemoved.push(itemId)
+              let deleteExistingOfferInCart = await Cart.destroy({
+                where: {
+                  cust_no: currentUser, item_id: itemId, is_offer: 1 
+                }
+              });
+            }
+          }
+        }
+  
+        for(const y of yItem){
+          const index = yItem.indexOf(y)
+          let response
+          
+          response = await Cart.create({
+              cust_no: currentUser,
+              item_id: y,
+              quantity: yItemQtyToBeAdded[index],
+              created_by: 1,
+              is_offer: 1,
+              offer_item_price: 0,
+          });
+        }
+      }else{
+
+        if(cartOfferId.length > 0){
+          for(const itemId of cartOfferId){
+            if(all_offer_item.includes(itemId)){
+              offerItemToBeRemoved.push(itemId)
+              let deleteExistingOfferInCart = await Cart.destroy({
+                where: {
+                  cust_no: currentUser, item_id: itemId, is_offer: 1 
+                }
+              });
+            }
+          }
+        }
+      }
+      
+    } 
+
+    return res.status(200).send({
+      success: true,
+      data: {
+        newQuantityOfNormalItem: finalQty,
+        offerItemRemoved: offerItemToBeRemoved
+      },
+      message: "Successfully updated quantity of item and its offer in cart" 
+    });
+
+  /*
     let offerItemToBeRemoved = null;
     let Xquantity = null;
     let Yquantity = null;
@@ -197,7 +386,7 @@ const subtractItemFromCart = async (req, res, next) => {
 
     if (itemExists.quantity === 1) {
       removedItemFromCart = await Cart.destroy({
-        where: { cust_no: currentUser, item_id: itemID,is_offer : null },
+        where: { cust_no: currentUser, item_id: itemID, is_offer : null },
       });
 
       if (offerItemToBeRemoved) {
@@ -296,7 +485,7 @@ const subtractItemFromCart = async (req, res, next) => {
         itemQuantityUpdated,
       },
       message: "Successfully reduced quantity of item in cart",
-    });
+    }); */
   } catch (error) {
     return res.status(400).send({
       success: false,
@@ -306,6 +495,7 @@ const subtractItemFromCart = async (req, res, next) => {
     });
   }
 };
+
 
 const removeItemFromCart = async (req, res, next) => {
   //Get current user from JWT
@@ -328,9 +518,7 @@ const removeItemFromCart = async (req, res, next) => {
         message: "Requested item does not exist in user's cart",
       });
     }
-    /**
-     * find active ecomm offer which is  
-     */
+    
     const offerExists = await Offers.findOne({
       where: {
         is_active: 1,
