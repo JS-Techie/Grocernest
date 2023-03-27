@@ -18,7 +18,7 @@ const grnDraftSaveController = async (req, res) => {
     grnDate,
     itemDetails,
   } = req.body;
-  console.log("heeeeeeeeeeey", grnId)
+  // console.log("heeeeeeeeeeey", grnId)
   let grnDedicatedNullCheckFlag = 0;
   let itemDetailsDedicatedNullCheckFlag = 0;
 
