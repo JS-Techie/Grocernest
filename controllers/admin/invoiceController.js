@@ -39,8 +39,6 @@ const downloadEcommInvoice = async (req, res, next) => {
 
     const promises = currentOrder.t_order_items_models.map(async (current) => {
 
-      console.log("the currentOrder t_order_items_models +++++++++++++++++++++========", currentOrder.t_order_items_models)
-      console.log("============================================>>>>>>>>>>>>>>>>>>>", current.item_id)
       const item = await Item.findOne({
         where: { id: current.item_id },
       });
@@ -52,9 +50,9 @@ const downloadEcommInvoice = async (req, res, next) => {
       // const oldestBatch = await Batch.findOne({
       //   where: { item_id: current.item_id, mark_selected: 1 },
       // });
-   
+
       const oldestBatch = await OrderItems.findOne({
-        where: {item_id: currentOrder.item_id}
+        where: { item_id: current.item_id }   ////////////////////////////////
       })
 
       if (oldestBatch) {
