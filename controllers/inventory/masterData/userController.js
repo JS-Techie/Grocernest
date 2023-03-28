@@ -379,7 +379,7 @@ const getBasicUserDetails = async (req, res, next) => {
         isActive: userObject.active_ind,
         locationId: userObject.location_id,
         locationName: locationObject.loc_name,
-        serverDate: null,
+        serverDate: new Date(),
         roleList: roleList,
         moduleList: [],
       },
