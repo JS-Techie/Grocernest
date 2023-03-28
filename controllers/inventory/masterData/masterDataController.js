@@ -21,6 +21,7 @@ const getMasterData = async (req, res, next) => {
     let divisionResolved;
     let sizeResolved;
     let roleResolved;
+    let subCatResolved;
 
     if (masterDataTypeList.includes("BRAND")) {
       const getBrandData = await Brand.findAll({
