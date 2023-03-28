@@ -149,7 +149,7 @@ console.log("hello2", currentCategory.id);
             var subcategory = sameSubCategoryArray[i];
             // console.log("the category id from array",subcategory.id)
             // console.log("the category id from request",subCategoryId)
-            if(subcategory.id!==subCategoryId){
+            if(!subcategory.id===subCategoryId){
                 sameCheckFlag = true
             }
             console.log("the flag within loop is", sameCheckFlag)
