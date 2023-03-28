@@ -2317,13 +2317,10 @@
                 "categoryIdList": {
                   "example": "any"
                 },
-                "fetchAllLocationData": {
+                "subCategoryIdList": {
                   "example": "any"
                 },
                 "includeInventory": {
-                  "example": "any"
-                },
-                "includeLowStockQuantity": {
                   "example": "any"
                 }
               }
