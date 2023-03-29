@@ -149,7 +149,7 @@ console.log("hello2", currentCategory.id);
                 ]
             }
         })
-        if(sameSubCategoryArray){
+        if(sameSubCategoryArray.length !== 0){
             return res.status(200).send({
                 status:404,
                 message: "SubCategory name or code already exists",

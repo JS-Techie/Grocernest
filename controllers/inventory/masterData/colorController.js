@@ -67,16 +67,10 @@ const saveColor = async (req, res, next) => {
                 attributes: ["id"],
                 where: {
                     [Op.or]: [{ color_cd: colorCode }, { color_name: colorName }],
+                    [Op.not]: [{id: colorId}]
                 },
             });
-            let idCheckflag = false
-            for (var i = 0; i < sameColorArray.length; i++) {
-                var color = sameColorArray[i];
-                if (color.id !== colorId) {
-                    idCheckflag = true
-                }
-            }
-            if (idCheckflag) {
+            if (sameColorArray.length!==0 ) {
                 return res.status(200).send({
                     status: 403,
                     message: "Color Name or Color code already exists",

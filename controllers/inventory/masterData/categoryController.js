@@ -80,20 +80,11 @@ const saveCategory = async (req, res, next) => {
       const sameCategoryArray = await Category.findAll({
         attributes: ["id"],
         where: {
-            [Op.or]: [{group_name: groupName}]
+            [Op.or]: [{group_name: groupName}],
+            [Op.not]:[{id: categoryId}]
         }
     })
-    let nameCheckFlag = false
-    for (var i=0; i<sameCategoryArray.length; i++){
-        var category = sameCategoryArray[i];
-        // console.log("the category id from array",category.id)
-        // console.log("the category id from request",categoryId)
-        if(category.id!==categoryId){
-            nameCheckFlag = true
-        }
-        // console.log("the flag within loop is", nameCheckFlag)
-    }
-    if(nameCheckFlag){
+    if(sameCategoryArray!==0){
         return res.status(200).send({
             status:400,
             message: "Category name already exists",

@@ -79,17 +79,10 @@ const saveDivision = async (req, res, next) => {
                 attributes: ["id"],
                 where: {
                     [Op.or]: [{ div_cd: divisionCode }, { div_name: divisionName }],
+                    [Op.not]: [{id:id}]
                 },
             });
-            let idCheckflag = false
-            for (var i = 0; i < sameDivisionArray.length; i++) {
-                var item = sameDivisionArray[i];
-
-                if (item.id !== id) {
-                    idCheckflag = true
-                }
-            }
-            if (idCheckflag) {
+            if (sameDivisionArray.length !== 0) {
                 return res.status(200).send({
                     status: 403,
                     message: "Division Name or Division code already exists",
