@@ -108,6 +108,104 @@ const getAllOffers = async (req, res, next) => {
   }
 };
 
+
+
+
+const getAllActiveOffers = async (req, res, next) => {
+  //Get current user from JWT
+
+  try {
+    //Get all offers
+    const offers = await Offers.findAll({
+      where: {is_active: 1}
+    });
+
+    if (offers.length === 0) {
+      return res.status(200).send({
+        success: true,
+        data: [],
+        message: "There are no active offers right now",
+      });
+    }
+
+    const promises = offers.map(async (current) => {
+
+      let itemX
+      let itemY
+      let itemZ
+      if (current.item_x) {
+        itemX = await Item.findOne({
+          where: { id: current.item_x },
+        });
+      }
+      if (current.item_y) {
+        itemY = await Item.findOne({
+          where: { id: current.item_y },
+        });
+      }
+      if (current.item_z) {
+        itemZ = await Item.findOne({
+          where: { id: current.item_z },
+        });
+      }
+
+      /*  const item = await Item.findOne({
+          where: { id: current.item_id },
+        });*/
+
+      const type = await typeIdDetails(current.type_id)
+
+      return {
+        offerID: current.id,
+        offerType: current.type_id,
+        offerName: (type !== null) ? type.offer_type : null,
+        itemX: current.item_x ? current.item_x : "",
+        xItemName: itemX ? itemX.name : "",
+        quantityOfItemX: current.item_x_quantity ? current.item_x_quantity : "",
+        itemY: current.item_y ? current.item_y : "",
+        yItemName: itemY ? itemY.name : "",
+        quantityOfItemY: current.item_y_quantity ? current.item_y_quantity : "",
+        itemZ: current.item_z ? current.item_z : "",
+        zItemName: itemZ ? itemZ.name : "",
+        quantityOfItemZ: current.item_z_quantity ? current.item_z_quantity : "",
+        //  itemID: current.item_id ? current.item_id : "",
+        // itemName: item ? item.name : "",
+        amountOfDiscount: current.amount_of_discount
+          ? current.amount_of_discount
+          : "",
+        isPercentage: current.is_percentage ? true : false,
+        isActive: current.is_active ? true : false,
+        startDate: current.start_date,
+        startTime: current.start_time,
+        endDate: current.end_date,
+        endTime: current.end_time,
+        isEcomm: current.is_ecomm
+          ? current.is_ecomm === 1
+            ? true
+            : false
+          : "",
+        isPos: current.is_pos ? (current.is_pos === 1 ? true : false) : "",
+      };
+    });
+
+    const response = await Promise.all(promises);
+
+    return res.status(200).send({
+      success: true,
+      data: response,
+      message: "Found all Active Offers",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message: "Exception Met ...",
+    });
+  }
+};
+
+
+
 const getOfferById = async (req, res, next) => {
   //Get current user from JWT
 
@@ -905,6 +1003,7 @@ const activateOffer = async (req, res, next) => {
 };
 
 module.exports = {
+  getAllActiveOffers,
   getAllOffers,
   getOfferById,
   createOffer,
