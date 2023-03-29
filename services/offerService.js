@@ -5,6 +5,7 @@ const lkp_offers = db.lkpOffersModel;
 const offers = db.OffersModel;
 const item = db.ItemModel;
 const customer = db.CustomerModel;
+const batch = db.BatchModel
 
 const Cart = db.CartModel;
 
@@ -78,11 +79,11 @@ const validationForExistingOffer = async (item_x, item_x_quantity) => {
     return false
 }
 
-const validationForExistingOfferUpdate = async (item_x, item_x_quantity, offerID) =>{
+const validationForExistingOfferUpdate = async (item_x, item_x_quantity, offerID) => {
     const existingOffer = await offers.findOne({
         where: {
             item_x, item_x_quantity,
-            [Op.not]: [{id: offerID}]
+            [Op.not]: [{ id: offerID }]
         }
     })
     if (existingOffer) {
@@ -107,7 +108,7 @@ const validationForYItemUpdate = async (item_x, item_y, offerId) => {
     const existingOfferItem = await offers.findOne({
         where: {
             item_x, item_y,
-            [Op.not]: [{id: offerId}]
+            [Op.not]: [{ id: offerId }]
         }
     })
     if (existingOfferItem) {
@@ -116,147 +117,224 @@ const validationForYItemUpdate = async (item_x, item_y, offerId) => {
     return false
 }
 
-const validationForDiscount = async(item_x, amount_of_discount, is_percentage) =>{
+const validationForDiscount = async (item_x, amount_of_discount, is_percentage) => {
     const existingDiscount = await offers.findOne({
-        where:{
+        where: {
             item_x,
             amount_of_discount,
-            is_percentage: (is_percentage===true)?1:null
+            is_percentage: (is_percentage === true) ? 1 : null
         }
     })
-    if(existingDiscount){
+    if (existingDiscount) {
         return true
     }
     return false
 }
 
-const validationForDiscountUpdate = async (item_x, amount_of_discount, is_percentage, offerID) =>{
+const validationForDiscountUpdate = async (item_x, amount_of_discount, is_percentage, offerID) => {
     const existingDiscount = await offers.findOne({
-        where:{
+        where: {
             item_x,
             amount_of_discount,
-            is_percentage: (is_percentage===true)?1:null,
-            [Op.not]: [{id:offerID}]
+            is_percentage: (is_percentage === true) ? 1 : null,
+            [Op.not]: [{ id: offerID }]
         }
     })
-    if(existingDiscount){
+    if (existingDiscount) {
         return true
     }
     return false
 }
 
-const typeIdDetails = async (type_id)=>{
+const typeIdDetails = async (type_id) => {
     const details = await lkp_offers.findOne({
-        where:{id:type_id}
+        where: { id: type_id }
     })
-    if(details){
+    if (details) {
         return details
     }
     return false
 }
 
-const offerItemDuplicacyCheckType3 = async(offerDetails)=>{
+const offerItemDuplicacyCheckType3 = async (offerDetails) => {
     let duplicate = null
     let result = []
     let offerItems = []
-   if(offerDetails.item_y){
-    offerItems = offerDetails.item_y
-   }
-   
-   for(i=0; i<offerItems.length; i++){
-     for(j=0; j<offerItems.length; j++){
-        if(i!=j){
-           if(offerItems[i]==offerItems[j]){
-              result.push(offerItems[i])
-           }
-        }  
-     }
-   }
-   if(result.length>0){
-    return result
-   }
-   return false
+    if (offerDetails.item_y) {
+        offerItems = offerDetails.item_y
+    }
+
+    for (i = 0; i < offerItems.length; i++) {
+        for (j = 0; j < offerItems.length; j++) {
+            if (i != j) {
+                if (offerItems[i] == offerItems[j]) {
+                    result.push(offerItems[i])
+                }
+            }
+        }
+    }
+    if (result.length > 0) {
+        return result
+    }
+    return false
 }
 
-const xSpecificYItemValidationType3 = async(offerDetails)=>{
+const xSpecificYItemValidationType3 = async (offerDetails) => {
     let allYItems = null
     let collectionOfY = []
     const isExists = await offers.findAll({
-        where:{
+        where: {
             type_id: offerDetails.type_id,
             item_x: offerDetails.item_x,
         }
     })
     //console.log("isExists "+isExists)
-    if(isExists){
-        isExists.map((each_obj)=>{
+    if (isExists) {
+        isExists.map((each_obj) => {
             //console.log("each_obj "+each_obj.item_y)
             collectionOfY.push(each_obj.item_y)
         })
     }
-    console.log("collectionOfY "+collectionOfY)
-    let result=[]
-    console.log("First Size "+result.length)
-    if(offerDetails.item_y){
-        console.log("yes, array")
-        offerDetails.item_y.map((y)=>{
+    // console.log("collectionOfY "+collectionOfY)
+    let result = []
+    // console.log("First Size "+result.length)
+    if (offerDetails.item_y) {
+        // console.log("yes, array")
+        offerDetails.item_y.map((y) => {
             const res = collectionOfY.includes(y)
-            console.log("isExists: "+res)
-            if(res){
-              result.push(y)
+            // console.log("isExists: "+res)
+            if (res) {
+                result.push(y)
             }
         })
     }
-    console.log("Result: "+result)
+    console.log("Result: " + result)
     const val = result.length
-    console.log("The val "+val)
-    if(result.length>0){
+    console.log("The val " + val)
+    if (result.length > 0) {
         return result
     }
     return false
 }
 
-const xSpecificYItemValidationType3Update = async(offerDetails, offerID)=>{
+
+
+const YItemUniquenessValidation= async(offerDetails, action)=>{
+
+    let yItemArray=[]
+    let itemX= offerDetails[0].item_x
+    let itemXQuantity = offerDetails[0].item_x_quantity
+    let yItemPresent
+
+
+    for (var i in offerDetails){
+        YitemArray.push(offerDetails[i].item_y)
+    }
+    
+    if (action === 'create'){
+         yItemPresent = await Offers.findAll({
+            where: { is_active:1, item_y: yItemArray }
+        })
+    }
+
+    if (action === 'update'){
+         yItemPresent = await Offers.findAll({
+            where: { is_active:1, item_y: yItemArray },
+            [Op.not]: [
+                {item_x: itemX,
+                item_x_quantity: itemXQuantity}
+            ]
+        })
+    }
+
+    if (yItemPresent){
+        return true 
+    }
+    return false
+
+}
+
+const TradeMarginCheck=async(offerDetails)=>{
+
+    const  itemX= offerDetails[0].item_x
+    const itemXDetails =await batch.findOne({
+        where:{ batch_no: offerDetails[0].item_x_batch_no}
+    })
+    const itemXTradeMargin = itemXDetails.MRP - itemXDetails.cost_price
+
+
+    let yItems = []
+
+    for (var i in offerDetails){
+        yItems.push(offerDetails[i].item_y)
+    }
+
+    const yItemsBatchDetails = await batch.findAll({
+        where: {batch_no: yItems}
+    })
+
+    let illegalY = []
+    for (var i in yItemsBatchDetails){
+        const eachYItem= yItemsBatchDetails[i]
+
+        const itemYTradeMargin = eachYItem.MRP - eachYItem.cost_price
+        if(itemYTradeMargin>itemXTradeMargin){
+            illegalY.push(eachYItem.item_y)
+        }
+    }
+    if(illegalY.length !== 0){
+        return illegalY
+    }
+    return true 
+
+}
+
+
+
+
+
+
+const xSpecificYItemValidationType3Update = async (offerDetails, offerID) => {
     let collectionOfY = []
     const isExists = await offers.findAll({
-        where:{
+        where: {
             type_id: offerDetails.type_id,
             item_x: offerDetails.item_x,
-            [Op.not]: [{id:offerID}]
+            [Op.not]: [{ id: offerID }]
         }
     })
-    if(isExists){
-        isExists.map((each_obj)=>{
+    if (isExists) {
+        isExists.map((each_obj) => {
             //console.log("each_obj "+each_obj.item_y)
             collectionOfY.push(each_obj.item_y)
         })
     }
-    console.log("collectionOfY "+collectionOfY)
-    let result=[]
-    console.log("First Size "+result.length)
-    if(offerDetails.item_y){
-        console.log("yes, array")
-        offerDetails.item_y.map((y)=>{
+    console.log("collectionOfY " + collectionOfY)
+    let result = []
+    console.log("First Size " + result.length)
+    if (offerDetails.item_y) {
+        // console.log("yes, array")
+        offerDetails.item_y.map((y) => {
             const res = collectionOfY.includes(y)
-            console.log("isExists: "+res)
-            if(res){
-              result.push(y)
+            console.log("isExists: " + res)
+            if (res) {
+                result.push(y)
             }
         })
     }
-    console.log("Result: "+result)
+    console.log("Result: " + result)
     const val = result.length
-    console.log("The val "+val)
-    if(result.length>0){
+    console.log("The val " + val)
+    if (result.length > 0) {
         return result
     }
     return false
 }
 
 
-const buyXGetAnyYCreation = async (offerDetails)=>{
+const buyXGetAnyYCreation = async (offerDetails) => {
     let ultimateValue = []
-    offerDetails.item_y.map((requestYItem)=>{
+    offerDetails.item_y.map((requestYItem) => {
         const value = {
             type_id: offerDetails.type_id,
             item_x: offerDetails.item_x,
@@ -276,17 +354,17 @@ const buyXGetAnyYCreation = async (offerDetails)=>{
             is_pos: offerDetails.is_pos,
             is_ecomm: offerDetails.is_ecomm,
             is_time: offerDetails.is_time,
-          } 
-          ultimateValue.push(value)
-        })
-        fieldValidation(offerDetails)
-        const offerBulk = offers.bulkCreate(ultimateValue) 
-        return  offerBulk
+        }
+        ultimateValue.push(value)
+    })
+    fieldValidation(offerDetails)
+    const offerBulk = offers.bulkCreate(ultimateValue)
+    return offerBulk
 }
 
-const buyXGetAnyYUpdate = async (offerDetails, offerID)=>{
+const buyXGetAnyYUpdate = async (offerDetails, offerID) => {
     let ultimateValue = []
-    offerDetails.item_y.map((requestYItem)=>{
+    offerDetails.item_y.map((requestYItem) => {
         const value = {
             type_id: offerDetails.type_id,
             item_x: offerDetails.item_x,
@@ -306,65 +384,65 @@ const buyXGetAnyYUpdate = async (offerDetails, offerID)=>{
             is_pos: offerDetails.is_pos,
             is_ecomm: offerDetails.is_ecomm,
             is_time: offerDetails.is_time,
-          } 
-          ultimateValue.push(value)
-        })
+        }
+        ultimateValue.push(value)
+    })
 
 }
 
-const fieldValidation =  (offerDetails)=>{
+const fieldValidation = (offerDetails) => {
     if (offerDetails.is_time && (!offerDetails.start_date || !offerDetails.start_time || !offerDetails.end_date || !offerDetails.end_time)) {
         return res.status(400).send({
-          success: false,
-          data: [],
-          message: "Please enter correct details for time based offers",
+            success: false,
+            data: [],
+            message: "Please enter correct details for time based offers",
         });
     }
     if (!offerDetails.is_pos && !offerDetails.is_ecomm) {
         return res.status(400).send({
-          success: false,
-          data: [],
-          message: "Please specify if this offer is for POS or ecomm or both",
+            success: false,
+            data: [],
+            message: "Please specify if this offer is for POS or ecomm or both",
         });
     }
 }
 
-const itemCombinationValidation = async (item_x, item_y)=>{
-    if(item_x!==null && item_y!==null){
+const itemCombinationValidation = async (item_x, item_y) => {
+    if (item_x !== null && item_y !== null) {
         const combitation = await offers.findOne({
-            where:{
-               item_x,
-               item_y,
-               [Op.or]:[{type_id:4},{type_id:5}]
+            where: {
+                item_x,
+                item_y,
+                [Op.or]: [{ type_id: 4 }, { type_id: 5 }]
             }
         })
-        if(combitation){
-           return combitation
+        if (combitation) {
+            return combitation
         }
-        return false  
-    }    
+        return false
+    }
 }
 
-const offerItemValidationType4 = async (item_z, type_id)=>{
-    if(item_z!==null && type_id!==null){
+const offerItemValidationType4 = async (item_z, type_id) => {
+    if (item_z !== null && type_id !== null) {
         const exists = await offers.findOne({
-            where:{
+            where: {
                 item_z,
                 type_id
             }
         })
-        if(exists){
+        if (exists) {
             return true
         }
         return false
-    }    
+    }
 }
 
 
 
-const cartCreation = async (currentUser, yItemQty, yItemQtyToBeAdded)=>{
+const cartCreation = async (currentUser, yItemQty, yItemQtyToBeAdded) => {
     let ultimateValue = []
-    yItemQty.map((requestYItem)=>{
+    yItemQty.map((requestYItem) => {
         let index = yItemQty.indexOf(requestYItem)
         const value = {
             cust_no: currentUser,
@@ -373,28 +451,28 @@ const cartCreation = async (currentUser, yItemQty, yItemQtyToBeAdded)=>{
             created_by: 1,
             is_offer: 1,
             offer_item_price: 0
-          } 
-          ultimateValue.push(value)
-        })
-        const cartBulk = Cart.bulkCreate(ultimateValue) 
-        return  cartBulk
+        }
+        ultimateValue.push(value)
+    })
+    const cartBulk = Cart.bulkCreate(ultimateValue)
+    return cartBulk
 }
 
-const collectAllYItem = async (itemX)=>{
+const collectAllYItem = async (itemX) => {
     let all_offer_qty = []
     const offer = await offers.findAll({
         where: {
-          is_active: 1,
-          item_x: itemX,
+            is_active: 1,
+            item_x: itemX,
         },
-      });
-    if(offer){
-        offers.map((each_offer)=>{
+    });
+    if (offer) {
+        offers.map((each_offer) => {
             all_offer_qty.push(each_offer.item_x_quantity)
-          })
-    }  
+        })
+    }
     return all_offer_qty
-   
+
 }
 
 
@@ -407,7 +485,9 @@ module.exports = {
     typeIdDetails,
     buyXGetAnyYCreation,
     fieldValidation,
-  //  isItemExists
+    YItemUniquenessValidation,
+    TradeMarginCheck,
+    //  isItemExists
     itemCombinationValidation,
     offerItemValidationType4,
     xSpecificYItemValidationType3,
@@ -416,6 +496,7 @@ module.exports = {
     validationForYItemUpdate,
     validationForDiscountUpdate,
     xSpecificYItemValidationType3Update,
+    buyXGetAnyYUpdate,
     cartCreation,
     collectAllYItem
 }
