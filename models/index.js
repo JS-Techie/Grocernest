@@ -139,6 +139,7 @@ db.CouponsModel = require("./t_coupons")(db.sequelize, Sequelize);
 db.GiftStrategyModel = require("./t_gift_strategy")(db.sequelize, Sequelize);
 
 db.lkpOffersModel = require("./t_lkp_offer")(db.sequelize, Sequelize);
+
 db.OffersModel = require("./t_offers")(db.sequelize, Sequelize);
 
 db.OffersCacheModel = require("./t_offer_cache")(db.sequelize, Sequelize);
