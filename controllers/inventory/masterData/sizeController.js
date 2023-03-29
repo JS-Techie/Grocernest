@@ -78,17 +78,10 @@ const saveSize = async (req, res, next) => {
             attributes: ["id"],
             where: {
                 [Op.or]: [{ size_cd: sizeCode }, { size_of_item: sizeOfItem }],
+                [Op.not]:[{id: id}]
             },
         });
-        let idCheckflag = false
-        for (var i = 0; i < sameSizeArray.length; i++) {
-            var item = sameSizeArray[i];
-
-            if (item.id !== id) {
-                idCheckflag = true
-            }
-        }
-        if (idCheckflag) {
+        if (sameSizeArray.length !== 0) {
             return res.status(200).send({
                 status: 403,
                 message: "Size Name or Size code already exists",

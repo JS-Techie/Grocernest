@@ -199,13 +199,15 @@ const updateUser = async (req, res, next) => {
       attributes: ["id"],
       where: {
         email: email,
-      },
-      [Op.not]: [
-        {id: userId}
-      ]
+        [Op.not]: [
+          {id: userId}
+        ]
+      }      
     });
+
+    console.log("====================", sameUserArray)
   
-    if (sameUserArray) {
+    if (sameUserArray.length !== 0) {
       return res.status(200).send({
         status: 400,
         message: "User email is not same",
