@@ -200,22 +200,12 @@ const updateUser = async (req, res, next) => {
       where: {
         email: email,
       },
+      [Op.not]: [
+        {id: userId}
+      ]
     });
-    let idCheckflag = false;
-
-    for (var i = 0; i < sameUserArray.length; i++) {
-      var user = sameUserArray[i];
-      if (user.id !== userId) {
-        console.log("the array item user id: ", user.id);
-        console.log("the req body id: ", userId);
-        idCheckflag = true;
-        console.log("the flag within loop : ", idCheckflag);
-      }
-    }
-
-    // console.log("the flag finally: ",idCheckflag);
-
-    if (idCheckflag) {
+  
+    if (sameUserArray) {
       return res.status(200).send({
         status: 400,
         message: "User email is not same",
