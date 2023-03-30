@@ -87,21 +87,52 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
   const endDate = req.body.endDate;
   const orderid = req.body.orderId;
 
+
+
+  let dateQuery
+  let orderSort
+
+
+
   const phoneNoQuery =
     phno == undefined || phno == ""
       ? ""
       : " AND tc.contact_no LIKE '%" + phno + "%'";
-  const dateQuery =
-    startDate == undefined ||
-      startDate == "" ||
-      endDate == undefined ||
-      endDate == ""
-      ? ""
-      : " AND tlo.created_at BETWEEN '" +
-      startDate +
-      "' AND (SELECT DATE_ADD('" +
-      endDate +
-      "', INTERVAL 1 DAY))";
+
+  if (orderType !== "Delivered") {
+    orderSort= "order by tlo.created_at DESC"
+    dateQuery =
+      startDate == undefined ||
+        startDate == "" ||
+        endDate == undefined ||
+        endDate == ""
+        ? ""
+        : " AND tlo.created_at BETWEEN '" +
+        startDate +
+        "' AND (SELECT DATE_ADD('" +
+        endDate +
+        "', INTERVAL 1 DAY))";
+    
+  }
+  if(orderType === "Delivered"){
+    orderSort= "order by tlo.delivery_date DESC"
+    dateQuery =
+      startDate == undefined ||
+        startDate == "" ||
+        endDate == undefined ||
+        endDate == ""
+        ? ""
+        : " AND tlo.delivery_date BETWEEN '" +
+        startDate +
+        "' AND (SELECT DATE_ADD('" +
+        endDate +
+        "', INTERVAL 1 DAY))";
+
+  }
+
+
+
+
   const orderId =
     orderid == undefined || orderid == ""
       ? ""
@@ -132,7 +163,7 @@ const getAllOrderByPhoneNumber = async (req, res, next) => {
             ${phoneNoQuery}
             ${dateQuery}
             ${orderId}
-             order by tlo.created_at DESC
+            ${orderSort}
           `);
 
     if (results.length === 0) {
