@@ -8,6 +8,7 @@ const Brand = db.LkpBrandModel;
 const Category = db.LkpCategoryModel;
 const SubCategory = db.LkpSubCategoryModel;
 const Department = db.LkpDepartmentModel;
+const Size = db.LkpSizeModel
 const querystring = require("querystring");
 
 const {
@@ -21,7 +22,10 @@ const {
   newTaxItemInfo,
 } = require("../../../services/inventory/itemServices");
 
-const { uploadImageToS3, deleteImageFromS3 } = require("../../../services/s3Service");
+const {
+  uploadImageToS3,
+  deleteImageFromS3,
+} = require("../../../services/s3Service");
 
 const getAllItem = async (req, res, next) => {
   const { pageNo, pageSize } = req.body;
@@ -34,9 +38,11 @@ const getAllItem = async (req, res, next) => {
     //   });
     // }
 
-    const offset = parseInt((pageNo) * pageSize);
+    const offset = parseInt(pageNo * pageSize);
     const limit = parseInt(pageSize);
-const [countItems, metadata1] =  await sequelize.query(`select count(*) as count from t_item `)
+    const [countItems, metadata1] = await sequelize.query(
+      `select count(*) as count from t_item `
+    );
     const [allItems, metadata] =
       await sequelize.query(`select  t_item.created_by , t_item.created_at , t_item.updated_by, t_item.updated_at , t_item.id ,t_item.name ,t_item.item_cd ,t_item.UOM ,t_item.units ,t_item.brand_id ,t_lkp_brand.brand_name ,t_item.div_id ,t_lkp_division.div_name ,t_item.category_id ,t_lkp_category.group_name ,t_lkp_category.HSN_CODE ,t_item.sub_category_id ,t_lkp_sub_category.sub_cat_name ,t_item.department_id ,t_lkp_department.dept_name ,t_item.color_id ,t_lkp_color.color_name ,t_item.size_id ,t_lkp_size.size_cd ,t_item.active_ind ,t_item.image ,t_item.description ,t_item.how_to_use ,t_item.country_of_origin ,t_item.manufacturer_name ,t_item.ingredients ,t_item.available_for_ecomm ,t_item.is_gift ,t_item.is_grocernest ,t_item.show_discount 
       from (((((((t_item 
@@ -1013,23 +1019,35 @@ const getItemData = async (req, res, next) => {
   const {
     brandIdList,
     categoryIdList,
+    colorIdList,
+    sizeIdList,
+    departmentIdList,
     subCategoryIdList,
-    includeInventory
   } = req.body;
   try {
-    const [getItemDetails, metadata] =
-      await sequelize.query(`select t_item.brand_id , t_lkp_brand.brand_name , t_item.category_id , t_lkp_sub_category.sub_cat_name , t_item.color_id ,t_lkp_color.color_name ,t_item.country_of_origin ,t_item.department_id , t_lkp_department.dept_name , t_item.description ,t_item.div_id , t_lkp_division.div_name , t_item.how_to_use ,t_lkp_category.HSN_CODE , t_item.id,t_item.image , t_item.ingredients , t_item.active_ind , t_item.available_for_ecomm , t_item.is_gift ,t_item.is_grocernest , t_item.item_cd , t_item.manufacturer_name , t_item.name , t_item.show_discount , t_item.size_id , t_lkp_size.size_cd , t_item.sub_category_id , t_item.units , t_item.UOM 
-      from(((((((t_item
-      inner join t_lkp_brand on t_lkp_brand.id= t_item.brand_id)
-      inner join t_lkp_color on t_lkp_color.id = t_item.color_id )
-      inner join t_lkp_category on t_lkp_category.id = t_item.category_id )
-      inner join t_lkp_department on t_lkp_department.id  = t_item.department_id )
-      inner join t_lkp_division on t_lkp_division.id  = t_item.div_id )
-      inner join t_lkp_size on t_lkp_size.id = t_item.size_id )
-      inner join t_lkp_sub_category on t_lkp_sub_category.id  = t_item.sub_category_id )
-          where t_item.brand_id = "${brandIdList}" and t_item.category_id ="${categoryIdList}" and t_item.sub_category_id = "${subCategoryIdList}"
-          `);
-          console.log("hello1", getItemDetails);
+    const  getItemDetails = await Item.findAll({
+      // where: {brand_name : brandIdList},
+      include: [
+        {
+          model: Brand
+        }
+      ]
+    })
+    // const [getItemDetails, metadata] =
+      // await sequelize.query(`select t_item.brand_id , t_lkp_brand.brand_name , t_item.category_id , t_lkp_sub_category.sub_cat_name , t_item.color_id ,t_lkp_color.color_name ,t_item.country_of_origin ,t_item.department_id , t_lkp_department.dept_name , t_item.description ,t_item.div_id , t_lkp_division.div_name , t_item.how_to_use ,t_lkp_category.HSN_CODE , t_item.id,t_item.image , t_item.ingredients , t_item.active_ind , t_item.available_for_ecomm , t_item.is_gift ,t_item.is_grocernest , t_item.item_cd , t_item.manufacturer_name , t_item.name , t_item.show_discount , t_item.size_id , t_lkp_size.size_cd , t_item.sub_category_id , t_item.units , t_item.UOM 
+      // from(((((((t_item
+      // inner join t_lkp_brand on t_lkp_brand.id= t_item.brand_id)
+      // inner join t_lkp_color on t_lkp_color.id = t_item.color_id )
+      // inner join t_lkp_category on t_lkp_category.id = t_item.category_id )
+      // inner join t_lkp_department on t_lkp_department.id  = t_item.department_id )
+      // inner join t_lkp_division on t_lkp_division.id  = t_item.div_id )
+      // inner join t_lkp_size on t_lkp_size.id = t_item.size_id )
+      // inner join t_lkp_sub_category on t_lkp_sub_category.id  = t_item.sub_category_id )
+      //     where t_item.brand_id = "${brandIdList}" and t_item.category_id ="${categoryIdList}" and 
+      //     t_item.sub_category_id = "${subCategoryIdList}" and t_item.department_id = "${departmentIdList}" and 
+      //     t_item.size_id = "${sizeIdList}" and t_item.color_id = "${colorIdList}"
+      //     `);
+    console.log("hello1", getItemDetails);
     if (getItemDetails.length === 0) {
       return res.status(200).send({
         status: 400,
@@ -1368,7 +1386,6 @@ const saveItem = async (req, res, next) => {
     );
 
     const newTaxItemInfo = await ItemTaxInfo.bulkCreate(taxItemInfoArray);
-
 
     const taxResolved = await getItemTaxArray(newItemFromDB.id);
     const inventoryResolved = await getInventoryArray(newItemFromDB.id);
