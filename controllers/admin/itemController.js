@@ -374,6 +374,8 @@ const getLastThreeItemBatches = async (req, res, next) => {
             sgst: currentDetails.sgst,
             igst: currentDetails.igst,
             otherTax: currentDetails.other_tax,
+            orderedQty: currentDetails.ordered_quantity,
+            receivedQty: currentDetails.received_quantity,
             supplierDiscount: currentDetails.supplier_disc,
             basePrice: currentDetails.base_price,
             shelfNo: currentDetails.shelf_no,
@@ -393,6 +395,7 @@ const getLastThreeItemBatches = async (req, res, next) => {
         mfgDate: currentBatch.mfg_date,
         expiryDate: currentBatch.expiry_date,
         createdAt: currentBatch.created_at,
+        availableQty: currentBatch.quantity,
         taxDetails,
       };
     });
