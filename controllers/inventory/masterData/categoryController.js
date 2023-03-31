@@ -84,7 +84,7 @@ const saveCategory = async (req, res, next) => {
             [Op.not]:[{id: categoryId}]
         }
     })
-    if(sameCategoryArray!==0){
+    if(sameCategoryArray.length!==0){
         return res.status(200).send({
             status:400,
             message: "Category name already exists",
