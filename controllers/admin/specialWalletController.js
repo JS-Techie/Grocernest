@@ -133,7 +133,8 @@ const viewStrategy = async (req, res, next) => {
             };
           }
           return {
-            id: item.id,
+            id: item.item_cd,
+            
             name: item.name,
           };
         })

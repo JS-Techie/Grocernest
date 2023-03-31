@@ -138,23 +138,18 @@ console.log("hello2", currentCategory.id);
 
         const key = `subcategory/${uniq()}.jpeg`
         const url = await uploadImageToS3(image, key);
+
+
         const sameSubCategoryArray = await SubCategory.findAll({
             attributes: ["id"],
             where: {
-                [Op.or]: [{sub_cat_cd: subCatCode, sub_cat_name:subCatName}]
+                [Op.or]: [{sub_cat_cd: subCatCode, sub_cat_name:subCatName}],
+                [Op.not]: [
+                    {id: subCategoryId}
+                ]
             }
         })
-        let sameCheckFlag = false
-        for (var i=0; i<sameSubCategoryArray.length; i++){
-            var subcategory = sameSubCategoryArray[i];
-            // console.log("the category id from array",subcategory.id)
-            // console.log("the category id from request",subCategoryId)
-            if(subcategory.id!==subCategoryId){
-                sameCheckFlag = true
-            }
-            console.log("the flag within loop is", sameCheckFlag)
-        }
-        if(sameCheckFlag){
+        if(sameSubCategoryArray.length !== 0){
             return res.status(200).send({
                 status:404,
                 message: "SubCategory name or code already exists",

@@ -7,6 +7,7 @@ const { getItemTaxArray } = require("../../services/itemsResponse");
 const Item = db.ItemModel;
 const Batch = db.BatchModel;
 const GrnDetails = db.GrnDetailsModel;
+const Inventory = db. InventoryModel;
 const s3 = new S3(s3Config);
 
 const uploadMultipleImages = async (req, res, next) => {
@@ -363,8 +364,12 @@ const getLastThreeItemBatches = async (req, res, next) => {
 
     const responsePromises = availableBatches.map(async (currentBatch) => {
       const taxDetailsDB = await GrnDetails.findAll({
-        where: { item_id, BATCH_NO: currentBatch.batch_no },
+        where: { item_id, BATCH_NO: currentBatch.batch_no},
       });
+
+      const availQty= await Inventory.findOne({
+        where: { item_id, batch_id: currentBatch.id, location_id: 4,  balance_type: 1}
+      })
 
       let taxDetailsPromises = [];
       if (taxDetailsDB.length > 0) {
@@ -374,6 +379,8 @@ const getLastThreeItemBatches = async (req, res, next) => {
             sgst: currentDetails.sgst,
             igst: currentDetails.igst,
             otherTax: currentDetails.other_tax,
+            orderedQty: currentDetails.ordered_quantity,
+            receivedQty: currentDetails.received_quantity,
             supplierDiscount: currentDetails.supplier_disc,
             basePrice: currentDetails.base_price,
             shelfNo: currentDetails.shelf_no,
@@ -393,6 +400,7 @@ const getLastThreeItemBatches = async (req, res, next) => {
         mfgDate: currentBatch.mfg_date,
         expiryDate: currentBatch.expiry_date,
         createdAt: currentBatch.created_at,
+        availableQty: availQty.quantity,
         taxDetails,
       };
     });

@@ -199,23 +199,15 @@ const updateUser = async (req, res, next) => {
       attributes: ["id"],
       where: {
         email: email,
-      },
+        [Op.not]: [
+          {id: userId}
+        ]
+      }      
     });
-    let idCheckflag = false;
 
-    for (var i = 0; i < sameUserArray.length; i++) {
-      var user = sameUserArray[i];
-      if (!user.id === userId) {
-        console.log("the array item user id: ", user.id);
-        console.log("the req body id: ", userId);
-        idCheckflag = true;
-        console.log("the flag within loop : ", idCheckflag);
-      }
-    }
-
-    // console.log("the flag finally: ",idCheckflag);
-
-    if (idCheckflag) {
+    console.log("====================", sameUserArray)
+  
+    if (sameUserArray.length !== 0) {
       return res.status(200).send({
         status: 400,
         message: "User email is not same",
@@ -379,7 +371,7 @@ const getBasicUserDetails = async (req, res, next) => {
         isActive: userObject.active_ind,
         locationId: userObject.location_id,
         locationName: locationObject.loc_name,
-        serverDate: null,
+        serverDate: new Date(),
         roleList: roleList,
         moduleList: [],
       },

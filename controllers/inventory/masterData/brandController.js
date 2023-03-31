@@ -76,20 +76,10 @@ const saveBrand = async (req, res, next) => {
       attributes: ["id"],
       where: {
         [Op.or]: [{ brand_cd: brandCode }, { brand_name: brandName }],
+        [Op.not]:[{id: id}]
       },
     });
-    let idCheckflag = false
-    // console.log("the same brand Array ::::",sameBrandArray)
-    for (var i = 0; i < sameBrandArray.length; i++) {
-      var item = sameBrandArray[i];
-      // console.log("the item is :",item.id)
-      // console.log("the requested item id is : ", id)
-      if (item.id !== id) {
-        idCheckflag = true
-      }
-    }
-    // console.log("the check flag:::",idCheckflag)
-    if (idCheckflag) {
+    if (sameBrandArray.length!==0) {
       return res.status(200).send({
         status: 403,
         message: "Brand Name or Brand code already exists",
