@@ -28,6 +28,6 @@ router.route("/secure/item/deactiveItem").post(authenticate,deactiveItem);
 router.route("/secure/item/searchItemDetailsByItemId").post(authenticate,getItemByItemId);
 router.route("/secure/item/searchItemDetailsByItemCode").post(authenticate,searchItemDetailsByItemCode);
 // router.route("/secure/item/:itemCode").post(authenticate, fetchItembyItemCode);
-router.route("/secure/item/getItemData").post(authenticate,getItemData);
+router.route("/secure/item/getItemData").post(getItemData);
 // router.route("/secure/item/:itemCode").post(authenticate,itemByCode);
 module.exports = router;

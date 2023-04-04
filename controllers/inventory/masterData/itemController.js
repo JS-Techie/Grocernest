@@ -748,15 +748,15 @@ const searchItemDetailsByItemCode = async (req, res, next) => {
     const itemList = await Item.finAll({
       where: { item_cd: itemCode, active_ind: "Y" },
     });
-    if (itemList!== null) {
+    if (itemList !== null) {
       const itemObj = itemList.map(async (current) => {
-        if (includeTaxDetails = "Y"){
+        if (includeTaxDetails = "Y") {
           const itemTaxInfo = await ItemTaxInfo.findAll({
             where: { item_id: current.id, active_ind: "Y" },
           });
         }
-        if(searchAllLocation ="Y"){
-          const [StockFromInventoryForAllLocation , metadata]= await sequelize.query(`select t_batch.id ,t_batch.batch_no , t_batch.MRP , t_batch.cost_price ,t_batch.sale_price , t_batch.discount ,t_batch.mfg_date ,
+        if (searchAllLocation = "Y") {
+          const [StockFromInventoryForAllLocation, metadata] = await sequelize.query(`select t_batch.id ,t_batch.batch_no , t_batch.MRP , t_batch.cost_price ,t_batch.sale_price , t_batch.discount ,t_batch.mfg_date ,
           t_inventory.location_id , t_lkp_location.loc_name ,t_lkp_location.type , t_inventory.quantity , t_inventory.cashback_is_percentage ,
           t_inventory.cashback from ((t_batch
           inner join t_inventory on t_inventory.batch_id = t_batch.id )
@@ -769,14 +769,14 @@ const searchItemDetailsByItemCode = async (req, res, next) => {
         inner join t_inventory on t_inventory.batch_id = t_batch.id )
         left join t_lkp_location on t_lkp_location.id = t_inventory.location_id )
         where t_batch.item_id = "${current.id}" and t_batch.active_ind = "Y"`)
-        if(stockFromInventory!==null){
-          const inventoryObj = stockFromInventory.map((currentobj) =>{
-            if(currentobj.cashback_is_percentage =="Y"){
-              if(currentobj.sale_price!== null && currentobj.cashback!==null){
-if(currentobj.cashback> 0){
-  let cashback = Math.round(currentobj.cashback)
-}
-cashback = currentobj.cashback 
+        if (stockFromInventory !== null) {
+          const inventoryObj = stockFromInventory.map((currentobj) => {
+            if (currentobj.cashback_is_percentage == "Y") {
+              if (currentobj.sale_price !== null && currentobj.cashback !== null) {
+                if (currentobj.cashback > 0) {
+                  let cashback = Math.round(currentobj.cashback)
+                }
+                cashback = currentobj.cashback
               }
               let stockInventory = []
               stockInventory = Math.round(cashback)
@@ -785,7 +785,7 @@ cashback = currentobj.cashback
         }
       })
     }
-  } catch (error) {}
+  } catch (error) { }
 };
 
 const fetchItembyItemCode = async (req, res, next) => {
@@ -907,6 +907,15 @@ const fetchItembyItemCode = async (req, res, next) => {
     });
   }
 };
+
+
+
+
+
+
+
+
+
 const getItemData = async (req, res, next) => {
   const {
     brandIdList,
@@ -917,28 +926,154 @@ const getItemData = async (req, res, next) => {
     subCategoryIdList,
   } = req.body;
   try {
-    const getItemDetails = await Item.findAll({
+    // const getItemDetails = await Item.findAll({
       // where: {brand_name : brandIdList},
-      include: [
-        {
-          model: Brand,
-        },
-      ],
-    });
-    // const [getItemDetails, metadata] =
-    // await sequelize.query(`select t_item.brand_id , t_lkp_brand.brand_name , t_item.category_id , t_lkp_sub_category.sub_cat_name , t_item.color_id ,t_lkp_color.color_name ,t_item.country_of_origin ,t_item.department_id , t_lkp_department.dept_name , t_item.description ,t_item.div_id , t_lkp_division.div_name , t_item.how_to_use ,t_lkp_category.HSN_CODE , t_item.id,t_item.image , t_item.ingredients , t_item.active_ind , t_item.available_for_ecomm , t_item.is_gift ,t_item.is_grocernest , t_item.item_cd , t_item.manufacturer_name , t_item.name , t_item.show_discount , t_item.size_id , t_lkp_size.size_cd , t_item.sub_category_id , t_item.units , t_item.UOM
-    // from(((((((t_item
-    // inner join t_lkp_brand on t_lkp_brand.id= t_item.brand_id)
-    // inner join t_lkp_color on t_lkp_color.id = t_item.color_id )
-    // inner join t_lkp_category on t_lkp_category.id = t_item.category_id )
-    // inner join t_lkp_department on t_lkp_department.id  = t_item.department_id )
-    // inner join t_lkp_division on t_lkp_division.id  = t_item.div_id )
-    // inner join t_lkp_size on t_lkp_size.id = t_item.size_id )
-    // inner join t_lkp_sub_category on t_lkp_sub_category.id  = t_item.sub_category_id )
-    //     where t_item.brand_id = "${brandIdList}" and t_item.category_id ="${categoryIdList}" and
-    //     t_item.sub_category_id = "${subCategoryIdList}" and t_item.department_id = "${departmentIdList}" and
-    //     t_item.size_id = "${sizeIdList}" and t_item.color_id = "${colorIdList}"
-    //     `);
+    //   include: [
+    //     {
+    //       model: Brand,
+    //     },
+    //   ],
+    // });
+
+
+    //shaping the req.body array to sql understandable language
+    let brandListQuery = "("
+    let categoryListQuery = "("
+    let subCategoryListQuery = "("
+    // let departmentListQuery = "("
+    // let sizeListQuery = "("
+    // let colorListQuery = "("
+
+    for (let i in brandIdList) {
+      brandListQuery = brandListQuery + brandIdList[i]
+      if (parseInt(i) === (brandIdList.length)-1) {
+        brandListQuery = brandListQuery + `)`
+      }
+      else {
+        brandListQuery = brandListQuery + `,`
+      }
+    }
+
+    for (let i in categoryIdList) {
+      categoryListQuery = categoryListQuery + categoryIdList[i]
+      if (parseInt(i) === (categoryIdList.length)-1) {
+        categoryListQuery = categoryListQuery + `)`
+      }
+      else {
+        categoryListQuery = categoryListQuery + `,`
+      }
+    }
+
+    for (let i in subCategoryIdList) {
+      subCategoryListQuery = subCategoryListQuery + subCategoryIdList[i]
+      if (parseInt(i) === (subCategoryIdList.length)-1) {
+        subCategoryListQuery = subCategoryListQuery + `)`
+      }
+      else {
+        subCategoryListQuery = subCategoryListQuery + `,`
+      }
+    }
+
+    // for (let i in sizeIdList) {
+    //   sizeListQuery = sizeListQuery + sizeIdList[i]
+    //   if (parseInt(i) === (sizeIdList.length)-1) {
+    //     sizeListQuery = sizeListQuery + `)`
+    //   }
+    //   else {
+    //     sizeListQuery = sizeListQuery + `,`
+    //   }
+    // }
+
+    // for (let i in colorIdList) {
+    //   colorListQuery = colorListQuery + colorIdList[i]
+    //   if (parseInt(i) === (colorIdList.length)-1) {
+    //     colorListQuery = colorListQuery + `)`
+    //   }
+    //   else {
+    //     colorListQuery = colorListQuery + `,`
+    //   }
+    // }
+
+    // for (let i in departmentIdList) {
+    //   departmentListQuery = departmentListQuery + departmentIdList[i]
+    //   if (parseInt(i) === (departmentIdList.length)-1) {
+    //     departmentListQuery = departmentListQuery + `)`
+    //   }
+    //   else {
+    //     departmentListQuery = departmentListQuery + `,`
+    //   }
+    // }
+
+
+    //thicc logicc ends
+
+    let firstQueryFlag = false
+    let queryWord
+
+    let brandQuery = brandIdList.length === 0 ? `` : `t_item.brand_id in ${brandListQuery}`
+    let categoryQuery = categoryIdList.length === 0 ? `` : `t_item.category_id in ${categoryListQuery}`
+    let subCategoryQuery = subCategoryIdList.length === 0 ? `` : `t_item.sub_category_id in ${subCategoryListQuery}`
+    // let departmentQuery = departmentIdList.length===0?``:`t_item.department_id in ${departmentListQuery}`
+    // let colorQuery= colorIdList.length===0?``:`t_item.color_id in ${colorListQuery}`
+    // let sizeQuery= sizeIdList.length===0?``:`t_item.size_id in ${sizeListQuery}`
+
+
+
+    //logic to provide where and and in sql query
+    if (brandIdList.length !== 0) {
+      !firstQueryFlag ? queryWord = `where ` : queryWord = `or `
+      queryWord === `where ` ? firstQueryFlag = true : firstQueryFlag = false
+      brandQuery = queryWord + brandQuery
+    }
+    if (categoryIdList.length !== 0) {
+      !firstQueryFlag ? queryWord = `where ` : queryWord = `or `
+      queryWord === `where ` ? firstQueryFlag = true : firstQueryFlag = false
+      categoryQuery = queryWord + categoryQuery
+    }
+    if (subCategoryIdList.length !== 0) {
+      !firstQueryFlag ? queryWord = `where ` : queryWord = `or `
+      queryWord === `where ` ? firstQueryFlag = true : firstQueryFlag = false
+      subCategoryQuery = queryWord + subCategoryQuery
+    }
+    // if(departmentIdList.length !== 0){
+    // !firstQueryFlag?queryWord=`where `:queryWord=`or `
+    //   queryWord===`where `?firstQueryFlag=true:firstQueryFlag=false
+    //   departmentQuery= queryWord +departmentQuery
+    // }
+    // if(colorIdList.length !== 0){
+    //   !firstQueryFlag?queryWord=`where `:queryWord=`or `
+    //   queryWord===`where `?firstQueryFlag=true:firstQueryFlag=false
+    //   colorQuery= queryWord +colorQuery
+    // }
+    // if(sizeIdList.length !== 0){
+    //   !firstQueryFlag?queryWord=`where `:queryWord=`or `
+    //   queryWord===`where `?firstQueryFlag=true:firstQueryFlag=false
+    //   sizeQuery= queryWord +sizeQuery
+    // }
+    //end of the thicc Logicc
+
+    console.log("=====================", brandQuery, categoryQuery, subCategoryQuery)
+
+
+
+
+    const [getItemDetails, metadata] =
+      await sequelize.query(`select t_item.brand_id , t_lkp_brand.brand_name , t_item.category_id , t_lkp_sub_category.sub_cat_name , t_item.description ,t_item.div_id ,t_item.how_to_use ,t_lkp_category.HSN_CODE , t_item.id,t_item.image , t_item.ingredients , t_item.active_ind , t_item.available_for_ecomm , t_item.is_gift ,t_item.is_grocernest , t_item.item_cd , t_item.manufacturer_name , t_item.name , t_item.show_discount , t_item.size_id , t_item.sub_category_id , t_item.units , t_item.UOM
+    from(((t_item
+    inner join t_lkp_brand on t_lkp_brand.id= t_item.brand_id)
+    inner join t_lkp_category on t_lkp_category.id = t_item.category_id )
+    inner join t_lkp_sub_category on t_lkp_sub_category.id  = t_item.sub_category_id )
+    ${brandQuery} ${categoryQuery} ${subCategoryQuery}
+        `);
+
+        // inner join t_lkp_color on t_lkp_color.id = t_item.color_id )
+        // inner join t_lkp_department on t_lkp_department.id  = t_item.department_id )
+        // inner join t_lkp_size on t_lkp_size.id = t_item.size_id )
+        // inner join t_lkp_division on t_lkp_division.id  = t_item.div_id )
+
+
+
+
     console.log("hello1", getItemDetails);
     if (getItemDetails.length === 0) {
       return res.status(200).send({
@@ -989,6 +1124,13 @@ const getItemData = async (req, res, next) => {
     });
   }
 };
+
+
+
+
+
+
+
 
 const itemByCode = async (req, res, next) => {
   try {
