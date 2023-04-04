@@ -2056,6 +2056,9 @@
                 },
                 "pageSize": {
                   "example": "any"
+                },
+                "itemCode": {
+                  "example": "any"
                 }
               }
             }
@@ -2165,7 +2168,7 @@
             "schema": {
               "type": "object",
               "properties": {
-                "itemIdList": {
+                "length": {
                   "example": "any"
                 }
               }
@@ -2268,25 +2271,28 @@
             "type": "string"
           },
           {
-            "name": "searchAllLocation",
-            "in": "query",
-            "type": "string"
-          },
-          {
-            "name": "includeTaxDetails",
-            "in": "query",
-            "type": "string"
-          },
-          {
-            "name": "itemCode",
-            "in": "query",
-            "type": "string"
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "itemCode": {
+                  "example": "any"
+                },
+                "storeId": {
+                  "example": "any"
+                },
+                "searchAllLocation": {
+                  "example": "any"
+                },
+                "includeTaxDetails": {
+                  "example": "any"
+                }
+              }
+            }
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          },
           "400": {
             "description": "Bad Request"
           },
@@ -2317,10 +2323,16 @@
                 "categoryIdList": {
                   "example": "any"
                 },
-                "subCategoryIdList": {
+                "colorIdList": {
                   "example": "any"
                 },
-                "includeInventory": {
+                "sizeIdList": {
+                  "example": "any"
+                },
+                "departmentIdList": {
+                  "example": "any"
+                },
+                "subCategoryIdList": {
                   "example": "any"
                 }
               }
@@ -6734,6 +6746,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "201": {
+            "description": "Created"
           },
           "400": {
             "description": "Bad Request"
