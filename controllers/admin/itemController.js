@@ -374,7 +374,12 @@ const getLastThreeItemBatches = async (req, res, next) => {
       let taxDetailsPromises = [];
       if (taxDetailsDB.length > 0) {
         taxDetailsPromises = taxDetailsDB.map((currentDetails) => {
+
+          // console.log("==========================", currentDetails.cashback)
+          // console.log("**************************", currentDetails.cashBack_is_percentage)
           return {
+            cashback : currentDetails.cashback,
+            cashbackIsPercentage: currentDetails.cashBack_is_percentage,
             cgst: currentDetails.cgst,
             sgst: currentDetails.sgst,
             igst: currentDetails.igst,
