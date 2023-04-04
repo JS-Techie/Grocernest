@@ -120,7 +120,8 @@ const userMasterUpdatePasswordRouter= require("./routes/inventory/PasswordHandle
 const authControllerRouter =require('./routes/authControllerRoutes')
 
 
-
+//external coupon 
+const externalCouponRouter = require("./routes/externalCouponRoutes")
 
 const sizeMasterRouter = require("./routes/inventory/masterData/sizeRoutes");
 const locationMaster = require("./routes/inventory/masterData/locationRoutes");
@@ -175,6 +176,9 @@ app.use("/inventory/grn", grnDraftSaveRouter);
 app.use("/inventory/passwordhandler", updateSelfPasswordRouter)
 app.use("/inventory/passwordhandler", userMasterUpdatePasswordRouter)
 app.use("/inventory", authControllerRouter)
+
+//external coupon 
+app.use("/coupon", externalCouponRouter)
 
 
 //stockTransfer routes
