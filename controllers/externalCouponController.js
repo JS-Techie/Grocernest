@@ -20,8 +20,8 @@ const searchTotalPurchaseController = async (req, res) => {
     } = req.body
 
 
-    if(dateSelection !== "L"){
-        if(!fromDate || !toDate){
+    if (dateSelection !== "L") {
+        if (!fromDate || !toDate) {
             return res.status(200).send({
                 success: false,
                 status: 400,
@@ -36,11 +36,13 @@ const searchTotalPurchaseController = async (req, res) => {
         const phoneNum = phoneNumber ? `and t_customer.calling_number= "${phoneNumber}"` : ``
         const innerJoinQuery = phoneNumber ? `inner join t_customer on t_order.cust_no = t_customer.cust_no` : ``
         const dateRange = dateSelection === "L" ? "month(t_order.created_at)=month(now())-1 " : `t_order.created_at between "${fromDate}" and "${toDate}"`
-        const amountRange = amountGreaterThan ? `where T2.total_purchase>= ${amountGreaterThan} `:`` 
+        const amountRange = amountGreaterThan ? `where T2.total_purchase>= ${amountGreaterThan} ` : ``
 
 
-        const searchCustomersForCouponsQuery = `select * from (select *, sum(T1.final_payable_amount) as total_purchase from 
-        (select t_order.* from t_order ${innerJoinQuery} where ${dateRange} ${phoneNum})T1 group by T1.cust_no)T2 ${amountRange}`
+        const searchCustomersForCouponsQuery = `select T2.*, t_customer.cust_name, t_customer.calling_number from 
+        (select *, sum(T1.final_payable_amount) as total_purchase
+         from 
+        (select t_order.* from t_order ${innerJoinQuery} where ${dateRange} ${phoneNum})T1 group by T1.cust_no)T2 inner join t_customer on T2.cust_no = t_customer.cust_no ${amountRange}`
 
 
         const [searchResults, metadata] = await sequelize.query(searchCustomersForCouponsQuery)
