@@ -463,6 +463,7 @@ const makeTaxInfoArray = async (igst, cgst, sgst, otherTax, user_id,item_id) => 
   return itemTaxInfoArray;
 };
 
+
 module.exports = {
   getInventoryArray,
   getItemTaxArray,
