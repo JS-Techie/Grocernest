@@ -36,11 +36,11 @@ const searchTotalPurchaseController = async (req, res) => {
         const phoneNum = phoneNumber ? `and t_customer.calling_number= "${phoneNumber}"` : ``
         const innerJoinQuery = phoneNumber ? `inner join t_customer on t_order.cust_no = t_customer.cust_no` : ``
         const dateRange = dateSelection === "L" ? "month(t_order.created_at)=month(now())-1 " : `t_order.created_at between "${fromDate}" and "${toDate}"`
-        const amountRange = amountGreaterThan ? "where T2.total_purchase>= ${amountGreaterThan} ":`` 
+        const amountRange = amountGreaterThan ? `where T2.total_purchase>= ${amountGreaterThan} `:`` 
 
 
         const searchCustomersForCouponsQuery = `select * from (select *, sum(T1.final_payable_amount) as total_purchase from 
-        (select t_order.* from t_order ${innerJoinQuery} where ${dateRange} ${phoneNum})T1 group by T1.cust_no)T2`
+        (select t_order.* from t_order ${innerJoinQuery} where ${dateRange} ${phoneNum})T1 group by T1.cust_no)T2 ${amountRange}`
 
 
         const [searchResults, metadata] = await sequelize.query(searchCustomersForCouponsQuery)
