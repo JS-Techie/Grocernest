@@ -720,6 +720,14 @@ const getCart = async (req, res, next) => {
       });
 
       if (currentItem) {
+        const isXItem = await Offers.findOne({
+          where : {
+            is_active: 1,
+            item_x: current.item_id,
+          }
+        });
+
+        
         return {
           itemID: current.item_id,
           quantity: current.quantity,
@@ -732,7 +740,7 @@ const getCart = async (req, res, next) => {
             current.is_offer === 1
               ? current.offer_item_price
               : oldestBatch.sale_price,
-          isXItem : current.is_offer === 1 ? true : false,    
+          isXItem : isXItem ? true : false,    
           discount: current.discount,
           cashback: currentItem.cashback ? currentItem.cashback : 0,
           cashback_is_percentage: currentItem.cashback_is_percentage
@@ -760,7 +768,7 @@ const getCart = async (req, res, next) => {
         resolvedWithoutUndefined.map((item) => [item["itemID"], item])
       ).values(),
     ];
-    
+
 
     return res.status(200).send({
       success: true,
