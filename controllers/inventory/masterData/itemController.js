@@ -865,7 +865,7 @@ const fetchItembyItemCode = async (req, res, next) => {
 
 
 const getItemData = async (req, res, next) => {
-  const {
+  let {
     brandIdList,
     categoryIdList,
     colorIdList,
@@ -873,60 +873,70 @@ const getItemData = async (req, res, next) => {
     departmentIdList,
     subCategoryIdList,
   } = req.body;
+
+
   try {
 
+    if (!brandIdList) {
+      brandIdList = []
+    }
+    if (!categoryIdList) {
+      categoryIdList = []
+    }
+    if (!subCategoryIdList) {
+      subCategoryIdList = []
+    }
+    if (!colorIdList) {
+      colorIdList = []
+    }
+    if (!sizeIdList) {
+      sizeIdList = []
+    }
+    if (!departmentIdList) {
+      departmentIdList = []
+    }
 
-
-
-
-
-    // const getItemDetails = await Item.findAll({
-    // where: {brand_name : brandIdList},
-    //   include: [
-    //     {
-    //       model: Brand,
-    //     }
-    //   ],
-    // });
 
 
     //shaping the req.body array to sql understandable language
-    let brandListQuery = "("
-    let categoryListQuery = "("
-    let subCategoryListQuery = "("
+
+
+    // let brandListQuery = "("
+    // let categoryListQuery = "("
+    // let subCategoryListQuery = "("
     // let departmentListQuery = "("
     // let sizeListQuery = "("
     // let colorListQuery = "("
 
-    for (let i in brandIdList) {
-      brandListQuery = brandListQuery + brandIdList[i]
-      if (parseInt(i) === (brandIdList.length) - 1) {
-        brandListQuery = brandListQuery + `)`
-      }
-      else {
-        brandListQuery = brandListQuery + `,`
-      }
-    }
+    // for (let i in brandIdList) {
+    //   brandListQuery = brandListQuery + brandIdList[i]
+    //   if (parseInt(i) === (brandIdList.length) - 1) {
+    //     brandListQuery = brandListQuery + `)`
+    //   }
+    //   else {
+    //     brandListQuery = brandListQuery + `,`
+    //   }
+    // }
 
-    for (let i in categoryIdList) {
-      categoryListQuery = categoryListQuery + categoryIdList[i]
-      if (parseInt(i) === (categoryIdList.length) - 1) {
-        categoryListQuery = categoryListQuery + `)`
-      }
-      else {
-        categoryListQuery = categoryListQuery + `,`
-      }
-    }
+    // for (let i in categoryIdList) {
+    //   categoryListQuery = categoryListQuery + categoryIdList[i]
+    //   if (parseInt(i) === (categoryIdList.length) - 1) {
+    //     categoryListQuery = categoryListQuery + `)`
+    //   }
+    //   else {
+    //     categoryListQuery = categoryListQuery + `,`
+    //   }
+    // }
 
-    for (let i in subCategoryIdList) {
-      subCategoryListQuery = subCategoryListQuery + subCategoryIdList[i]
-      if (parseInt(i) === (subCategoryIdList.length) - 1) {
-        subCategoryListQuery = subCategoryListQuery + `)`
-      }
-      else {
-        subCategoryListQuery = subCategoryListQuery + `,`
-      }
-    }
+    // for (let i in subCategoryIdList) {
+    //   subCategoryListQuery = subCategoryListQuery + subCategoryIdList[i]
+    //   if (parseInt(i) === (subCategoryIdList.length) - 1) {
+    //     subCategoryListQuery = subCategoryListQuery + `)`
+    //   }
+    //   else {
+    //     subCategoryListQuery = subCategoryListQuery + `,`
+    //   }
+    // }
 
     // for (let i in sizeIdList) {
     //   sizeListQuery = sizeListQuery + sizeIdList[i]
@@ -961,15 +971,16 @@ const getItemData = async (req, res, next) => {
 
     //thicc logicc ends
 
+
     let firstQueryFlag = false
     let queryWord
 
     let brandQuery = brandIdList.length === 0 ? `` : `t_item.brand_id = ${brandIdList[brandIdList.length - 1]}`
     let categoryQuery = categoryIdList.length === 0 ? `` : `t_item.category_id = ${categoryIdList[categoryIdList.length - 1]}`
     let subCategoryQuery = subCategoryIdList.length === 0 ? `` : `t_item.sub_category_id = ${subCategoryIdList[subCategoryIdList.length - 1]}`
-    // let departmentQuery = departmentIdList.length===0?``:`t_item.department_id = ${departmentIdList[departmentIdList.length-1]}`
-    // let colorQuery= colorIdList.length===0?``:`t_item.color_id = ${colorIdList[colorIdlist.legnth-1]}`
-    // let sizeQuery= sizeIdList.length===0?``:`t_item.size_id = ${sizeIdList[sizeIdList.length -1]}`
+    let departmentQuery = departmentIdList.length === 0 ? `` : `t_item.department_id = ${departmentIdList[departmentIdList.length - 1]}`
+    let colorQuery = colorIdList.length === 0 ? `` : `t_item.color_id = ${colorIdList[colorIdlist.length - 1]}`
+    let sizeQuery = sizeIdList.length === 0 ? `` : `t_item.size_id = ${sizeIdList[sizeIdList.length - 1]}`
 
 
 
@@ -989,24 +1000,22 @@ const getItemData = async (req, res, next) => {
       queryWord === `where ` ? firstQueryFlag = true : firstQueryFlag = false
       subCategoryQuery = queryWord + subCategoryQuery
     }
-    // if(departmentIdList.length !== 0){
-    // !firstQueryFlag?queryWord=`where `:queryWord=`and `
-    //   queryWord===`where `?firstQueryFlag=true:firstQueryFlag=false
-    //   departmentQuery= queryWord +departmentQuery
-    // }
-    // if(colorIdList.length !== 0){
-    //   !firstQueryFlag?queryWord=`where `:queryWord=`and `
-    //   queryWord===`where `?firstQueryFlag=true:firstQueryFlag=false
-    //   colorQuery= queryWord +colorQuery
-    // }
-    // if(sizeIdList.length !== 0){
-    //   !firstQueryFlag?queryWord=`where `:queryWord=`and `
-    //   queryWord===`where `?firstQueryFlag=true:firstQueryFlag=false
-    //   sizeQuery= queryWord +sizeQuery
-    // }
+    if (departmentIdList.length !== 0) {
+      !firstQueryFlag ? queryWord = `where ` : queryWord = `and `
+      queryWord === `where ` ? firstQueryFlag = true : firstQueryFlag = false
+      departmentQuery = queryWord + departmentQuery
+    }
+    if (colorIdList.length !== 0) {
+      !firstQueryFlag ? queryWord = `where ` : queryWord = `and `
+      queryWord === `where ` ? firstQueryFlag = true : firstQueryFlag = false
+      colorQuery = queryWord + colorQuery
+    }
+    if (sizeIdList.length !== 0) {
+      !firstQueryFlag ? queryWord = `where ` : queryWord = `and `
+      queryWord === `where ` ? firstQueryFlag = true : firstQueryFlag = false
+      sizeQuery = queryWord + sizeQuery
+    }
     //end of the thicc Logicc
-
-    console.log("=====================", brandQuery, categoryQuery, subCategoryQuery)
 
 
 
@@ -1016,14 +1025,18 @@ const getItemData = async (req, res, next) => {
     from(((t_item
     inner join t_lkp_brand on t_lkp_brand.id= t_item.brand_id)
     inner join t_lkp_category on t_lkp_category.id = t_item.category_id )
-    inner join t_lkp_sub_category on t_lkp_sub_category.id  = t_item.sub_category_id )
+    left outer join t_lkp_sub_category on t_lkp_sub_category.id  = t_item.sub_category_id )
     ${brandQuery} ${categoryQuery} ${subCategoryQuery}
         `);
 
-    // inner join t_lkp_color on t_lkp_color.id = t_item.color_id )
-    // inner join t_lkp_department on t_lkp_department.id  = t_item.department_id )
-    // inner join t_lkp_size on t_lkp_size.id = t_item.size_id )
-    // inner join t_lkp_division on t_lkp_division.id  = t_item.div_id )
+
+        // ${colorQuery} ${sizeQuery} ${departmentQuery}
+        // inner join t_lkp_color on t_lkp_color.id = t_item.color_id )
+        // inner join t_lkp_department on t_lkp_department.id  = t_item.department_id )
+        // inner join t_lkp_size on t_lkp_size.id = t_item.size_id )
+        // inner join t_lkp_division on t_lkp_division.id  = t_item.div_id )
+
+    
 
 
 
@@ -1422,6 +1435,11 @@ const saveItem = async (req, res, next) => {
     });
   }
 };
+
+
+
+
+
 
 module.exports = {
   saveItem,
