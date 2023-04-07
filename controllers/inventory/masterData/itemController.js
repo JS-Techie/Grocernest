@@ -689,6 +689,16 @@ const getItemByItemId = async (req, res, next) => {
   }
 };
 
+
+
+
+
+
+
+
+
+
+
 const searchItemDetailsByItemCode = async (req, res, next) => {
   const { itemCode, storeId, searchAllLocation, includeTaxDetails } = req.body;
   try {
