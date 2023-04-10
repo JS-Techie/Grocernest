@@ -224,6 +224,9 @@ const viewCoupon = async(req, res) => {
 
 
 
+
+
+
 module.exports = {
     searchTotalPurchaseController,
     generateCoupon,

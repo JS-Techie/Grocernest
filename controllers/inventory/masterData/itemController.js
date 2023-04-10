@@ -51,7 +51,7 @@ const getAllItem = async (req, res, next) => {
       `select count(*) as count from t_item `
     );
 
-    const whereQuery = itemCode ? ` where t_item.item_cd = "${itemCode}"` : ``
+    const whereQuery = itemCode ? ` where t_item.item_cd = "%${itemCode}%" or t_item.name="%${itemCode}%` : ``
 
 
     const [allItems, metadata] =
