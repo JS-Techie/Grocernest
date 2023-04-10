@@ -37,7 +37,7 @@ const searchTotalPurchaseController = async (req, res) => {
     try {
 
         // console.log(":::::::::::::::::::::::::::::", randomAlphanumericStringGenerator(7))
-        const phoneNum = phoneNumber ? `and t_customer.calling_number= "${phoneNumber}"` : ``
+        const phoneNum = phoneNumber ? `and t_customer.contact_no= "${phoneNumber}"` : ``
         const innerJoinQuery = phoneNumber ? `inner join t_customer on t_order.cust_no = t_customer.cust_no` : ``
         const dateRange = dateSelection === "L" ? "month(t_order.created_at)=month(now())-1 " : `t_order.created_at between "${fromDate}" and "${toDate}"`
         const amountRange = amountGreaterThan ? `where T2.total_purchase>= ${amountGreaterThan} ` : ``
@@ -151,9 +151,9 @@ const generateCoupon = async (req, res) => {
             message: "Coupons Generated Successfully"
         })
 
-    }catch(error){
+    } catch (error) {
         return res.status(500).send({
-            success:false,
+            success: false,
             status: 500,
             message: "Coupons Not Generated. Error Occured. Please Try Again Later",
             error: error.message
@@ -170,31 +170,31 @@ const generateCoupon = async (req, res) => {
 
 
 
-const viewCoupon = async(req, res) => {
+const viewCoupon = async (req, res) => {
 
     const {
         customerNo
-    }= req.body
+    } = req.body
 
 
-    try{
-        if (!customerNo){
+    try {
+        if (!customerNo) {
             return res.status(400).send({
                 success: false,
                 message: "Customer Number Not supplied. No Coupon Data Fetched"
             })
         }
-        
-        const mapTableResponse= await ExternalCouponCustomerMap.findAll({
-            where: {cust_no: customerNo}
+
+        const mapTableResponse = await ExternalCouponCustomerMap.findAll({
+            where: { cust_no: customerNo }
         })
 
-        const couponDetailsPromise = await mapTableResponse.map(async(eachCoupon)=>{
+        const couponDetailsPromise = await mapTableResponse.map(async (eachCoupon) => {
             const eachCouponDetail = await ExternalCoupon.findOne({
-                where: {coupon_code: eachCoupon.coupon_code}
+                where: { coupon_code: eachCoupon.coupon_code }
             })
 
-            const response= {
+            const response = {
                 customerNo: eachCoupon.cust_no,
                 couponCode: eachCoupon.coupon_code,
                 expiryDate: eachCouponDetail.expiry_date,
@@ -204,7 +204,7 @@ const viewCoupon = async(req, res) => {
             return response
         })
 
-        const couponDetails= await Promise.all(couponDetailsPromise)
+        const couponDetails = await Promise.all(couponDetailsPromise)
         res.status(200).send({
             success: true,
             message: "Coupons Fetched Successfully",
@@ -212,12 +212,76 @@ const viewCoupon = async(req, res) => {
             status: 200
         })
     }
-    catch(error){
+    catch (error) {
         return res.status(500).send({
             success: false,
-            message:"Coupons could not be Fetched. Please Try Again Later",
+            message: "Coupons could not be Fetched. Please Try Again Later",
             status: 500,
             error: error.message
+        })
+    }
+}
+
+
+const vendorCouponRedemption = async (req, res) => {
+
+    const {
+        couponCode,
+        phoneNumber
+    } = req.body
+
+    if (!couponCode || !phoneNumber) {
+        return res.status(400).send({
+            status: 400,
+            success: false,
+            message: "Mandatory Fields of Coupon Code and Phone Number are not filled UP"
+        })
+    }
+
+    try {
+
+        const couponSearchQuery = ` select * from t_ext_coupon_customer_map where coupon_code="${couponCode}" and cust_no=(select cust_no from t_customer where contact_no="${phoneNumber}" ) `
+
+        const [couponCodeValidation, metadata] = await sequelize.query(couponSearchQuery)
+        console.log("==============-------------------==-------------======================", couponCodeValidation)
+        if (!couponCodeValidation) {
+            return res.status(404).send({
+                success: false,
+                message: "Phone No doesnot Correspond with the provided coupon code",
+                status: 404
+
+            })
+        }
+
+        // const today = new Date(Date.now())
+        const today = new Date().toISOString().slice(0, 19).replace('T', ' ');
+        // const todayDate = today.toString()
+        console.log("==========================", today,typeof today)
+        const updateQuery = `update t_ext_coupon set status="redeemed" where coupon_code = "${couponCodeValidation[0].coupon_code}" and expiry_date>="${today}"`
+        const redeemUpdate = await sequelize.query(updateQuery)
+
+        if (redeemUpdate === 0) {
+            return res.status(400).send({
+                message: "Coupon has Expired. Cannot be Redeemed",
+                status: 400,
+                success: false
+            })
+        }
+
+        res.status(200).send({
+            message: "Coupon Redeemed Successfully",
+            success: true,
+            status: 200
+        })
+
+
+    }
+    catch (error) {
+        return res.status(500).send({
+            message: "Coupon Not Found. Please Try Again after sometime.",
+            success: false,
+            status: 500,
+            errorL: error.message
         })
     }
 }
@@ -230,6 +294,7 @@ const viewCoupon = async(req, res) => {
 module.exports = {
     searchTotalPurchaseController,
     generateCoupon,
-    viewCoupon
+    viewCoupon,
+    vendorCouponRedemption
 }
 
