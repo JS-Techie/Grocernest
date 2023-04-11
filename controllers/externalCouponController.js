@@ -43,7 +43,7 @@ const searchTotalPurchaseController = async (req, res) => {
         const amountRange = amountGreaterThan ? `where T2.total_purchase>= ${amountGreaterThan} ` : ``
 
 
-        const searchCustomersForCouponsQuery = `select T2.*, t_customer.cust_name, t_customer.calling_number from 
+        const searchCustomersForCouponsQuery = `select T2.*, t_customer.cust_name, t_customer.contact_no from 
         (select *, sum(T1.final_payable_amount) as total_purchase
          from 
         (select t_order.* from t_order ${innerJoinQuery} where ${dateRange} ${phoneNum})T1 group by T1.cust_no)T2 inner join t_customer on T2.cust_no = t_customer.cust_no ${amountRange}`
