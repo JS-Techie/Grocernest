@@ -51,7 +51,33 @@ const searchTotalPurchaseController = async (req, res) => {
 
         const [searchResults, metadata] = await sequelize.query(searchCustomersForCouponsQuery)
 
-        if (!searchResults) {
+        let responseData = []
+
+        for (let i in searchResults) {
+            const eachCustomerData = searchResults[i]
+            let generateFlag
+            const customerPresent = await sequelize.query(`select * from t_ext_coupon_customer_map where cust_no="${eachCustomerData.cust_no}"`)
+            if (!customerPresent) {
+                generateFlag = "Coupon Generated"
+            }
+            else {
+                generateFlag = "Coupon Not Generated"
+            }
+            const eachResponse = {
+                "customerNo": eachCustomerData.cust_no,
+                "customerName": eachCustomerData.cust_name,
+                "contactNo": eachCustomerData.contact_no,
+                "totalPurchase": eachCustomerData.total_purchase,
+                "generateFlag": generateFlag
+            }
+            responseData.push(eachResponse)
+        }
+
+        console.log("-------------------------------------", responseData)
+
+
+
+        if (!responseData) {
             return res.status(400).send({
                 success: true,
                 status: 400,
@@ -60,7 +86,7 @@ const searchTotalPurchaseController = async (req, res) => {
         }
 
         return res.status(200).send({
-            data: searchResults,
+            data: responseData,
             success: true,
             status: 200,
             message: "Results Fetched Successfully"
@@ -223,7 +249,13 @@ const viewCoupon = async (req, res) => {
 }
 
 
-const vendorCouponRedemption = async (req, res) => {
+
+
+
+
+
+
+const vendorSearch = async (req, res) => {
 
     const {
         couponCode,
@@ -237,26 +269,86 @@ const vendorCouponRedemption = async (req, res) => {
             message: "Mandatory Fields of Coupon Code and Phone Number are not filled UP"
         })
     }
+    try {
+
+        const couponSearchQuery = ` select * from t_ext_coupon_customer_map where coupon_code="${couponCode}" and cust_no=(select cust_no from t_customer where contact_no="${phoneNumber}" ) `
+
+        const [couponCodeValidation, metadata] = await sequelize.query(couponSearchQuery)
+        if (!couponCodeValidation) {
+            return res.status(404).send({
+                success: false,
+                message: "Phone No doesnot Correspond with the provided coupon code",
+                status: 404
+            })
+        }
+        const [couponDetailResult, metadata1] = await sequelize.query(`select * from t_ext_coupon where coupon_code = "${couponCodeValidation[0].coupon_code}" `)
+
+        const response = {
+            "customerPhone": phoneNumber,
+            "couponCode": couponCodeValidation[0].coupon_code,
+            "expiryDate": couponDetailResult[0].expiry_date
+        }
+        res.status(200).send({
+            data: response,
+            success: false,
+            status: 200,
+            message: "Coupon Found and Fetched Successfully"
+        })
+
+
+
+    } catch (error) {
+        return res.status(500).send({
+            message: "Coupon Not Found. Please Try Again after sometime.",
+            success: false,
+            status: 500,
+            errorL: error.message
+        })
+    }
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+const vendorCouponRedemption = async (req, res) => {
+
+    const {
+        couponCode,
+        phoneNumber
+    } = req.body
+
+    if (!couponCode || !phoneNumber) {
+        return res.status(400).send({
+            status: 400,
+            success: false,
+            message: "Coupon Code and Phone Number are not Provided"
+        })
+    }
 
     try {
 
         const couponSearchQuery = ` select * from t_ext_coupon_customer_map where coupon_code="${couponCode}" and cust_no=(select cust_no from t_customer where contact_no="${phoneNumber}" ) `
 
         const [couponCodeValidation, metadata] = await sequelize.query(couponSearchQuery)
-        console.log("==============-------------------==-------------======================", couponCodeValidation)
+        // console.log("==============-------------------==-------------======================", couponCodeValidation)
         if (!couponCodeValidation) {
             return res.status(404).send({
                 success: false,
                 message: "Phone No doesnot Correspond with the provided coupon code",
                 status: 404
-
             })
         }
 
-        // const today = new Date(Date.now())
         const today = new Date().toISOString().slice(0, 19).replace('T', ' ');
-        // const todayDate = today.toString()
-        console.log("==========================", today,typeof today)
         const updateQuery = `update t_ext_coupon set status="redeemed" where coupon_code = "${couponCodeValidation[0].coupon_code}" and expiry_date>="${today}"`
         const redeemUpdate = await sequelize.query(updateQuery)
 
@@ -295,6 +387,7 @@ module.exports = {
     searchTotalPurchaseController,
     generateCoupon,
     viewCoupon,
+    vendorSearch,
     vendorCouponRedemption
 }
 
