@@ -28,6 +28,7 @@ const searchTotalPurchaseController = async (req, res) => {
             return res.status(200).send({
                 success: false,
                 status: 400,
+                data: [],
                 message: "Date Fields are Empty though they are Mandotory Fields"
             })
         }
@@ -76,12 +77,12 @@ const searchTotalPurchaseController = async (req, res) => {
         // console.log("-------------------------------------", responseData)
 
 
-
-        if (!responseData) {
+        if (responseData.length === 0) {
             return res.status(400).send({
                 success: true,
                 status: 400,
-                message: " No Data to Fetch with the selected Filters"
+                message: " No Data to Fetch with the selected Filters",
+                data: []
             })
         }
 
@@ -125,12 +126,15 @@ const generateCoupon = async (req, res) => {
             return res.status(400).send({
                 success: false,
                 message: "Coupon not Generated. Customer Number not found ",
-                status: 400
+                status: 400,
+                data: []
             })
         }
         if (!couponData) {
             return res.status(400).send({
                 success: false,
+                status: 400,
+                data: [],
                 message: "Coupon Not Generated. No Coupon amount supplied."
             })
         }
@@ -207,6 +211,7 @@ const viewCoupon = async (req, res) => {
         if (!customerNo) {
             return res.status(400).send({
                 success: false,
+                data: [],
                 message: "Customer Number Not supplied. No Coupon Data Fetched"
             })
         }
@@ -265,6 +270,7 @@ const vendorSearch = async (req, res) => {
     if (!couponCode || !phoneNumber) {
         return res.status(400).send({
             status: 400,
+            data: [],
             success: false,
             message: "Mandatory Fields of Coupon Code and Phone Number are not filled UP"
         })
@@ -274,19 +280,22 @@ const vendorSearch = async (req, res) => {
         const couponSearchQuery = ` select * from t_ext_coupon_customer_map where coupon_code="${couponCode}" and cust_no=(select cust_no from t_customer where contact_no="${phoneNumber}" ) `
 
         const [couponCodeValidation, metadata] = await sequelize.query(couponSearchQuery)
-        if (!couponCodeValidation) {
+        if (couponCodeValidation.length === 0) {
             return res.status(404).send({
                 success: false,
+                data: [],
                 message: "Phone No doesnot Correspond with the provided coupon code",
                 status: 404
             })
         }
         const [couponDetailResult, metadata1] = await sequelize.query(`select * from t_ext_coupon where coupon_code = "${couponCodeValidation[0].coupon_code}" `)
 
+
         const response = {
             "customerPhone": phoneNumber,
             "couponCode": couponCodeValidation[0].coupon_code,
-            "expiryDate": couponDetailResult[0].expiry_date
+            "expiryDate": couponDetailResult[0].expiry_date,
+            "status": couponDetailResult[0].status
         }
         res.status(200).send({
             data: response,
@@ -302,7 +311,7 @@ const vendorSearch = async (req, res) => {
             message: "Coupon Not Found. Please Try Again after sometime.",
             success: false,
             status: 500,
-            errorL: error.message
+            error: error.message
         })
     }
 
@@ -330,7 +339,8 @@ const vendorCouponRedemption = async (req, res) => {
         return res.status(400).send({
             status: 400,
             success: false,
-            message: "Coupon Code and Phone Number are not Provided"
+            message: "Coupon Code and Phone Number are not Provided",
+            data: []
         })
     }
 
@@ -340,10 +350,11 @@ const vendorCouponRedemption = async (req, res) => {
 
         const [couponCodeValidation, metadata] = await sequelize.query(couponSearchQuery)
         // console.log("==============-------------------==-------------======================", couponCodeValidation)
-        if (!couponCodeValidation) {
+        if (couponCodeValidation.length === 0) {
             return res.status(404).send({
                 success: false,
                 message: "Phone No doesnot Correspond with the provided coupon code",
+                data: [],
                 status: 404
             })
         }
@@ -351,11 +362,11 @@ const vendorCouponRedemption = async (req, res) => {
         const today = new Date().toISOString().slice(0, 19).replace('T', ' ');
         const updateQuery = `update t_ext_coupon set status='redeemed', redemption_date="${today}" where coupon_code = "${couponCodeValidation[0].coupon_code}" and expiry_date>="${today}" and status='pending'`
 
-        const [redemptionCheck, metadata2]= await sequelize.query(`select * from t_ext_coupon where coupon_code = "${couponCodeValidation[0].coupon_code}" and expiry_date>="${today}" and status='pending'`)
+        const [redemptionCheck, metadata2] = await sequelize.query(`select * from t_ext_coupon where coupon_code = "${couponCodeValidation[0].coupon_code}" and expiry_date>="${today}" and status='pending'`)
 
-        console.log("==========================================", redemptionCheck)
+        // console.log("==========================================", redemptionCheck)
 
-        if(redemptionCheck.length === 0){
+        if (redemptionCheck.length === 0) {
             return res.status(400).send({
                 message: "Coupon already Redeemed",
                 data: [],
@@ -369,14 +380,16 @@ const vendorCouponRedemption = async (req, res) => {
             return res.status(400).send({
                 message: "Coupon has Expired. Cannot be Redeemed",
                 status: 400,
-                success: false
+                success: false,
+                data: []
             })
         }
 
         res.status(200).send({
             message: "Coupon Redeemed Successfully",
             success: true,
-            status: 200
+            status: 200,
+            data: []
         })
 
 
