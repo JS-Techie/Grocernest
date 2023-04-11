@@ -73,7 +73,7 @@ const searchTotalPurchaseController = async (req, res) => {
             responseData.push(eachResponse)
         }
 
-        console.log("-------------------------------------", responseData)
+        // console.log("-------------------------------------", responseData)
 
 
 
@@ -349,7 +349,20 @@ const vendorCouponRedemption = async (req, res) => {
         }
 
         const today = new Date().toISOString().slice(0, 19).replace('T', ' ');
-        const updateQuery = `update t_ext_coupon set status="redeemed" where coupon_code = "${couponCodeValidation[0].coupon_code}" and expiry_date>="${today}"`
+        const updateQuery = `update t_ext_coupon set status='redeemed', redemption_date="${today}" where coupon_code = "${couponCodeValidation[0].coupon_code}" and expiry_date>="${today}" and status='pending'`
+
+        const [redemptionCheck, metadata2]= await sequelize.query(`select * from t_ext_coupon where coupon_code = "${couponCodeValidation[0].coupon_code}" and expiry_date>="${today}" and status='pending'`)
+
+        console.log("==========================================", redemptionCheck)
+
+        if(redemptionCheck.length === 0){
+            return res.status(400).send({
+                message: "Coupon already Redeemed",
+                data: [],
+                success: false,
+                status: 400
+            })
+        }
         const redeemUpdate = await sequelize.query(updateQuery)
 
         if (redeemUpdate === 0) {
