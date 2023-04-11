@@ -57,7 +57,7 @@ const searchTotalPurchaseController = async (req, res) => {
         for (let i in searchResults) {
             const eachCustomerData = searchResults[i]
             let generateFlag
-            const customerPresent = await sequelize.query(`select * from t_ext_coupon_customer_map where cust_no="${eachCustomerData.cust_no}"`)
+            const [customerPresent, metadata4] = await sequelize.query(`select * from t_ext_coupon_customer_map where cust_no="${eachCustomerData.cust_no}"`)
             if (customerPresent.length===0) {
                 generateFlag = false
             }
