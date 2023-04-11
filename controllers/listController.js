@@ -190,7 +190,17 @@ const getAllOffers = async (req, res, next) => {
   let z_item_details = null
 
   try {
-    const offers = await Offer.findAll({
+
+    const [promises, metadata] = 
+        await sequelize.query(`select offers.id as offerID, offers.type_id as offerType, t_lkp_offer.offer_type as offerName, offers.item_x as itemX, i.name as xItemName, i.image as xItemImage, offers.item_y as itemY, i2.name as yItemName, i2.image as yItemImage, offers.item_z as itemZ, i3.name as zItemName, i3.image as zItemImage, offers.item_x_quantity as quantityOfItemX, offers.item_y_quantity as quantityOfItemY, offers.item_z_quantity as quantityOfItemZ,
+        offers.amount_of_discount as amountOfDiscount, offers.is_percentage as isPercentage, offers.created_by, offers.updated_by, offers.created_at, offers.updated_at, offers.is_active as isActive, 
+        offers.start_date as startDate, offers.start_time as startTime, offers.end_time as endDate, offers.is_ecomm as isEcomm, offers.is_pos as isPos, offers.is_time as isTime
+        from t_offers offers inner join t_lkp_offer on offers.type_id = t_lkp_offer.id
+        left join t_item i on i.id = offers.item_x 
+        left join t_item i2 on i2.id = offers.item_y
+        left join t_item i3 on i3.id = offers.item_z
+        order by created_at desc`);
+  /*  const offers = await Offer.findAll({
       where: { is_active: 1, is_ecomm: 1 },
       order: [["created_at", "DESC"]],
     });
@@ -205,16 +215,24 @@ const getAllOffers = async (req, res, next) => {
         message: "There are no offers",
       });
     }
-    const promises = offers.map(async (currentOffer) => {
+    var count = 0;
+    var counter = 0;
+   const promises = offers.map(async (currentOffer) => {
+
       if(currentOffer.type_id){
+        console.log(counter+ " type_id: "+ currentOffer.type_id);
+        // counter = counter + 1;
         type_details = await lkpOffers.findOne({
           where:{ id: currentOffer.type_id}
         })
       }
       console.log("type_details:id "+type_details.id)
       console.log("type_details:name "+type_details.offer_type)
-      const offer_name = type_details.offer_type
+      const offer_name = type_details.offer_type;
+      
       if(currentOffer.item_x) {
+        console.log(count, currentOffer.item_x);
+        count = count+1;
         x_item_details = await Item.findOne({
           where:{
             id: currentOffer.item_x
@@ -265,6 +283,7 @@ const getAllOffers = async (req, res, next) => {
         }
         console.log("Hello world");
     });
+    */
 
     //console.log(promises);
 
