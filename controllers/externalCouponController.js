@@ -58,11 +58,11 @@ const searchTotalPurchaseController = async (req, res) => {
             const eachCustomerData = searchResults[i]
             let generateFlag
             const customerPresent = await sequelize.query(`select * from t_ext_coupon_customer_map where cust_no="${eachCustomerData.cust_no}"`)
-            if (!customerPresent) {
-                generateFlag = "Coupon Generated"
+            if (customerPresent.length===0) {
+                generateFlag = false
             }
             else {
-                generateFlag = "Coupon Not Generated"
+                generateFlag = true
             }
             const eachResponse = {
                 "customerNo": eachCustomerData.cust_no,
@@ -225,11 +225,18 @@ const viewCoupon = async (req, res) => {
                 where: { coupon_code: eachCoupon.coupon_code }
             })
 
+            const [phoneNumber, metadata3] = await sequelize.query(`select contact_no from t_customer where cust_no="${eachCoupon.cust_no}" `)
+
+            console.log("--------=================---------", phoneNumber)
+
             const response = {
                 customerNo: eachCoupon.cust_no,
                 couponCode: eachCoupon.coupon_code,
                 expiryDate: eachCouponDetail.expiry_date,
                 issueDate: eachCouponDetail.start_date,
+                status: eachCouponDetail.status,
+                couponAmount: eachCouponDetail.coupon_amount,
+                phoneNumber: phoneNumber[0].contact_no
 
             }
             return response
