@@ -199,6 +199,7 @@ const getAllOffers = async (req, res, next) => {
         left join t_item i on i.id = offers.item_x 
         left join t_item i2 on i2.id = offers.item_y
         left join t_item i3 on i3.id = offers.item_z
+        where offers.is_active = 1
         order by created_at desc`);
   /*  const offers = await Offer.findAll({
       where: { is_active: 1, is_ecomm: 1 },
