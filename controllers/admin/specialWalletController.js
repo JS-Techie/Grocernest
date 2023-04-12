@@ -1,6 +1,8 @@
+const { Json } = require("sequelize/lib/utils");
 const db = require("../../models");
 const { sequelize } = require("../../models");
 const uniqid = require("uniqid");
+const { Op } = require("sequelize");
 
 const WalletStrategy = db.SpecialWalletStrategy;
 const itemTable = db.ItemModel;
@@ -64,9 +66,9 @@ const createStrategy = async (req, res, next) => {
     })
     console.log(flag)
 
-    if(flag===1){
+    if (flag === 1) {
       return res.status(404).json({
-        success:false,
+        success: false,
         message: "Same Item cannot be provided with more than one offer strategy",
       })
     }
@@ -134,7 +136,7 @@ const viewStrategy = async (req, res, next) => {
           }
           return {
             id: item.item_cd,
-            
+
             name: item.name,
           };
         })
@@ -194,10 +196,68 @@ const deleteStrategy = async (req, res, next) => {
   }
 };
 
+
+
+
+
+
+
+
+
 const toggleStrategy = async (req, res, next) => {
   const { strategy_id, status } = req.body;
 
   try {
+
+
+    // THE CONFUSING, COMPLEX AND LONG LOGIC REGARDING EXTRACTING THE ITEM CODES AND CHECK THEIR COINCIDENCE
+
+    const AlreadyPresentAllItemListsSearchOutput = await WalletStrategy.findAll({     //returns a string that looks like an array
+      attributes: ['items_list'],
+      where:{
+        [Op.not]: [{id: strategy_id}]
+      },
+      raw: true
+    })
+
+    let AlreadyPresentItemListsArray = []   //for storing all the items fetched as an individual string in a list
+
+    for (let i in AlreadyPresentAllItemListsSearchOutput) {
+      const eachItemArray = AlreadyPresentAllItemListsSearchOutput[i].items_list //taking of each string - "["93483","38932"]"
+      const arrayFormat = eachItemArray.slice(1, (eachItemArray.length - 1)).split(",") //first stripping off the square braces and then splitting them off on commas
+      for (let j in arrayFormat) {
+        eachItemFromArray = arrayFormat[j]  
+        AlreadyPresentItemListsArray.push(eachItemFromArray.split("\"")[1])   // splitting each element on the basis of double qoutes and taking the middle element i.e. the original code 
+      }
+    }
+
+
+    const [strategyItemList, metadata5] = await sequelize.query(`select * from t_special_wallet_strategy where id="${strategy_id}"`)
+
+
+
+    const strategyArrayFormat = strategyItemList[0].items_list.slice(1, (strategyItemList[0].items_list.length - 1)).split(",") //doing the same with the id fetched array
+
+    let strategyItemArray = []
+    for (let i in strategyArrayFormat) {
+      const eachStrategyItem = strategyArrayFormat[i]
+      strategyItemArray.push(eachStrategyItem.split("\"")[1]) //doing the same above process to extract the original item codes
+    }
+
+
+    for (let element of strategyItemArray) {            //checking if the two arrays coincide 
+      if (AlreadyPresentItemListsArray.includes(element)) {
+        return res.status(404).send({
+          message: "Coupon could not be activated as some items are already present in other offer strategy",
+          data:[],
+          status: 404,
+          success: false
+        })
+      }
+    }
+
+    
+
     let updated_wallet_strategy = await WalletStrategy.update(
       {
         status: parseInt(status),
