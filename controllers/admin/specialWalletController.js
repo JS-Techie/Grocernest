@@ -47,6 +47,7 @@ const createStrategy = async (req, res, next) => {
 
     const AlreadyPresentAllItemListsSearchOutput = await WalletStrategy.findAll({
       attributes: ['items_list'],
+      where: { status: 1, is_deleted: 0 }
     })
     var AlreadyPresentItemListsArray = []
     const getItemsFunc = (item) => {
@@ -111,7 +112,9 @@ const createStrategy = async (req, res, next) => {
 const viewStrategy = async (req, res, next) => {
   try {
     let item_name_list = [];
-    let allStrategy = await WalletStrategy.findAll({});
+    let allStrategy = await WalletStrategy.findAll({
+      where: { is_deleted: 0 }
+    });
     console.log(allStrategy);
 
     //loop through strategies
@@ -165,9 +168,16 @@ const viewStrategy = async (req, res, next) => {
 
 const editStrategy = async (req, res, next) => { };
 
+
+
+
+
 const deleteStrategy = async (req, res, next) => {
   const { strategy_id } = req.body;
   try {
+
+    console.log("Hit")
+
     if (!strategy_id) {
       return res.status(400).send({
         success: false,
@@ -176,17 +186,29 @@ const deleteStrategy = async (req, res, next) => {
       });
     }
 
-    const deleted_strategy = await WalletStrategy.destroy({
-      where: {
-        id: strategy_id,
-      },
-    });
 
-    return res.status(200).send({
+    const deleted_strategy = await WalletStrategy.update(
+      { is_deleted: 1 },
+      {
+        where: {
+          id: strategy_id,
+        },
+      });
+
+    if (deleted_strategy[0]===0) {
+      return res.status(200).send({
+        success: false,
+        data: [],
+        message: "Unable to delete item. "
+      });
+    }
+
+    res.status(200).send({
       success: true,
       data: deleted_strategy,
       message: "Strategy deleted successfully",
-    });
+    })
+
   } catch (err) {
     return res.status(400).send({
       success: false,
@@ -214,8 +236,10 @@ const toggleStrategy = async (req, res, next) => {
 
     const AlreadyPresentAllItemListsSearchOutput = await WalletStrategy.findAll({     //returns a string that looks like an array
       attributes: ['items_list'],
-      where:{
-        [Op.not]: [{id: strategy_id}]
+      where: {
+        is_deleted: 0,
+        status: 1,
+        [Op.not]: [{ id: strategy_id }]
       },
       raw: true
     })
@@ -226,7 +250,7 @@ const toggleStrategy = async (req, res, next) => {
       const eachItemArray = AlreadyPresentAllItemListsSearchOutput[i].items_list //taking of each string - "["93483","38932"]"
       const arrayFormat = eachItemArray.slice(1, (eachItemArray.length - 1)).split(",") //first stripping off the square braces and then splitting them off on commas
       for (let j in arrayFormat) {
-        eachItemFromArray = arrayFormat[j]  
+        eachItemFromArray = arrayFormat[j]
         AlreadyPresentItemListsArray.push(eachItemFromArray.split("\"")[1])   // splitting each element on the basis of double qoutes and taking the middle element i.e. the original code 
       }
     }
@@ -249,14 +273,14 @@ const toggleStrategy = async (req, res, next) => {
       if (AlreadyPresentItemListsArray.includes(element)) {
         return res.status(404).send({
           message: "Coupon could not be activated as some items are already present in other offer strategy",
-          data:[],
+          data: [],
           status: 404,
           success: false
         })
       }
     }
 
-    
+
 
     let updated_wallet_strategy = await WalletStrategy.update(
       {
@@ -283,10 +307,59 @@ const toggleStrategy = async (req, res, next) => {
   }
 };
 
+
+
+const viewDeleteHistory = async (req, res) => {
+
+  try {
+    console.log("HIT")
+
+    const [deletedHistory, metadata] = await sequelize.query(`select offer_name, amount_of_discount, items_list, start_date, expiry_date, instant_cashback, first_buy from t_special_wallet_strategy where is_deleted=1`)
+
+    if (deletedHistory.length === 0) {
+      return res.status(404).send({
+        data: [],
+        message: "No Data Found",
+        status: 404,
+        success: false
+      })
+    }
+    res.status(200).send({
+      status: 200,
+      data: deletedHistory,
+      success: true,
+      message: "History of Deleted Items Fetched Successfully "
+    })
+
+  }
+  catch (error) {
+    res.status(500).send({
+      success: false,
+      error: error.message,
+      message: "Error occured. please try again later"
+    })
+  }
+
+}
+
+
+
+
+
+
+
+
 module.exports = {
   createStrategy,
   viewStrategy,
   editStrategy,
   deleteStrategy,
   toggleStrategy,
+  viewDeleteHistory
 };
+
+
+
+
+
+// offername amountof dixcount start date end date item list instant cashback fist buy 
