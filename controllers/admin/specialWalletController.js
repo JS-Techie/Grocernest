@@ -312,6 +312,7 @@ const toggleStrategy = async (req, res, next) => {
 const viewDeleteHistory = async (req, res) => {
 
   try {
+    console.log("HIT")
 
     const [deletedHistory, metadata] = await sequelize.query(`select offer_name, amount_of_discount, items_list, start_date, expiry_date, instant_cashback, first_buy from t_special_wallet_strategy where is_deleted=1`)
 
