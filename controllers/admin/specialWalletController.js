@@ -231,6 +231,7 @@ const toggleStrategy = async (req, res, next) => {
 
   try {
 
+    if(parseInt(status)===1){
 
     // THE CONFUSING, COMPLEX AND LONG LOGIC REGARDING EXTRACTING THE ITEM CODES AND CHECK THEIR COINCIDENCE
 
@@ -279,7 +280,7 @@ const toggleStrategy = async (req, res, next) => {
         })
       }
     }
-
+  }
 
 
     let updated_wallet_strategy = await WalletStrategy.update(
