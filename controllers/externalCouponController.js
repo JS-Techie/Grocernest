@@ -145,7 +145,7 @@ const generateCoupon = async (req, res) => {
 
             // console.log("==================================", eachCouponData, typeof(eachCouponData))
 
-            const couponCode = randomAlphanumericStringGenerator(7)
+            const couponCode = "PRSTG"+ randomAlphanumericStringGenerator(7)
 
             const couponCreation = await ExternalCoupon.create({
                 coupon_code: couponCode,
