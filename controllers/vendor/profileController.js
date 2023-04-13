@@ -67,6 +67,10 @@ const loginVendor = async (req, res, next) => {
 
     const userType = "VENDOR";
 
+    if (vendor.business_name == "PRESTIGE"){
+      userType = "PRESTIGE";
+    }
+    
     const { id } = vendor;
     const token = jwt.sign(
       {
