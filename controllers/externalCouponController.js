@@ -7,6 +7,7 @@ const db = require('../models')
 const { sequelize } = require('../models')
 const { Op } = require("sequelize")
 const { response } = require('express')
+const { RedshiftData } = require('aws-sdk')
 
 const ExternalCoupon = db.ExternalCouponModel
 const ExternalCouponCustomerMap = db.ExternalCouponCustomerMapModel
@@ -58,7 +59,7 @@ const searchTotalPurchaseController = async (req, res) => {
             const eachCustomerData = searchResults[i]
             let generateFlag
             const [customerPresent, metadata4] = await sequelize.query(`select * from t_ext_coupon_customer_map where cust_no="${eachCustomerData.cust_no}"`)
-            if (customerPresent.length===0) {
+            if (customerPresent.length === 0) {
                 generateFlag = false
             }
             else {
@@ -145,7 +146,7 @@ const generateCoupon = async (req, res) => {
 
             // console.log("==================================", eachCouponData, typeof(eachCouponData))
 
-            const couponCode = "PRSTG"+ randomAlphanumericStringGenerator(7)
+            const couponCode = "PRSTG" + randomAlphanumericStringGenerator(7)
 
             const couponCreation = await ExternalCoupon.create({
                 coupon_code: couponCode,
@@ -416,11 +417,77 @@ const vendorCouponRedemption = async (req, res) => {
 
 
 
+const viewRedeemHistory = async (req, res) => {
+
+    const {
+        fromDate,
+        toDate
+    }= req.body
+
+    try {
+
+        // console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", fromDate)
+        let dateQuery=``
+        if (fromDate && toDate){
+            dateQuery= `and t_ext_coupon.redemption_date>= "${fromDate}" and t_ext_coupon.redemption_date<="${toDate}"`
+        }
+
+
+        const [redeemHistory, metadata] = await sequelize.query(` select t_ext_coupon.*, t_customer.cust_name, t_customer.contact_no  from 
+      ((t_ext_coupon inner join t_ext_coupon_customer_map on t_ext_coupon.coupon_code=t_ext_coupon_customer_map.coupon_code) inner join t_customer on t_customer.cust_no = t_ext_coupon_customer_map.cust_no)
+      where t_ext_coupon.status = 'redeemed' ${dateQuery}
+      `)
+
+        // console.log("============================", redeemHistory)
+
+        let sumAmount = 0
+        for (let i in redeemHistory){
+            sumAmount = sumAmount + parseInt(redeemHistory[i].coupon_amount)
+        }
+
+        // console.log("sum ::::::::::::::::::::::::::::::::", sumAmount)
+
+        const historyResponse = {
+            "sumAmount": sumAmount,
+            "redeemHistory": redeemHistory
+        }
+
+        if(redeemHistory.length === 0){
+            return res.status(400).send({
+                success: false,
+                data: [],
+                message: "No Coupons were Redeemed Yet. Nothing to SHOW",
+                status: 400
+            })
+        }
+        res.status(200).send({
+            success: true,
+            data: historyResponse,
+            message: "Data retrieved Successfully",
+            status: 200
+        })
+
+    }
+    catch (error) {
+        res.status(500).send({
+            message: "Error occured. please try again after some time",
+            success: false,
+            error: error.message
+
+        })
+    }
+}
+
+
+
+
+
 module.exports = {
     searchTotalPurchaseController,
     generateCoupon,
     viewCoupon,
     vendorSearch,
-    vendorCouponRedemption
+    vendorCouponRedemption,
+    viewRedeemHistory
 }
 
