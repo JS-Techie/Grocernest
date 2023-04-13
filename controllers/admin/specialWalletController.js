@@ -345,18 +345,13 @@ const viewDeleteHistory = async (req, res) => {
 
 
 
-
-
-
-
-
 module.exports = {
   createStrategy,
   viewStrategy,
   editStrategy,
   deleteStrategy,
   toggleStrategy,
-  viewDeleteHistory
+  viewDeleteHistory,
 };
 
 
