@@ -65,7 +65,7 @@ const loginVendor = async (req, res, next) => {
       });
     }
 
-    const userType = "VENDOR";
+    let userType = "VENDOR";
 
     if (vendor.business_name == "PRESTIGE"){
       userType = "PRESTIGE";
