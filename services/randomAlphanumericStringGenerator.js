@@ -1,6 +1,6 @@
 const randomAlphanumericStringGenerator = (stringLength) =>{
 
-    const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
+    const characters = "ABCDEFGHIJKLMNPQRSTUVWXYZ1234567890"
 
     const randomStringArray = Array.from (
         {length: stringLength},
