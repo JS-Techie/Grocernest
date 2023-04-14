@@ -40,6 +40,8 @@ app.get("/", (req, res, next) => {
 // Swagger route
 app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(endPoint));
 
+
+
 // customer routers import
 const authRouter = require("./routes/authRoutes");
 const listRouter = require("./routes/listRoutes");
@@ -176,6 +178,13 @@ app.use("/inventory/grn", grnDraftSaveRouter);
 app.use("/inventory/passwordhandler", updateSelfPasswordRouter)
 app.use("/inventory/passwordhandler", userMasterUpdatePasswordRouter)
 app.use("/inventory", authControllerRouter)
+
+
+const grnRouter = require("./routes/admin/grnRouter");
+/**
+ * TODO: mention ecomm-inventory routes
+ */
+app.use("/api/grn", grnRouter);
 
 //external coupon 
 app.use("/coupon", externalCouponRouter)

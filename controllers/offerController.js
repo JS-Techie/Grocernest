@@ -325,6 +325,7 @@ const offerForItemBuyNow = async (req, res, next) => {
   }
 
   try {
+    
     const offer = await Offers.findAll({
       where: {
         is_active: 1,
