@@ -147,6 +147,15 @@ module.exports = sequelize => {
       autoIncrement: false,
       comment: null,
       field: "redeem_amt"
+    },
+    is_deleted: {
+      type: DataTypes.INTEGER(1),
+      allowNull: true,
+      defaultValue: "0",
+      primaryKey: false,
+      autoIncrement: false,
+      comment: null,
+      field: "is_deleted"
     }
   };
   const options = {

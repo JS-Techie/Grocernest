@@ -53,6 +53,7 @@ const addressRouter = require("./routes/addressRoutes");
 const profileRouter = require("./routes/profileRoutes");
 const checkoutRouter = require("./routes/checkoutRoutes");
 const orderRouter = require("./routes/ordersRoutes");
+const returnItemShowRouter= require('./routes/returnItemShowRoutes');
 const couponRouter = require("./routes/couponsRoutes");
 const referralRouter = require("./routes/referralRoutes");
 const giftRouter = require("./routes/giftRoutes");
@@ -121,7 +122,8 @@ const userMasterUpdatePasswordRouter= require("./routes/inventory/PasswordHandle
 const authControllerRouter =require('./routes/authControllerRoutes')
 
 
-
+//external coupon 
+const externalCouponRouter = require("./routes/externalCouponRoutes")
 
 const sizeMasterRouter = require("./routes/inventory/masterData/sizeRoutes");
 const locationMaster = require("./routes/inventory/masterData/locationRoutes");
@@ -167,7 +169,7 @@ app.use("/inventory/departmentmaster", departmentMasterRouter);
 app.use("/inventory/categorymaster", categoryMasterRouter);
 app.use("/inventory/subCategorymaster", subCategoryMasterRouter);
 app.use("/inventory/itemmaster", itemMasterRouter)
-app.use("/master", masterDataRouter)
+app.use(masterDataRouter)
 //report routes
 app.use("/inventory/dailySalesReport", dailySalesReportRouter)
 
@@ -177,11 +179,15 @@ app.use("/inventory/passwordhandler", updateSelfPasswordRouter)
 app.use("/inventory/passwordhandler", userMasterUpdatePasswordRouter)
 app.use("/inventory", authControllerRouter)
 
+
 const grnRouter = require("./routes/admin/grnRouter");
 /**
  * TODO: mention ecomm-inventory routes
  */
 app.use("/api/grn", grnRouter);
+
+//external coupon 
+app.use("/coupon", externalCouponRouter)
 
 
 //stockTransfer routes
@@ -201,6 +207,7 @@ app.use("/address", addressRouter);
 app.use("/profile", profileRouter);
 app.use("/checkout", checkoutRouter);
 app.use("/orders", orderRouter);
+app.use("/orders", returnItemShowRouter)
 app.use("/coupons", couponRouter);
 app.use("/referral/view", referralRouter);
 app.use("/gift", giftRouter);
@@ -264,6 +271,7 @@ app.use("/vendor", vendorRouter);
 
 //Start server and connect to DB
 const db = require("./services/dbSetupService.js");
+const returnItemShowController = require("./controllers/returnItemShowController");
 const PORT = process.env.PORT || 8080;
 const start = async () => {
   try {

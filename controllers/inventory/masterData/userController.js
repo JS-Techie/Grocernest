@@ -36,7 +36,7 @@ const saveUser = async (req, res, next) => {
       });
     }
     const userObject = await User.findOne({
-      where: { email},
+      where: { email },
     });
     if (userObject) {
       return res.status(200).send({
@@ -46,8 +46,8 @@ const saveUser = async (req, res, next) => {
       });
     }
 
-    const locationObject = await User.findOne({
-      where: { location_id: locationId },
+    const locationObject = await Location.findOne({
+      where: { id: locationId },
     });
     if (!locationObject) {
       return res.status(200).send({
@@ -121,9 +121,9 @@ const updateUser = async (req, res, next) => {
     fullName,
     mobileNo,
     email,
-    userType,
+    userType
   } = req.body;
-  const  userId  = req.params.userId;
+  const userId = req.params.userId;
   // console.log("checking the fetched data by printing it :::=", userId, typeof(userId));
   // const { user_id } = req;
   try {
@@ -177,7 +177,6 @@ const updateUser = async (req, res, next) => {
       });
     }
 
-
     const locationObject = await User.findOne({
       where: { location_id: locationId },
     });
@@ -195,38 +194,26 @@ const updateUser = async (req, res, next) => {
       dob.split("/")[0]
     }`;
 
-
     //update with same email address
     const sameUserArray = await User.findAll({
-      attributes: ['id'],
+      attributes: ["id"],
       where: {
-        email: email
-      },
+        email: email,
+        [Op.not]: [
+          {id: userId}
+        ]
+      }      
     });
-    let idCheckflag = false
-    
-    for (var i = 0; i < sameUserArray.length; i++) {
-      var user = sameUserArray[i];
-      if (user.id !== userId) {
 
-        // console.log("the array item user id: ", user.id);
-        // console.log("the req body id: ", userId);
-        idCheckflag = true
-        // console.log("the flag within loop : ", idCheckflag);
-      }
-    }
-
-    // console.log("the flag finally: ",idCheckflag);
-
-    if (idCheckflag) {
+    console.log("====================", sameUserArray)
+  
+    if (sameUserArray.length !== 0) {
       return res.status(200).send({
         status: 400,
         message: "User email is not same",
         data: [],
       });
     }
-
-
 
     const updateUser = await User.update(
       {
@@ -239,7 +226,6 @@ const updateUser = async (req, res, next) => {
       },
       { where: { id: userId } }
     );
-
 
     // console.log("the returned object of the updated user from the query : ", updateUser);
     const updatedUser = await User.findOne({
@@ -385,7 +371,7 @@ const getBasicUserDetails = async (req, res, next) => {
         isActive: userObject.active_ind,
         locationId: userObject.location_id,
         locationName: locationObject.loc_name,
-        serverDate: null,
+        serverDate: new Date(),
         roleList: roleList,
         moduleList: [],
       },
@@ -489,7 +475,7 @@ const tellerList = async (req, res, next) => {
 };
 
 const activateUser = async (req, res, next) => {
-  const userId   = req.params.userId;
+  const userId = req.params.userId;
   try {
     if (!userId) {
       return res.status(200).send({
@@ -537,7 +523,7 @@ const activateUser = async (req, res, next) => {
 };
 
 const deactivateUser = async (req, res, next) => {
-  const userId  = req.params.userId;
+  const userId = req.params.userId;
   try {
     if (!userId) {
       return res.status(200).send({

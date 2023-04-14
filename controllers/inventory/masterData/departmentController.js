@@ -77,17 +77,10 @@ const saveDepartment = async (req, res, next) => {
             attributes: ["id"],
             where: {
                 [Op.or]: [{ dept_cd: deptCode }, { dept_name: deptName }],
+                [Op.not]: [{id: id}]
             },
         });
-        let idCheckflag = false
-        for (var i = 0; i < sameDepartmentArray.length; i++) {
-            var item = sameDepartmentArray[i];
-
-            if (item.id !== id) {
-                idCheckflag = true
-            }
-        }
-        if (idCheckflag) {
+        if (sameDepartmentArray.length!==0) {
             return res.status(200).send({
                 status: 403,
                 message: "Department Name or Department code already exists",
