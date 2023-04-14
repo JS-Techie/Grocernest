@@ -118,6 +118,11 @@ db.CustomerToCouponMappingModel = require("./t_customer_coupon_mapping")(
   Sequelize
 );
 
+db.ExternalCouponModel = require("./t_ext_coupon")(db.sequelize, Sequelize);
+
+db.ExternalCouponCustomerMapModel = require("./t_ext_coupon_customer_map")(db.sequelize, Sequelize);
+
+
 db.WishlistModel = require("./t_lkp_wishlist")(db.sequelize, Sequelize);
 
 db.AddressModel = require("./t_address")(db.sequelize, Sequelize);

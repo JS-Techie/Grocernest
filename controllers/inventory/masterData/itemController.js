@@ -8,6 +8,7 @@ const Brand = db.LkpBrandModel;
 const Category = db.LkpCategoryModel;
 const SubCategory = db.LkpSubCategoryModel;
 const Department = db.LkpDepartmentModel;
+const Size = db.LkpSizeModel;
 const querystring = require("querystring");
 
 const {
@@ -21,10 +22,19 @@ const {
   newTaxItemInfo,
 } = require("../../../services/inventory/itemServices");
 
-const { uploadImageToS3, deleteImageFromS3 } = require("../../../services/s3Service");
+const {
+  uploadImageToS3,
+  deleteImageFromS3,
+} = require("../../../services/s3Service");
+
+
+
+
+
+
 
 const getAllItem = async (req, res, next) => {
-  const { pageNo, pageSize } = req.body;
+  const { pageNo, pageSize, itemCode } = req.body;
   try {
     // if (!active_ind) {
     //   return res.status(200).send({
@@ -34,19 +44,28 @@ const getAllItem = async (req, res, next) => {
     //   });
     // }
 
-    const offset = parseInt((pageNo) * pageSize);
+    console.log("=========-------------==========", pageNo, typeof (pageNo), pageSize, typeof (pageSize))
+    const offset = parseInt(pageNo * pageSize);
     const limit = parseInt(pageSize);
-const [countItems, metadata1] =  await sequelize.query(`select count(*) as count from t_item `)
+    const [countItems, metadata1] = await sequelize.query(
+      `select count(*) as count from t_item `
+    );
+
+    const whereQuery = itemCode ? ` where t_item.item_cd like "%${itemCode}%" or t_item.name like "%${itemCode}%"  ` : ``
+
+
     const [allItems, metadata] =
       await sequelize.query(`select  t_item.created_by , t_item.created_at , t_item.updated_by, t_item.updated_at , t_item.id ,t_item.name ,t_item.item_cd ,t_item.UOM ,t_item.units ,t_item.brand_id ,t_lkp_brand.brand_name ,t_item.div_id ,t_lkp_division.div_name ,t_item.category_id ,t_lkp_category.group_name ,t_lkp_category.HSN_CODE ,t_item.sub_category_id ,t_lkp_sub_category.sub_cat_name ,t_item.department_id ,t_lkp_department.dept_name ,t_item.color_id ,t_lkp_color.color_name ,t_item.size_id ,t_lkp_size.size_cd ,t_item.active_ind ,t_item.image ,t_item.description ,t_item.how_to_use ,t_item.country_of_origin ,t_item.manufacturer_name ,t_item.ingredients ,t_item.available_for_ecomm ,t_item.is_gift ,t_item.is_grocernest ,t_item.show_discount 
       from (((((((t_item 
       inner join t_lkp_brand on t_lkp_brand.id = t_item.brand_id )
       inner join t_lkp_category on t_lkp_category.id = t_item.category_id )
       inner join t_lkp_division  on t_lkp_division.id = t_item.div_id )
-      inner join t_lkp_sub_category on t_lkp_sub_category.id = t_item.sub_category_id )
+      left outer join t_lkp_sub_category on t_lkp_sub_category.id = t_item.sub_category_id )
       inner join t_lkp_department on t_lkp_department.id = t_item.department_id )
       inner join t_lkp_color on t_lkp_color.id = t_item.color_id )
-      inner join t_lkp_size on t_lkp_size.id = t_item.size_id ) limit ${limit} offset ${offset} `);
+      inner join t_lkp_size on t_lkp_size.id = t_item.size_id ) ${whereQuery} limit ${limit} offset ${offset} `);
+
+    console.log("++++++++++++++++++++++++++++++++", allItems)
 
     if (allItems.length === 0) {
       return res.status(200).send({
@@ -115,6 +134,16 @@ const [countItems, metadata1] =  await sequelize.query(`select count(*) as count
     });
   }
 };
+
+
+
+
+
+
+
+
+
+
 
 const getActiveItem = async (req, res, next) => {
   let { pageNo, pageSize } = req.body;
@@ -279,8 +308,8 @@ const getDeactiveItem = async (req, res, next) => {
 };
 
 const activeItem = async (req, res, next) => {
-  const { itemIdList } = req.body;
-
+  const itemIdList = req.body;
+  console.log("hello1", itemIdList);
   try {
     if (itemIdList.length === 0) {
       return res.status(200).send({
@@ -293,6 +322,7 @@ const activeItem = async (req, res, next) => {
       const current = await Item.findOne({
         where: { id: currentItem },
       });
+      console.log("hello2", current);
       if (current) {
         const activeItem = await Item.update(
           {
@@ -659,235 +689,61 @@ const getItemByItemId = async (req, res, next) => {
   }
 };
 
-const getItemByItemCode = async (req, res, next) => {
-  const searchAllLocation = req.query.searchAllLocation;
-  const includeTaxDetails = req.query.includeTaxDetails;
-  const itemCode = req.query.itemCode;
 
+
+
+
+
+
+
+
+
+
+const searchItemDetailsByItemCode = async (req, res, next) => {
+  const { itemCode, storeId, searchAllLocation, includeTaxDetails } = req.body;
   try {
-    if (searchAllLocation == "N" && includeTaxDetails == "Y") {
-      const getItemByCode = await Item.findOne({
-        where: {
-          item_cd: itemCode,
-        },
-      });
-      if (!getItemByCode) {
-        return res.status(200).send({
-          status: 400,
-          message: "Item code not found",
-          data: [],
-        });
-      }
-      const taxInfoSolved = await getItemTaxArray(getItemByCode.id);
-      const inventoryResolved = await getInventoryArray(getItemByCode.id);
-
-      const response = {
-        createdBy: getItemByCode.created_by,
-        createdAt: getItemByCode.created_at,
-        updatedBy: getItemByCode.updated_by,
-        updatedAt: getItemByCode.updated_at,
-        isActive: getItemByCode.active_ind,
-        id: getItemByCode.id,
-        name: getItemByCode.name,
-        itemCode: getItemByCode.item_cd,
-        uom: getItemByCode.UOM,
-        units: getItemByCode.units,
-        brandId: getItemByCode.brand_id,
-        divisionId: getItemByCode.div_id,
-        categoryId: getItemByCode.category_id,
-        subCategoryId: getItemByCode.sub_category_id,
-        departmentId: getItemByCode.department_id,
-        colourId: getItemByCode.color_id,
-        sizeId: getItemByCode.size_id,
-        availableForEcomm: getItemByCode.available_for_ecomm,
-        isGift: getItemByCode.is_gift,
-        isGrocernest: getItemByCode.is_grocernest,
-        image: getItemByCode.image,
-        description: getItemByCode.description,
-        howToUse: getItemByCode.how_to_use,
-        countryOfOrigin: getItemByCode.country_of_origin,
-        manufactureName: getItemByCode.manufacturer_name,
-        ingredients: getItemByCode.ingredients,
-        showDiscount: getItemByCode.show_discount,
-        itemTaxInfoList: taxInfoSolved,
-        stockFromInventory: inventoryResolved,
-        availableBatches: null,
-      };
-      return res.status(200).send({
-        status: 200,
-        message: "Successfully fetched the item by item code",
-        data: response,
-      });
-    }
-    if (searchAllLocation == "N" && includeTaxDetails == "N") {
-      const getItemByCode = await Item.findOne({
-        where: {
-          item_cd: itemCode,
-        },
-      });
-      if (!getItemByCode) {
-        return res.status(200).send({
-          status: 400,
-          message: "Item code not found",
-          data: [],
-        });
-      }
-      const taxInfoSolved = await getItemTaxArray(getItemByCode.id);
-      const inventoryResolved = await getInventoryArray(getItemByCode.id);
-
-      const response = {
-        createdBy: getItemByCode.created_by,
-        createdAt: getItemByCode.created_at,
-        updatedBy: getItemByCode.updated_by,
-        updatedAt: getItemByCode.updated_at,
-        isActive: getItemByCode.active_ind,
-        id: getItemByCode.id,
-        name: getItemByCode.name,
-        itemCode: getItemByCode.item_cd,
-        uom: getItemByCode.UOM,
-        units: getItemByCode.units,
-        brandId: getItemByCode.brand_id,
-        divisionId: getItemByCode.div_id,
-        categoryId: getItemByCode.category_id,
-        subCategoryId: getItemByCode.sub_category_id,
-        departmentId: getItemByCode.department_id,
-        colourId: getItemByCode.color_id,
-        sizeId: getItemByCode.size_id,
-        availableForEcomm: getItemByCode.available_for_ecomm,
-        isGift: getItemByCode.is_gift,
-        isGrocernest: getItemByCode.is_grocernest,
-        image: getItemByCode.image,
-        description: getItemByCode.description,
-        howToUse: getItemByCode.how_to_use,
-        countryOfOrigin: getItemByCode.country_of_origin,
-        manufactureName: getItemByCode.manufacturer_name,
-        ingredients: getItemByCode.ingredients,
-        showDiscount: getItemByCode.show_discount,
-        itemTaxInfoList: taxInfoSolved,
-        stockFromInventory: inventoryResolved,
-        availableBatches: null,
-      };
-      return res.status(200).send({
-        status: 200,
-        message: "Successfully fetched the item by item code",
-        data: response,
-      });
-    }
-    if (searchAllLocation == "Y" && includeTaxDetails == "N") {
-      const getItemByCode = await Item.findOne({
-        where: {
-          item_cd: itemCode,
-        },
-      });
-      if (!getItemByCode) {
-        return res.status(200).send({
-          status: 400,
-          message: "Item code not found",
-          data: [],
-        });
-      }
-      const taxInfoSolved = await getItemTaxArray(getItemByCode.id);
-      const inventoryResolved = await getInventoryArray(getItemByCode.id);
-
-      const response = {
-        createdBy: getItemByCode.created_by,
-        createdAt: getItemByCode.created_at,
-        updatedBy: getItemByCode.updated_by,
-        updatedAt: getItemByCode.updated_at,
-        isActive: getItemByCode.active_ind,
-        id: getItemByCode.id,
-        name: getItemByCode.name,
-        itemCode: getItemByCode.item_cd,
-        uom: getItemByCode.UOM,
-        units: getItemByCode.units,
-        brandId: getItemByCode.brand_id,
-        divisionId: getItemByCode.div_id,
-        categoryId: getItemByCode.category_id,
-        subCategoryId: getItemByCode.sub_category_id,
-        departmentId: getItemByCode.department_id,
-        colourId: getItemByCode.color_id,
-        sizeId: getItemByCode.size_id,
-        availableForEcomm: getItemByCode.available_for_ecomm,
-        isGift: getItemByCode.is_gift,
-        isGrocernest: getItemByCode.is_grocernest,
-        image: getItemByCode.image,
-        description: getItemByCode.description,
-        howToUse: getItemByCode.how_to_use,
-        countryOfOrigin: getItemByCode.country_of_origin,
-        manufactureName: getItemByCode.manufacturer_name,
-        ingredients: getItemByCode.ingredients,
-        showDiscount: getItemByCode.show_discount,
-        itemTaxInfoList: taxInfoSolved,
-        stockFromInventory: inventoryResolved,
-        availableBatches: null,
-      };
-      return res.status(200).send({
-        status: 200,
-        message: "Successfully fetched the item by item code",
-        data: response,
-      });
-    }
-    if (searchAllLocation == "Y" && includeTaxDetails == "Y") {
-      const getItemByCode = await Item.findOne({
-        where: {
-          item_cd: itemCode,
-        },
-      });
-      if (!getItemByCode) {
-        return res.status(200).send({
-          status: 400,
-          message: "Item code not found",
-          data: [],
-        });
-      }
-      const taxInfoSolved = await getItemTaxArray(getItemByCode.id);
-      const inventoryResolved = await getInventoryArray(getItemByCode.id);
-
-      const response = {
-        createdBy: getItemByCode.created_by,
-        createdAt: getItemByCode.created_at,
-        updatedBy: getItemByCode.updated_by,
-        updatedAt: getItemByCode.updated_at,
-        isActive: getItemByCode.active_ind,
-        id: getItemByCode.id,
-        name: getItemByCode.name,
-        itemCode: getItemByCode.item_cd,
-        uom: getItemByCode.UOM,
-        units: getItemByCode.units,
-        brandId: getItemByCode.brand_id,
-        divisionId: getItemByCode.div_id,
-        categoryId: getItemByCode.category_id,
-        subCategoryId: getItemByCode.sub_category_id,
-        departmentId: getItemByCode.department_id,
-        colourId: getItemByCode.color_id,
-        sizeId: getItemByCode.size_id,
-        availableForEcomm: getItemByCode.available_for_ecomm,
-        isGift: getItemByCode.is_gift,
-        isGrocernest: getItemByCode.is_grocernest,
-        image: getItemByCode.image,
-        description: getItemByCode.description,
-        howToUse: getItemByCode.how_to_use,
-        countryOfOrigin: getItemByCode.country_of_origin,
-        manufactureName: getItemByCode.manufacturer_name,
-        ingredients: getItemByCode.ingredients,
-        showDiscount: getItemByCode.show_discount,
-        itemTaxInfoList: taxInfoSolved,
-        stockFromInventory: inventoryResolved,
-        availableBatches: null,
-      };
-      return res.status(200).send({
-        status: 200,
-        message: "Successfully fetched the item by item code",
-        data: response,
-      });
-    }
-  } catch (error) {
-    return res.status(200).send({
-      status: 500,
-      message: "Something went wrong , please try again later",
-      data: error.message,
+    itemListReturn = [];
+    const itemList = await Item.finAll({
+      where: { item_cd: itemCode, active_ind: "Y" },
     });
-  }
+    if (itemList !== null) {
+      const itemObj = itemList.map(async (current) => {
+        if (includeTaxDetails = "Y") {
+          const itemTaxInfo = await ItemTaxInfo.findAll({
+            where: { item_id: current.id, active_ind: "Y" },
+          });
+        }
+        if (searchAllLocation = "Y") {
+          const [StockFromInventoryForAllLocation, metadata] = await sequelize.query(`select t_batch.id ,t_batch.batch_no , t_batch.MRP , t_batch.cost_price ,t_batch.sale_price , t_batch.discount ,t_batch.mfg_date ,
+          t_inventory.location_id , t_lkp_location.loc_name ,t_lkp_location.type , t_inventory.quantity , t_inventory.cashback_is_percentage ,
+          t_inventory.cashback from ((t_batch
+          inner join t_inventory on t_inventory.batch_id = t_batch.id )
+          left join t_lkp_location on t_lkp_location.id = t_inventory.location_id )
+          where t_batch.item_id = "${current.id}" and t_inventory.item_id = "${current.id}" and t_batch.active_ind = "Y" and t_inventory.balance_type = "1"`)
+        }
+        const [stockFromInventory, metadata1] = await sequelize.query(`select t_batch.id ,t_batch.batch_no , t_batch.MRP , t_batch.cost_price ,t_batch.sale_price , t_batch.discount ,t_batch.mfg_date ,
+        t_inventory.location_id , t_lkp_location.loc_name ,t_lkp_location.type , t_inventory.quantity , t_inventory.cashback_is_percentage ,
+        t_inventory.cashback from ((t_batch
+        inner join t_inventory on t_inventory.batch_id = t_batch.id )
+        left join t_lkp_location on t_lkp_location.id = t_inventory.location_id )
+        where t_batch.item_id = "${current.id}" and t_batch.active_ind = "Y"`)
+        if (stockFromInventory !== null) {
+          const inventoryObj = stockFromInventory.map((currentobj) => {
+            if (currentobj.cashback_is_percentage == "Y") {
+              if (currentobj.sale_price !== null && currentobj.cashback !== null) {
+                if (currentobj.cashback > 0) {
+                  let cashback = Math.round(currentobj.cashback)
+                }
+                cashback = currentobj.cashback
+              }
+              let stockInventory = []
+              stockInventory = Math.round(cashback)
+            }
+          })
+        }
+      })
+    }
+  } catch (error) { }
 };
 
 const fetchItembyItemCode = async (req, res, next) => {
@@ -1009,27 +865,193 @@ const fetchItembyItemCode = async (req, res, next) => {
     });
   }
 };
+
+
+
+
+
+
+
+
+
 const getItemData = async (req, res, next) => {
-  const {
+  let {
     brandIdList,
     categoryIdList,
+    colorIdList,
+    sizeIdList,
+    departmentIdList,
     subCategoryIdList,
-    includeInventory
   } = req.body;
+
+
   try {
+
+    if (!brandIdList) {
+      brandIdList = []
+    }
+    if (!categoryIdList) {
+      categoryIdList = []
+    }
+    if (!subCategoryIdList) {
+      subCategoryIdList = []
+    }
+    if (!colorIdList) {
+      colorIdList = []
+    }
+    if (!sizeIdList) {
+      sizeIdList = []
+    }
+    if (!departmentIdList) {
+      departmentIdList = []
+    }
+
+
+
+    //shaping the req.body array to sql understandable language
+
+
+    // let brandListQuery = "("
+    // let categoryListQuery = "("
+    // let subCategoryListQuery = "("
+    // let departmentListQuery = "("
+    // let sizeListQuery = "("
+    // let colorListQuery = "("
+
+    // for (let i in brandIdList) {
+    //   brandListQuery = brandListQuery + brandIdList[i]
+    //   if (parseInt(i) === (brandIdList.length) - 1) {
+    //     brandListQuery = brandListQuery + `)`
+    //   }
+    //   else {
+    //     brandListQuery = brandListQuery + `,`
+    //   }
+    // }
+
+    // for (let i in categoryIdList) {
+    //   categoryListQuery = categoryListQuery + categoryIdList[i]
+    //   if (parseInt(i) === (categoryIdList.length) - 1) {
+    //     categoryListQuery = categoryListQuery + `)`
+    //   }
+    //   else {
+    //     categoryListQuery = categoryListQuery + `,`
+    //   }
+    // }
+
+    // for (let i in subCategoryIdList) {
+    //   subCategoryListQuery = subCategoryListQuery + subCategoryIdList[i]
+    //   if (parseInt(i) === (subCategoryIdList.length) - 1) {
+    //     subCategoryListQuery = subCategoryListQuery + `)`
+    //   }
+    //   else {
+    //     subCategoryListQuery = subCategoryListQuery + `,`
+    //   }
+    // }
+
+    // for (let i in sizeIdList) {
+    //   sizeListQuery = sizeListQuery + sizeIdList[i]
+    //   if (parseInt(i) === (sizeIdList.length)-1) {
+    //     sizeListQuery = sizeListQuery + `)`
+    //   }
+    //   else {
+    //     sizeListQuery = sizeListQuery + `,`
+    //   }
+    // }
+
+    // for (let i in colorIdList) {
+    //   colorListQuery = colorListQuery + colorIdList[i]
+    //   if (parseInt(i) === (colorIdList.length)-1) {
+    //     colorListQuery = colorListQuery + `)`
+    //   }
+    //   else {
+    //     colorListQuery = colorListQuery + `,`
+    //   }
+    // }
+
+    // for (let i in departmentIdList) {
+    //   departmentListQuery = departmentListQuery + departmentIdList[i]
+    //   if (parseInt(i) === (departmentIdList.length)-1) {
+    //     departmentListQuery = departmentListQuery + `)`
+    //   }
+    //   else {
+    //     departmentListQuery = departmentListQuery + `,`
+    //   }
+    // }
+
+
+    //thicc logicc ends
+
+
+    let firstQueryFlag = false
+    let queryWord
+
+    let brandQuery = brandIdList.length === 0 ? `` : `t_item.brand_id = ${brandIdList[brandIdList.length - 1]}`
+    let categoryQuery = categoryIdList.length === 0 ? `` : `t_item.category_id = ${categoryIdList[categoryIdList.length - 1]}`
+    let subCategoryQuery = subCategoryIdList.length === 0 ? `` : `t_item.sub_category_id = ${subCategoryIdList[subCategoryIdList.length - 1]}`
+    let departmentQuery = departmentIdList.length === 0 ? `` : `t_item.department_id = ${departmentIdList[departmentIdList.length - 1]}`
+    let colorQuery = colorIdList.length === 0 ? `` : `t_item.color_id = ${colorIdList[colorIdlist.length - 1]}`
+    let sizeQuery = sizeIdList.length === 0 ? `` : `t_item.size_id = ${sizeIdList[sizeIdList.length - 1]}`
+
+
+
+    //logic to provide where and and in sql query
+    if (brandIdList.length !== 0) {
+      !firstQueryFlag ? queryWord = `where ` : queryWord = `and `
+      queryWord === `where ` ? firstQueryFlag = true : firstQueryFlag = false
+      brandQuery = queryWord + brandQuery
+    }
+    if (categoryIdList.length !== 0) {
+      !firstQueryFlag ? queryWord = `where ` : queryWord = `and `
+      queryWord === `where ` ? firstQueryFlag = true : firstQueryFlag = false
+      categoryQuery = queryWord + categoryQuery
+    }
+    if (subCategoryIdList.length !== 0) {
+      !firstQueryFlag ? queryWord = `where ` : queryWord = `and `
+      queryWord === `where ` ? firstQueryFlag = true : firstQueryFlag = false
+      subCategoryQuery = queryWord + subCategoryQuery
+    }
+    if (departmentIdList.length !== 0) {
+      !firstQueryFlag ? queryWord = `where ` : queryWord = `and `
+      queryWord === `where ` ? firstQueryFlag = true : firstQueryFlag = false
+      departmentQuery = queryWord + departmentQuery
+    }
+    if (colorIdList.length !== 0) {
+      !firstQueryFlag ? queryWord = `where ` : queryWord = `and `
+      queryWord === `where ` ? firstQueryFlag = true : firstQueryFlag = false
+      colorQuery = queryWord + colorQuery
+    }
+    if (sizeIdList.length !== 0) {
+      !firstQueryFlag ? queryWord = `where ` : queryWord = `and `
+      queryWord === `where ` ? firstQueryFlag = true : firstQueryFlag = false
+      sizeQuery = queryWord + sizeQuery
+    }
+    //end of the thicc Logicc
+
+
+
+
     const [getItemDetails, metadata] =
-      await sequelize.query(`select t_item.brand_id , t_lkp_brand.brand_name , t_item.category_id , t_lkp_sub_category.sub_cat_name , t_item.color_id ,t_lkp_color.color_name ,t_item.country_of_origin ,t_item.department_id , t_lkp_department.dept_name , t_item.description ,t_item.div_id , t_lkp_division.div_name , t_item.how_to_use ,t_lkp_category.HSN_CODE , t_item.id,t_item.image , t_item.ingredients , t_item.active_ind , t_item.available_for_ecomm , t_item.is_gift ,t_item.is_grocernest , t_item.item_cd , t_item.manufacturer_name , t_item.name , t_item.show_discount , t_item.size_id , t_lkp_size.size_cd , t_item.sub_category_id , t_item.units , t_item.UOM 
-      from(((((((t_item
-      inner join t_lkp_brand on t_lkp_brand.id= t_item.brand_id)
-      inner join t_lkp_color on t_lkp_color.id = t_item.color_id )
-      inner join t_lkp_category on t_lkp_category.id = t_item.category_id )
-      inner join t_lkp_department on t_lkp_department.id  = t_item.department_id )
-      inner join t_lkp_division on t_lkp_division.id  = t_item.div_id )
-      inner join t_lkp_size on t_lkp_size.id = t_item.size_id )
-      inner join t_lkp_sub_category on t_lkp_sub_category.id  = t_item.sub_category_id )
-          where t_item.brand_id = "${brandIdList}" and t_item.category_id ="${categoryIdList}" and t_item.sub_category_id = "${subCategoryIdList}"
-          `);
-          console.log("hello1", getItemDetails);
+      await sequelize.query(`select t_item.brand_id , t_lkp_brand.brand_name , t_item.category_id , t_lkp_sub_category.sub_cat_name , t_item.description ,t_item.div_id ,t_item.how_to_use ,t_lkp_category.HSN_CODE , t_item.id,t_item.image , t_item.ingredients , t_item.active_ind , t_item.available_for_ecomm , t_item.is_gift ,t_item.is_grocernest , t_item.item_cd , t_item.manufacturer_name , t_item.name , t_item.show_discount , t_item.size_id , t_item.sub_category_id , t_item.units , t_item.UOM
+    from(((t_item
+    inner join t_lkp_brand on t_lkp_brand.id= t_item.brand_id)
+    inner join t_lkp_category on t_lkp_category.id = t_item.category_id )
+    left outer join t_lkp_sub_category on t_lkp_sub_category.id  = t_item.sub_category_id )
+    ${brandQuery} ${categoryQuery} ${subCategoryQuery}
+        `);
+
+
+        // ${colorQuery} ${sizeQuery} ${departmentQuery}
+        // inner join t_lkp_color on t_lkp_color.id = t_item.color_id )
+        // inner join t_lkp_department on t_lkp_department.id  = t_item.department_id )
+        // inner join t_lkp_size on t_lkp_size.id = t_item.size_id )
+        // inner join t_lkp_division on t_lkp_division.id  = t_item.div_id )
+
+    
+
+
+
+
+    console.log("hello1", getItemDetails);
     if (getItemDetails.length === 0) {
       return res.status(200).send({
         status: 400,
@@ -1079,6 +1101,13 @@ const getItemData = async (req, res, next) => {
     });
   }
 };
+
+
+
+
+
+
+
 
 const itemByCode = async (req, res, next) => {
   try {
@@ -1369,7 +1398,6 @@ const saveItem = async (req, res, next) => {
 
     const newTaxItemInfo = await ItemTaxInfo.bulkCreate(taxItemInfoArray);
 
-
     const taxResolved = await getItemTaxArray(newItemFromDB.id);
     const inventoryResolved = await getInventoryArray(newItemFromDB.id);
     response = {
@@ -1418,6 +1446,11 @@ const saveItem = async (req, res, next) => {
   }
 };
 
+
+
+
+
+
 module.exports = {
   saveItem,
   getAllItem,
@@ -1426,7 +1459,7 @@ module.exports = {
   activeItem,
   deactiveItem,
   getItemByItemId,
-  getItemByItemCode,
+  searchItemDetailsByItemCode,
   fetchItembyItemCode,
   getItemData,
   itemByCode,

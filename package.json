@@ -43,6 +43,7 @@
     "referral-code-generator": "^1.0.8",
     "sequelize": "^6.20.1",
     "sequelize-automate": "^1.2.2",
+    "swagger": "^0.7.5",
     "swagger-autogen": "^2.23.1",
     "swagger-jsdoc": "^6.2.1",
     "swagger-ui-express": "^4.4.0",
