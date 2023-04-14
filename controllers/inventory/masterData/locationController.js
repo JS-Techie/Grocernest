@@ -84,17 +84,11 @@ const saveLocation = async (req, res, next) => {
         const sameLocationArray = await Location.findAll({
             attributes: ['id'],
             where: {
-                [Op.or]: [{loc_name: locationName}]
+                [Op.or]: [{loc_name: locationName}],
+                [Op.not]: [{id: id}]
             }
         })
-        let nameCheckFlag = false
-        for (var i=0; i<sameLocationArray.length; i++){
-            var location = sameLocationArray[i];
-            if(!location.id===id){
-                nameCheckFlag = true
-            }
-        }
-        if(nameCheckFlag){
+        if(sameLocationArray.length !== 0){
             return res.status(200).send({
                 status:400,
                 message: "Location name already exists",
