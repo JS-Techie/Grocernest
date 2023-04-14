@@ -626,6 +626,7 @@ const getItemCount = async (req, res, next) => {
 };
 
 const getCart = async (req, res, next) => {
+
   // console.log("===========whatsapp testing==============");
   // sendInvoiceToWhatsapp("8910443583", "123456774", "https://ecomm-dev.s3.ap-south-1.amazonaws.com/pdfs/invoices/invoice-307172.pdf");
   //sendOrderStatusToWhatsapp("7980996735", "123456774", "Shipped");
@@ -643,9 +644,8 @@ const getCart = async (req, res, next) => {
   //Find the cart associated with this customer id
 
   try {
-    const [cartForUser, metadata] =
-      await sequelize.query(`select t_cart.item_id, t_cart.id, t_cart.quantity, t_item.name, t_item.image, t_item.description,
-    t_batch.MRP,t_batch.sale_price, t_batch.discount,t_lkp_color.color_name, t_lkp_brand.brand_name, t_cart.is_offer,t_cart.is_gift,t_cart.offer_item_price
+    const [cartForUser, metadata] = await sequelize.query(`select t_cart.item_id, t_cart.id, t_cart.quantity, t_item.name, t_item.image, t_item.description, t_batch.id as batchId,
+    t_batch.MRP, t_batch.sale_price, t_batch.discount, t_batch.mark_selected, t_lkp_color.color_name, t_lkp_brand.brand_name, t_cart.is_offer,t_cart.is_gift, t_cart.offer_item_price
     from ((((t_cart
     inner join t_item on t_item.id = t_cart.item_id)
     inner join t_batch on t_batch.item_id = t_cart.item_id )

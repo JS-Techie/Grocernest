@@ -388,6 +388,7 @@ const createOffer = async (req, res, next) => {
             })
           }
         }*/
+        
         break;
       case 2:
         existingOffer = await validationForExistingOffer(item_x, item_x_quantity)
