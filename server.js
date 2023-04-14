@@ -148,7 +148,6 @@ const grnDraftSaveRouter = require("./routes/inventory/grn/grnDraftSaveRoutes");
 
 
 //Vendor routes import
-
 const vendorRouter = require("./routes/vendor/profileRoutes");
 
 //routes
