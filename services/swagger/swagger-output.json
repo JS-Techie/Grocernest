@@ -2203,7 +2203,10 @@
             "schema": {
               "type": "object",
               "properties": {
-                "itemIdlist": {
+                "length": {
+                  "example": "any"
+                },
+                "map((currentItem": {
                   "example": "any"
                 }
               }

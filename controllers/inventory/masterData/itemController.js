@@ -54,9 +54,9 @@ const getAllItem = async (req, res, next) => {
       `select count(*) as count from t_item `
     );
 console.log("hello", countItems[0].count);
-    const whereQuery = itemCode
-      ? ` where t_item.item_cd like "%${itemCode}%" or t_item.name like "%${itemCode}%"  `
-      : ``;
+    // const whereQuery = itemCode
+    //   ? ` where t_item.item_cd like "%${itemCode}%" or t_item.name like "%${itemCode}%"  `
+    //   : ``;
 
     const [allItems, metadata] =
       await sequelize.query(`select  t_item.created_by , t_item.created_at , t_item.updated_by, t_item.updated_at , t_item.id ,t_item.name ,t_item.item_cd ,t_item.UOM ,t_item.units ,t_item.brand_id ,t_lkp_brand.brand_name ,t_item.div_id ,t_lkp_division.div_name ,t_item.category_id ,t_lkp_category.group_name ,t_lkp_category.HSN_CODE ,t_item.sub_category_id ,t_lkp_sub_category.sub_cat_name ,t_item.department_id ,t_lkp_department.dept_name ,t_item.color_id ,t_lkp_color.color_name ,t_item.size_id ,t_lkp_size.size_cd ,t_item.active_ind ,t_item.image ,t_item.description ,t_item.how_to_use ,t_item.country_of_origin ,t_item.manufacturer_name ,t_item.ingredients ,t_item.available_for_ecomm ,t_item.is_gift ,t_item.is_grocernest ,t_item.show_discount 
@@ -68,7 +68,7 @@ console.log("hello", countItems[0].count);
       left join t_lkp_department on t_lkp_department.id = t_item.department_id )
       left join t_lkp_color on t_lkp_color.id = t_item.color_id )
       left join t_lkp_size on t_lkp_size.id = t_item.size_id )  
-      ${whereQuery}    limit ${limit} offset ${offset} `);
+      where (t_item.name like "%${itemCode}%" or t_item.item_cd like "%${itemCode}%" ) limit ${limit} offset ${offset} `);
 
     console.log("++++++++++++++++++++++++++++++++", allItems);
 
@@ -120,7 +120,7 @@ console.log("hello", countItems[0].count);
 
     const resolved = await Promise.all(promises);
 
-    return res.status(200).send({
+    return res.status(200).send({ 
       status: 200,
       message: "Successfully retrieved all item data",
       data: {
@@ -384,7 +384,7 @@ const activeItem = async (req, res, next) => {
 };
 
 const deactiveItem = async (req, res, next) => {
-  const itemIdlist = req.body;
+  const itemIdlist = req.body ;
 console.log("heeeey", itemIdlist);
   try {
     if (itemIdlist.length === 0) {
