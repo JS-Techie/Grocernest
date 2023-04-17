@@ -68,7 +68,8 @@ console.log("hello", countItems[0].count);
       left join t_lkp_department on t_lkp_department.id = t_item.department_id )
       left join t_lkp_color on t_lkp_color.id = t_item.color_id )
       left join t_lkp_size on t_lkp_size.id = t_item.size_id )  
-      ${whereQuery} limit ${limit} offset ${offset} `);
+      ${whereQuery}    limit ${limit} offset ${offset} `);
+
 
     console.log("++++++++++++++++++++++++++++++++", allItems);
 
@@ -120,6 +121,7 @@ console.log("hello", countItems[0].count);
 
     const resolved = await Promise.all(promises);
 
+
     if(resolved.length === 0){
       return res.status(400).send({
         data:[],
@@ -129,7 +131,8 @@ console.log("hello", countItems[0].count);
       })
     }
 
-    return res.status(200).send({ 
+    res.status(200).send({ 
+
       status: 200,
       message: "Successfully retrieved all item data",
       data: {
@@ -393,7 +396,7 @@ const activeItem = async (req, res, next) => {
 };
 
 const deactiveItem = async (req, res, next) => {
-  const itemIdlist = req.body ;
+  const itemIdlist = req.body;
 console.log("heeeey", itemIdlist);
   try {
     if (itemIdlist.length === 0) {
