@@ -70,6 +70,7 @@ console.log("hello", countItems[0].count);
       left join t_lkp_size on t_lkp_size.id = t_item.size_id )  
       ${whereQuery}    limit ${limit} offset ${offset} `);
 
+
     console.log("++++++++++++++++++++++++++++++++", allItems);
 
     if(allItems.length === 0) {
@@ -120,7 +121,18 @@ console.log("hello", countItems[0].count);
 
     const resolved = await Promise.all(promises);
 
-    return res.status(200).send({
+
+    if(resolved.length === 0){
+      return res.status(400).send({
+        data:[],
+        message: "Data not found",
+        status:400,
+        success: false
+      })
+    }
+
+    res.status(200).send({ 
+
       status: 200,
       message: "Successfully retrieved all item data",
       data: {
