@@ -113,6 +113,10 @@ function generateInvoiceTable(doc, invoice) {
       salePrice = item.salePrice;
       total = salePrice * item.quantity;
     }
+    else {
+      salePrice = item.MRP;
+      total = salePrice * item.quantity;
+    }
 
     let item_name = item.itemName;
     if (item_name.length > 15) {
@@ -124,8 +128,8 @@ function generateInvoiceTable(doc, invoice) {
       item.isGift === true
         ? `${item_name} (Gift)`
         : item.isOffer === true
-        ? `${item_name} (Offer)`
-        : item_name,
+          ? `${item_name} (Offer)`
+          : item_name,
       item.quantity,
       item.MRP,
       salePrice,
@@ -157,8 +161,7 @@ function generateFooter(invoice, doc) {
     )
     .text(`Applied coupon discount : ${invoice.appliedDiscount}`, 50, 560)
     .text(
-      `Applied Coupon : ${
-        invoice.appliedCoupon ? invoice.appliedCoupon : "None"
+      `Applied Coupon : ${invoice.appliedCoupon ? invoice.appliedCoupon : "None"
       }`,
       50,
       580
