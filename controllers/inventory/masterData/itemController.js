@@ -1279,7 +1279,7 @@ const saveItem = async (req, res, next) => {
         });
       }
 
-      if (!name || name > 250 || !itemCode || itemCode > 200) {
+      if (!name || !itemCode ) {
         return res.status(200).send({
           status: 400,
           message: "Please enter correct details for item name and item code",
@@ -1288,7 +1288,7 @@ const saveItem = async (req, res, next) => {
       }
 
       if (detailsChangedFlag == "Y") {
-        const updatedRows = await Item.update(
+        const updateRows = await Item.update(
           {
             brand_id: brandId,
             category_id: categoryId,
@@ -1322,6 +1322,44 @@ const saveItem = async (req, res, next) => {
             where: { id },
           }
         );
+        const updatedRows = await Item.findOne({ where: { id } });
+        response = {
+          id: newItemFromDB.id,
+          createdBy: updatedRows.created_by,
+          createdAt: updatedRows.created_at,
+          updatedBy: updatedRows.updated_by,
+          updatedAt: updatedRows.updated_at,
+          isActive: "Y",
+          name: updatedRows.name,
+          itemCode: updatedRows.item_cd,
+          uom: updatedRows.UOM,
+          units: updatedRows.units,
+          brandId: updatedRows.brand_id,
+          divisionId: updatedRows.div_id,
+          categoryId: updatedRows.category_id,
+          subCategoryId: updatedRows.sub_category_id,
+          departmentId: updatedRows.department_id,
+          colourId: updatedRows.color_id,
+          sizeId: updatedRows.size_id,
+          availableForEcomm: updatedRows.available_for_ecomm,
+          isGift: updatedRows.is_gift,
+          isGrocernest: updatedRows.is_grocernest,
+          image: updatedRows.image,
+          description: updatedRows.description,
+          howToUse: updatedRows.how_to_use,
+          countryOfOrigin: updatedRows.country_of_origin,
+          manufactureName: updatedRows.manufacturer_name,
+          ingredients: updatedRows.ingredients,
+          showDiscount: updatedRows.show_discount,
+          itemTaxInfoList: taxResolved,
+          stockFromInventory: inventoryResolved,
+          availableBatches: null,
+        };
+        return res.status(200).send({
+          status: 200,
+          message: "Successfully updated the item",
+          data : response
+        })
       } else {
         const newItem = await Item.create({
           name,
