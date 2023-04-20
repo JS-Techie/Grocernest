@@ -766,7 +766,30 @@ const InvoiceGen = async (
       where: { cust_no: currentCustomer },
     });
 
+
+    let totalPrice=0
     const promises = currentOrder.t_order_items_models.map(async (current) => {
+
+      let itemIsX = 0
+      const [itemIsOfferX, metadata] = await sequelize.query(`select * from t_offers where item_x=${current.item_id} and item_x_quantity=${current.quantity} and is_active=1`)
+      // console.log("YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY", itemIsOfferX)
+      if (itemIsOfferX.length === 0) {
+        itemIsX = 0
+      }
+      else {
+        itemIsX = 1
+      }
+
+      if(itemIsX === 1){
+        totalPrice  = totalPrice + parseInt(current.MRP)*parseInt(current.quantity)
+      }
+      if(itemIsX === 0 && current.isOffer === 0){
+        totalPrice = totalPrice + parseInt(current.sale_price)*parseInt(current.quantity)
+      }
+
+
+
+
       const item = await Item.findOne({
         where: { id: current.item_id },
       });
@@ -814,15 +837,16 @@ const InvoiceGen = async (
           }
         });
         return {
-          itemName: item.name,
-          quantity: current.quantity,
-          MRP: oldestBatch ? oldestBatch.MRP : "",
-          image: item.image,
-          description: item.description,
-          isGift: item.is_gift == 1 ? true : false,
-          isOffer: current.is_offer == 1 ? true : false,
-          offerPrice: current.is_offer == 1 ? current.offer_price : "",
-          salePrice: oldestBatch.sale_price,
+          "itemName": item.name,
+          "quantity": current.quantity,
+          "MRP": oldestBatch ? oldestBatch.MRP : "",
+          "image": item.image,
+          "description": item.description,
+          "itemIsX": itemIsX,
+          "isGift": item.is_gift == 1 ? true : false,
+          "isOffer": current.is_offer == 1 ? true : false,
+          "offerPrice": current.is_offer == 1 ? current.offer_price : "",
+          "salePrice": oldestBatch.sale_price,
         };
       }
     });
@@ -835,7 +859,7 @@ const InvoiceGen = async (
       orderID: currentOrder.order_id,
       status: currentOrder.status,
       address: currentOrder.address,
-      total: currentOrder.total,
+      total: totalPrice,
       date: currentOrder.created_at,
       payableTotal: currentOrder.final_payable_amount,
       walletBalanceUsed: currentOrder.wallet_balance_used
