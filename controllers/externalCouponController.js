@@ -39,16 +39,17 @@ const searchTotalPurchaseController = async (req, res) => {
     try {
 
         // console.log(":::::::::::::::::::::::::::::", randomAlphanumericStringGenerator(7))
-        const phoneNum = phoneNumber ? `and t_customer.contact_no= "${phoneNumber}"` : ``
-        const innerJoinQuery = phoneNumber ? `inner join t_customer on t_order.cust_no = t_customer.cust_no` : ``
-        const dateRange = dateSelection === "L" ? "month(t_order.created_at)=month(now())-1 " : `t_order.created_at between "${fromDate}" and "${toDate}"`
+        const phoneNum = phoneNumber ? `and t_customer.contact_no like "%${phoneNumber}%"` : ``
+        const innerJoinQuery = phoneNumber ? `inner join t_customer on t_invoice.cust_id = t_customer.id` : ``
+        const dateRange = dateSelection === "L" ? "month(t_invoice.created_at)=month(now())-1 " : `t_invoice.created_at between "${fromDate}" and "${toDate}"`
         const amountRange = amountGreaterThan ? `where T2.total_purchase>= ${amountGreaterThan} ` : ``
 
 
-        const searchCustomersForCouponsQuery = `select T2.*, t_customer.cust_name, t_customer.contact_no from 
-        (select *, sum(T1.final_payable_amount) as total_purchase
+        const searchCustomersForCouponsQuery = `select T2.*, t_customer.cust_no as cust_no, t_customer.cust_name, t_customer.contact_no from 
+        (select *, sum(T1.total_amount) as total_purchase
          from 
-        (select t_order.* from t_order ${innerJoinQuery} where ${dateRange} ${phoneNum})T1 group by T1.cust_no)T2 inner join t_customer on T2.cust_no = t_customer.cust_no ${amountRange}`
+        (select t_invoice.* from t_invoice ${innerJoinQuery} where ${dateRange} and total_quantity>0 and payment_conf_ind ='Y' and invoice_type= "Normal" ${phoneNum})T1 group by T1.cust_id)T2 
+        inner join t_customer on T2.cust_id = t_customer.id ${amountRange}`
 
 
         const [searchResults, metadata] = await sequelize.query(searchCustomersForCouponsQuery)
@@ -422,14 +423,14 @@ const viewRedeemHistory = async (req, res) => {
     const {
         fromDate,
         toDate
-    }= req.body
+    } = req.body
 
     try {
 
         // console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", fromDate)
-        let dateQuery=``
-        if (fromDate && toDate){
-            dateQuery= `and t_ext_coupon.redemption_date>= "${fromDate}" and t_ext_coupon.redemption_date<="${toDate}"`
+        let dateQuery = ``
+        if (fromDate && toDate) {
+            dateQuery = `and t_ext_coupon.redemption_date>= "${fromDate}" and t_ext_coupon.redemption_date<="${toDate}"`
         }
 
 
@@ -441,7 +442,7 @@ const viewRedeemHistory = async (req, res) => {
         // console.log("============================", redeemHistory)
 
         let sumAmount = 0
-        for (let i in redeemHistory){
+        for (let i in redeemHistory) {
             sumAmount = sumAmount + parseInt(redeemHistory[i].coupon_amount)
         }
 
@@ -452,7 +453,7 @@ const viewRedeemHistory = async (req, res) => {
             "redeemHistory": redeemHistory
         }
 
-        if(redeemHistory.length === 0){
+        if (redeemHistory.length === 0) {
             return res.status(400).send({
                 success: false,
                 data: [],
