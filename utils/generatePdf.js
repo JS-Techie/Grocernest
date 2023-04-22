@@ -97,7 +97,7 @@ function generateInvoiceTable(doc, invoice) {
     return currentItem != undefined;
   });
 
-  console.log(orderItems);
+  console.log("(((((((())))))))",orderItems);
   let last_position = 0;
 
   for (i = 0; i < orderItems.length; i++) {
@@ -113,6 +113,15 @@ function generateInvoiceTable(doc, invoice) {
       salePrice = item.salePrice;
       total = salePrice * item.quantity;
     }
+    if (item.isOffer === true && item.itemIsX === 0) {
+      salePrice = 0;
+      total = salePrice * item.quantity;
+    }
+
+    if (item.itemIsX === 1) {
+      salePrice = item.MRP;
+      total = salePrice * item.quantity;
+    }
 
     let item_name = item.itemName;
     if (item_name.length > 15) {
@@ -123,13 +132,15 @@ function generateInvoiceTable(doc, invoice) {
       position,
       item.isGift === true
         ? `${item_name} (Gift)`
-        : item.isOffer === true
-        ? `${item_name} (Offer)`
-        : item_name,
+        : (item.isOffer === true && item.itemIsX === 0)
+          ? `${item_name} (Free)`
+          : item.itemIsX === 1 
+            ? `${item_name} (Offer)`
+            : item_name,
       item.quantity,
       item.MRP,
-      salePrice,
-      total
+      (item.isOffer === true && item.itemIsX === 0) ? 0 : salePrice,
+      (item.isOffer === true && item.itemIsX === 0) ? 0 : total
     );
     generateHr(doc, position + 20);
     last_position = position + 20;
@@ -157,8 +168,7 @@ function generateFooter(invoice, doc) {
     )
     .text(`Applied coupon discount : ${invoice.appliedDiscount}`, 50, 560)
     .text(
-      `Applied Coupon : ${
-        invoice.appliedCoupon ? invoice.appliedCoupon : "None"
+      `Applied Coupon : ${invoice.appliedCoupon ? invoice.appliedCoupon : "None"
       }`,
       50,
       580

@@ -507,7 +507,7 @@ const offerForItemBuyNow = async (req, res, next) => {
               ? "Not enough items to avail offer"
               : yItemResponse,
           //total: oldestBatch.sale_price * quantity,
-          total: oldestBatch.MRP * quantity,
+          total: oldestBatch.sale_price * quantity,
           DBresponse: saveAllOfferItemInCache,
         },
         message: (yItem.length>0) ? "Offer successfully applied for current item" : "Not enough items to avail offer",

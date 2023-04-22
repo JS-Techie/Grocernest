@@ -2,6 +2,7 @@ const { generatePdf } = require("../utils/generatePdf");
 const fs = require("fs");
 const db = require("../models");
 const { uploadToS3, checkIfFileExists } = require("../services/s3Service");
+const {sequelize}=  require("../models");
 
 const Order = db.OrderModel;
 const OrderItems = db.OrderItemsModel;
@@ -14,6 +15,7 @@ const TaxInfo = db.ItemTaxInfoModel;
 const Coupon = db.CouponsModel;
 
 const downloadInvoice = async (req, res, next) => {
+  console.log("XXXXXXXXXXXXXXXXXXXXXHITXXXXXXXXXXXXXXXXXX",)
   //Get current user from jwt
   const currentCustomer = req.cust_no;
 
@@ -67,6 +69,21 @@ const downloadInvoice = async (req, res, next) => {
     }
 
     const promises = currentOrder.t_order_items_models.map(async (current) => {
+
+      // console.log(":::::::::::::::::::::::::::::::::::::::::", current)
+      
+      let itemIsX=0
+        const [itemIsOfferX, metadata] = await sequelize.query(`select * from t_offers where item_x=${current.item_id} and item_x_quantity=${current.quantity} and is_active=1`)
+        console.log("========================::::::::::", itemIsOfferX)
+        if(itemIsOfferX.length === 0){
+          itemIsX=0
+        }
+        else{
+          itemIsX=1
+        }
+
+
+
       const item = await Item.findOne({
         where: { id: current.item_id },
       });
@@ -118,15 +135,16 @@ const downloadInvoice = async (req, res, next) => {
           }
         });
         return {
-          itemName: item.name,
-          quantity: current.quantity,
-          MRP: oldestBatch ? oldestBatch.MRP : "",
-          image: item.image,
-          description: item.description,
-          isGift: item.is_gift == 1 ? true : false,
-          isOffer: current.is_offer == 1 ? true : false,
-          offerPrice: current.is_offer == 1 ? current.offer_price : "",
-          salePrice: oldestBatch.sale_price,
+          "itemName": item.name,
+          "quantity": current.quantity,
+          "MRP": oldestBatch ? oldestBatch.MRP : "",
+          "image": item.image,
+          "description": item.description,
+          "itemIsX" : itemIsX,
+          "isGift": item.is_gift == 1 ? true : false,
+          "isOffer": current.is_offer == 1 ? true : false,
+          "offerPrice": current.is_offer == 1 ? current.offer_price : "",
+          "salePrice": oldestBatch.sale_price,
         };
       }
     });
