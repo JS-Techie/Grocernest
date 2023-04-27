@@ -63,8 +63,8 @@ const fetchCustomerReport = async (req, res) => {
       const [customer_purchase_count_report, metadata] = await sequelize.query(
         `      select t_customer.cust_no,t_customer.id, count(t_invoice.id) as customer_purchase_count from t_customer
         inner join t_invoice on t_invoice.cust_id = t_customer.id ` +
-          date_field_query_add_on_2 +
-          ` and t_invoice.payment_conf_ind = "Y" group by t_customer.cust_no 
+        date_field_query_add_on_2 +
+        ` and t_invoice.payment_conf_ind = "Y" group by t_customer.cust_no 
           order by customer_purchase_count desc`
       );
 
@@ -107,6 +107,90 @@ const fetchCustomerReport = async (req, res) => {
   }
 };
 
+
+
+
+const fetchItemtoCustomerReport = async (req, res) => {
+
+  const {
+    item_id,
+    start_date,
+    end_date
+  } = req.body
+
+  if (!item_id || item_id === "" || !start_date || start_date === "" || !end_date || end_date === "") {
+    return res.status(400).send({
+      success: false,
+      data: "",
+      message: "No customer is available in this customer number.",
+    });
+  }
+
+
+  try {
+
+    const CustomerIDforDateQuery = ` 
+    select cust_id, created_at, count(*) as quantity  from t_invoice where id in 
+    (select invoice_id from t_invoice_item_dtls where item_id = ${item_id} and created_at between "${start_date}" and "${end_date}") group by Date(created_at) 
+    `
+
+    const [CustomerIDforDateResult, metadata] = await sequelize.query(CustomerIDforDateQuery)
+
+    if (CustomerIDforDateResult.length === 0) {
+      return res.status(400).send({
+        success: false,
+        data: "",
+        message: "No customer is available corresponding this item.",
+      })
+    }
+
+    // console.log("::::::::::::::::::::", CustomerIDforDateResult)
+    const [itemName, metadata2] = await sequelize.query(`select * from t_item where id=${item_id}`)
+
+
+    let responseArray = []
+
+    for (i in CustomerIDforDateResult) {
+      const eachCustomer = CustomerIDforDateResult[i]
+      const [customerDetails, metadata1] = await sequelize.query(`select * from t_customer where id=${eachCustomer.cust_id}`)
+
+      // console.log("((((((((((((((((((()))))))))))))))))))", customerDetails)
+
+      const response = {
+        itemName: itemName[0].name,
+        custName: customerDetails[0].cust_name,
+        custPhone: customerDetails[0].contact_no,
+        quantity: eachCustomer.quantity,
+        invoiceDate: eachCustomer.created_at,
+        custId: eachCustomer.cust_id
+      }
+
+      // console.log("++++++++++++++++++++++", response)
+
+      responseArray.push(response)
+    }
+
+    return res.status(200).send({
+      success: true,
+      data: responseArray,
+      message: "successfully fetched multiple item corresponding customer data.",
+    });
+
+  }
+  catch (error) {
+    return res.status(400).send({
+      success: false,
+      data: error.message,
+      message:
+        "Something went wrong while fetching multiple customer report data.",
+    });
+  }
+
+}
+
+
+
 module.exports = {
   fetchCustomerReport,
+  fetchItemtoCustomerReport
 };
