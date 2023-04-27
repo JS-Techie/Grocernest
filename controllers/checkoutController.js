@@ -412,7 +412,7 @@ const buyNow = async (req, res, next) => {
             inner join t_lkp_category on t_lkp_category.id = t_item.category_id)
             inner join t_lkp_brand on t_lkp_brand.id = t_item.brand_id)
             inner join t_inventory on t_inventory.item_id = t_item.id)
-             where t_item.id = ${itemID} and t_inventory.location_id = 4 and t_lkp_category.available_for_ecomm = 1 and t_item.available_for_ecomm = 1 `);
+            where t_item.id = ${itemID} and t_inventory.location_id = 4 and t_lkp_category.available_for_ecomm = 1 and t_item.available_for_ecomm = 1 `);
 
     if (currentItemDetails.length === 0) {
       return res.status(404).send({
@@ -437,6 +437,7 @@ const buyNow = async (req, res, next) => {
     }
 
     const newOrder = await Order.create({
+
       cust_no: currentUser,
       order_id: Math.floor(Math.random() * 10000000 + 1),
       status: "Placed",
@@ -449,6 +450,7 @@ const buyNow = async (req, res, next) => {
       cashback_amount: cashback_amount,
       item_wallet_used,
       coupon_id,
+
     });
 
     const user_wallet = await Wallet.findOne({
@@ -516,28 +518,32 @@ const buyNow = async (req, res, next) => {
       if (oldestBatch) {
         if (offer.is_percentage) {
           newSalePrice =
-            oldestBatch.sale_price -
-            (offer.amount_of_discount / 100) * oldestBatch.sale_price;
+            oldestBatch.MRP -
+            (offer.amount_of_discount / 100) * oldestBatch.MRP;
         } else {
-          newSalePrice = oldestBatch.sale_price - offer.amount_of_discount;
+          newSalePrice = oldestBatch.MRP - offer.amount_of_discount;
         }
       }
     }
+
+    /**
+     * TODO: In buyNow it's 
+     */
+    const offerItem = await OffersCache.findOne({
+      where: { cust_no: currentUser },
+    });
 
     orderItems.push({
       order_id: newOrder.order_id,
       item_id: itemID,
       quantity,
       created_by: newOrder.created_by,
-      is_offer: offer ? 1 : null,
+      is_offer: null,
       offer_price: offer ? newSalePrice : null,
       MRP: oldestBatch.MRP,
       sale_price: oldestBatch.sale_price,
-      cashback_amount: cashback_amount,
-    });
-
-    const offerItem = await OffersCache.findOne({
-      where: { cust_no: currentUser },
+      cashback_amount: cashback_amount
+      //cashback_amount: offerItem ? 0 : cashback_amount,
     });
 
     let deletedFromCache;
@@ -548,7 +554,7 @@ const buyNow = async (req, res, next) => {
         quantity: offerItem.quantity,
         created_by: newOrder.created_by,
         is_offer: 1,
-        offer_price: 0,
+        offer_price: 0
       });
 
       deletedFromCache = await OffersCache.destroy({
