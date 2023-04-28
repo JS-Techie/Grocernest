@@ -130,7 +130,7 @@ const fetchItemtoCustomerReport = async (req, res) => {
   try {
 
     const CustomerIDforDateQuery = ` 
-    select cust_id, created_at, count(*) as quantity  from t_invoice where id in 
+    select cust_id, Date(created_at) as InvDate, count(*) as quantity  from t_invoice where id in 
     (select invoice_id from t_invoice_item_dtls where item_id = ${item_id} and created_at between "${start_date}" and "${end_date}") group by Date(created_at) 
     `
 
@@ -161,7 +161,7 @@ const fetchItemtoCustomerReport = async (req, res) => {
         custName: customerDetails[0].cust_name,
         custPhone: customerDetails[0].contact_no,
         quantity: eachCustomer.quantity,
-        invoiceDate: eachCustomer.created_at,
+        invoiceDate: eachCustomer.InvDate,
         custId: eachCustomer.cust_id
       }
 
